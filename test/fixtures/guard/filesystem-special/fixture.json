@@ -1,0 +1,6 @@
+{
+  "expect": "filesystem",
+  "fifos": [
+    "skills/apple/.vendor/demo-part/pipe"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-notarization",
+  "name": "asc-notarization",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-notarization",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+    "A Developer ID Application certificate, which only the Account Holder can create.",
+    "An Xcode project for the archive steps; apps built without Xcode use only the notarize and staple steps."
+  ],
+  "risks": [
+    "Submits the app to Apple's notary service."
+  ],
+  "errata": [
+    "SKILL.md:152-153 staple a DMG that was never submitted for notarization; submit the DMG itself before stapling it."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "e3e674725cd8f3fa422ce80c516eb2292b39e888473271b9053391abfd906b82",
+      "bytes": 7142,
+      "executable": false
+    }
+  ]
+}

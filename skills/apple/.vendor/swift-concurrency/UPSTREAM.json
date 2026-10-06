@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "id": "swift-concurrency",
+  "name": "swift-concurrency",
+  "repo": "AvdLee/Swift-Concurrency-Agent-Skill",
+  "commit": "d5770817d2622e1585b1f7eaebc791a9cb0959c8",
+  "path": "skills/swift-concurrency",
+  "exclude": [
+    "agents/**",
+    "assets/**"
+  ],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "Access to the module's build settings: read default isolation, NonisolatedNonsendingByDefault and the strict-concurrency level from Package.swift, the .pbxproj or the swiftc build script before advising."
+  ],
+  "risks": [
+    "About 80 links point to the author's paid course; they are optional reading."
+  ],
+  "errata": [
+    "SKILL.md:89: withTaskGroup always waits for its child tasks and does not cancel them automatically (Apple documentation).",
+    "references/threading.md:306, :342 and :470 tie Swift 6.2 features to Xcode 16+; Swift 6.2 ships with Xcode 26.",
+    "SKILL.md:20 names swiftLanguageVersions, which is deprecated."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "8c667b2ff988251c7c291abe046b77d7b8fcfbe3b5ed36961e25e224b1ead491",
+      "bytes": 12852,
+      "executable": false
+    },
+    {
+      "path": "references/_index.md",
+      "sha256": "7e9e076d885ef05402a67aa8a84b83e63a3c29b3d005816f6acb4c30b6d76531",
+      "bytes": 2150,
+      "executable": false
+    },
+    {
+      "path": "references/actors.md",
+      "sha256": "2de7cebbdd1cbc2b7c9312c7b59a3f44ada0456b6e74579aae7fba3e02b0b5fe",
+      "bytes": 17545,
+      "executable": false
+    },
+    {
+      "path": "references/async-algorithms.md",
+      "sha256": "9e16790e9b81850a37b3de995220074491f3efd5accab1f5daa0a633625fed40",
+      "bytes": 20705,
+      "executable": false
+    },
+    {
+      "path": "references/async-await-basics.md",
+      "sha256": "e550aba692af77cf660ad6f754a65c52b01505cad234d159a6d47a919faaf536",
+      "bytes": 7686,
+      "executable": false
+    },
+    {
+      "path": "references/async-sequences.md",
+      "sha256": "33d853118e37c1ac380c253200571efa44fe7127b9b6512ba95b43e670a5f453",
+      "bytes": 17136,
+      "executable": false
+    },
+    {
+      "path": "references/core-data.md",
+      "sha256": "c89c4846fa64a2389abf807684ed373a6c0e6d16351dfa051e1fd71b85444d00",
+      "bytes": 14888,
+      "executable": false
+    },
+    {
+      "path": "references/glossary.md",
+      "sha256": "20dd1f05717810944af675db215d758efa5d1c7b487ee007faae1ec4e2a7c36f",
+      "bytes": 7081,
+      "executable": false
+    },
+    {
+      "path": "references/linting.md",
+      "sha256": "ead994f6e254208acf298a588ad9a49bbd9779530f31e01c74c4d32d06a7bd4a",
+      "bytes": 5334,
+      "executable": false
+    },
+    {
+      "path": "references/memory-management.md",
+      "sha256": "28dcb8a7ff7411390ca0b7f1b0db16d6b00c3705bd6ed1f9b649c476bf0a7554",
+      "bytes": 12736,
+      "executable": false
+    },
+    {
+      "path": "references/migration.md",
+      "sha256": "9115da8228d3a19426869627c28b7ed444f8d783723039293cceb46a1fc1c570",
+      "bytes": 33770,
+      "executable": false
+    },
+    {
+      "path": "references/observation.md",
+      "sha256": "940c085d43e2e067848d7caf95731fb1335c3f16f83ebe43b06549021a29f1b1",
+      "bytes": 14212,
+      "executable": false
+    },
+    {
+      "path": "references/performance.md",
+      "sha256": "dfd74c1c592ce42c520b54a309ba2b50e228608efa055fd6b597067e9ad71668",
+      "bytes": 15490,
+      "executable": false
+    },
+    {
+      "path": "references/sendable.md",
+      "sha256": "af8e026b3c205d3c3acb58bf9a59e456f063f564845f38020a91cac511a08ca8",
+      "bytes": 13603,
+      "executable": false
+    },
+    {
+      "path": "references/tasks.md",
+      "sha256": "0401a762683454149d5ca532684901f4fb5597a6821acacc8d49d037db9a37e9",
+      "bytes": 17019,
+      "executable": false
+    },
+    {
+      "path": "references/testing.md",
+      "sha256": "3df9e839b3338dd473115d9ac8787a42d91b50a537fe40c55cf66d21034679db",
+      "bytes": 13757,
+      "executable": false
+    },
+    {
+      "path": "references/threading.md",
+      "sha256": "0a4e44bd27fdf852cf5f8f5aa64cfe15ba229fb7c885b3f69ed2afdbfac8752a",
+      "bytes": 16440,
+      "executable": false
+    }
+  ]
+}

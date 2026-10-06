@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-whats-new-writer",
+  "name": "asc-whats-new-writer",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-whats-new-writer",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "Drafting and localizing (phases 1-3) need no asc when the user supplies keywords.",
+    "Uploading needs a paid Apple Developer Program account and asc with an App Store Connect API key."
+  ],
+  "risks": [
+    "Uploads release notes and promotional text after approval (SKILL.md:143-145)."
+  ],
+  "errata": [
+    "Overstates promotional text as the only field editable without a new submission."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "592c33a56caf79e60598f48c01be1bac2d4ef57fb9148805993c44383ea8e78d",
+      "bytes": 7178,
+      "executable": false
+    },
+    {
+      "path": "references/release_notes_guidelines.md",
+      "sha256": "b4a33667d0745b9f7b9539a07673327d57582a2fefee098881b722538ed2902f",
+      "bytes": 5081,
+      "executable": false
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "id": "swift-testing-pro",
+  "name": "swift-testing-pro",
+  "repo": "twostraws/Swift-Testing-Agent-Skill",
+  "commit": "2d6bba14a3c8bf3694f218b92fffe617c41ae43e",
+  "path": "swift-testing-pro",
+  "exclude": [
+    "skills/**",
+    ".claude-plugin/**",
+    "agents/**",
+    "assets/**"
+  ],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "b9b479e6df9f27cbc8e7abe91f771b396f3f0fa114d070c7c0b02c820c6b74dc",
+    "copyright": "Copyright (c) 2026 Paul Hudson."
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "A Swift toolchain with Swift Testing."
+  ],
+  "risks": [
+    "references/async-tests.md:3 and references/writing-better-tests.md:36 suggest installing the author's concurrency and SwiftUI skills; use the matching apple parts instead."
+  ],
+  "errata": [
+    "Does not cover the Swift Testing additions in Swift 6.3 and 6.4."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "b9b479e6df9f27cbc8e7abe91f771b396f3f0fa114d070c7c0b02c820c6b74dc",
+      "bytes": 1068,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "ad4f1bff44b5b7fce20b282481e651876efce024d13b16cb969bc433036ac059",
+      "bytes": 4302,
+      "executable": false
+    },
+    {
+      "path": "references/async-tests.md",
+      "sha256": "bc6e0eabd10377b5796e9e554a4965a78b7d1aaba8f11021c2a63b6e8a9e669a",
+      "bytes": 8535,
+      "executable": false
+    },
+    {
+      "path": "references/core-rules.md",
+      "sha256": "2271efdca6c2b7b3365501172147884b6e786bcee7bef680fb4f4718929d6180",
+      "bytes": 4032,
+      "executable": false
+    },
+    {
+      "path": "references/migrating-from-xctest.md",
+      "sha256": "35b64812402ad1d15b496993e1721daaf4e80672bf9cce47078f772fd271f93f",
+      "bytes": 2072,
+      "executable": false
+    },
+    {
+      "path": "references/new-features.md",
+      "sha256": "988df5cb556893c789f9aecdc4c8773fdbbda787ab1dad766bf1182a7b9a4819",
+      "bytes": 10202,
+      "executable": false
+    },
+    {
+      "path": "references/writing-better-tests.md",
+      "sha256": "25da3455f6cec4f10d3dff0bf3e8e1372568c75691916541b4d517f451cb8bf1",
+      "bytes": 11008,
+      "executable": false
+    }
+  ]
+}

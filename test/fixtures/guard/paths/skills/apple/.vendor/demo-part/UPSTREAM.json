@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "demo-part",
+  "name": "demo-part",
+  "repo": "example/demo-skills",
+  "commit": "0123456789abcdef0123456789abcdef01234567",
+  "path": "skills/demo-part",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "67b53e3340dee5b65e4431674ff654e3e7a40d26325777f20c161585b5f055ef",
+    "copyright": "Copyright (c) 2026 Example Author"
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [],
+  "risks": [],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "67b53e3340dee5b65e4431674ff654e3e7a40d26325777f20c161585b5f055ef",
+      "bytes": 1071,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "7f5a11bd7b5112d252f8e729f133086dc90e7a65984262928e4b229cd601da17",
+      "bytes": 117,
+      "executable": false
+    },
+    {
+      "path": "../outside.md",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "bytes": 1,
+      "executable": false
+    }
+  ]
+}

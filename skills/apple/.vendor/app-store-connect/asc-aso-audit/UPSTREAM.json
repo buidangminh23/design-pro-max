@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-aso-audit",
+  "name": "asc-aso-audit",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-aso-audit",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "Offline checks of the ./metadata files need no asc.",
+    "Keyword gap analysis uses Astro MCP (optional, SKILL.md:15); the optimize plan needs Apple Ads credentials."
+  ],
+  "risks": [
+    "Its ASO claims are unverified."
+  ],
+  "errata": [
+    "SKILL.md:105 counts keywords in characters; the limit is 100 bytes."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "7cabafa6277c1b1a2d4f14aae0134d05147040ce887a6a1239ad55e63a017694",
+      "bytes": 11554,
+      "executable": false
+    },
+    {
+      "path": "references/aso_rules.md",
+      "sha256": "24db94262be1e22820d9afb0a3a8952790bdf2c7d4e6d82d24454dcac1361c47",
+      "bytes": 4068,
+      "executable": false
+    }
+  ]
+}

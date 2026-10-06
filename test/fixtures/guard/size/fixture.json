@@ -1,0 +1,9 @@
+{
+  "expect": "size",
+  "generate": [
+    {
+      "path": "skills/apple/.vendor/demo-part/references/big.md",
+      "bytes": 600000
+    }
+  ]
+}

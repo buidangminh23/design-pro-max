@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-signing-setup",
+  "name": "asc-signing-setup",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-signing-setup",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+    "The Account Holder role for Developer ID certificates.",
+    "A git repository for encrypted signing sync.",
+    "An Apple ID web session for App Groups."
+  ],
+  "risks": [
+    "Revokes certificates, deletes profiles and pushes signing material (SKILL.md:66-85) behind --confirm only; it says to review the plan (:137) but never to ask the user."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "7197b0780904541a62e3ae4949c89425d2dab276b2486285922775de6a81d16a",
+      "bytes": 9161,
+      "executable": false
+    }
+  ]
+}

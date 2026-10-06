@@ -1,0 +1,139 @@
+{
+  "schema": 1,
+  "id": "core-data-expert",
+  "name": "core-data-expert",
+  "repo": "AvdLee/Core-Data-Agent-Skill",
+  "commit": "855ca7d0df50e82b00c12881dd9cd23c19ef5f49",
+  "path": "core-data-expert",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "None beyond a project that uses Core Data."
+  ],
+  "risks": [
+    "Three short API-call code blocks closely match Apple documentation code (for example references/migration.md:34); they ship as upstream wrote them."
+  ],
+  "errata": [
+    "references/batch-operations.md:26-34: the batch insert handler always returns false, but Core Data keeps calling the handler until it returns true, so the insert never ends."
+  ],
+  "appleText": [
+    {
+      "file": "references/migration.md",
+      "lines": "34-45",
+      "source": "Code listings in Apple's Core Data documentation.",
+      "reason": "A short API-call code block (addPersistentStore with the automatic migration options) that closely matches Apple's listing, measured at 82 percent."
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "74cac8c2a86868a30d41769529ab45124098d89cebd65c2fa310dd52a5ff1b7e",
+      "bytes": 4894,
+      "executable": false
+    },
+    {
+      "path": "references/_index.md",
+      "sha256": "02c357fe6e02194baa3fc83088f41dea630c3bd6b07ae14f373c4c71601169f4",
+      "bytes": 4108,
+      "executable": false
+    },
+    {
+      "path": "references/batch-operations.md",
+      "sha256": "96ab160c97b15b661de854bd24a2e5e3a9b8ec05a51009f5fe98ad887e52e0e7",
+      "bytes": 14737,
+      "executable": false
+    },
+    {
+      "path": "references/cloudkit-integration.md",
+      "sha256": "550039d328a43519a2fb50ce3d8d8572a2ab8253991aa919ec33b849b60b56a8",
+      "bytes": 6368,
+      "executable": false
+    },
+    {
+      "path": "references/concurrency.md",
+      "sha256": "8e9713ad82219015cb318c328d74dbd023a7d4ac870a2ab998b329ce19e04d7a",
+      "bytes": 12808,
+      "executable": false
+    },
+    {
+      "path": "references/fetch-requests.md",
+      "sha256": "2b379b91bd699b5d7f52ce2a06e010fa6c725cac13c24e135d61d17c435d442c",
+      "bytes": 17542,
+      "executable": false
+    },
+    {
+      "path": "references/glossary.md",
+      "sha256": "0447b399a482f94ac30e361dead1ebaa125872ef408a63e72276c2bb734f7e7e",
+      "bytes": 5709,
+      "executable": false
+    },
+    {
+      "path": "references/migration.md",
+      "sha256": "29d44e4e606e186259fc3119b7724f8f04233a91988b527a4d9efc8ec854fa29",
+      "bytes": 10886,
+      "executable": false
+    },
+    {
+      "path": "references/model-configuration.md",
+      "sha256": "d3fcf2fd3653ecb3f74dd9acf995d2f659186f12404d111e7135d8d1bf1f192b",
+      "bytes": 14508,
+      "executable": false
+    },
+    {
+      "path": "references/performance.md",
+      "sha256": "dfa91b5614dd93f3e6b84726cec60d666d3f2b1e7b22fb018adddbfa49a5d437",
+      "bytes": 6378,
+      "executable": false
+    },
+    {
+      "path": "references/persistent-history.md",
+      "sha256": "19576751ee95cee482b87dbc53b50f0406907b94de6789dc834a28a96e4a9abd",
+      "bytes": 17470,
+      "executable": false
+    },
+    {
+      "path": "references/project-audit.md",
+      "sha256": "8cf020317265adb98a354074b12c741b5c7928a1c7546dae295b75129c1b0083",
+      "bytes": 2164,
+      "executable": false
+    },
+    {
+      "path": "references/saving.md",
+      "sha256": "7fc94a45be412f02a8c3cc25efbbb80e78fa8a6772993152dbf3205a9eb7b1f8",
+      "bytes": 13998,
+      "executable": false
+    },
+    {
+      "path": "references/stack-setup.md",
+      "sha256": "f0d6e5bee9af4608da07bf5894e6f67a65f310648a430668a9371ac3b28ad4e6",
+      "bytes": 17913,
+      "executable": false
+    },
+    {
+      "path": "references/testing.md",
+      "sha256": "7c94557f728a0832dc7f65d97e11f8308d15abe54a3da0b90cdafa8799496bdb",
+      "bytes": 7947,
+      "executable": false
+    },
+    {
+      "path": "references/threading.md",
+      "sha256": "9ff68f4f0a7a9060aab83b9ddded7035212b2fb048eb74ccefd69fc961c839b6",
+      "bytes": 14409,
+      "executable": false
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-submission-health",
+  "name": "asc-submission-health",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-submission-health",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+    "An Apple ID web session for App Privacy."
+  ],
+  "risks": [
+    "Its repairs edit the version and it can cancel a review; both need the user's authorization."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "e9c66fb0792807e39608a0eb624f70b5360b0b681d08e173fcaca6116b7c4dc1",
+      "bytes": 8810,
+      "executable": false
+    },
+    {
+      "path": "references/app-privacy.md",
+      "sha256": "671a31e9c1c236e23ad6b8d52874a7a86c5f9d939ffb87eb4a5e7e8341abc425",
+      "bytes": 1511,
+      "executable": false
+    },
+    {
+      "path": "references/digital-goods.md",
+      "sha256": "5beacf88fcfdcc661700666074a838813ac378fb91531230768b055b5f0cc802",
+      "bytes": 8758,
+      "executable": false
+    },
+    {
+      "path": "references/readiness-repairs.md",
+      "sha256": "da7a126bed827512d1f3ea5e95945419a2cb34b96230f4e7035225ed1b9a22e3",
+      "bytes": 5934,
+      "executable": false
+    }
+  ]
+}

@@ -1,0 +1,837 @@
+{
+  "schema": 1,
+  "parts": [
+    {
+      "id": "swiftui-expert-skill",
+      "repo": "AvdLee/SwiftUI-Agent-Skill",
+      "commit": "204dba7c67256a8b707ee3fbc5759a824191974f",
+      "path": "skills/swiftui-expert-skill",
+      "exclude": [
+        "agents/**",
+        "assets/**"
+      ],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "None for SwiftUI code work.",
+        "Trace recording and analysis (scripts/record_trace.py, scripts/analyze_trace.py) need python3 and Xcode's xctrace; run them outside the agent sandbox, one trace at a time on 8 GB Macs."
+      ],
+      "risks": [
+        "references/iphone-duo.md:69 points to RocketSim, a paid third-party app; install it only when the user asks."
+      ],
+      "errata": [
+        "references/latest-apis.md:381, :386 and :418 use APIs that are absent from Apple's documentation index (checked 2026-10-06).",
+        "references/latest-apis.md:402 and :406: .concentric is not a RoundedCornerStyle.",
+        "references/toolbar-patterns.md:33: .navigationBarLeading is deprecated as of SDK 27.2; use .topBarLeading.",
+        "references/latest-apis.md:5 points to a maintenance skill (.agents/skills/update-swiftui-apis) that does not ship with this part; ignore that instruction."
+      ],
+      "appleText": [
+        {
+          "file": "references/animation-advanced.md",
+          "lines": "369",
+          "source": "https://developer.apple.com/videos/",
+          "reason": "WWDC session titles, cited as sources."
+        },
+        {
+          "file": "references/charts-accessibility.md",
+          "lines": "113-119",
+          "source": "https://developer.apple.com/videos/",
+          "reason": "WWDC session titles, cited as sources."
+        },
+        {
+          "file": "references/latest-apis.md",
+          "lines": "312, 346, 371, 390, 421, 435, 453, 473, 479",
+          "source": "https://developer.apple.com/videos/",
+          "reason": "WWDC session titles, cited as sources."
+        },
+        {
+          "file": "references/liquid-glass.md",
+          "lines": "112",
+          "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+          "reason": "A phrase that matches the transcript of WWDC25 session 323: glass samples content from an area larger than itself."
+        },
+        {
+          "file": "references/liquid-glass.md",
+          "lines": "141, 407",
+          "source": "https://developer.apple.com/videos/",
+          "reason": "WWDC session titles, cited as sources."
+        },
+        {
+          "file": "references/macos-scenes.md",
+          "lines": "83, 110",
+          "source": "https://developer.apple.com/documentation/swiftui/menubarextra",
+          "reason": "Two phrases that match Apple's MenuBarExtra documentation: a persistent control in the system menu bar, and termination when the user removes the extra."
+        },
+        {
+          "file": "references/performance-patterns.md",
+          "lines": "164, 237, 291, 315",
+          "source": "https://developer.apple.com/videos/",
+          "reason": "WWDC session titles, cited as sources."
+        }
+      ]
+    },
+    {
+      "id": "swift-concurrency",
+      "repo": "AvdLee/Swift-Concurrency-Agent-Skill",
+      "commit": "d5770817d2622e1585b1f7eaebc791a9cb0959c8",
+      "path": "skills/swift-concurrency",
+      "exclude": [
+        "agents/**",
+        "assets/**"
+      ],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "Access to the module's build settings: read default isolation, NonisolatedNonsendingByDefault and the strict-concurrency level from Package.swift, the .pbxproj or the swiftc build script before advising."
+      ],
+      "risks": [
+        "About 80 links point to the author's paid course; they are optional reading."
+      ],
+      "errata": [
+        "SKILL.md:89: withTaskGroup always waits for its child tasks and does not cancel them automatically (Apple documentation).",
+        "references/threading.md:306, :342 and :470 tie Swift 6.2 features to Xcode 16+; Swift 6.2 ships with Xcode 26.",
+        "SKILL.md:20 names swiftLanguageVersions, which is deprecated."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "swift-testing-pro",
+      "repo": "twostraws/Swift-Testing-Agent-Skill",
+      "commit": "2d6bba14a3c8bf3694f218b92fffe617c41ae43e",
+      "path": "swift-testing-pro",
+      "exclude": [
+        "skills/**",
+        ".claude-plugin/**",
+        "agents/**",
+        "assets/**"
+      ],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "A Swift toolchain with Swift Testing."
+      ],
+      "risks": [
+        "references/async-tests.md:3 and references/writing-better-tests.md:36 suggest installing the author's concurrency and SwiftUI skills; use the matching apple parts instead."
+      ],
+      "errata": [
+        "Does not cover the Swift Testing additions in Swift 6.3 and 6.4."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "swiftdata-pro",
+      "repo": "twostraws/SwiftData-Agent-Skill",
+      "commit": "922d989473a9914210b41529a1ac5636aff4b8c1",
+      "path": "swiftdata-pro",
+      "exclude": [
+        "agents/**",
+        "assets/**"
+      ],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "None beyond a project that uses SwiftData."
+      ],
+      "risks": [
+        "references/core-rules.md:5 and :14 suggest installing the author's concurrency and SwiftUI skills; use the matching apple parts instead."
+      ],
+      "errata": [
+        "references/predicates.md:41 lists Collection.first as unsupported in #Predicate; `$0.tags.first == \"a\"` typechecks with Swift 6.4 (swiftc -typecheck, 2026-10-06; runtime untested).",
+        "Predates the WWDC26 SwiftData changes and gives migrations one rule (references/core-rules.md:12); use Apple's VersionedSchema documentation for migrations."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "core-data-expert",
+      "repo": "AvdLee/Core-Data-Agent-Skill",
+      "commit": "855ca7d0df50e82b00c12881dd9cd23c19ef5f49",
+      "path": "core-data-expert",
+      "exclude": [],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "None beyond a project that uses Core Data."
+      ],
+      "risks": [
+        "Three short API-call code blocks closely match Apple documentation code (for example references/migration.md:34); they ship as upstream wrote them."
+      ],
+      "errata": [
+        "references/batch-operations.md:26-34: the batch insert handler always returns false, but Core Data keeps calling the handler until it returns true, so the insert never ends."
+      ],
+      "appleText": [
+        {
+          "file": "references/migration.md",
+          "lines": "34-45",
+          "source": "Code listings in Apple's Core Data documentation.",
+          "reason": "A short API-call code block (addPersistentStore with the automatic migration options) that closely matches Apple's listing, measured at 82 percent."
+        }
+      ]
+    },
+    {
+      "id": "xcode-disk-cleanup",
+      "repo": "AvdLee/Xcode-Disk-Cleanup-Agent-Skill",
+      "commit": "304e86e619ac49cb12cb69969a0588400b17d64f",
+      "path": "xcode-disk-cleanup",
+      "exclude": [],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [
+        "macOS with Xcode's command line tools (xcrun, simctl) and python3.",
+        "Run the audit outside the agent sandbox; xcrun hits a cache error inside it."
+      ],
+      "risks": [
+        "Deletes only IDs from a displayed, frozen selection after the user's plain-language approval, and the agent then passes --confirm itself (SKILL.md:154-158, :209).",
+        "Moves most items to the Trash (scripts/xcode_disk_cleanup.py:1301), but simulator device and runtime deletion is permanent (:1254, :1264); get separate approval for it.",
+        "Never pass --scan-root on an external volume."
+      ],
+      "errata": [
+        "scripts/xcode_disk_cleanup.py:567 scans ~/Library/Developer/CoreSimulator/Caches/dyld; the dyld cache lives in /Library/Developer/CoreSimulator/Caches/dyld."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/xcode-build-orchestrator",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/xcode-build-orchestrator",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [
+        "Runs xcodebuild clean without asking first; tell the user before it runs.",
+        "scripts/benchmark_builds.py:225-245 deletes the folder passed as --derived-data-path; never pass a shared one.",
+        "Never use scripts/diagnose_compilation.py --per-file-timing; it relies on -debug-time-compilation.",
+        "SKILL.md:110 and references/orchestration-report-template.md:126 offer a community-results pull request; open one only when the user asks."
+      ],
+      "errata": [
+        "scripts/diagnose_compilation.py:172 passes -debug-time-compilation, which Swift 6.4 does not have.",
+        "references/build-settings-best-practices.md:153 predates Xcode 26."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/xcode-build-benchmark",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/xcode-build-benchmark",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [
+        "Runs xcodebuild clean without asking first; tell the user before it runs.",
+        "scripts/benchmark_builds.py:225-245 deletes the folder passed as --derived-data-path; never pass a shared one."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/xcode-build-fixer",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/xcode-build-fixer",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [
+        "Changes build settings and project files; apply only the items the user approved.",
+        "Runs xcodebuild clean without asking first; tell the user before it runs.",
+        "scripts/benchmark_builds.py:225-245 deletes the folder passed as --derived-data-path; never pass a shared one."
+      ],
+      "errata": [
+        "references/build-settings-best-practices.md:153 predates Xcode 26."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/xcode-compilation-analyzer",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/xcode-compilation-analyzer",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [
+        "Runs xcodebuild clean without asking first; tell the user before it runs.",
+        "Never use scripts/diagnose_compilation.py --per-file-timing; it relies on -debug-time-compilation."
+      ],
+      "errata": [
+        "-debug-time-compilation (SKILL.md:28, references/code-compilation-checks.md:11, scripts/diagnose_compilation.py:172) does not exist in Swift 6.4."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/xcode-project-analyzer",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/xcode-project-analyzer",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [],
+      "errata": [
+        "references/build-settings-best-practices.md:153 predates Xcode 26."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "xcode-build/spm-build-analysis",
+      "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+      "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+      "path": "skills/spm-build-analysis",
+      "exclude": [],
+      "active": false,
+      "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+      "prerequisites": [
+        "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+        "python3 for the bundled scripts.",
+        "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+      ],
+      "risks": [],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-cli-usage",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-cli-usage",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "`asc web api-keys create --output-dir ./keys` (SKILL.md:59-62) writes a private key into the working folder; keep keys outside any repository.",
+        "asc sends telemetry by default; run it with ASC_TELEMETRY_DISABLED=1.",
+        "Never run `asc install-skills`: it installs the same 25 skill names at an older commit."
+      ],
+      "errata": [
+        "SKILL.md:3 describes using asc 'in this repo', meaning the asc CLI repository, not the user's project."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-id-resolver",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-id-resolver",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-app-create-ui",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-app-create-ui",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "An Account Holder, Admin or App Manager role, and the Account Holder has signed the latest agreement.",
+        "The user's own signed-in browser session; Apple offers no API for creating app records."
+      ],
+      "risks": [
+        "Creates a permanent app record; its pause before Create covers standalone scripts only (SKILL.md:26), so stop before Create and ask."
+      ],
+      "errata": [],
+      "appleText": [
+        {
+          "file": "SKILL.md",
+          "lines": "131",
+          "source": "https://developer.apple.com/documentation/appstoreconnectapi/apps",
+          "reason": "An 18-word quote, attributed in place, of Apple's note that new apps are created on the App Store Connect website, not through the API."
+        }
+      ]
+    },
+    {
+      "id": "app-store-connect/asc-signing-setup",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-signing-setup",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "The Account Holder role for Developer ID certificates.",
+        "A git repository for encrypted signing sync.",
+        "An Apple ID web session for App Groups."
+      ],
+      "risks": [
+        "Revokes certificates, deletes profiles and pushes signing material (SKILL.md:66-85) behind --confirm only; it says to review the plan (:137) but never to ask the user."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-xcode-build",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-xcode-build",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "An Xcode project with working signing."
+      ],
+      "risks": [
+        "Uploads builds and can distribute or submit for review (SKILL.md:143-156, `publish appstore --submit --confirm`) without asking.",
+        "-allowProvisioningUpdates changes certificates and profiles."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-build-lifecycle",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-build-lifecycle",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "`builds expire-all` (dry run, then --confirm, SKILL.md:29-33) stops testing for testers.",
+        "SKILL.md:25 also submits with `publish appstore --submit --confirm`."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-testflight-orchestration",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-testflight-orchestration",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "Emails tester invitations and distributes builds (SKILL.md:21-26); only removing groups needs --confirm."
+      ],
+      "errata": [
+        "Omits that the first build in an external group needs Beta App Review (`builds add-groups ... --submit --confirm`, asc CLI README:281) and test information."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-crash-triage",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-crash-triage",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-analytics-reports",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-analytics-reports",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI with an Admin API key.",
+        "jq, openssl and a live app."
+      ],
+      "risks": [
+        "Creates report requests on App Store Connect; get explicit approval first."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-submission-health",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-submission-health",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "An Apple ID web session for App Privacy."
+      ],
+      "risks": [
+        "Its repairs edit the version and it can cancel a review; both need the user's authorization."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-release-flow",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-release-flow",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "`release stage --allow-deletes` deletes metadata and `review submit --confirm` submits for review; it requires a dry run first and asks before a multi-item submit."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-metadata-sync",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-metadata-sync",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "A push changes the live App Store listing."
+      ],
+      "errata": [
+        "SKILL.md:160 gives keywords as '100 comma-separated characters'; Apple counts 100 bytes, which matters for multi-byte text such as Vietnamese."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-localize-metadata",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-localize-metadata",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+      ],
+      "risks": [
+        "Uploads translated listing metadata after the user confirms the shown translations."
+      ],
+      "errata": [
+        "SKILL.md:93 and :108 give keywords as 'max 100 chars total'; the limit is 100 bytes."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-whats-new-writer",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-whats-new-writer",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "Drafting and localizing (phases 1-3) need no asc when the user supplies keywords.",
+        "Uploading needs a paid Apple Developer Program account and asc with an App Store Connect API key."
+      ],
+      "risks": [
+        "Uploads release notes and promotional text after approval (SKILL.md:143-145)."
+      ],
+      "errata": [
+        "Overstates promotional text as the only field editable without a new submission."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-aso-audit",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-aso-audit",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "Offline checks of the ./metadata files need no asc.",
+        "Keyword gap analysis uses Astro MCP (optional, SKILL.md:15); the optimize plan needs Apple Ads credentials."
+      ],
+      "risks": [
+        "Its ASO claims are unverified."
+      ],
+      "errata": [
+        "SKILL.md:105 counts keywords in characters; the limit is 100 bytes."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-screenshot-resize",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-screenshot-resize",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "sips, built into macOS, for checks and resizing.",
+        "Uploading needs a paid Apple Developer Program account and asc with an App Store Connect API key."
+      ],
+      "risks": [
+        "The batch alpha strip (SKILL.md:68-75) round-trips through JPEG and overwrites the originals; work on copies.",
+        "The upload step (SKILL.md:107) runs without --confirm."
+      ],
+      "errata": [
+        "SKILL.md:119 uses the profile 'sRGB IEC61966-2.1.icc', which macOS 27.2 does not ship; use 'sRGB Profile.icc'."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-shots-pipeline",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-shots-pipeline",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "AXe and Koubou 0.20.0 (install Koubou in a virtual environment).",
+        "bash 4 or later for `declare -A` (SKILL.md:205, :252, :316); macOS /bin/bash is 3.2."
+      ],
+      "risks": [
+        "Uploading is off by default (upload_enabled false); turning it on uploads screenshots to App Store Connect."
+      ],
+      "errata": [
+        "Device frames stop at iPhone 17 and iPhone Air."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-notarization",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-notarization",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "A Developer ID Application certificate, which only the Account Holder can create.",
+        "An Xcode project for the archive steps; apps built without Xcode use only the notarize and staple steps."
+      ],
+      "risks": [
+        "Submits the app to Apple's notary service."
+      ],
+      "errata": [
+        "SKILL.md:152-153 staple a DMG that was never submitted for notarization; submit the DMG itself before stapling it."
+      ],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-ad-hoc-distribution",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-ad-hoc-distribution",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The experimental `asc distribute` command.",
+        "A PKCS#12 signing identity, a devices file, an S3 bucket and jq."
+      ],
+      "risks": [
+        "Registers devices and creates provisioning profiles; it applies only after the user authorizes the exact plan hash (SKILL.md:44).",
+        "Treat the install URL as a secret."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-workflow",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-workflow",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI, jq and a trusted .asc/workflow.json file."
+      ],
+      "risks": [
+        "Runs shell commands from .asc/workflow.json, and its examples bake --confirm into stage, review submit and publish --submit; approve the file before running a workflow with submit or --confirm steps."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-apple-ads",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-apple-ads",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc ads auth status --validate` (SKILL.md:51) passes, and the user confirms a paid Apple Developer Program account; it uses Apple Ads OAuth, not the App Store Connect API key.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "An Apple Ads account with an OAuth client ID and team ID.",
+        "The asc CLI and jq."
+      ],
+      "risks": [
+        "Spends money; payloads with status PAUSED run without --confirm (SKILL.md:177).",
+        "Ad accounts cannot be deleted.",
+        "Its API claims were not checked against Apple Ads documentation."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-ppp-pricing",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-ppp-pricing",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "Existing in-app purchases or subscriptions."
+      ],
+      "risks": [
+        "Changes customer prices after a dry run with no ask step."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-subscription-localization",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-subscription-localization",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "Existing subscriptions."
+      ],
+      "risks": [
+        "Creates subscription localization versions that cannot be deleted."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-revenuecat-catalog-sync",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-revenuecat-catalog-sync",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, the RevenueCat MCP tools (mcp_RC_*) are available, and the user confirms a paid Apple Developer Program account.",
+      "prerequisites": [
+        "A paid Apple Developer Program account.",
+        "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+        "The RevenueCat MCP server (mcp_RC_* tools, SKILL.md:74-77) and a RevenueCat v2 API key."
+      ],
+      "risks": [
+        "Writes to App Store Connect and RevenueCat after asking."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "app-store-connect/asc-wall-submit",
+      "repo": "rorkai/app-store-connect-cli-skills",
+      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "path": "skills/asc-wall-submit",
+      "exclude": [],
+      "active": false,
+      "activation": "`command -v asc` succeeds, `gh auth status` succeeds, the user confirms a paid Apple Developer Program account, and the user explicitly asks for a Wall of Apps submission.",
+      "prerequisites": [
+        "The asc CLI and a signed-in gh.",
+        "An App Store app ID, or a TestFlight link plus an app name.",
+        "SKILL.md:25 runs its commands from an App-Store-Connect-CLI repository checkout."
+      ],
+      "risks": [
+        "Forks rorkai/App-Store-Connect-CLI and opens a public pull request under the user's account (asc CLI README:248)."
+      ],
+      "errata": [],
+      "appleText": []
+    },
+    {
+      "id": "macos-menubar-tuist-app",
+      "repo": "Dimillian/Skills",
+      "commit": "05ba982bfeb0d77d3c97d4542b0ee15034d05f84",
+      "path": "macos-menubar-tuist-app",
+      "exclude": [
+        "agents/**"
+      ],
+      "active": false,
+      "activation": "Tuist.swift and Project.swift exist in the working project and `tuist version` succeeds.",
+      "prerequisites": [
+        "Tuist on PATH and a Tuist-managed project (Tuist.swift and Project.swift)."
+      ],
+      "risks": [
+        "`tuist xcodebuild` may report to Tuist servers when the project is linked to a Tuist account (unverified)."
+      ],
+      "errata": [
+        "Never mentions MenuBarExtra; route scene and view APIs to swiftui-expert-skill.",
+        "TUIST_SKIP_UPDATE_CHECK does not appear in the strings of tuist 4.211.0."
+      ],
+      "appleText": []
+    }
+  ]
+}

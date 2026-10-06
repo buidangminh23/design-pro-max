@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-app-create-ui",
+  "name": "asc-app-create-ui",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-app-create-ui",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "An Account Holder, Admin or App Manager role, and the Account Holder has signed the latest agreement.",
+    "The user's own signed-in browser session; Apple offers no API for creating app records."
+  ],
+  "risks": [
+    "Creates a permanent app record; its pause before Create covers standalone scripts only (SKILL.md:26), so stop before Create and ask."
+  ],
+  "errata": [],
+  "appleText": [
+    {
+      "file": "SKILL.md",
+      "lines": "131",
+      "source": "https://developer.apple.com/documentation/appstoreconnectapi/apps",
+      "reason": "An 18-word quote, attributed in place, of Apple's note that new apps are created on the App Store Connect website, not through the API."
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "b3afdc3ff50fa47fc7a3d7de4d1ce6759518c503c6c12c8300202fc90ed1d237",
+      "bytes": 6138,
+      "executable": false
+    }
+  ]
+}

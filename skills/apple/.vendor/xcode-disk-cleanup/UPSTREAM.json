@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "id": "xcode-disk-cleanup",
+  "name": "xcode-disk-cleanup",
+  "repo": "AvdLee/Xcode-Disk-Cleanup-Agent-Skill",
+  "commit": "304e86e619ac49cb12cb69969a0588400b17d64f",
+  "path": "xcode-disk-cleanup",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "macOS with Xcode's command line tools (xcrun, simctl) and python3.",
+    "Run the audit outside the agent sandbox; xcrun hits a cache error inside it."
+  ],
+  "risks": [
+    "Deletes only IDs from a displayed, frozen selection after the user's plain-language approval, and the agent then passes --confirm itself (SKILL.md:154-158, :209).",
+    "Moves most items to the Trash (scripts/xcode_disk_cleanup.py:1301), but simulator device and runtime deletion is permanent (:1254, :1264); get separate approval for it.",
+    "Never pass --scan-root on an external volume."
+  ],
+  "errata": [
+    "scripts/xcode_disk_cleanup.py:567 scans ~/Library/Developer/CoreSimulator/Caches/dyld; the dyld cache lives in /Library/Developer/CoreSimulator/Caches/dyld."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "b070fa1eb8513db2d295cb178349204e52c7062305903931f4fa732888ce5b34",
+      "bytes": 12457,
+      "executable": false
+    },
+    {
+      "path": "references/generated-data.md",
+      "sha256": "ae47c06f56fef3f00aa781c18fbf668898b7b6746cba47c474f0d9e06c530e58",
+      "bytes": 2324,
+      "executable": false
+    },
+    {
+      "path": "references/release-artifacts.md",
+      "sha256": "966f0dfa74cd63aa128e2f8cdceb683c6a178c3f94d2d9566a8b16bdaa615227",
+      "bytes": 3247,
+      "executable": false
+    },
+    {
+      "path": "references/safety-model.md",
+      "sha256": "2b719d45b780fc4851a02627da90993a4334b053bbee017e60fd463bd5734fdc",
+      "bytes": 2935,
+      "executable": false
+    },
+    {
+      "path": "references/simulators.md",
+      "sha256": "e7edbeb3e1f89efe5745ec18c6158b6489b6f04a96c61e4d60913507dbd6ca51",
+      "bytes": 3657,
+      "executable": false
+    },
+    {
+      "path": "references/xcode-installations.md",
+      "sha256": "7a1fe1eabab0453ae290a7af430fde07fb523934774cbc5c4ceabc435797ff48",
+      "bytes": 1961,
+      "executable": false
+    },
+    {
+      "path": "scripts/xcode_disk_cleanup.py",
+      "sha256": "18b10694d5b597e37ea254f35ede86334bfbfe27b50e466ceb45508d22c5ffb9",
+      "bytes": 51483,
+      "executable": false
+    }
+  ]
+}

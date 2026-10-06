@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-metadata-sync",
+  "name": "asc-metadata-sync",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-metadata-sync",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+  ],
+  "risks": [
+    "A push changes the live App Store listing."
+  ],
+  "errata": [
+    "SKILL.md:160 gives keywords as '100 comma-separated characters'; Apple counts 100 bytes, which matters for multi-byte text such as Vietnamese."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "1a4b5b2dfc42a6fa95541f5ceff3b1a484c3b4f02eef2f0693237fbd927d9e1a",
+      "bytes": 7924,
+      "executable": false
+    }
+  ]
+}

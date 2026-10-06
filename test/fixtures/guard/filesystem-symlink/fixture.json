@@ -1,0 +1,9 @@
+{
+  "expect": "filesystem",
+  "symlinks": [
+    {
+      "path": "skills/apple/.vendor/demo-part/alias.md",
+      "target": "SKILL.md"
+    }
+  ]
+}

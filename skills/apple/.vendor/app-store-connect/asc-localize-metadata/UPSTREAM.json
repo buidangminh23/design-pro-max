@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-localize-metadata",
+  "name": "asc-localize-metadata",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-localize-metadata",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+  ],
+  "risks": [
+    "Uploads translated listing metadata after the user confirms the shown translations."
+  ],
+  "errata": [
+    "SKILL.md:93 and :108 give keywords as 'max 100 chars total'; the limit is 100 bytes."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "771f01d1007839fb25739e7b9e36d8077eefa54f92fdef77c883377630773c83",
+      "bytes": 11435,
+      "executable": false
+    }
+  ]
+}

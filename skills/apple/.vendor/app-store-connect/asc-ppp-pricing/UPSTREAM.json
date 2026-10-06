@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-ppp-pricing",
+  "name": "asc-ppp-pricing",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-ppp-pricing",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once).",
+    "Existing in-app purchases or subscriptions."
+  ],
+  "risks": [
+    "Changes customer prices after a dry run with no ask step."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "1f27077369ea6fd5564f415befea7272ef4ac70ae3677f9b7fc69ade9c28e359",
+      "bytes": 16881,
+      "executable": false
+    }
+  ]
+}

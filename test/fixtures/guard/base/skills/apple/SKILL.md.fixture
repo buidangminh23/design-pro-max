@@ -1,0 +1,8 @@
+---
+name: apple
+description: Fixture router used by the guard tests.
+---
+
+# apple
+
+Routes fixture tasks to `.vendor/demo-part/SKILL.md`.

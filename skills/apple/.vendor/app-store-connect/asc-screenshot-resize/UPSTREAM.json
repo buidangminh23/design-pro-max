@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-screenshot-resize",
+  "name": "asc-screenshot-resize",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-screenshot-resize",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "sips, built into macOS, for checks and resizing.",
+    "Uploading needs a paid Apple Developer Program account and asc with an App Store Connect API key."
+  ],
+  "risks": [
+    "The batch alpha strip (SKILL.md:68-75) round-trips through JPEG and overwrites the originals; work on copies.",
+    "The upload step (SKILL.md:107) runs without --confirm."
+  ],
+  "errata": [
+    "SKILL.md:119 uses the profile 'sRGB IEC61966-2.1.icc', which macOS 27.2 does not ship; use 'sRGB Profile.icc'."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "311b549c07d90ef5d0710217fb1936370714250e8edf7e1c74c76156e6a19637",
+      "bytes": 3708,
+      "executable": false
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "expect": "part-files",
+  "remove": [
+    "skills/apple/.vendor/demo-part/UPSTREAM.json"
+  ]
+}

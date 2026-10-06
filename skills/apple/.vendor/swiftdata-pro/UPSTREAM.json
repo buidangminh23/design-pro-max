@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "id": "swiftdata-pro",
+  "name": "swiftdata-pro",
+  "repo": "twostraws/SwiftData-Agent-Skill",
+  "commit": "922d989473a9914210b41529a1ac5636aff4b8c1",
+  "path": "swiftdata-pro",
+  "exclude": [
+    "agents/**",
+    "assets/**"
+  ],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "b9b479e6df9f27cbc8e7abe91f771b396f3f0fa114d070c7c0b02c820c6b74dc",
+    "copyright": "Copyright (c) 2026 Paul Hudson."
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "None beyond a project that uses SwiftData."
+  ],
+  "risks": [
+    "references/core-rules.md:5 and :14 suggest installing the author's concurrency and SwiftUI skills; use the matching apple parts instead."
+  ],
+  "errata": [
+    "references/predicates.md:41 lists Collection.first as unsupported in #Predicate; `$0.tags.first == \"a\"` typechecks with Swift 6.4 (swiftc -typecheck, 2026-10-06; runtime untested).",
+    "Predates the WWDC26 SwiftData changes and gives migrations one rule (references/core-rules.md:12); use Apple's VersionedSchema documentation for migrations."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "b9b479e6df9f27cbc8e7abe91f771b396f3f0fa114d070c7c0b02c820c6b74dc",
+      "bytes": 1068,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "79164f3bc4942b8ca384057cbe951ca7715aecee4970bea38781d91ddb1c442e",
+      "bytes": 3722,
+      "executable": false
+    },
+    {
+      "path": "references/class-inheritance.md",
+      "sha256": "05b22c87e9864a47517ba095c9a870dc320f0e6f4cd85ff9f0b54c5ca356a41d",
+      "bytes": 3804,
+      "executable": false
+    },
+    {
+      "path": "references/cloudkit.md",
+      "sha256": "52a549b1713d55be183b79af595d37729426af0abea36ed05f932b718d8ee11f",
+      "bytes": 662,
+      "executable": false
+    },
+    {
+      "path": "references/core-rules.md",
+      "sha256": "8bf45a2af28bfb0648303bb520d3d317d2794b56fcfabe599c4785ccdf02f80a",
+      "bytes": 3977,
+      "executable": false
+    },
+    {
+      "path": "references/indexing.md",
+      "sha256": "909167e538461bf517f8fc6b00bfe70d1c8ea19b12a4749088823c275de52a82",
+      "bytes": 800,
+      "executable": false
+    },
+    {
+      "path": "references/predicates.md",
+      "sha256": "623c3195fccdec0ec95c0291223ced7491025b04e59c0b4f4fe5ffd23eb1019b",
+      "bytes": 2454,
+      "executable": false
+    }
+  ]
+}

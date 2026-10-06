@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "parts": [
+    {
+      "id": "demo-part",
+      "repo": "example/demo-skills",
+      "commit": "0123456",
+      "path": "skills/demo-part",
+      "exclude": [],
+      "active": true,
+      "activation": "None; active by default.",
+      "prerequisites": [],
+      "risks": [],
+      "errata": [],
+      "appleText": []
+    }
+  ]
+}

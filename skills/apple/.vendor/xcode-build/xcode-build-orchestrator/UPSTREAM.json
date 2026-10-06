@@ -1,0 +1,90 @@
+{
+  "schema": 1,
+  "id": "xcode-build/xcode-build-orchestrator",
+  "name": "xcode-build-orchestrator",
+  "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+  "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+  "path": "skills/xcode-build-orchestrator",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+  "prerequisites": [
+    "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+    "python3 for the bundled scripts.",
+    "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+  ],
+  "risks": [
+    "Runs xcodebuild clean without asking first; tell the user before it runs.",
+    "scripts/benchmark_builds.py:225-245 deletes the folder passed as --derived-data-path; never pass a shared one.",
+    "Never use scripts/diagnose_compilation.py --per-file-timing; it relies on -debug-time-compilation.",
+    "SKILL.md:110 and references/orchestration-report-template.md:126 offer a community-results pull request; open one only when the user asks."
+  ],
+  "errata": [
+    "scripts/diagnose_compilation.py:172 passes -debug-time-compilation, which Swift 6.4 does not have.",
+    "references/build-settings-best-practices.md:153 predates Xcode 26."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "e919677be70ad7ddf4b0e5be5c5d5275d4e820490233f6084ce1ab3a9555404b",
+      "bytes": 11513,
+      "executable": false
+    },
+    {
+      "path": "references/benchmark-artifacts.md",
+      "sha256": "ec3a5ed992db24e945255c87361ab347f925ef94b474fd3f002fde650fbd4392",
+      "bytes": 4816,
+      "executable": false
+    },
+    {
+      "path": "references/build-settings-best-practices.md",
+      "sha256": "26f1a3a23b3fece4b067fb094ab12fb6bd7dee33e97044d515db3cf70bc9b8a4",
+      "bytes": 8567,
+      "executable": false
+    },
+    {
+      "path": "references/orchestration-report-template.md",
+      "sha256": "78bead992d838c737088ec2f98cfba620a7a32569f1f525d281f7500c479b72e",
+      "bytes": 6666,
+      "executable": false
+    },
+    {
+      "path": "references/recommendation-format.md",
+      "sha256": "ad8eb87228be739d2dd53d0b927558fc9e68b2135e1b1eec475a981c4cd1feb2",
+      "bytes": 2876,
+      "executable": false
+    },
+    {
+      "path": "scripts/benchmark_builds.py",
+      "sha256": "efb10cb4702243a69441692d6fc49106618ad693ad26333a8b0c29f0e5425227",
+      "bytes": 12347,
+      "executable": true
+    },
+    {
+      "path": "scripts/diagnose_compilation.py",
+      "sha256": "5d3783b053ae54f0e3730d40cf3931a4261625daa5893ad4a942b55303a9cdc6",
+      "bytes": 10147,
+      "executable": true
+    },
+    {
+      "path": "scripts/generate_optimization_report.py",
+      "sha256": "7c03d61fbce2c7ae44eaa752fbf65ce5256ddba336690a9265976dd9c0a69a85",
+      "bytes": 22701,
+      "executable": false
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-testflight-orchestration",
+  "name": "asc-testflight-orchestration",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-testflight-orchestration",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI on PATH with an App Store Connect API key (the .p8 key downloads only once)."
+  ],
+  "risks": [
+    "Emails tester invitations and distributes builds (SKILL.md:21-26); only removing groups needs --confirm."
+  ],
+  "errata": [
+    "Omits that the first build in an external group needs Beta App Review (`builds add-groups ... --submit --confirm`, asc CLI README:281) and test information."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "1cf2ca07e46d7d845a03fd64ba69a17376a9973d91d7ea6ab92908a49c9fd311",
+      "bytes": 2172,
+      "executable": false
+    }
+  ]
+}

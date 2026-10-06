@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "id": "macos-menubar-tuist-app",
+  "name": "macos-menubar-tuist-app",
+  "repo": "Dimillian/Skills",
+  "commit": "05ba982bfeb0d77d3c97d4542b0ee15034d05f84",
+  "path": "macos-menubar-tuist-app",
+  "exclude": [
+    "agents/**"
+  ],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "df17aae89ce4705d0a6e5f7b46eeea3b9023967ecad948f8779b47039eb55a8b",
+    "copyright": "Copyright (c) 2026 Thomas Ricouard"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "Tuist.swift and Project.swift exist in the working project and `tuist version` succeeds.",
+  "prerequisites": [
+    "Tuist on PATH and a Tuist-managed project (Tuist.swift and Project.swift)."
+  ],
+  "risks": [
+    "`tuist xcodebuild` may report to Tuist servers when the project is linked to a Tuist account (unverified)."
+  ],
+  "errata": [
+    "Never mentions MenuBarExtra; route scene and view APIs to swiftui-expert-skill.",
+    "TUIST_SKIP_UPDATE_CHECK does not appear in the strings of tuist 4.211.0."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "df17aae89ce4705d0a6e5f7b46eeea3b9023967ecad948f8779b47039eb55a8b",
+      "bytes": 1072,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "a9eb12f37a31410ae3e353c8aa34d4e5e9ea421e612541dad5edd774f08c490e",
+      "bytes": 4264,
+      "executable": false
+    }
+  ]
+}

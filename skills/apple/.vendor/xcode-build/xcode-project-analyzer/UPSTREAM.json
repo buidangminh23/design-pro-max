@@ -1,0 +1,66 @@
+{
+  "schema": 1,
+  "id": "xcode-build/xcode-project-analyzer",
+  "name": "xcode-project-analyzer",
+  "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+  "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+  "path": "skills/xcode-project-analyzer",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+  "prerequisites": [
+    "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+    "python3 for the bundled scripts.",
+    "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+  ],
+  "risks": [],
+  "errata": [
+    "references/build-settings-best-practices.md:153 predates Xcode 26."
+  ],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "1fb85b5556ba85950073231c893c63db9231bb684052e4838e96a80cdd6e8866",
+      "bytes": 4890,
+      "executable": false
+    },
+    {
+      "path": "references/build-optimization-sources.md",
+      "sha256": "77abb87a6ac6608a2db1a5415559f85df8f6f33d0a4767dd5ab62db939d217e6",
+      "bytes": 7875,
+      "executable": false
+    },
+    {
+      "path": "references/build-settings-best-practices.md",
+      "sha256": "26f1a3a23b3fece4b067fb094ab12fb6bd7dee33e97044d515db3cf70bc9b8a4",
+      "bytes": 8567,
+      "executable": false
+    },
+    {
+      "path": "references/project-audit-checks.md",
+      "sha256": "eb61ac8e1329eccac33e7d8b4c466003f50cca6b1a23e2be118d1f6a9af62e53",
+      "bytes": 8433,
+      "executable": false
+    },
+    {
+      "path": "references/recommendation-format.md",
+      "sha256": "ad8eb87228be739d2dd53d0b927558fc9e68b2135e1b1eec475a981c4cd1feb2",
+      "bytes": 2876,
+      "executable": false
+    }
+  ]
+}

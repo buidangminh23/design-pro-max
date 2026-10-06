@@ -1,0 +1,26 @@
+{
+  "name": "design-pro-max",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Design skills for AI coding agents; the first is apple, a router over vendored Apple-platform skills",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buidangminh23/design-pro-max.git"
+  },
+  "homepage": "https://github.com/buidangminh23/design-pro-max#readme",
+  "bugs": {
+    "url": "https://github.com/buidangminh23/design-pro-max/issues"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "vendor:sync": "node scripts/vendor-sync.mjs sync",
+    "vendor:check": "node scripts/vendor-sync.mjs check",
+    "guard": "node scripts/vendor-guard.mjs",
+    "notices": "node scripts/vendor-sync.mjs notices"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "id": "xcode-build/xcode-build-benchmark",
+  "name": "xcode-build-benchmark",
+  "repo": "AvdLee/Xcode-Build-Optimization-Agent-Skill",
+  "commit": "6bd7b596cd688b1127ded00e812b1b6937ec35d6",
+  "path": "skills/xcode-build-benchmark",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "The working project has an .xcodeproj or .xcworkspace with a scheme: `xcodebuild -list`, run outside the agent sandbox, lists at least one scheme.",
+  "prerequisites": [
+    "Xcode and an .xcodeproj or .xcworkspace with a scheme.",
+    "python3 for the bundled scripts.",
+    "Run xcodebuild outside the agent sandbox; SwiftPM packages fail to resolve inside it."
+  ],
+  "risks": [
+    "Runs xcodebuild clean without asking first; tell the user before it runs.",
+    "scripts/benchmark_builds.py:225-245 deletes the folder passed as --derived-data-path; never pass a shared one."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "91b85f1b9b7344123178d23896f5cc7e0c6bcfdbb05aa670c0ba1411ba72a3bd",
+      "bytes": 4608,
+      "executable": false
+    },
+    {
+      "path": "references/benchmark-artifacts.md",
+      "sha256": "8087ebebff618af462200af9a49f825281ea039feaa7c5d5e3dbc49afe425798",
+      "bytes": 4818,
+      "executable": false
+    },
+    {
+      "path": "references/benchmarking-workflow.md",
+      "sha256": "036c6b7de76974dd6648d0edc64cf6d950b079a3a2e509b61138dba560518c9d",
+      "bytes": 2258,
+      "executable": false
+    },
+    {
+      "path": "schemas/build-benchmark.schema.json",
+      "sha256": "473b377e7677bc4aeeac8cc16ea09b90b6e3ea00c23ee7f027e1f9a5c96a27ba",
+      "bytes": 4638,
+      "executable": false
+    },
+    {
+      "path": "scripts/benchmark_builds.py",
+      "sha256": "efb10cb4702243a69441692d6fc49106618ad693ad26333a8b0c29f0e5425227",
+      "bytes": 12347,
+      "executable": true
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-workflow",
+  "name": "asc-workflow",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-workflow",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
+  "prerequisites": [
+    "A paid Apple Developer Program account.",
+    "The asc CLI, jq and a trusted .asc/workflow.json file."
+  ],
+  "risks": [
+    "Runs shell commands from .asc/workflow.json, and its examples bake --confirm into stage, review submit and publish --submit; approve the file before running a workflow with submit or --confirm steps."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "ba607f8e533b86fa9b08246615ae15d9daa58bf4d61896d9d7a05f7ef9002922",
+      "bytes": 6900,
+      "executable": false
+    }
+  ]
+}

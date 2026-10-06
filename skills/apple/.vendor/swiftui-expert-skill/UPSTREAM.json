@@ -1,0 +1,368 @@
+{
+  "schema": 1,
+  "id": "swiftui-expert-skill",
+  "name": "swiftui-expert-skill",
+  "repo": "AvdLee/SwiftUI-Agent-Skill",
+  "commit": "204dba7c67256a8b707ee3fbc5759a824191974f",
+  "path": "skills/swiftui-expert-skill",
+  "exclude": [
+    "agents/**",
+    "assets/**"
+  ],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+    "copyright": "Copyright (c) 2026 Antoine van der Lee"
+  },
+  "fetched": "2026-10-06",
+  "active": true,
+  "activation": "None; active by default.",
+  "prerequisites": [
+    "None for SwiftUI code work.",
+    "Trace recording and analysis (scripts/record_trace.py, scripts/analyze_trace.py) need python3 and Xcode's xctrace; run them outside the agent sandbox, one trace at a time on 8 GB Macs."
+  ],
+  "risks": [
+    "references/iphone-duo.md:69 points to RocketSim, a paid third-party app; install it only when the user asks."
+  ],
+  "errata": [
+    "references/latest-apis.md:381, :386 and :418 use APIs that are absent from Apple's documentation index (checked 2026-10-06).",
+    "references/latest-apis.md:402 and :406: .concentric is not a RoundedCornerStyle.",
+    "references/toolbar-patterns.md:33: .navigationBarLeading is deprecated as of SDK 27.2; use .topBarLeading.",
+    "references/latest-apis.md:5 points to a maintenance skill (.agents/skills/update-swiftui-apis) that does not ship with this part; ignore that instruction."
+  ],
+  "appleText": [
+    {
+      "file": "references/animation-advanced.md",
+      "lines": "369",
+      "source": "https://developer.apple.com/videos/",
+      "reason": "WWDC session titles, cited as sources."
+    },
+    {
+      "file": "references/charts-accessibility.md",
+      "lines": "113-119",
+      "source": "https://developer.apple.com/videos/",
+      "reason": "WWDC session titles, cited as sources."
+    },
+    {
+      "file": "references/latest-apis.md",
+      "lines": "312, 346, 371, 390, 421, 435, 453, 473, 479",
+      "source": "https://developer.apple.com/videos/",
+      "reason": "WWDC session titles, cited as sources."
+    },
+    {
+      "file": "references/liquid-glass.md",
+      "lines": "112",
+      "source": "https://developer.apple.com/videos/play/wwdc2025/323/",
+      "reason": "A phrase that matches the transcript of WWDC25 session 323: glass samples content from an area larger than itself."
+    },
+    {
+      "file": "references/liquid-glass.md",
+      "lines": "141, 407",
+      "source": "https://developer.apple.com/videos/",
+      "reason": "WWDC session titles, cited as sources."
+    },
+    {
+      "file": "references/macos-scenes.md",
+      "lines": "83, 110",
+      "source": "https://developer.apple.com/documentation/swiftui/menubarextra",
+      "reason": "Two phrases that match Apple's MenuBarExtra documentation: a persistent control in the system menu bar, and termination when the user removes the extra."
+    },
+    {
+      "file": "references/performance-patterns.md",
+      "lines": "164, 237, 291, 315",
+      "source": "https://developer.apple.com/videos/",
+      "reason": "WWDC session titles, cited as sources."
+    }
+  ],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "8f5fd8e5cddb015b5627e45e68b256356586144288a4a0a3db87e38bcb0c9155",
+      "bytes": 1076,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "3b794f9cb46efb016eafcad2fcedce7127c74d60c50a949619e0bcd2bc38351f",
+      "bytes": 11637,
+      "executable": false
+    },
+    {
+      "path": "references/accessibility-patterns.md",
+      "sha256": "bb942dd3b31fa24aa051943a6b7754a2de45a263dda0da3ac9dc2c7ce43b14d2",
+      "bytes": 6073,
+      "executable": false
+    },
+    {
+      "path": "references/animation-advanced.md",
+      "sha256": "ed395dcc1d26730dd45b166e98442cac008ab4714de70b32f41b23b7a995e8e5",
+      "bytes": 11439,
+      "executable": false
+    },
+    {
+      "path": "references/animation-basics.md",
+      "sha256": "5c6e8911c4011d772db061d3438ec07491bf1c467ab87af4d56e21720a189c9f",
+      "bytes": 6865,
+      "executable": false
+    },
+    {
+      "path": "references/animation-transitions.md",
+      "sha256": "20e5685f50588a48816d2f8d475db82109c528bf603c4a54f4a545f1b914f896",
+      "bytes": 8052,
+      "executable": false
+    },
+    {
+      "path": "references/charts-accessibility.md",
+      "sha256": "772d1c1099a5cc7eef172a206ae60c9269da5d8b6c6a1f885854a1b04f6f619b",
+      "bytes": 6291,
+      "executable": false
+    },
+    {
+      "path": "references/charts.md",
+      "sha256": "32dd76aae9ccfafa817bb5d6862e509ee3966d40653ab28d715348b3859c3158",
+      "bytes": 17219,
+      "executable": false
+    },
+    {
+      "path": "references/document-apps.md",
+      "sha256": "fc392cf67384f3b4ac9be81c49560b7454d0455adef08d75da11779618d3fb1c",
+      "bytes": 11319,
+      "executable": false
+    },
+    {
+      "path": "references/environment-patterns.md",
+      "sha256": "0425978dc6aceb1c009ff35ebd789caca6aae1315b39f3aacbd748f5b4a5a2e6",
+      "bytes": 7278,
+      "executable": false
+    },
+    {
+      "path": "references/focus-patterns.md",
+      "sha256": "35e411675ba93ce92b9b652c804d8349b7f693a9928017b201ae802077e73ab6",
+      "bytes": 8877,
+      "executable": false
+    },
+    {
+      "path": "references/image-optimization.md",
+      "sha256": "1b2fd159a815e4afdf6288341d3a377aa0b5f8d8fc4551c73409bd64228fb806",
+      "bytes": 10617,
+      "executable": false
+    },
+    {
+      "path": "references/iphone-duo.md",
+      "sha256": "f1129c5806860b0d66c9855ab10e964f75c24a98fd8702c1510f64ba4ec2c19f",
+      "bytes": 7620,
+      "executable": false
+    },
+    {
+      "path": "references/latest-apis.md",
+      "sha256": "19ba6a56dd5bf7f13c7c3032756a75a5ec04a56ca956a48c2ed4e6af530026b2",
+      "bytes": 25395,
+      "executable": false
+    },
+    {
+      "path": "references/layout-best-practices.md",
+      "sha256": "95b8b6df0111301d4ea75c5db7b6eed2cb01bf69c4468b1cde5ef8f90f3298b7",
+      "bytes": 21066,
+      "executable": false
+    },
+    {
+      "path": "references/liquid-glass.md",
+      "sha256": "a96ff9cbd81c37ab268cdba9971b80e7ca7c2e75a141582c60ee78fa334ae89e",
+      "bytes": 12660,
+      "executable": false
+    },
+    {
+      "path": "references/list-patterns.md",
+      "sha256": "2002b89b5c869e54b69f4ab3e61f9a3d715fd6b56a1d5284fe900dc2353f0537",
+      "bytes": 21013,
+      "executable": false
+    },
+    {
+      "path": "references/localization.md",
+      "sha256": "f6adcf85da40bd011e9aa585cd45cca96223f2d8f9ec4f55b5bda87c2538d574",
+      "bytes": 9920,
+      "executable": false
+    },
+    {
+      "path": "references/macos-scenes.md",
+      "sha256": "ac464e1f81b97638d799b1482196b553e85a27d7599fe5d571f8e9dad37d1fdf",
+      "bytes": 9757,
+      "executable": false
+    },
+    {
+      "path": "references/macos-views.md",
+      "sha256": "a82101901fadee2f6cf7b1400fedaea73bab0a07f5aafef38631cdaeee6af63d",
+      "bytes": 11027,
+      "executable": false
+    },
+    {
+      "path": "references/macos-window-styling.md",
+      "sha256": "0c9fc677599d5488e9c58a05d6a5a4a61001d439db4cf7626c222601493437bf",
+      "bytes": 8815,
+      "executable": false
+    },
+    {
+      "path": "references/modifier-patterns.md",
+      "sha256": "24d08e954398da0787e8dbac764bb20c53447e33260cf890c025fc915c2037cc",
+      "bytes": 2530,
+      "executable": false
+    },
+    {
+      "path": "references/performance-patterns.md",
+      "sha256": "2e2643503ae283f2a99f31b5a97abbf141d15c61f1c6271640cfef9333940818",
+      "bytes": 11933,
+      "executable": false
+    },
+    {
+      "path": "references/previews.md",
+      "sha256": "fdf50f169607ddb7e9c03218957df2b2d733e211f591ac86c99816ca058ede01",
+      "bytes": 8327,
+      "executable": false
+    },
+    {
+      "path": "references/scroll-patterns.md",
+      "sha256": "82bc253cccc9f4ff11fe7af49259246dfaf8ad4d06960c90dfdeacaa97ab5bd6",
+      "bytes": 10839,
+      "executable": false
+    },
+    {
+      "path": "references/sheet-navigation-patterns.md",
+      "sha256": "48349b929e54bf2bbc7213cc20af8bb56d2bfa5de452b58a3ea9056dbb2d8ef6",
+      "bytes": 15380,
+      "executable": false
+    },
+    {
+      "path": "references/soft-deprecation.md",
+      "sha256": "ac907d3729e75747c6b19e9cc6a911337c05b8ff1c25695495ce7cda9d2f5548",
+      "bytes": 3002,
+      "executable": false
+    },
+    {
+      "path": "references/state-management.md",
+      "sha256": "49a0e00334f94176d5c5a4835061238fdbc9c67dd8dce73b847718eab8a1c5a2",
+      "bytes": 22009,
+      "executable": false
+    },
+    {
+      "path": "references/styled-text-editing.md",
+      "sha256": "f8dc9bb560107ff8f9e286e3876929f0285c2548195e0c7dda0daa6de70e58fd",
+      "bytes": 8938,
+      "executable": false
+    },
+    {
+      "path": "references/text-patterns.md",
+      "sha256": "26b960e9c8c7f5e15e9b2e297b6bd36eb872ec4ab8a0a84f61aa9c64d50191b8",
+      "bytes": 1637,
+      "executable": false
+    },
+    {
+      "path": "references/toolbar-patterns.md",
+      "sha256": "e57a64be79177888325ece20a4f7cf74d0b2d8d7793b7a2cf8f20ed347bfb1a1",
+      "bytes": 10159,
+      "executable": false
+    },
+    {
+      "path": "references/trace-analysis.md",
+      "sha256": "7b0aba8e633a079bad03597c51657fc9b744035ea064fe4198b55e41e5ec4bc1",
+      "bytes": 14415,
+      "executable": false
+    },
+    {
+      "path": "references/trace-recording.md",
+      "sha256": "8035631402352b8682ef64155ee7462365de5eea0dd2de7dbcda61bfaa8541a9",
+      "bytes": 5939,
+      "executable": false
+    },
+    {
+      "path": "references/view-structure.md",
+      "sha256": "bf5716d78c7fc460b849d55aa8347716ec7ab8049b95900b10d5d888da10248b",
+      "bytes": 28979,
+      "executable": false
+    },
+    {
+      "path": "references/webkit-integration.md",
+      "sha256": "73a893af77b52c05b3ea8e3e378c82bb9066cb887a2ab7485ec128bb95ba9541",
+      "bytes": 9732,
+      "executable": false
+    },
+    {
+      "path": "scripts/analyze_trace.py",
+      "sha256": "f40d49cfd4b5afcea717560787c34dcef1574f831a55a7d846303910df539636",
+      "bytes": 10155,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/__init__.py",
+      "sha256": "fdf7c99bed236e0fb71524b155be864a00a71af4997d6848c6c33f49fce62861",
+      "bytes": 69,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/causes.py",
+      "sha256": "cf6e067e5f47130562522ed27ca4f2551d0b2de669b5063db950e220e19cbd1f",
+      "bytes": 6092,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/correlate.py",
+      "sha256": "c4bd0c6d14cc96e03cf058ae134c661ace6de5d9b95d417e742278a9c86d064b",
+      "bytes": 6367,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/events.py",
+      "sha256": "e389fed14c398732aadb04bddeed399d4856eca24741396e3c845d4a4a95be57",
+      "bytes": 10804,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/hangs.py",
+      "sha256": "af779727b7342186606021acad8f38dfb88778ee068a95d0a9b119f415bc5162",
+      "bytes": 3507,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/hitches.py",
+      "sha256": "39c4a6d96fa4447709eeff98f033a2a6cac1a70b205fd543b7711e1d4759dd2f",
+      "bytes": 4634,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/summary.py",
+      "sha256": "dc856a29008aa2218cf30fc82db133f75efc1f67580b27fb3077f17ccc365296",
+      "bytes": 9291,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/swiftui.py",
+      "sha256": "f499b222b24c2129208284ccc61d6d0ac27bfe67831a5f7db51848f83d20fdd5",
+      "bytes": 6798,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/time_profiler.py",
+      "sha256": "dd3ab3f6e8e41b8ad00bbbd38ac96ada12a945bd82e51c923ac912fc46bff9b6",
+      "bytes": 4385,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/xctrace.py",
+      "sha256": "b680bddb80d7f63ff97b7ba69b1c9ddda57d4080d601e9a1a47f09e81c2870ce",
+      "bytes": 3607,
+      "executable": false
+    },
+    {
+      "path": "scripts/instruments_parser/xml_utils.py",
+      "sha256": "f0f4476f0f1f0ce9ad5779509b59c2c77b0f7438a57d358aa76e715e7a23b4d6",
+      "bytes": 7536,
+      "executable": false
+    },
+    {
+      "path": "scripts/record_trace.py",
+      "sha256": "7d9c33de1146a274f6ca45790a25f4421ea697893e18a0a6b2ccfb401e245891",
+      "bytes": 10831,
+      "executable": false
+    }
+  ]
+}

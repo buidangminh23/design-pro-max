@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "id": "app-store-connect/asc-wall-submit",
+  "name": "asc-wall-submit",
+  "repo": "rorkai/app-store-connect-cli-skills",
+  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "path": "skills/asc-wall-submit",
+  "exclude": [],
+  "license": {
+    "spdx": "MIT",
+    "file": "LICENSE",
+    "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+    "copyright": "Copyright (c) 2026 Rudrank Riyam"
+  },
+  "fetched": "2026-10-06",
+  "active": false,
+  "activation": "`command -v asc` succeeds, `gh auth status` succeeds, the user confirms a paid Apple Developer Program account, and the user explicitly asks for a Wall of Apps submission.",
+  "prerequisites": [
+    "The asc CLI and a signed-in gh.",
+    "An App Store app ID, or a TestFlight link plus an app name.",
+    "SKILL.md:25 runs its commands from an App-Store-Connect-CLI repository checkout."
+  ],
+  "risks": [
+    "Forks rorkai/App-Store-Connect-CLI and opens a public pull request under the user's account (asc CLI README:248)."
+  ],
+  "errata": [],
+  "appleText": [],
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
+      "bytes": 1070,
+      "executable": false
+    },
+    {
+      "path": "SKILL.md",
+      "sha256": "d19bfaff35f88b516ee90a4a6a1f645d0255c6192578d0c3fdb05a6227efe999",
+      "bytes": 1686,
+      "executable": false
+    }
+  ]
+}
