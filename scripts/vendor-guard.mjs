@@ -234,7 +234,7 @@ function gitFiles(root) {
   const run = (args, encoding) => execFileSync('git', ['-C', root, ...args], { env, encoding, stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024, windowsHide: true });
   try {
     const top = run(['rev-parse', '--show-toplevel'], 'utf8').trim();
-    if (!top || fs.realpathSync(top) !== fs.realpathSync(root)) return null;
+    if (!top || fs.realpathSync.native(top) !== fs.realpathSync.native(root)) return null;
     return [...new Set(run(['ls-files', '-z', '--cached', '--others', '--exclude-standard'], 'utf8').split('\0').filter(Boolean))];
   } catch {
     return null;
