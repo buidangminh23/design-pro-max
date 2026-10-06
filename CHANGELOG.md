@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `scripts/gen.mjs`: writes `skills.json` (the skills an installer finds), `skills/apple/references/parts-index.md` (every part with its group, status, activation check, prerequisites and errata pointers, linked from the router), the README credits table, and the trademark line in the README and in `NOTICE.md`; `--check` fails when one is out of date. The trademark line is built from the Apple marks the project's own text uses, so it now also credits iOS and macOS and carries Cisco's IOS sentence.
 - The apple skill's icon: the Apple logo at `skills/apple/assets/apple.svg`, copied unmodified from icons-pro-max (devicon drawing, MIT; the logo is Apple's trademark and outside this project's MIT license), a Codex `agents/openai.yaml` with the display name and icon, and `skills/apple/NOTICE.md` with the disclaimer and the icon's source.
 - Repository scaffold: MIT licence, a package manifest for Node 22 or later with no dependencies, and git attributes that keep vendored bytes unchanged.
 - `vendor/sources.json`: 38 parts from 9 repositories, pinned to full commits, with excludes, activation checks, prerequisites, risks, errata and the Apple text each part is known to quote (`appleText`).

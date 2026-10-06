@@ -79,7 +79,7 @@ Not covered by any part: WidgetKit, App Intents, SMAppService login items, AppKi
 
 ## Parts index
 
-Part names below are folder names under `.vendor/`. Every part's `UPSTREAM.json` lists all of its prerequisites, risks and errata.
+Part names below are folder names under `.vendor/`. Every part's `UPSTREAM.json` lists all of its prerequisites, risks and errata, and `references/parts-index.md` lists every part with its group, activation check, prerequisites and errata pointers.
 
 ### Active (6)
 

@@ -18,7 +18,9 @@
     "vendor:sync": "node scripts/vendor-sync.mjs sync",
     "vendor:check": "node scripts/vendor-sync.mjs check",
     "guard": "node scripts/vendor-guard.mjs",
-    "notices": "node scripts/vendor-sync.mjs notices"
+    "notices": "node scripts/vendor-sync.mjs notices",
+    "gen": "node scripts/gen.mjs",
+    "gen:check": "node scripts/gen.mjs --check"
   },
   "engines": {
     "node": ">=22"

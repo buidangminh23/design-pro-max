@@ -13,6 +13,7 @@ skills/
   apple/
     SKILL.md                 router: standing rules, routing table, parts index
     NOTICE.md                disclaimer, trademarks and the icon's source
+    references/parts-index.md  generated: every part's group, activation, prerequisites and errata pointers
     agents/openai.yaml       display name and icon for Codex
     assets/apple.svg         the skill icon (the Apple logo)
     .vendor/                 third-party parts, byte-for-byte at pinned commits
@@ -22,9 +23,11 @@ skills/
         UPSTREAM.json        source, commit, prerequisites, risks, errata, Apple text, file hashes and modes
       xcode-build/<part>/
       app-store-connect/<part>/
+skills.json                  generated: the skills in this repository, for installers
 vendor/sources.json          the 38 parts: repository, commit, path, excludes, status
 scripts/vendor-sync.mjs      sync, check and notices
 scripts/vendor-guard.mjs     offline guard
+scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 ```
 
@@ -64,6 +67,8 @@ Main risks, all gated by the router: the build parts run `xcodebuild clean` and 
 ## Credits
 
 Every vendored part is MIT-licensed and every vendored file is unmodified. The excludes in `vendor/sources.json` leave out a nested plugin copy, a plugin manifest, agent UI metadata (`agents/openai.yaml`) and icon images, some of which reproduce Apple's Swift logo, so no image ships. Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the MIT licences; each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`. Thanks to the authors. Full licence texts are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+<!-- gen:credits -->
 
 | Part | Author | Repository | Commit | Licence |
 |---|---|---|---|---|
@@ -106,6 +111,8 @@ Every vendored part is MIT-licensed and every vendored file is unmodified. The e
 | `app-store-connect/asc-wall-submit` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
 | `macos-menubar-tuist-app` | Thomas Ricouard | [Dimillian/Skills](https://github.com/Dimillian/Skills) | `05ba982bfeb0` | MIT |
 
+<!-- /gen:credits -->
+
 ## Maintenance
 
 Node 22 or later; no dependencies.
@@ -115,10 +122,11 @@ Node 22 or later; no dependencies.
 | `node scripts/vendor-sync.mjs sync [--only <id>] [--force]` | Fetches each pinned repository once (a shallow git fetch by commit), copies every part's tracked files byte for byte with their executable bits, adds the upstream licence and writes `UPSTREAM.json`. Parts that already match only get their metadata refreshed, so a repeated sync is offline. It refuses to start while `.vendor/` holds a symlink or special file, never writes outside the real `.vendor/` folder, and refuses upstream symlinks, submodules, nested git metadata files, images, media, fonts, archives, names outside plain ASCII and names that differ only in case from the `LICENSE` or `UPSTREAM.json` it writes; exclude those in `vendor/sources.json` |
 | `node scripts/vendor-sync.mjs check` | Offline: every part's files and executable bits match its `UPSTREAM.json` and the manifest, `appleText` entries name shipped files and existing lines, and nothing else, including symlinks and special files, sits in `.vendor/` |
 | `node scripts/vendor-sync.mjs notices [--check]` | Regenerates `THIRD_PARTY_NOTICES.md`, or fails when it is out of date |
+| `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, the README credits table and the trademark line in this README and in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories |
 
-To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices` and the guard, and review the upstream diff before committing.
+To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.
 
 Exclude globs in `vendor/sources.json` are matched against paths inside the part and anchored at the part's folder, unlike gitignore patterns: `agents/**` leaves out the top-level `agents` folder only, and `**/__pycache__` matches at any depth. A pattern that matches a folder leaves out everything in it, and a trailing slash is ignored.
 
@@ -127,10 +135,15 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 ## Disclaimers
 
 - design-pro-max is an independent open-source project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
-- Apple, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions.
 - design-pro-max is unrelated to nextlevelbuilder/ui-ux-pro-max.
 - The apple skill's icon, `skills/apple/assets/apple.svg`, is the Apple logo, a trademark of Apple Inc. It identifies the skill's subject only, is not covered by the MIT License, and must not be modified, recolored or redrawn. The drawing comes from devicon (MIT) via buidangminh23/icons-pro-max. It will be replaced with a neutral icon if Apple asks.
 - The vendored parts are their authors' work and are shipped as published. Known errors are recorded as errata in each part's `UPSTREAM.json` rather than edited in place.
+
+<!-- gen:trademarks -->
+
+Apple, the Apple logo, iOS, macOS, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+
+<!-- /gen:trademarks -->
 
 ## License
 

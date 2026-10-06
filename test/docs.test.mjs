@@ -22,7 +22,6 @@ test('the README credits every part with its pinned commit', () => {
 test('the README carries the required disclaimers', () => {
   for (const sentence of [
     'design-pro-max is an independent open-source project and has not been authorized, sponsored, or otherwise approved by Apple Inc.',
-    'Apple, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions.',
     'design-pro-max is unrelated to nextlevelbuilder/ui-ux-pro-max.',
   ]) {
     assert.ok(readme.includes(sentence), sentence);

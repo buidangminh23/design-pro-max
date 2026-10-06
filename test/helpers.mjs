@@ -102,6 +102,44 @@ export function canCreate(kind) {
 }
 
 /**
+ * A temporary copy of the files git would ship from this checkout: tracked files and untracked files that are not
+ * ignored, with their modes. With `commit` set the copy is also a git repository holding those files in one commit.
+ */
+export function copyCheckout({ commit = false } = {}) {
+  const root = tempDir('design-pro-max-copy-');
+  const env = { ...process.env };
+  for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE']) delete env[key];
+  const listing = execFileSync('git', ['-C', ROOT, 'ls-files', '-z', '--cached', '--others', '--exclude-standard'], { env, encoding: 'utf8' });
+  for (const file of listing.split('\0').filter(Boolean)) {
+    const source = path.join(ROOT, ...file.split('/'));
+    if (!fs.existsSync(source)) continue;
+    const target = path.join(root, ...file.split('/'));
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(source, target);
+  }
+  if (commit) commitTree(root);
+  return root;
+}
+
+/**
+ * Make `root` a git repository whose only commit holds every file in it, with git's global and system configuration
+ * ignored. Returns the commit SHA.
+ */
+export function commitTree(root, message = 'fixture') {
+  const home = tempDir('design-pro-max-git-');
+  try {
+    const env = isolatedGitEnv(home);
+    const git = (...args) => execFileSync('git', ['-C', root, ...args], { env, encoding: 'utf8' }).trim();
+    if (!fs.existsSync(path.join(root, '.git'))) git('init', '--quiet');
+    git('add', '--all');
+    git('-c', 'user.name=Fixture', '-c', `user.email=${['fixture', 'users.noreply.github.com'].join('@')}`, '-c', 'commit.gpgsign=false', 'commit', '--quiet', '--allow-empty', '-m', message);
+    return git('rev-parse', 'HEAD');
+  } finally {
+    removeTree(home);
+  }
+}
+
+/**
  * Run one of the repository's scripts with Node and return its exit status, signal and output.
  */
 export function runScript(script, args = [], { env = process.env, timeout = 60_000 } = {}) {
