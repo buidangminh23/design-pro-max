@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- `scripts/check-history.mjs`: fails when any commit reachable from HEAD adds an image, font, media file or archive, found by extension or by its first bytes, other than a reviewed file with its reviewed bytes (today only the apple skill's icon), or any file in a vendored part's `assets/` or `agents/` folder; merges are checked against each parent and a shallow clone fails.
 - `scripts/gen.mjs`: writes `skills.json` (the skills an installer finds), `skills/apple/references/parts-index.md` (every part with its group, status, activation check, prerequisites and errata pointers, linked from the router), the README credits table, and the trademark line in the README and in `NOTICE.md`; `--check` fails when one is out of date. The trademark line is built from the Apple marks the project's own text uses, so it now also credits iOS and macOS and carries Cisco's IOS sentence.
 - The apple skill's icon: the Apple logo at `skills/apple/assets/apple.svg`, copied unmodified from icons-pro-max (devicon drawing, MIT; the logo is Apple's trademark and outside this project's MIT license), a Codex `agents/openai.yaml` with the display name and icon, and `skills/apple/NOTICE.md` with the disclaimer and the icon's source.
 - Repository scaffold: MIT licence, a package manifest for Node 22 or later with no dependencies, and git attributes that keep vendored bytes unchanged.

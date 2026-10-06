@@ -1,0 +1,8 @@
+{
+  "description": "An image added and deleted later still sits in the history.",
+  "expect": ["docs/shot.png: .png file not on the reviewed list"],
+  "commits": [
+    { "files": { "README.md": "# Fixture\n", "docs/shot.png": { "signature": "png" } } },
+    { "remove": ["docs/shot.png"] }
+  ]
+}

@@ -28,6 +28,7 @@ vendor/sources.json          the 38 parts: repository, commit, path, excludes, s
 scripts/vendor-sync.mjs      sync, check and notices
 scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
+scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 ```
 
@@ -124,6 +125,7 @@ Node 22 or later; no dependencies.
 | `node scripts/vendor-sync.mjs notices [--check]` | Regenerates `THIRD_PARTY_NOTICES.md`, or fails when it is out of date |
 | `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, the README credits table and the trademark line in this README and in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
+| `node scripts/check-history.mjs` | Fails when any commit reachable from HEAD adds an image, font, media file or archive, recognised by extension or by its first bytes, other than a reviewed file with its reviewed bytes (`REVIEWED_MEDIA` in `scripts/lib/media.mjs`; today only `skills/apple/assets/apple.svg`), or any file in a vendored part's `assets/` or `agents/` folder. It needs the full history, so it fails in a shallow clone |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories |
 
 To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.

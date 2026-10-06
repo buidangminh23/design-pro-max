@@ -1,0 +1,18 @@
+{
+  "description": "Images and fonts saved under text names are recognised by their first bytes.",
+  "expect": [
+    "notes/diagram.md: PNG image not on the reviewed list",
+    "notes/inline.txt: SVG image not on the reviewed list",
+    "notes/type.dat: WOFF2 font not on the reviewed list"
+  ],
+  "commits": [
+    {
+      "files": {
+        "notes/diagram.md": { "signature": "png" },
+        "notes/inline.txt": "<?xml version=\"1.0\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>\n",
+        "notes/type.dat": { "signature": "woff2" },
+        "notes/plain.md": "Use free tools; BM text, ID3 tags and icns are words here.\n"
+      }
+    }
+  ]
+}

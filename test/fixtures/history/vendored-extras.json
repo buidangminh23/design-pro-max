@@ -1,0 +1,15 @@
+{
+  "description": "Vendored agents/ and assets/ files fail even when they are text.",
+  "expect": [
+    "skills/apple/.vendor/demo-part/agents/openai.yaml: sits in a vendored part's agents/ folder",
+    "skills/apple/.vendor/group/demo-two/assets/notes.md: sits in a vendored part's assets/ folder"
+  ],
+  "commits": [
+    {
+      "files": {
+        "skills/apple/.vendor/demo-part/agents/openai.yaml": "policy:\n  allow_implicit_invocation: false\n",
+        "skills/apple/.vendor/group/demo-two/assets/notes.md": "Plain text.\n"
+      }
+    }
+  ]
+}

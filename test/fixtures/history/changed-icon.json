@@ -1,0 +1,8 @@
+{
+  "description": "The reviewed path with other bytes is not the reviewed file.",
+  "expect": ["skills/apple/assets/apple.svg: .svg file not on the reviewed list"],
+  "commits": [
+    { "files": { "skills/apple/assets/apple.svg": { "copy": "skills/apple/assets/apple.svg" } } },
+    { "files": { "skills/apple/assets/apple.svg": "<svg xmlns=\"http://www.w3.org/2000/svg\"><circle r=\"1\"/></svg>\n" } }
+  ]
+}

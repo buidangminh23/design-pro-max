@@ -20,7 +20,8 @@
     "guard": "node scripts/vendor-guard.mjs",
     "notices": "node scripts/vendor-sync.mjs notices",
     "gen": "node scripts/gen.mjs",
-    "gen:check": "node scripts/gen.mjs --check"
+    "gen:check": "node scripts/gen.mjs --check",
+    "history": "node scripts/check-history.mjs"
   },
   "engines": {
     "node": ">=22"

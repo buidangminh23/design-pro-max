@@ -1,0 +1,20 @@
+{
+  "description": "Own files, own agent metadata and the reviewed icon with its reviewed bytes pass.",
+  "expect": [],
+  "commits": [
+    {
+      "files": {
+        "README.md": "# Fixture\n",
+        "skills/apple/SKILL.md": "---\nname: apple\ndescription: Fixture router.\n---\n",
+        "skills/apple/agents/openai.yaml": "interface:\n  display_name: \"Fixture\"\n",
+        "skills/apple/assets/apple.svg": { "copy": "skills/apple/assets/apple.svg" }
+      }
+    },
+    {
+      "files": {
+        "skills/apple/.vendor/demo-part/SKILL.md": "---\nname: demo-part\ndescription: A part.\n---\n",
+        "skills/apple/.vendor/demo-part/references/assets-and-agents.md": "Notes about assets and agents folders.\n"
+      }
+    }
+  ]
+}
