@@ -1,0 +1,7 @@
+interface:
+  display_name: "Apple"
+  short_description: "SwiftUI, Swift, Xcode and App Store Connect"
+  icon_small: "./assets/apple.svg"
+  icon_large: "./assets/apple.svg"
+  brand_color: "#000000"
+  default_prompt: "Use $apple to review this SwiftUI view for deprecated APIs and fix them."

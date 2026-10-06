@@ -6,6 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- The apple skill's icon: the Apple logo at `skills/apple/assets/apple.svg`, copied unmodified from icons-pro-max (devicon drawing, MIT; the logo is Apple's trademark and outside this project's MIT license), a Codex `agents/openai.yaml` with the display name and icon, and `skills/apple/NOTICE.md` with the disclaimer and the icon's source.
 - Repository scaffold: MIT licence, a package manifest for Node 22 or later with no dependencies, and git attributes that keep vendored bytes unchanged.
 - `vendor/sources.json`: 38 parts from 9 repositories, pinned to full commits, with excludes, activation checks, prerequisites, risks, errata and the Apple text each part is known to quote (`appleText`).
 - `scripts/vendor-sync.mjs`: `sync` fetches each pinned repository once and copies every part byte for byte with its licence and an `UPSTREAM.json` record; `check` verifies the tree offline; `notices` regenerates `THIRD_PARTY_NOTICES.md`. Sync refuses to run while the vendor folder holds a symlink or special file, never writes outside it, and refuses upstream files that would change what git stores or collide with the files it writes.

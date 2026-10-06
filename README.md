@@ -1,5 +1,7 @@
 # design-pro-max
 
+<img src="skills/apple/assets/apple.svg" width="56" height="56" alt="Apple logo, the icon of the apple skill">
+
 Design skills for AI coding agents, one skill per design. The first skill is **apple**: a router for Apple-platform work that sends each task to one bundled third-party guide and has the agent read that guide in full.
 
 > **Status: pre-release.** Nothing has been released yet. Install instructions will arrive with v0.1.
@@ -10,6 +12,9 @@ Design skills for AI coding agents, one skill per design. The first skill is **a
 skills/
   apple/
     SKILL.md                 router: standing rules, routing table, parts index
+    NOTICE.md                disclaimer, trademarks and the icon's source
+    agents/openai.yaml       display name and icon for Codex
+    assets/apple.svg         the skill icon (the Apple logo)
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -124,8 +129,9 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 - design-pro-max is an independent open-source project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
 - Apple, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions.
 - design-pro-max is unrelated to nextlevelbuilder/ui-ux-pro-max.
+- The apple skill's icon, `skills/apple/assets/apple.svg`, is the Apple logo, a trademark of Apple Inc. It identifies the skill's subject only, is not covered by the MIT License, and must not be modified, recolored or redrawn. The drawing comes from devicon (MIT) via buidangminh23/icons-pro-max. It will be replaced with a neutral icon if Apple asks.
 - The vendored parts are their authors' work and are shipped as published. Known errors are recorded as errata in each part's `UPSTREAM.json` rather than edited in place.
 
 ## License
 
-The project's own files are released under the [MIT License](LICENSE). Each vendored part keeps its upstream MIT licence in its own `LICENSE` file.
+The project's own files are released under the [MIT License](LICENSE), except the Apple logo at `skills/apple/assets/apple.svg` (see Disclaimers). Each vendored part keeps its upstream MIT licence in its own `LICENSE` file.
