@@ -158,8 +158,6 @@ jobs:
           TITLE: ${{ steps.classify.outputs.title }}
           VERDICT: ${{ steps.classify.outputs.verdict }}
         run: |
-          gh label create vendor-sync --color 0e8a16 --description "Weekly sync of the vendored parts" --force > /dev/null
-          gh label create needs-review --color d93f0b --description "Upstream change the owner must review before merging" --force > /dev/null
           number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
           if [ -n "$number" ]; then
             gh pr edit "$number" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
@@ -167,12 +165,18 @@ jobs:
             gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
             number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number')
           fi
-          if [ "$VERDICT" = safe ]; then
-            gh pr edit "$number" --add-label vendor-sync --remove-label needs-review
-          else
-            gh pr edit "$number" --add-label vendor-sync --add-label needs-review
-          fi
           echo "number=$number" >> "$GITHUB_OUTPUT"
+          labelled=true
+          gh label create vendor-sync --color 0e8a16 --description "Weekly sync of the vendored parts" --force > /dev/null || labelled=false
+          gh label create needs-review --color d93f0b --description "Upstream change the owner must review before merging" --force > /dev/null || labelled=false
+          if [ "$VERDICT" = safe ]; then
+            gh pr edit "$number" --add-label vendor-sync --remove-label needs-review > /dev/null || labelled=false
+          else
+            gh pr edit "$number" --add-label vendor-sync --add-label needs-review > /dev/null || labelled=false
+          fi
+          if [ "$labelled" = false ]; then
+            echo "::warning::The pull request is open, but its labels could not be set; its body states the verdict."
+          fi
       - name: Merge a safe update after the checks above passed
         if: steps.classify.outputs.verdict == 'safe' && steps.pr.outputs.number != ''
         env:
