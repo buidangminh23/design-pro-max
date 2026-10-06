@@ -20,19 +20,19 @@ const section = (heading) => {
 test('the router is the apple skill with a description inside the limits', () => {
   assert.deepEqual(frontmatterProblems(router), []);
   assert.equal(fields.name, 'apple');
-  assert.ok(fields.description.length <= 1024, `${fields.description.length} characters`);
+  assert.ok(fields.description.length <= 500, `${fields.description.length} characters`);
   assert.ok(!/[<>]/.test(fields.description), 'no angle brackets in the description');
 });
 
-test('the description opens with a referential phrase', () => {
-  assert.ok(fields.description.startsWith('For Apple app code ('), fields.description.slice(0, 40));
-});
-
-test('the first 68 characters of the description carry the job', () => {
-  const firstSentence = fields.description.indexOf('. ') + 1;
+test('the description opens referentially and carries the job where a short listing still shows it', () => {
+  const { description } = fields;
+  assert.ok(description.startsWith('For '), description.slice(0, 40));
+  const firstSentence = description.indexOf('. ') + 1;
   assert.ok(firstSentence > 0 && firstSentence <= 68, `first sentence ends at ${firstSentence}`);
-  const head = fields.description.slice(0, 68);
-  for (const word of ['Apple', 'SwiftUI', 'Xcode']) assert.ok(head.includes(word), word);
+  const head = description.slice(0, 56);
+  for (const word of ['Apple', 'SwiftUI', 'Xcode']) assert.ok(head.includes(word), `${word} within the first 56 characters`);
+  assert.match(description, /\bUse (?:for|when)\b/);
+  assert.match(description, /\bNot for\b/);
 });
 
 test('the router body stays under 300 lines and an estimated 5,000 tokens', () => {
@@ -66,7 +66,7 @@ test('the parts index names every part', () => {
 
 test('the router keeps the standing rules the parts depend on', () => {
   const rules = section('## Standing rules');
-  for (const phrase of ['in full', 'the folder of the file that mentions it', 'absolute path', 'activation check', 'explicit yes', 'ASC_TELEMETRY_DISABLED=1', 'asc install-skills', 'write-swift', 'apple-design', 'xcode-disk-cleanup']) {
+  for (const phrase of ['in full', 'the folder of the file that mentions it', 'absolute path', 'python3 -B', 'PYTHONDONTWRITEBYTECODE=1', 'activation check', 'explicit yes', 'ASC_TELEMETRY_DISABLED=1', 'asc install-skills', 'write-swift', 'apple-design', 'xcode-disk-cleanup']) {
     assert.ok(rules.includes(phrase), phrase);
   }
 });
