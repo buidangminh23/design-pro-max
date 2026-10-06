@@ -88,15 +88,21 @@ test('the default token is read-only and every job states its own permissions', 
   }
 });
 
-test('checkouts in jobs that push nothing keep no credentials', () => {
+test('no checkout keeps credentials, and a push authenticates only its own step', () => {
   for (const name of files) {
     for (const job of jobs(read(name))) {
-      const writes = job.lines.some((line) => /^ {6}contents: write$/.test(line));
-      const pushes = job.lines.some((line) => /\bgit push\b/.test(line));
       for (const step of steps(job).filter((lines) => /uses: actions\/checkout@/.test(lines[0]))) {
-        const keeps = !step.some((line) => /persist-credentials: false/.test(line));
-        if (keeps) assert.ok(writes && pushes, `${name}: job ${job.name} keeps checkout credentials without pushing`);
-        else assert.ok(!pushes, `${name}: job ${job.name} pushes without credentials`);
+        assert.ok(step.some((line) => /persist-credentials: false/.test(line)), `${name}: job ${job.name} keeps checkout credentials`);
+      }
+      for (const step of steps(job)) {
+        const text = step.join('\n');
+        const credential = /GIT_CONFIG_KEY_0=http\.https:\/\/github\.com\/\.extraheader/.test(text);
+        if (/\bgit push\b/.test(text)) {
+          assert.ok(credential, `${name}: job ${job.name} pushes without a credential scoped to that step`);
+          assert.match(text, /GH_TOKEN: \$\{\{ github\.token \}\}/, `${name}: job ${job.name} pushes without the step's own token`);
+        } else {
+          assert.ok(!credential, `${name}: job ${job.name} sets a git credential in a step that does not push`);
+        }
       }
     }
   }
@@ -126,7 +132,7 @@ test('the release workflow re-checks, drafts, verifies the download and publishe
   assert.ok(publish.lines.some((line) => /^ {6}contents: write$/.test(line)));
 });
 
-test('the vendor sync runs weekly, stages read-only and merges only safe updates', () => {
+test('the vendor sync stages read-only, confirms upstream and merges only safe updates after CI', () => {
   const sync = read('vendor-sync.yml');
   assert.match(sync, /cron: "41 2 \* \* 1"/);
   assert.match(sync, /workflow_dispatch:/);
@@ -134,17 +140,21 @@ test('the vendor sync runs weekly, stages read-only and merges only safe updates
   assert.deepEqual([fetch.name, propose.name, heartbeat.name], ['fetch', 'propose', 'heartbeat']);
   assert.ok(fetch.lines.some((line) => /^ {6}contents: read$/.test(line)));
   assert.ok(!fetch.lines.some((line) => /: write$/.test(line)));
-  assert.ok(propose.lines.some((line) => /^ {6}pull-requests: write$/.test(line)));
+  for (const permission of ['actions: write', 'contents: write', 'pull-requests: write']) assert.ok(propose.lines.includes(`      ${permission}`), permission);
   assert.match(sync, /include-hidden-files: true/);
   assert.match(sync, /node scripts\/vendor-sync\.mjs stage --out/);
-  assert.match(sync, /node scripts\/vendor-sync\.mjs apply --from/);
+  const proposeText = propose.lines.join('\n');
+  assert.match(proposeText, /gh pr list --head "\$BRANCH" --base main --state open --json number,isCrossRepository --jq '\[\.\[\] \| select\(\.isCrossRepository == false\)\]/);
+  assert.match(proposeText, /--ignored=matching/);
   const merge = steps(propose).find((lines) => /gh pr merge/.test(lines.join('\n')));
   assert.ok(merge[0].includes('Merge a safe update'));
-  assert.ok(merge.some((line) => line.includes("if: steps.classify.outputs.verdict == 'safe'")));
-  assert.ok(merge.some((line) => line.includes('--match-head-commit "$SHA"')));
-  const proposeText = propose.lines.join('\n');
-  const order = ['classify --from', 'apply --from', 'npm test', 'node scripts/vendor-guard.mjs', 'node scripts/check-history.mjs', 'git push', 'gh pr create', 'gh pr merge'].map((text) => proposeText.indexOf(text));
+  assert.ok(merge.some((line) => line.includes("if: steps.classify.outputs.verdict == 'safe' && steps.ci.outputs.passed == 'true'")));
+  assert.ok(merge.some((line) => line.includes('--match-head-commit "$HEAD_SHA"')));
+  const order = ['confirm --from', 'classify --from', 'apply --from', 'npm test', 'node scripts/vendor-guard.mjs', 'node scripts/check-history.mjs', 'check --root "$RUNNER_TEMP/committed"', 'git push', 'gh pr create', 'gh workflow run ci.yml', 'gh run watch', 'gh pr merge'].map((text) => proposeText.indexOf(text));
   assert.ok(order.every((index) => index >= 0), 'the propose job runs every step');
-  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'classify, apply, check, push, propose, merge, in that order');
-  assert.match(sync, /if \[ "\$days" -lt 45 \]/);
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'confirm, classify, apply, check, commit, push, propose, CI, merge, in that order');
+  const heartbeatText = heartbeat.lines.join('\n');
+  assert.match(heartbeatText, /if \[ "\$days" -lt 45 \]/);
+  assert.match(heartbeatText, /gh issue create/);
+  assert.doesNotMatch(heartbeatText, /git push|contents: write/);
 });

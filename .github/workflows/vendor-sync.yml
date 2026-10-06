@@ -16,6 +16,7 @@ env:
   BRANCH: vendor-sync
   BOT_NAME: github-actions[bot]
   BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+  HEARTBEAT_TITLE: "Vendor sync: main has had no commit for 45 days"
 
 jobs:
   fetch:
@@ -81,8 +82,9 @@ jobs:
     needs: fetch
     if: ${{ !cancelled() && needs.fetch.outputs.uploaded == 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     permissions:
+      actions: write
       contents: write
       pull-requests: write
     steps:
@@ -90,6 +92,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
@@ -97,6 +100,8 @@ jobs:
         with:
           name: vendor-sync
           path: ${{ runner.temp }}/staged
+      - name: Confirm the staged files against upstream
+        run: node scripts/vendor-sync.mjs confirm --from "$RUNNER_TEMP/staged"
       - name: Classify the update
         id: classify
         run: |
@@ -119,7 +124,7 @@ jobs:
           node scripts/vendor-sync.mjs notices --check
           node scripts/gen.mjs --check
           node scripts/release.mjs check
-      - name: Commit to the vendor-sync branch
+      - name: Commit the update and check the committed tree
         id: commit
         run: |
           unexpected=$(git status --porcelain=v1 --untracked-files=all | cut -c4- | grep -Ev '^(vendor/sources\.json|skills/apple/\.vendor/.+|README\.md|THIRD_PARTY_NOTICES\.md|skills\.json|skills/apple/NOTICE\.md|skills/apple/references/parts-index\.md)$' || true)
@@ -128,43 +133,76 @@ jobs:
             printf '%s\n' "$unexpected"
             exit 1
           fi
+          ignored=$(git status --porcelain=v1 --ignored=matching --untracked-files=all -- skills vendor | grep '^!! ' || true)
+          if [ -n "$ignored" ]; then
+            echo "The update holds files that .gitignore would leave out of the commit:"
+            printf '%s\n' "$ignored"
+            exit 1
+          fi
           git config user.name "$BOT_NAME"
           git config user.email "$BOT_EMAIL"
           git checkout -q -B "$BRANCH"
           git add --all -- vendor/sources.json skills README.md THIRD_PARTY_NOTICES.md skills.json
           git commit -q -F "$RUNNER_TEMP/message.txt"
           node scripts/check-history.mjs
+          git worktree add -q --detach "$RUNNER_TEMP/committed" HEAD
+          node scripts/vendor-sync.mjs check --root "$RUNNER_TEMP/committed"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
-            git fetch -q origin "$BRANCH"
-            if [ "$(git log -1 --format=%ae "origin/$BRANCH")" != "$BOT_EMAIL" ]; then
-              echo "Someone else pushed to $BRANCH; leaving the branch and its pull request to them."
+      - name: Push the vendor-sync branch
+        id: push
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          remote=$(git ls-remote --heads origin "refs/heads/$BRANCH" | cut -f1)
+          if [ -n "$remote" ]; then
+            git fetch -q --no-tags origin "refs/heads/$BRANCH"
+            if [ "$(git log -1 --format=%ae FETCH_HEAD)" != "$BOT_EMAIL" ]; then
+              echo "::warning::Someone else pushed to $BRANCH; leaving the branch and its pull request to them."
               echo "state=foreign" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            if git diff --quiet "origin/$BRANCH" HEAD -- vendor/sources.json; then
-              echo "$BRANCH already proposes these upstream commits."
-              echo "state=same" >> "$GITHUB_OUTPUT"
+            if [ "$(git rev-parse "FETCH_HEAD^{tree}")" = "$(git rev-parse "$SHA^{tree}")" ]; then
+              echo "$BRANCH already holds this update on top of the current main."
+              { echo "state=same"; echo "head=$remote"; } >> "$GITHUB_OUTPUT"
               exit 0
             fi
           fi
-          git push -q --force origin "HEAD:refs/heads/$BRANCH"
-          echo "state=pushed" >> "$GITHUB_OUTPUT"
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.https://github.com/.extraheader GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth" \
+            git push -q --force origin "$SHA:refs/heads/$BRANCH"
+          { echo "state=pushed"; echo "head=$SHA"; } >> "$GITHUB_OUTPUT"
       - name: Open or update the pull request
         id: pr
-        if: steps.commit.outputs.state == 'pushed'
+        if: steps.push.outputs.state == 'pushed' || steps.push.outputs.state == 'same'
         env:
           GH_TOKEN: ${{ github.token }}
+          STATE: ${{ steps.push.outputs.state }}
+          HEAD_SHA: ${{ steps.push.outputs.head }}
           TITLE: ${{ steps.classify.outputs.title }}
           VERDICT: ${{ steps.classify.outputs.verdict }}
         run: |
-          number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
-          if [ -n "$number" ]; then
-            gh pr edit "$number" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
-          else
-            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
-            number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number')
+          number=$(gh pr list --head "$BRANCH" --base main --state open --json number,isCrossRepository --jq '[.[] | select(.isCrossRepository == false)][0].number // empty')
+          if [ -z "$number" ] && [ "$STATE" = same ]; then
+            echo "::notice::$BRANCH already holds this update and its pull request is closed; none opens again until upstream moves."
+            exit 0
           fi
+          if [ -z "$number" ]; then
+            url=$(gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md")
+            number=${url##*/}
+          fi
+          head=""
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            head=$(gh pr view "$number" --json headRefOid,isCrossRepository --jq 'select(.isCrossRepository == false) | .headRefOid')
+            [ "$head" = "$HEAD_SHA" ] && break
+            sleep 6
+          done
+          if [ "$head" != "$HEAD_SHA" ]; then
+            echo "Pull request #$number has the head ${head:-of another repository}, not $HEAD_SHA; leaving it alone."
+            exit 1
+          fi
+          gh pr edit "$number" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md" > /dev/null
           echo "number=$number" >> "$GITHUB_OUTPUT"
           labelled=true
           gh label create vendor-sync --color 0e8a16 --description "Weekly sync of the vendored parts" --force > /dev/null || labelled=false
@@ -177,19 +215,49 @@ jobs:
           if [ "$labelled" = false ]; then
             echo "::warning::The pull request is open, but its labels could not be set; its body states the verdict."
           fi
-      - name: Merge a safe update after the checks above passed
-        if: steps.classify.outputs.verdict == 'safe' && steps.pr.outputs.number != ''
+      - name: Run CI on the pull request's head commit
+        id: ci
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.push.outputs.head }}
+          VERDICT: ${{ steps.classify.outputs.verdict }}
+        run: |
+          since=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run ci.yml --ref "$BRANCH"
+          run=""
+          for _ in $(seq 1 30); do
+            sleep 10
+            run=$(gh run list --workflow ci.yml --event workflow_dispatch --commit "$HEAD_SHA" --created ">=$since" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run" ] && break
+          done
+          if [ -z "$run" ]; then
+            echo "The CI workflow did not start on $HEAD_SHA."
+            exit 1
+          fi
+          echo "CI run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$run"
+          if [ "$VERDICT" != safe ]; then
+            echo "The update needs review; the owner reads this run with the pull request."
+            exit 0
+          fi
+          if ! gh run watch "$run" --exit-status --interval 30 > /dev/null; then
+            echo "CI did not pass on $HEAD_SHA; the pull request waits for the owner."
+            exit 1
+          fi
+          echo "passed=true" >> "$GITHUB_OUTPUT"
+      - name: Merge a safe update once CI passed and main has not moved
+        if: steps.classify.outputs.verdict == 'safe' && steps.ci.outputs.passed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ steps.pr.outputs.number }}
-          SHA: ${{ steps.commit.outputs.sha }}
+          HEAD_SHA: ${{ steps.push.outputs.head }}
           BASE: ${{ steps.classify.outputs.base }}
         run: |
           if [ "$(git ls-remote origin refs/heads/main | cut -f1)" != "$BASE" ]; then
-            echo "main moved while this job ran; the next run checks the update again."
+            echo "main moved while this job ran; the next run rebuilds the update on the new main."
             exit 0
           fi
-          gh pr merge "$NUMBER" --squash --delete-branch --match-head-commit "$SHA"
+          gh pr merge "$NUMBER" --squash --delete-branch --match-head-commit "$HEAD_SHA"
 
   heartbeat:
     name: Keep the schedule alive
@@ -198,21 +266,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write
+      actions: write
+      contents: read
+      issues: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: main
-      - name: Commit a heartbeat after 45 quiet days
+      - name: Re-enable the schedule and open an issue after 45 quiet days
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          days=$(( ($(date +%s) - $(git log -1 --format=%ct)) / 86400 ))
+          last=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq '.commit.committer.date')
+          days=$(( ($(date +%s) - $(date -d "$last" +%s)) / 86400 ))
           if [ "$days" -lt 45 ]; then
             echo "main changed $days day(s) ago."
             exit 0
           fi
-          printf '{\n  "lastQuietCheck": "%s"\n}\n' "$(date -u +%Y-%m-%d)" > vendor/heartbeat.json
-          git config user.name "$BOT_NAME"
-          git config user.email "$BOT_EMAIL"
-          git add vendor/heartbeat.json
-          git commit -q -m "chore: keep the vendor sync schedule alive"
-          git push -q origin HEAD:main
+          gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/vendor-sync.yml/enable"
+          body="main has had no commit for $days days. GitHub disables scheduled workflows in a public repository after 60 days without activity. This run enabled the vendor sync through the API, which may not reset that timer; a commit on main does. Close this issue after the next commit."
+          number=$(gh issue list --state open --limit 200 --json number,title | jq -r --arg title "$HEARTBEAT_TITLE" '[.[] | select(.title == $title)][0].number // empty')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$HEARTBEAT_TITLE" --body "$body"
+          fi
