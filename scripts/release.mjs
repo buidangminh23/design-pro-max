@@ -12,8 +12,11 @@
  *
  * Every command takes --root <dir>. Verification reads the ZIP itself: one visible SKILL.md per skill in skills.json,
  * every vendored file equal to its UPSTREAM.json hash, one MIT LICENSE per part, exactly the parts of
- * vendor/sources.json, no symlinks, __pycache__ folders, compiled Python or metadata.json files, and no image, font,
- * media file or archive other than a reviewed file with its reviewed bytes.
+ * vendor/sources.json, no symlinks, __pycache__ folders, compiled Python or metadata.json files, no image, font,
+ * media file or archive other than a reviewed file with its reviewed bytes, and no entry name over 150 characters.
+ * With a checkout it also compares the ZIP with the tracked payload of the tag vX.Y.Z, or of HEAD before the tag
+ * exists, so an attribute that drops or rewrites a file cannot pass. Archives are made with TZ=UTC, so the ZIP bytes
+ * do not depend on the packer's time zone.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,13 +40,18 @@ import {
   writeRegular,
 } from './lib/vendor.mjs';
 import { isReviewedMedia, mediaKind } from './lib/media.mjs';
+import { readBlobs } from './check-history.mjs';
 import { SKILLS_FILE, skillsList } from './gen.mjs';
 import { visiblePath } from './vendor-guard.mjs';
 
 export const NAME = 'design-pro-max';
+export const PUBLIC_NAME = new RegExp(`^@[a-z0-9][a-z0-9-]*/${NAME}$`);
+export const PUBLIC_FROM = '0.2.0';
 export const SUMS_FILE = 'SHA256SUMS.txt';
+export const MAX_ENTRY_NAME = 150;
+export const PRE_RELEASE_BANNER = '**Status: pre-release.**';
 export const PAYLOAD = ['CHANGELOG.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', SKILLS_FILE, 'skills'];
-export const REPO_ONLY = ['.github', '.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'designs', 'evals', 'evidence', 'fixtures', 'package.json', 'rules.json', 'scripts', 'test', 'vendor'];
+export const REPO_ONLY = ['.github', '.claude-plugin', '.codex-plugin', '.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'designs', 'evals', 'evidence', 'fixtures', 'package.json', 'rules.json', 'scripts', 'test', 'vendor', 'web-card.json'];
 
 const VERSION = /^\d+\.\d+\.\d+$/;
 const TAG = /^v(\d+\.\d+\.\d+)$/;
@@ -63,10 +71,65 @@ function readText(base, relative) {
   return bytes.toString('utf8');
 }
 
-function gitIn(root) {
-  const env = { ...process.env, GIT_TERMINAL_PROMPT: '0' };
+function gitIn(root, extra = {}) {
+  const env = { ...process.env, GIT_TERMINAL_PROMPT: '0', ...extra };
   for (const key of GIT_ENV_KEYS) delete env[key];
   return (args) => execFileSync('git', ['-C', root, ...args], { env, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true }).trim();
+}
+
+/**
+ * Negative, zero or positive as version `a` is older than, equal to or newer than version `b`, both major.minor.patch.
+ */
+export function compareVersions(a, b) {
+  const [left, right] = [a, b].map((version) => version.split('.').map(Number));
+  for (let index = 0; index < 3; index += 1) if (left[index] !== right[index]) return left[index] - right[index];
+  return 0;
+}
+
+/**
+ * What package.json must say for a version: the private package design-pro-max before 0.2.0, and from 0.2.0 on a
+ * public npm package named @<scope>/design-pro-max. The release ZIP keeps the name design-pro-max either way.
+ */
+export function packageProblems(pkg, version) {
+  if (version && compareVersions(version, PUBLIC_FROM) >= 0) {
+    return PUBLIC_NAME.test(pkg.name ?? '') && pkg.private !== true ? [] : [`package.json must name a public package @<scope>/${NAME} from ${PUBLIC_FROM} on`];
+  }
+  return pkg.name === NAME && pkg.private === true ? [] : [`package.json must name the private package ${NAME} before ${PUBLIC_FROM}`];
+}
+
+/**
+ * The top-level names of the files git would ship from `root`, tracked or untracked but not ignored, or null outside
+ * a git checkout.
+ */
+function shippedTopLevel(root) {
+  let listing;
+  try {
+    listing = gitIn(root)(['ls-files', '-z', '--cached', '--others', '--exclude-standard']);
+  } catch {
+    return null;
+  }
+  return [...new Set(listing.split('\0').filter(Boolean).map((file) => file.split('/')[0]))].sort(compareStrings);
+}
+
+/**
+ * The tracked payload files of the commit a release of `version` comes from, as path to { mode, type, object }: the
+ * tag v<version> when `root` has it, otherwise HEAD.
+ */
+export function trackedPayload(root, version) {
+  const git = gitIn(root);
+  let rev = 'HEAD';
+  try {
+    rev = git(['rev-parse', '--verify', '--quiet', `refs/tags/v${version}^{commit}`]);
+  } catch {
+    rev = 'HEAD';
+  }
+  const tree = new Map();
+  for (const record of git(['ls-tree', '-r', '-z', '--full-tree', rev, '--', ...PAYLOAD]).split('\0').filter(Boolean)) {
+    const tab = record.indexOf('\t');
+    const [mode, type, object] = record.slice(0, tab).split(' ');
+    tree.set(record.slice(tab + 1), { mode, type, object });
+  }
+  return { rev, tree };
 }
 
 /**
@@ -133,14 +196,17 @@ export function checkRelease(root = ROOT, tag = null) {
   } catch (error) {
     problems.push(error.message);
   }
-  if (pkg.name !== NAME || pkg.private !== true) problems.push(`package.json must name the private package ${NAME}`);
   const version = typeof pkg.version === 'string' && VERSION.test(pkg.version) ? pkg.version : null;
   if (!version) problems.push('package.json version must be major.minor.patch');
+  problems.push(...packageProblems(pkg, version));
   for (const item of PAYLOAD) if (!describeEntry(root, item)) problems.push(`${item}: is missing`);
   try {
     problems.push(...attributeProblems(readText(root, '.gitattributes')));
   } catch (error) {
     problems.push(error.message);
+  }
+  for (const item of shippedTopLevel(root) ?? []) {
+    if (!PAYLOAD.includes(item) && !REPO_ONLY.includes(item)) problems.push(`${item}: is neither in the release payload nor a repo-only path; add it to PAYLOAD, or to REPO_ONLY with a "/${item} export-ignore" line`);
   }
   try {
     if (JSON.stringify(JSON.parse(readText(root, SKILLS_FILE))) !== JSON.stringify(skillsList(root))) problems.push(`${SKILLS_FILE} does not match the skill folders; run node scripts/gen.mjs`);
@@ -158,6 +224,11 @@ export function checkRelease(root = ROOT, tag = null) {
       } catch (error) {
         problems.push(error.message);
       }
+    }
+    try {
+      if (readText(root, 'README.md').includes(PRE_RELEASE_BANNER)) problems.push('README.md still carries the pre-release banner; remove it in the release commit');
+    } catch (error) {
+      problems.push(error.message);
     }
   }
   return { version, problems };
@@ -307,6 +378,33 @@ function partProblems(files, problems) {
 }
 
 /**
+ * Compare the archive's files with the tracked payload of `root`: every tracked file present with its exact bytes and
+ * executable bit, and nothing else. An export-ignore or export-subst attribute in a nested .gitattributes or in
+ * .git/info/attributes, or a line-ending filter, shows up here.
+ */
+function treeProblems(root, version, files, report) {
+  let payload;
+  try {
+    payload = trackedPayload(root, version);
+  } catch (error) {
+    report(`the tracked files of ${root} cannot be read: ${String(error.stderr ?? '').trim() || error.message}`);
+    return;
+  }
+  const blobs = readBlobs(root, [...new Set([...payload.tree.values()].filter((item) => item.type === 'blob').map((item) => item.object))]);
+  for (const [file, item] of payload.tree) {
+    if (item.type !== 'blob') {
+      report(`${file}: is a ${item.type} in git, which a release cannot ship`);
+      continue;
+    }
+    const entry = files.get(file);
+    if (!entry) report(`${file}: is tracked but missing from the archive; an export-ignore attribute dropped it`);
+    else if (!entry.data.equals(blobs.get(item.object))) report(`${file}: differs from the tracked file; an attribute such as export-subst or an end-of-line filter changed it`);
+    else if (entry.mode && ((entry.mode & 0o111) !== 0) !== (item.mode === '100755')) report(`${file}: its executable bit differs from git`);
+  }
+  for (const file of files.keys()) if (PAYLOAD.includes(file.split('/')[0]) && !payload.tree.has(file)) report(`${file}: is not a tracked file of ${payload.rev === 'HEAD' ? 'HEAD' : `v${version}`}`);
+}
+
+/**
  * Verify release assets in `dir` against the installer contract and, with `root`, against that checkout's manifest.
  * Returns a summary or throws an error listing every problem.
  */
@@ -328,6 +426,7 @@ export function verifyAssets(dir, { root = null } = {}) {
     reported.add(message);
   };
   for (const entry of entries) {
+    if (entry.name.length > MAX_ENTRY_NAME) report(`${visiblePath(entry.name)}: is ${entry.name.length} characters long; entry names stay at or under ${MAX_ENTRY_NAME}, so an installer that unpacks into a Windows temporary folder stays under the 260-character path limit`);
     if (!entry.name.startsWith(prefix)) {
       report(`${visiblePath(entry.name)}: lies outside the ${prefix} folder`);
       continue;
@@ -356,6 +455,7 @@ export function verifyAssets(dir, { root = null } = {}) {
   const skills = skillProblems(files, problems);
   const parts = partProblems(files, problems);
   if (root) {
+    treeProblems(root, zip.version, files, report);
     const expected = loadSources(root).parts.map((part) => part.id).sort(compareStrings);
     const shipped = parts.filter((folder) => folder.startsWith(`${VENDOR_DIR}/`)).map((folder) => folder.slice(VENDOR_DIR.length + 1));
     const missing = expected.filter((id) => !shipped.includes(id));
@@ -372,7 +472,7 @@ export function verifyAssets(dir, { root = null } = {}) {
 export function pack(root = ROOT, tag = null) {
   const { version, problems } = checkRelease(root, tag);
   if (problems.length) throw new Error(`The release inputs are not ready:\n- ${problems.join('\n- ')}`);
-  const git = gitIn(root);
+  const git = gitIn(root, { TZ: 'UTC' });
   if (git(['status', '--porcelain', '--untracked-files=normal'])) throw new Error('Commit every change before packing; the archive is made from HEAD');
   if (tag) {
     let tagged;

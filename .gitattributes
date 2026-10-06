@@ -3,6 +3,8 @@
 *.jpg binary
 skills/apple/.vendor/** -text linguist-vendored
 /.github export-ignore
+/.claude-plugin export-ignore
+/.codex-plugin export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /CONTRIBUTING.md export-ignore
@@ -15,3 +17,4 @@ skills/apple/.vendor/** -text linguist-vendored
 /scripts export-ignore
 /test export-ignore
 /vendor export-ignore
+/web-card.json export-ignore

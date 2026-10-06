@@ -161,6 +161,18 @@ test('agent metadata that allows implicit invocation fails the layout rule', (t)
   ]);
 });
 
+test('git metadata anywhere under skills/ fails the layout rule', (t) => {
+  const root = materialize();
+  t.after(() => removeTree(root));
+  fs.writeFileSync(path.join(root, 'skills', 'apple', '.gitattributes'), 'NOTICE.md export-ignore\n');
+  fs.mkdirSync(path.join(root, 'skills', 'apple', 'references'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'skills', 'apple', 'references', '.gitignore'), '*.md\n');
+  assert.deepEqual(summary(runGuard(root, { terms: FIXTURE_TERMS })).sort(), [
+    'layout skills/apple/.gitattributes: git metadata under skills/ changes what git stores and what a release ships; keep attributes and ignore rules at the repository root',
+    'layout skills/apple/references/.gitignore: git metadata under skills/ changes what git stores and what a release ships; keep attributes and ignore rules at the repository root',
+  ]);
+});
+
 test('each folder under skills/ is one skill with its own SKILL.md', (t) => {
   const root = materialize();
   t.after(() => removeTree(root));

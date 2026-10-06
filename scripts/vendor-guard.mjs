@@ -355,7 +355,9 @@ function checkSkills(root, entries, fail) {
     if (entry.kind === 'dir' && RESERVED_DIRS.has(name)) fail('layout', entry.path, `folders named ${name} are not allowed under ${SKILLS_DIR}/`);
     if (entry.kind === 'dir' && PLUGIN_DIRS.has(name) && segments.length > 2) fail('layout', entry.path, `${name} must not sit inside a skill folder`);
     if (entry.kind === 'file' && name === 'metadata.json') fail('layout', entry.path, 'installers drop files named metadata.json');
-    if (entry.kind === 'file' && GIT_METADATA_NAMES.has(name) && entry.path.startsWith(`${VENDOR_DIR}/`)) fail('layout', entry.path, 'nested git metadata changes what git stores; exclude it in vendor/sources.json');
+    if (entry.kind === 'file' && GIT_METADATA_NAMES.has(name)) {
+      fail('layout', entry.path, entry.path.startsWith(`${VENDOR_DIR}/`) ? 'nested git metadata changes what git stores; exclude it in vendor/sources.json' : 'git metadata under skills/ changes what git stores and what a release ships; keep attributes and ignore rules at the repository root');
+    }
   }
   const visible = skillEntries
     .filter((entry) => entry.kind === 'file' && entry.path.endsWith('/SKILL.md'))

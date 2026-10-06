@@ -4,14 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import {
+  MAX_ENTRY_NAME,
   NAME,
   PAYLOAD,
+  PRE_RELEASE_BANNER,
   REPO_ONLY,
   SUMS_FILE,
   attributeProblems,
   changelogProblems,
   checkRelease,
+  compareVersions,
   pack,
+  packageProblems,
   readZip,
   releaseNotes,
   verifyAssets,
@@ -127,6 +131,70 @@ for (const [label, mutate, message] of BROKEN) {
     assert.throws(() => pack(root), message);
   });
 }
+
+test('pack refuses an archive that leaves out or rewrites a tracked file', (t) => {
+  const nested = releaseFixture(t, (base) => {
+    write(base, 'skills/apple/notes.md', 'Notes.\n');
+    write(base, 'skills/apple/.gitattributes', 'notes.md export-ignore\n');
+  });
+  assert.throws(() => pack(nested), /skills\/apple\/notes\.md: is tracked but missing from the archive/);
+  const local = releaseFixture(t, (base) => write(base, 'skills/apple/notes.md', 'Notes.\n'));
+  write(local, '.git/info/attributes', 'skills/apple/notes.md export-ignore\n');
+  assert.throws(() => pack(local), /skills\/apple\/notes\.md: is tracked but missing from the archive/);
+  const substituted = releaseFixture(t, (base) => {
+    write(base, 'skills/apple/notes.md', `Built from ${['$Format', '%H$'].join(':')}\n`);
+    write(base, 'skills/apple/.gitattributes', 'notes.md export-subst\n');
+  });
+  assert.throws(() => pack(substituted), /skills\/apple\/notes\.md: differs from the tracked file/);
+});
+
+test('pack refuses entry names longer than the Windows installers can unpack', (t) => {
+  const root = releaseFixture(t, (base) => write(base, `skills/apple/references/${'a'.repeat(120)}.md`, 'Deep.\n'));
+  const length = `${NAME}-v0.0.0/skills/apple/references/${'a'.repeat(120)}.md`.length;
+  assert.ok(length > MAX_ENTRY_NAME);
+  assert.throws(() => pack(root), new RegExp(`is ${length} characters long; entry names stay at or under ${MAX_ENTRY_NAME}`));
+});
+
+test('the release ZIP does not depend on the packer\'s time zone', (t) => {
+  const root = releaseFixture(t);
+  const sumsIn = (zone) => {
+    const result = runScript(RELEASE, ['pack', '--root', root], { env: { ...process.env, TZ: zone } });
+    assert.equal(result.status, 0, result.stderr);
+    return fs.readFileSync(path.join(root, 'dist', SUMS_FILE), 'utf8');
+  };
+  assert.equal(sumsIn('America/Los_Angeles'), sumsIn('Asia/Ho_Chi_Minh'));
+});
+
+test('check names top-level items that are neither payload nor repo-only, and plugin and card files stay out', (t) => {
+  const stray = releaseFixture(t, (base) => write(base, 'extra.md', 'Stray.\n'));
+  assert.match(checkRelease(stray).problems.join('\n'), /extra\.md: is neither in the release payload nor a repo-only path/);
+  const listed = releaseFixture(t, (base) => {
+    write(base, '.claude-plugin/marketplace.json', '{}\n');
+    write(base, '.codex-plugin/plugin.json', '{}\n');
+    write(base, 'web-card.json', '{}\n');
+  });
+  assert.deepEqual(checkRelease(listed).problems, []);
+  const { dist, zip } = pack(listed);
+  const names = readZip(fs.readFileSync(path.join(dist, zip))).map((entry) => entry.name);
+  for (const item of ['.claude-plugin', '.codex-plugin', 'web-card.json']) assert.ok(!names.some((name) => name.split('/')[1] === item), item);
+});
+
+test('the package is private before 0.2.0 and a public scoped package from then on, and a tag drops the banner', (t) => {
+  assert.ok(compareVersions('0.10.0', '0.9.9') > 0 && compareVersions('0.2.0', '0.2.0') === 0 && compareVersions('0.1.9', '0.2.0') < 0);
+  assert.deepEqual(packageProblems({ name: NAME, private: true }, '0.1.0'), []);
+  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.1.0').join(''), /must name the private package design-pro-max before 0\.2\.0/);
+  assert.match(packageProblems({ name: NAME, private: true }, '0.2.0').join(''), /must name a public package @<scope>\/design-pro-max from 0\.2\.0 on/);
+  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.2.0').join(''), /public package/);
+  assert.deepEqual(packageProblems({ name: `@example/${NAME}` }, '0.2.0'), []);
+  const changelog = '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n- First release.\n';
+  const root = releaseFixture(t, (base) => {
+    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'CHANGELOG.md', changelog);
+    write(base, 'README.md', `# design-pro-max\n\n> ${PRE_RELEASE_BANNER} Nothing has been released yet.\n`);
+  });
+  assert.deepEqual(checkRelease(root).problems, []);
+  assert.deepEqual(checkRelease(root, 'v0.1.0').problems, ['README.md still carries the pre-release banner; remove it in the release commit']);
+});
 
 test('pack refuses an archive with a symlink', { skip: !canCreate('symlink') && 'cannot create a symlink here' }, (t) => {
   const root = releaseFixture(t, (base) => fs.symlinkSync('SKILL.md', path.join(base, 'skills', 'apple', 'alias.md')));
