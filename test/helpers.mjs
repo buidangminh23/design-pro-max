@@ -166,15 +166,23 @@ export function upstreamEnv(home) {
 }
 
 /**
- * Commit `files` (path to text, or to `{ text, executable }`) as the only commit of a fake upstream repository named
- * `repo`, and return the commit SHA.
+ * The working folder of the fake upstream repository named `repo`.
  */
-export function commitUpstream(home, repo, files) {
-  const dir = path.join(home, 'upstream', ...`${repo}.git`.split('/'));
+export function upstreamDir(home, repo) {
+  return path.join(home, 'upstream', ...`${repo}.git`.split('/'));
+}
+
+/**
+ * Commit `files` (path to text, or to `{ text, executable }`) to a fake upstream repository named `repo`, after
+ * deleting the paths in `remove`, and return the commit SHA. The first call creates the repository.
+ */
+export function commitUpstream(home, repo, files, { remove = [] } = {}) {
+  const dir = upstreamDir(home, repo);
   fs.mkdirSync(dir, { recursive: true });
   const env = isolatedGitEnv(home);
   const git = (...args) => execFileSync('git', ['-C', dir, ...args], { env, encoding: 'utf8' }).trim();
   git('init', '--quiet');
+  for (const relative of remove) fs.rmSync(path.join(dir, ...relative.split('/')), { force: true });
   for (const [relative, spec] of Object.entries(files)) {
     const file = path.join(dir, ...relative.split('/'));
     fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -183,7 +191,7 @@ export function commitUpstream(home, repo, files) {
   }
   git('add', '--all');
   for (const [relative, spec] of Object.entries(files)) {
-    if (typeof spec === 'object' && spec.executable) git('update-index', '--chmod=+x', '--', relative);
+    git('update-index', `--chmod=${typeof spec === 'object' && spec.executable ? '+' : '-'}x`, '--', relative);
   }
   git('-c', 'user.name=Fixture', '-c', `user.email=${['fixture', 'users.noreply.github.com'].join('@')}`, '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'fixture');
   return git('rev-parse', 'HEAD');
