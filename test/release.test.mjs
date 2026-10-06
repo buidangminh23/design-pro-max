@@ -148,6 +148,27 @@ test('pack refuses an archive that leaves out or rewrites a tracked file', (t) =
   assert.throws(() => pack(substituted), /skills\/apple\/notes\.md: differs from the tracked file/);
 });
 
+test('verify compares the executable bit of each file with git', { skip: process.platform === 'win32' && 'git on Windows records no executable bit from the file system' }, (t) => {
+  const root = releaseFixture(t, (base) => {
+    write(base, 'skills/apple/tool.sh', '#!/bin/sh\necho tool\n');
+    fs.chmodSync(path.join(base, 'skills', 'apple', 'tool.sh'), 0o755);
+  });
+  const { dist, zip } = pack(root);
+  const file = path.join(dist, zip);
+  const buffer = fs.readFileSync(file);
+  const name = Buffer.from(`${NAME}-v0.0.0/skills/apple/tool.sh`);
+  const central = Buffer.from([0x50, 0x4b, 0x01, 0x02]);
+  let offset = buffer.indexOf(central);
+  while (offset >= 0 && !buffer.subarray(offset + 46, offset + 46 + name.length).equals(name)) offset = buffer.indexOf(central, offset + 4);
+  assert.ok(offset >= 0, 'the central directory names the script');
+  assert.ok((buffer.readUInt32LE(offset + 38) >>> 16) & 0o100, 'git archive marks the script executable');
+  buffer.writeUInt16LE(0x003f, offset + 4);
+  buffer.writeUInt32LE(0, offset + 38);
+  fs.writeFileSync(file, buffer);
+  fs.writeFileSync(path.join(dist, SUMS_FILE), sums(zip, file));
+  assert.throws(() => verifyAssets(dist, { root }), /skills\/apple\/tool\.sh: its executable bit differs from git/);
+});
+
 test('pack refuses entry names longer than the Windows installers can unpack', (t) => {
   const root = releaseFixture(t, (base) => write(base, `skills/apple/references/${'a'.repeat(120)}.md`, 'Deep.\n'));
   const length = `${NAME}-v0.0.0/skills/apple/references/${'a'.repeat(120)}.md`.length;

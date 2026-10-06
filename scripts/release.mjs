@@ -399,7 +399,7 @@ function treeProblems(root, version, files, report) {
     const entry = files.get(file);
     if (!entry) report(`${file}: is tracked but missing from the archive; an export-ignore attribute dropped it`);
     else if (!entry.data.equals(blobs.get(item.object))) report(`${file}: differs from the tracked file; an attribute such as export-subst or an end-of-line filter changed it`);
-    else if (entry.mode && ((entry.mode & 0o111) !== 0) !== (item.mode === '100755')) report(`${file}: its executable bit differs from git`);
+    else if (((entry.mode & 0o111) !== 0) !== (item.mode === '100755')) report(`${file}: its executable bit differs from git`);
   }
   for (const file of files.keys()) if (PAYLOAD.includes(file.split('/')[0]) && !payload.tree.has(file)) report(`${file}: is not a tracked file of ${payload.rev === 'HEAD' ? 'HEAD' : `v${version}`}`);
 }
