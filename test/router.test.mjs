@@ -24,6 +24,10 @@ test('the router is the apple skill with a description inside the limits', () =>
   assert.ok(!/[<>]/.test(fields.description), 'no angle brackets in the description');
 });
 
+test('the description opens with a referential phrase', () => {
+  assert.ok(fields.description.startsWith('For Apple app code ('), fields.description.slice(0, 40));
+});
+
 test('the first 68 characters of the description carry the job', () => {
   const firstSentence = fields.description.indexOf('. ') + 1;
   assert.ok(firstSentence > 0 && firstSentence <= 68, `first sentence ends at ${firstSentence}`);

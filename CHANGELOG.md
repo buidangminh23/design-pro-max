@@ -24,3 +24,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The `apple` skill: a router `SKILL.md` with standing rules (full reads, part paths resolved from the file that mentions them, activation checks, an approval gate for App Store Connect mutations and disk cleanup deletions, asc telemetry off), a routing table and a parts index.
 - README with the layout, why `.vendor` is hidden, the parts and their prerequisites, credits, maintenance commands, exclude glob rules and disclaimers.
 - Tests for the manifest, the vendored tree and notices, every guard rule on its own fixture, both command-line tools (including runs through a symlinked path and FIFOs where files are expected), sync against local fake upstream repositories, the router and its path rule, and the README.
+
+### Changed
+
+- The router's description opens with a referential phrase, "For Apple app code (SwiftUI, Swift 6, SwiftData, Xcode, App Store).", instead of starting with the mark; the first sentence stays within 68 characters and keeps its keywords.

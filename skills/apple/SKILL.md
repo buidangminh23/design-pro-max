@@ -1,6 +1,6 @@
 ---
 name: apple
-description: Apple app code (SwiftUI, Swift 6, SwiftData, Xcode, App Store). Routes each task to one bundled third-party guide and reads it in full. Use for writing or reviewing SwiftUI, Swift concurrency diagnosis and Swift 6 migration, Swift Testing, SwiftData or Core Data, freeing Xcode disk space, and, once their prerequisites exist, slow Xcode builds, Tuist menu bar apps and App Store Connect work with the asc CLI. Not for web springs or gestures (apple-design) or general Swift style (write-swift).
+description: For Apple app code (SwiftUI, Swift 6, SwiftData, Xcode, App Store). Routes each task to one bundled third-party guide and reads it in full. Use for writing or reviewing SwiftUI, Swift concurrency diagnosis and Swift 6 migration, Swift Testing, SwiftData or Core Data, freeing Xcode disk space, and, once their prerequisites exist, slow Xcode builds, Tuist menu bar apps and App Store Connect work with the asc CLI. Not for web springs or gestures (apple-design) or general Swift style (write-swift).
 ---
 
 # apple
