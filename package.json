@@ -21,7 +21,10 @@
     "notices": "node scripts/vendor-sync.mjs notices",
     "gen": "node scripts/gen.mjs",
     "gen:check": "node scripts/gen.mjs --check",
-    "history": "node scripts/check-history.mjs"
+    "history": "node scripts/check-history.mjs",
+    "release:check": "node scripts/release.mjs check",
+    "release:notes": "node scripts/release.mjs notes",
+    "release:pack": "node scripts/release.mjs pack"
   },
   "engines": {
     "node": ">=22"

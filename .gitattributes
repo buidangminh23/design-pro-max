@@ -2,3 +2,16 @@
 *.png binary
 *.jpg binary
 skills/apple/.vendor/** -text linguist-vendored
+/.github export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/CONTRIBUTING.md export-ignore
+/designs export-ignore
+/evals export-ignore
+/evidence export-ignore
+/fixtures export-ignore
+/package.json export-ignore
+/rules.json export-ignore
+/scripts export-ignore
+/test export-ignore
+/vendor export-ignore

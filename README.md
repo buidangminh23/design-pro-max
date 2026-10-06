@@ -29,6 +29,7 @@ scripts/vendor-sync.mjs      sync, check and notices
 scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
 scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
+scripts/release.mjs          checks, packs and verifies the release ZIP
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 ```
 
@@ -126,6 +127,10 @@ Node 22 or later; no dependencies.
 | `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, the README credits table and the trademark line in this README and in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
 | `node scripts/check-history.mjs` | Fails when any commit reachable from HEAD adds an image, font, media file or archive, recognised by extension or by its first bytes, other than a reviewed file with its reviewed bytes (`REVIEWED_MEDIA` in `scripts/lib/media.mjs`; today only `skills/apple/assets/apple.svg`), or any file in a vendored part's `assets/` or `agents/` folder. It needs the full history, so it fails in a shallow clone |
+| `node scripts/release.mjs check [vX.Y.Z]` | Validates the release inputs: the payload exists, `skills.json` is current and `.gitattributes` marks exactly the repo-only paths `export-ignore`. With a tag, the tag must match the `package.json` version, `[Unreleased]` must be empty and the newest CHANGELOG entry must be that version, dated, with notes |
+| `node scripts/release.mjs notes vX.Y.Z` | Prints the CHANGELOG notes of that version |
+| `node scripts/release.mjs pack [vX.Y.Z]` | Builds `dist/design-pro-max-vX.Y.Z.zip` from a clean HEAD (the tag's commit when a tag is given) with git archive, plus `dist/SHA256SUMS.txt` naming it, then verifies both. The ZIP holds one `design-pro-max-vX.Y.Z/` folder with `skills/` (the hidden `.vendor/` folders included), `skills.json`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `CHANGELOG.md`; everything else is `export-ignore` |
+| `node scripts/release.mjs verify <dir>` | Checks release assets, such as a downloaded release, against the installers' contract: `SHA256SUMS.txt` names exactly one ZIP, without "plugin" in its name, and its hash matches; the ZIP holds one `SKILL.md` outside dot-folders per skill in `skills.json`, every vendored file with the hash in its `UPSTREAM.json`, one MIT `LICENSE` per part and exactly the parts of `vendor/sources.json`, and no symlinks, `__pycache__` folders, compiled Python, `metadata.json` files or media other than reviewed files |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories |
 
 To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.
