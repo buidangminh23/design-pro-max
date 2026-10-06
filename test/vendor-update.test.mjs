@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { VENDOR_DIR, readUpstream, sha256 } from '../scripts/lib/vendor.mjs';
-import { applyUpdate, checkVendor, classifyUpdate, compareParts, hostsIn, lineChanges, linksIn, mixedScriptWords, readStaged, renderProposal } from '../scripts/vendor-sync.mjs';
+import { applyUpdate, checkVendor, classifyUpdate, compareParts, lineChanges, linksIn, mixedScriptWords, readStaged, renderProposal } from '../scripts/vendor-sync.mjs';
 import { ROOT, canCreate, commitUpstream, materialize, removeTree, runScript, tempDir, upstreamDir, upstreamEnv } from './helpers.mjs';
 
 const SYNC = path.join(ROOT, 'scripts', 'vendor-sync.mjs');
@@ -333,9 +333,8 @@ test('a command moved to another file still counts as added there', () => {
   assert.ok(reasons.includes('demo: references/usage.md adds a link to github.com/evil-org/tool/raw/main/install.sh'), reasons.join('\n'));
 });
 
-test('hostsIn, linksIn, lineChanges and mixedScriptWords read text the way the classifier needs', () => {
-  assert.deepEqual([...hostsIn(`See https://Docs.Example.org/a, ${scpHost('code.example.com', 't/r.git')} and mirror.example.net/x.`)].sort(), ['code.example.com', 'docs.example.org', 'mirror.example.net']);
-  assert.deepEqual([...hostsIn('A path like references/guide.md and version 1.2.3, no hosts.')], []);
+test('linksIn, lineChanges and mixedScriptWords read text the way the classifier needs', () => {
+  assert.deepEqual([...linksIn('A path like references/guide.md and version 1.2.3, no links.')], []);
   assert.deepEqual([...linksIn(`See https://Docs.Example.org/a, ${scpHost('code.example.com', 't/r.git')}, mirror.example.net/x. and https://example.org.`)].sort(), ['code.example.com/t/r.git', 'docs.example.org/a', 'example.org', 'mirror.example.net/x']);
   assert.deepEqual(lineChanges('a\nb\n', 'a\n```\nnew\n```\nb\n'), { added: ['```', 'new', '```'], removed: 0, code: 1 });
   assert.deepEqual(lineChanges('a\na\nb\n', 'a\nc\n'), { added: ['c'], removed: 2, code: 0 });

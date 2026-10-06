@@ -507,9 +507,6 @@ const REPORT_FILE = 'report.json';
 const SCRIPT_EXTENSIONS = new Set(['.applescript', '.bash', '.bat', '.cjs', '.cmd', '.cts', '.fish', '.js', '.lua', '.mjs', '.mts', '.php', '.pl', '.ps1', '.psm1', '.py', '.rb', '.scpt', '.sh', '.swift', '.ts', '.zsh']);
 const SCRIPT_FOLDERS = new Set(['bin', 'hooks', 'scripts']);
 const UTF8 = new TextDecoder('utf-8', { fatal: true });
-const URL_HOST = /\b[a-z][a-z0-9+.-]*:\/\/(?:[^\s/?#@"'<>()[\]{}`]*@)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+)/gi;
-const SCP_HOST = /(?<![\w.-])[\w.-]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+):(?!\/\/)/gi;
-const BARE_HOST = /(?<![\w@./:-])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,})(?=\/[\w~-])/gi;
 const URL_LINK = /\b[a-z][a-z0-9+.-]*:\/\/(?:[^\s/?#@"'<>()[\]{}`]*@)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+)(?::\d+)?([^\s"'<>()[\]{}`|\\]*)/gi;
 const SCP_LINK = /(?<![\w.-])[\w.-]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+):(?!\/\/)([^\s"'<>()[\]{}`|\\]*)/gi;
 const BARE_LINK = /(?<![\w@./:-])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,})(\/[\w~-][^\s"'<>()[\]{}`|\\]*)/gi;
@@ -560,15 +557,6 @@ const decode = (bytes) => {
     return null;
   }
 };
-
-/**
- * Host names a text points to: URL hosts, scp-style git hosts and bare domains followed by a path.
- */
-export function hostsIn(text) {
-  const hosts = new Set();
-  for (const pattern of [URL_HOST, SCP_HOST, BARE_HOST]) for (const match of text.matchAll(pattern)) hosts.add(match[1].toLowerCase().replace(/\.+$/, ''));
-  return hosts;
-}
 
 /**
  * Every place a text links to, as host plus path: URLs, scp-style git remotes and bare domains followed by a path. Two
