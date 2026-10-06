@@ -34,8 +34,8 @@ Never edit a vendored file. Record a known error as an erratum in `vendor/source
 
 ## Vendor updates
 
-The weekly vendor sync proposes upstream changes as one pull request on the `vendor-sync` branch. A `safe` update merges itself once its checks pass; a `needs-review` update waits for the maintainer. Comments on that pull request about what you checked in the upstream diff are welcome.
+The weekly vendor sync proposes upstream changes as one pull request on the `vendor-sync` branch. Only an update that changes no shipped file, where upstream moved past the pins without touching the parts, merges itself, after the CI workflow passes on it; every update that adds, removes or edits a file waits for the maintainer, because agents read and run these files with the user's permissions. Comments on that pull request about what you checked in the upstream diff are welcome.
 
 ## Releases
 
-The maintainer cuts releases from `vX.Y.Z` tags; the README's Maintenance section describes the steps and the workflows.
+The maintainer cuts releases from `vX.Y.Z` tags on commits that are already on `main` and green in CI; the README's Maintenance section describes the steps and the workflows.
