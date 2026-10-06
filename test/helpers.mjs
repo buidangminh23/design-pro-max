@@ -144,6 +144,9 @@ export function commitUpstream(home, repo, files) {
     fs.chmodSync(file, typeof spec === 'object' && spec.executable ? 0o755 : 0o644);
   }
   git('add', '--all');
+  for (const [relative, spec] of Object.entries(files)) {
+    if (typeof spec === 'object' && spec.executable) git('update-index', '--chmod=+x', '--', relative);
+  }
   git('-c', 'user.name=Fixture', '-c', `user.email=${['fixture', 'users.noreply.github.com'].join('@')}`, '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'fixture');
   return git('rev-parse', 'HEAD');
 }
