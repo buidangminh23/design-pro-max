@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { MEDIA_EXTENSIONS, NOTICES_FILE, RECORD_KEYS, UPSTREAM_FILE, VENDOR_DIR, isExcluded, isMitLicence, loadSources, readUpstream, walk } from '../scripts/lib/vendor.mjs';
+import { MEDIA_EXTENSIONS, NOTICES_FILE, RECORD_KEYS, UPSTREAM_FILE, VENDOR_DIR, copyrightLines, isExcluded, isMitLicence, loadSources, readUpstream, walk } from '../scripts/lib/vendor.mjs';
+import { MEDIA_NOTICES } from '../scripts/lib/media.mjs';
 import { buildNotices, checkVendor, chooseLicence, planPart } from '../scripts/vendor-sync.mjs';
 import { ROOT, canCreate, materialize, removeTree, tempDir } from './helpers.mjs';
 
@@ -234,4 +235,11 @@ test('exclude globs are anchored at the part folder and match the folders above 
   assert.ok(!isExcluded('deep/.DS_Store', ['.DS_Store']));
   assert.ok(!isExcluded('references/skills.md', ['skills/**']));
   assert.ok(!isExcluded('SKILL.md', []));
+});
+
+test('a licence line that starts with COPYRIGHT HOLDERS is licence text, not a copyright notice', () => {
+  const wrapped = MEDIA_NOTICES.find((media) => media.project === 'devicon').licence;
+  assert.ok(wrapped.split('\n').some((line) => line.startsWith('COPYRIGHT HOLDERS')));
+  assert.ok(isMitLicence(wrapped));
+  assert.deepEqual(copyrightLines(wrapped), ['Copyright (c) 2015 konpa']);
 });

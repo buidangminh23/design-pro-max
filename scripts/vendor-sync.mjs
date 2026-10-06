@@ -63,6 +63,7 @@ import {
   walk,
   writeRegular,
 } from './lib/vendor.mjs';
+import { MEDIA_NOTICES } from './lib/media.mjs';
 import { RISKY_PATTERNS, visiblePath } from './vendor-guard.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -456,7 +457,7 @@ export function buildNotices(root = ROOT) {
   const lines = [
     '# Third-party notices',
     '',
-    'design-pro-max includes third-party agent skills, unmodified, in `skills/apple/.vendor/`. Each part keeps its upstream licence in its own `LICENSE` file and records its origin in `UPSTREAM.json`.',
+    'design-pro-max includes third-party agent skills, unmodified, in `skills/apple/.vendor/`. Each part keeps its upstream licence in its own `LICENSE` file and records its origin in `UPSTREAM.json`. The third-party drawings it ships are listed after the parts, with their licences.',
     '',
     'Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the licences below. Each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`.',
     '',
@@ -481,6 +482,21 @@ export function buildNotices(root = ROOT) {
         marker,
       );
     }
+  }
+  for (const notice of MEDIA_NOTICES) {
+    const marker = fence(notice.licence);
+    lines.push(
+      '',
+      `## ${notice.project}`,
+      '',
+      `- Files: ${notice.files.map((file) => `\`${file}\``).join(', ')}`,
+      `- Source: ${notice.source}`,
+      `- Licence: ${isMitLicence(notice.licence) ? 'MIT' : 'see the text below'}; it covers the drawing, not a trademark the drawing shows`,
+      '',
+      `${marker}text`,
+      notice.licence.trimEnd(),
+      marker,
+    );
   }
   return `${lines.join('\n')}\n`;
 }

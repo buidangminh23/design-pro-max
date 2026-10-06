@@ -1,6 +1,6 @@
 # Third-party notices
 
-design-pro-max includes third-party agent skills, unmodified, in `skills/apple/.vendor/`. Each part keeps its upstream licence in its own `LICENSE` file and records its origin in `UPSTREAM.json`.
+design-pro-max includes third-party agent skills, unmodified, in `skills/apple/.vendor/`. Each part keeps its upstream licence in its own `LICENSE` file and records its origin in `UPSTREAM.json`. The third-party drawings it ships are listed after the parts, with their licences.
 
 Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the licences below. Each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`.
 
@@ -292,4 +292,33 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
+
+## devicon
+
+- Files: `skills/apple/assets/apple.svg`
+- Source: https://github.com/devicons/devicon
+- Licence: MIT; it covers the drawing, not a trademark the drawing shows
+
+```text
+The MIT License (MIT)
+
+Copyright (c) 2015 konpa
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```

@@ -6,7 +6,7 @@
  *   skills/apple/references/parts-index.md   every part with its group, status, activation check, prerequisites and
  *                                            errata pointers
  *   README.md                                the credits table and the trademark line
- *   skills/apple/NOTICE.md                   the trademark line
+ *   skills/apple/NOTICE.md                   the trademark line and the licences of third-party drawings it ships
  *
  *   node scripts/gen.mjs [--check] [--root <dir>]
  *
@@ -35,6 +35,7 @@ import {
   walk,
   writeRegular,
 } from './lib/vendor.mjs';
+import { MEDIA_NOTICES } from './lib/media.mjs';
 
 export const SKILLS_FILE = 'skills.json';
 export const PARTS_INDEX_FILE = `${SKILL_DIR}/references/parts-index.md`;
@@ -193,6 +194,21 @@ export function trademarkLine(marks, { logo = false } = {}) {
 }
 
 /**
+ * The media block of a skill's NOTICE.md: each third-party drawing the skill ships, where it comes from and its full
+ * licence text, from MEDIA_NOTICES in scripts/lib/media.mjs.
+ */
+export function mediaNoticeBlock(skillPath) {
+  const notices = MEDIA_NOTICES.filter((notice) => notice.files.some((file) => file.startsWith(`${skillPath}/`)));
+  if (!notices.length) return 'This skill ships no third-party drawing.';
+  return notices.map((notice) => {
+    const files = notice.files.filter((file) => file.startsWith(`${skillPath}/`)).map((file) => `\`${file.slice(skillPath.length + 1)}\``);
+    let fence = '```';
+    while (notice.licence.includes(fence)) fence += '`';
+    return [`The drawing in ${files.join(', ')} comes from ${notice.project} (${notice.source}) under this licence, which covers the drawing and not the trademark it shows:`, '', `${fence}text`, notice.licence.trimEnd(), fence].join('\n');
+  }).join('\n\n');
+}
+
+/**
  * Replace the lines between the start and end markers of one gen block, keeping the markers.
  */
 export function replaceBlock(text, name, body, file) {
@@ -244,7 +260,7 @@ export function generate(root = ROOT) {
   const marks = usedMarks(ownText(root, files));
   const line = trademarkLine(marks, { logo: describeEntry(root, LOGO_FILE)?.kind === 'file' });
   files.set(README_FILE, replaceBlock(readme, 'trademarks', line, README_FILE));
-  files.set(NOTICE_FILE, replaceBlock(readText(root, NOTICE_FILE), 'trademarks', line, NOTICE_FILE));
+  files.set(NOTICE_FILE, replaceBlock(replaceBlock(readText(root, NOTICE_FILE), 'trademarks', line, NOTICE_FILE), 'media', mediaNoticeBlock(SKILL_DIR), NOTICE_FILE));
   return { files, marks, trademarks: line };
 }
 

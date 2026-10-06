@@ -508,7 +508,7 @@ export function frontmatterProblems(text) {
 }
 
 const isTitleLine = (line) => /^\s*#*\s*(?:the\s+)?mit\s+licen[cs]e(?:\s*\(mit\))?\s*$/i.test(line);
-const isCopyrightLine = (line) => /^\s*(?:copyright\b|\(c\)|\u{A9})/iu.test(line);
+const isCopyrightLine = (line) => /^\s*(?:copyright\b(?!\s+holders\b)|\(c\)|\u{A9})/iu.test(line);
 
 /**
  * Licence text without its title and copyright lines, whitespace collapsed, ready to compare with the MIT template.

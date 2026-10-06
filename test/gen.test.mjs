@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { SKILL_DIR, loadSources } from '../scripts/lib/vendor.mjs';
+import { SKILL_DIR, isMitLicence, loadSources } from '../scripts/lib/vendor.mjs';
+import { MEDIA_NOTICES, REVIEWED_MEDIA } from '../scripts/lib/media.mjs';
 import {
   CISCO_SENTENCE,
   NOTICE_FILE,
@@ -11,6 +12,7 @@ import {
   SKILLS_FILE,
   errataPointers,
   generate,
+  mediaNoticeBlock,
   replaceBlock,
   staleFiles,
   trademarkLine,
@@ -81,6 +83,21 @@ test('README.md and NOTICE.md carry the generated trademark line', () => {
   assert.ok(trademarks.endsWith(CISCO_SENTENCE));
   assert.ok(read(ROOT, README_FILE).includes(trademarks));
   assert.ok(read(ROOT, NOTICE_FILE).includes(trademarks));
+});
+
+test('NOTICE.md and THIRD_PARTY_NOTICES.md carry the full licence of every third-party drawing', () => {
+  const notice = read(ROOT, NOTICE_FILE);
+  const notices = read(ROOT, 'THIRD_PARTY_NOTICES.md');
+  assert.ok(MEDIA_NOTICES.length > 0);
+  for (const media of MEDIA_NOTICES) {
+    assert.ok(isMitLicence(media.licence), media.project);
+    for (const file of media.files) assert.ok(REVIEWED_MEDIA.has(file), `${file} is a reviewed file`);
+    assert.ok(notice.includes(media.licence.trimEnd()), `${media.project} licence in NOTICE.md`);
+    assert.ok(notices.includes(`## ${media.project}\n`), `${media.project} section in THIRD_PARTY_NOTICES.md`);
+    assert.ok(notices.includes(media.licence.trimEnd()), `${media.project} licence in THIRD_PARTY_NOTICES.md`);
+  }
+  assert.match(notice, /The drawing in `assets\/apple\.svg` comes from devicon \(https:\/\/github\.com\/devicons\/devicon\)/);
+  assert.equal(mediaNoticeBlock('skills/other'), 'This skill ships no third-party drawing.');
 });
 
 test('replaceBlock rewrites only the lines between its markers', () => {
