@@ -22,7 +22,7 @@
       "errata": [
         "references/latest-apis.md:381, :386 and :418 use APIs that are absent from Apple's documentation index (checked 2026-10-06).",
         "references/latest-apis.md:402 and :406: .concentric is not a RoundedCornerStyle.",
-        "references/toolbar-patterns.md:33: .navigationBarLeading is deprecated as of SDK 27.2; use .topBarLeading.",
+        "references/toolbar-patterns.md:33 uses .navigationBarLeading, which Apple's documentation marks as deprecated; use .topBarLeading.",
         "references/latest-apis.md:5 points to a maintenance skill (.agents/skills/update-swiftui-apis) that does not ship with this part; ignore that instruction."
       ],
       "appleText": [
@@ -628,7 +628,7 @@
         "The upload step (SKILL.md:107) runs without --confirm."
       ],
       "errata": [
-        "SKILL.md:119 uses the profile 'sRGB IEC61966-2.1.icc', which macOS 27.2 does not ship; use 'sRGB Profile.icc'."
+        "SKILL.md:119 names the profile 'sRGB IEC61966-2.1.icc'; where /System/Library/ColorSync/Profiles lacks it, use 'sRGB Profile.icc' from the same folder."
       ],
       "appleText": []
     },

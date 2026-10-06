@@ -29,7 +29,7 @@ This skill routes Apple-platform tasks to third-party guides ("parts") bundled u
 
 | Task | Part | Status |
 |---|---|---|
-| Write, review, refactor or migrate SwiftUI: state, navigation, sheets, toolbars, lists, layout, animation, Liquid Glass, macOS scenes (MenuBarExtra, Settings), SDK 26 to 27.1 deprecations | `.vendor/swiftui-expert-skill/SKILL.md` | active |
+| Write, review, refactor or migrate SwiftUI: state, navigation, sheets, toolbars, lists, layout, animation, Liquid Glass, macOS scenes (MenuBarExtra, Settings), SDK 26 and 27 deprecations | `.vendor/swiftui-expert-skill/SKILL.md` | active |
 | SwiftUI performance: slow body updates, hangs, hitches, Instruments traces | `.vendor/swiftui-expert-skill/SKILL.md` | active |
 | Swift concurrency in a configured project: data-race and Sendable diagnosis, module-wide Swift 6 migration plans | `.vendor/swift-concurrency/SKILL.md` | active |
 | Swift Testing: review existing suites, migrate from XCTest, traits, parameterized, async and exit tests, attachments | `.vendor/swift-testing-pro/SKILL.md` | active |

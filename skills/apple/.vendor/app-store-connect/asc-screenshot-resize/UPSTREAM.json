@@ -24,7 +24,7 @@
     "The upload step (SKILL.md:107) runs without --confirm."
   ],
   "errata": [
-    "SKILL.md:119 uses the profile 'sRGB IEC61966-2.1.icc', which macOS 27.2 does not ship; use 'sRGB Profile.icc'."
+    "SKILL.md:119 names the profile 'sRGB IEC61966-2.1.icc'; where /System/Library/ColorSync/Profiles lacks it, use 'sRGB Profile.icc' from the same folder."
   ],
   "appleText": [],
   "files": [

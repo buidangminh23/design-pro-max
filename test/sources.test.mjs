@@ -1,9 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PART_KEYS, loadSources, validateSources } from '../scripts/lib/vendor.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { PART_KEYS, SKILL_DIR, loadSources, validateSources } from '../scripts/lib/vendor.mjs';
 import { ROOT } from './helpers.mjs';
 
 const manifest = loadSources(ROOT);
+const NEWEST_RELEASED_OS = 27.0;
+const OS_VERSION = /\b(?:iOS|iPadOS|macOS|watchOS|tvOS|visionOS|SDKs?)\s+(\d+(?:\.\d+)?)\+?(?:\s*(?:to|through|and|-|\u2013)\s*(\d+(?:\.\d+)?))?/g;
 const ACTIVE = ['swiftui-expert-skill', 'swift-concurrency', 'swift-testing-pro', 'swiftdata-pro', 'core-data-expert', 'xcode-disk-cleanup'];
 
 test('the manifest lists 38 parts with unique ids and the documented key set', () => {
@@ -83,4 +87,16 @@ test('the manifest records the Apple text that ships in three parts', () => {
   const createUi = manifest.parts.find((part) => part.id === 'app-store-connect/asc-app-create-ui');
   assert.deepEqual(createUi.appleText.map((quote) => `${quote.file}:${quote.lines}`), ['SKILL.md:131']);
   for (const quote of manifest.parts.flatMap((part) => part.appleText)) assert.match(quote.source, /^https:\/\/developer\.apple\.com\/|Apple/);
+});
+
+test('errata and the project\'s own text name only released OS and SDK versions', () => {
+  const own = ['README.md', 'CHANGELOG.md', `${SKILL_DIR}/SKILL.md`, `${SKILL_DIR}/NOTICE.md`].map((file) => [file, fs.readFileSync(path.join(ROOT, ...file.split('/')), 'utf8')]);
+  const texts = [...manifest.parts.flatMap((part) => [part.activation, ...part.prerequisites, ...part.risks, ...part.errata].map((text) => [part.id, text])), ...own];
+  for (const [where, text] of texts) {
+    for (const match of text.matchAll(OS_VERSION)) {
+      for (const version of match.slice(1).filter(Boolean)) {
+        assert.ok(Number(version) <= NEWEST_RELEASED_OS, `${where} names ${match[0]}, past the newest released ${NEWEST_RELEASED_OS}; name only released versions, or raise NEWEST_RELEASED_OS once Apple ships it`);
+      }
+    }
+  }
 });
