@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: release-${{ inputs.tag || github.ref_name }}
+  group: release
   cancel-in-progress: false
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-      - name: Check the tag and the release inputs
+      - name: Check the tag, its place on main and the release inputs
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
         run: |
@@ -41,6 +41,11 @@ jobs:
             v[0-9]*.[0-9]*.[0-9]*) ;;
             *) echo "$TAG is not a vX.Y.Z tag"; exit 1 ;;
           esac
+          git fetch -q --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "$TAG points to a commit that is not on main; push main, wait for CI, then push the tag."
+            exit 1
+          fi
           node scripts/release.mjs check "$TAG"
       - name: Tests
         run: npm test
@@ -78,7 +83,6 @@ jobs:
     permissions:
       contents: write
     env:
-      GH_TOKEN: ${{ github.token }}
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,32 +98,79 @@ jobs:
           path: ${{ runner.temp }}/assets
       - name: Verify the built assets
         run: node scripts/release.mjs verify "$RUNNER_TEMP/assets"
-      - name: Create the draft release, or check the published one
+      - name: Create the draft release, or find the published one
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           state=$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null || echo missing)
           case "$state" in
-            missing) gh release create "$TAG" --verify-tag --draft --title "$TAG" --notes-file "$RUNNER_TEMP/assets/release-notes.md" "$RUNNER_TEMP"/assets/*.zip "$RUNNER_TEMP/assets/SHA256SUMS.txt" ;;
+            missing)
+              gh release create "$TAG" --verify-tag --draft --title "$TAG" --notes-file "$RUNNER_TEMP/assets/release-notes.md" "$RUNNER_TEMP"/assets/*.zip "$RUNNER_TEMP/assets/SHA256SUMS.txt"
+              state=true
+              ;;
             true) gh release upload "$TAG" "$RUNNER_TEMP"/assets/*.zip "$RUNNER_TEMP/assets/SHA256SUMS.txt" --clobber ;;
             false) echo "$TAG is already published; its assets are only verified." ;;
             *) echo "Unexpected release state: $state"; exit 1 ;;
           esac
+          echo "draft=$state" >> "$GITHUB_OUTPUT"
+      - name: Hold exactly the ZIP and SHA256SUMS.txt
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRAFT: ${{ steps.release.outputs.draft }}
+        run: |
+          zip=$(basename "$RUNNER_TEMP"/assets/*.zip)
+          expected=$(printf '%s\n' "$zip" SHA256SUMS.txt | sort)
+          while read -r name; do
+            if ! printf '%s\n' "$expected" | grep -qxF "$name"; then
+              if [ "$DRAFT" != true ]; then
+                echo "The published release $TAG also holds $name; installers read every asset, so remove it by hand."
+                exit 1
+              fi
+              gh release delete-asset "$TAG" "$name" --yes
+            fi
+          done < <(gh release view "$TAG" --json assets --jq '.assets[].name')
+          actual=$(gh release view "$TAG" --json assets --jq '.assets[].name' | sort)
+          if [ "$actual" != "$expected" ]; then
+            echo "$TAG holds $(printf '%s' "$actual" | tr '\n' ' ')instead of $zip and SHA256SUMS.txt."
+            exit 1
+          fi
       - name: Download the release and verify it again
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRAFT: ${{ steps.release.outputs.draft }}
         run: |
           downloaded="$RUNNER_TEMP/downloaded"
           mkdir -p "$downloaded"
           gh release download "$TAG" --dir "$downloaded" --pattern '*.zip' --pattern 'SHA256SUMS.txt'
-          if ! cmp -s "$downloaded/SHA256SUMS.txt" "$RUNNER_TEMP/assets/SHA256SUMS.txt"; then
-            echo "$TAG holds other assets than this build; refusing to replace them."
+          if [ "$DRAFT" = true ] && ! cmp -s "$downloaded/SHA256SUMS.txt" "$RUNNER_TEMP/assets/SHA256SUMS.txt"; then
+            echo "The draft of $TAG holds other assets than this build; refusing to publish them."
             exit 1
           fi
           node scripts/release.mjs verify "$downloaded"
-      - name: Publish as Latest, never as a prerelease
+      - name: Publish as Latest, never as a prerelease and never behind a newer release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRAFT: ${{ steps.release.outputs.draft }}
         run: |
-          if [ "$(gh release view "$TAG" --json isDraft --jq '.isDraft')" = true ]; then
-            gh release edit "$TAG" --draft=false --prerelease=false --latest
+          latest() {
+            curl -fsS -o /dev/null -w '%{redirect_url}' "https://github.com/$GITHUB_REPOSITORY/releases/latest" || true
+          }
+          if [ "$DRAFT" != true ]; then
+            case "$(latest)" in
+              */releases/tag/"$TAG") echo "$TAG is published and releases/latest points to it." ;;
+              *) echo "$TAG is published; releases/latest points to another release, which this run leaves alone." ;;
+            esac
+            exit 0
           fi
+          newest=$(gh release list --exclude-drafts --limit 200 --json tagName --jq '.[].tagName' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
+          if [ -n "$newest" ] && [ "$(printf '%s\n%s\n' "$newest" "$TAG" | sort -V | tail -n 1)" != "$TAG" ]; then
+            echo "$newest is published and newer than $TAG; the draft of $TAG stays a draft so Latest never moves back."
+            exit 1
+          fi
+          gh release edit "$TAG" --draft=false --prerelease=false --latest
           for attempt in 1 2 3 4 5 6; do
-            location=$(curl -fsS -o /dev/null -w '%{redirect_url}' "https://github.com/$GITHUB_REPOSITORY/releases/latest" || true)
+            location=$(latest)
             case "$location" in
               */releases/tag/"$TAG") echo "releases/latest points to $TAG."; exit 0 ;;
             esac

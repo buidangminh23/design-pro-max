@@ -127,9 +127,18 @@ test('the release workflow re-checks, drafts, verifies the download and publishe
   assert.match(release, /node scripts\/release\.mjs verify "\$downloaded"/);
   assert.match(release, /gh release edit "\$TAG" --draft=false --prerelease=false --latest/);
   assert.doesNotMatch(release, /--prerelease(?!=false)/);
+  assert.match(release, /^concurrency:\n {2}group: release\n/m);
+  assert.match(release, /git merge-base --is-ancestor HEAD origin\/main/);
+  assert.match(release, /gh release delete-asset "\$TAG" "\$name" --yes/);
+  assert.match(release, /sort -V \| tail -n 1/);
   const [verify, publish] = jobs(release);
   assert.ok(verify.lines.some((line) => /^ {6}contents: read$/.test(line)));
   assert.ok(publish.lines.some((line) => /^ {6}contents: write$/.test(line)));
+  assert.ok(!publish.lines.some((line) => /^ {6}GH_TOKEN:/.test(line)), 'the publish job sets no job-wide GH_TOKEN');
+  for (const step of steps(publish)) {
+    const text = step.join('\n');
+    if (/\bgh (?:release|api)\b/.test(text)) assert.match(text, /^ {10}GH_TOKEN: \$\{\{ github\.token \}\}$/m, step[0]);
+  }
 });
 
 test('the vendor sync stages read-only, confirms upstream and merges only safe updates after CI', () => {
