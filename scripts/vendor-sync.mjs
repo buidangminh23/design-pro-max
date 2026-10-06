@@ -7,7 +7,10 @@
  *   notices [--check]                  regenerate THIRD_PARTY_NOTICES.md, or fail when it is out of date
  *   stage --out <dir>                  stage the parts of every source whose upstream HEAD moved past its pin
  *   classify --from <dir> [--json | --markdown]
- *                                      compare a staged update with the tree: safe or needs-review, and why
+ *                                      compare a staged update with the tree: safe only when no shipped file of a
+ *                                      moved part changes, otherwise needs-review with every reason
+ *   confirm --from <dir>               network: re-fetch every moved source at its staged commit and require the
+ *                                      staged parts to match a fresh copy, with the pin an ancestor of that commit
  *   apply --from <dir>                 check a staged update and copy it into the tree
  *
  * Every command also takes --root <dir>. Git always runs through execFile, never through a shell. Sync refuses to
@@ -67,7 +70,7 @@ const OBJECT_PATTERN = /^[0-9a-f]{40,64}$/;
 const RESERVED_SEGMENTS = new Set(['.claude-plugin', '.codex-plugin', '.claude', '.agents', '.codex', '.git']);
 const GENERATED_NAMES = new Map([['license', 'LICENSE'], [UPSTREAM_FILE.toLowerCase(), UPSTREAM_FILE]]);
 const CHECKS_MODES = process.platform !== 'win32';
-const USAGE = 'Usage: node scripts/vendor-sync.mjs <sync [--only <id>] [--force] | check | notices [--check] | stage --out <dir> | classify --from <dir> [--json | --markdown] | apply --from <dir>> [--root <dir>]';
+const USAGE = 'Usage: node scripts/vendor-sync.mjs <sync [--only <id>] [--force] | check | notices [--check] | stage --out <dir> | classify --from <dir> [--json | --markdown] | confirm --from <dir> | apply --from <dir>> [--root <dir>]';
 
 /**
  * Run git with an argument list and return stdout as text, or as a Buffer when `buffer` is set.
@@ -491,19 +494,31 @@ const UTF8 = new TextDecoder('utf-8', { fatal: true });
 const URL_HOST = /\b[a-z][a-z0-9+.-]*:\/\/(?:[^\s/?#@"'<>()[\]{}`]*@)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+)/gi;
 const SCP_HOST = /(?<![\w.-])[\w.-]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+):(?!\/\/)/gi;
 const BARE_HOST = /(?<![\w@./:-])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,})(?=\/[\w~-])/gi;
+const URL_LINK = /\b[a-z][a-z0-9+.-]*:\/\/(?:[^\s/?#@"'<>()[\]{}`]*@)?([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+)(?::\d+)?([^\s"'<>()[\]{}`|\\]*)/gi;
+const SCP_LINK = /(?<![\w.-])[\w.-]+@([a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+):(?!\/\/)([^\s"'<>()[\]{}`|\\]*)/gi;
+const BARE_LINK = /(?<![\w@./:-])((?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,})(\/[\w~-][^\s"'<>()[\]{}`|\\]*)/gi;
+const LATIN = /\p{Script=Latin}/u;
+const LOOKALIKE = /[\p{Script=Cyrillic}\p{Script=Greek}\p{Script=Armenian}\p{Script=Cherokee}]/u;
+const FENCE = /^\s*(?:```|~~~)/;
 
 /**
- * Commands and phrases that make an upstream change need a person's review when they appear more often than before.
+ * Commands that the added lines of an upstream change are scanned for. They only point a reviewer at lines worth
+ * reading: every change to a shipped file needs a review whatever they find, because no pattern can prove text safe.
  */
 export const REVIEW_PATTERNS = [
   ...RISKY_PATTERNS,
+  ['text piped to a shell', /\|\s*(?:sudo\s+)?(?:env\s+)?(?:\/[\w./-]*\/)?(?:ba|z|da|k|fi)?sh\b(?![\w.-])/g],
+  ['download read by a shell', /\b(?:ba|z|da|k|fi)?sh\s+<\(|<\(\s*(?:curl|wget|iwr|irm)\b/gi],
+  ['deletion with rm flags', /\brm\s+(?:-{1,2}[A-Za-z][\w-]*\s+)*-{1,2}(?:[A-Za-z]*[rRfF][A-Za-z]*|recursive|force)\b/g],
   ['recursive delete in PowerShell', /\bRemove-Item\b[^\n`]*-Recurse/gi],
-  ['skipped permission checks', /--dangerously-skip-permissions|\bbypassPermissions\b|--permission-mode[ =]bypass|danger-full-access|--yolo\b/gi],
-  ['decoded hidden payload', /\bbase64\s+(?:-d|--decode)\b|\bFromBase64String\b|\batob\(/g],
+  ['skipped permission checks', /--dangerously-skip-permissions|\bbypassPermissions\b|--permission-mode[ =]bypass|danger-full-access|--yolo\b|--ask-for-approval[ =]never\b|(?<![\w-])-a\s+never\b|--full-auto\b|approval_policy\s*=\s*["']?never/gi],
+  ['decoded hidden payload', /\bbase64\s+(?:-d|-D|--decode)\b|\bFromBase64String\b|\batob\(/g],
   ['download piped to an interpreter', /\b(?:curl|wget|irm|iwr|Invoke-WebRequest|Invoke-RestMethod)\b[^\n|]*\|\s*(?:sudo\s+)?(?:python[0-9.]*|node|deno|bun|perl|ruby|php|pwsh|powershell|iex)\b/gi],
+  ['PowerShell expression run', /\b(?:iex|Invoke-Expression)\b/gi],
   ['downloaded code run inline', /\$\(\s*(?:curl|wget)\b|\b(?:ba|z)?sh\s+-c\s+["']?\$\(/gi],
   ['global software install', /\b(?:npm|pnpm|yarn)\s+(?:i|install|add)\s+(?:-g|--global)\b|\bpip3?\s+install\b|\bpipx\s+install\b|\buv\s+tool\s+install\b|\bgem\s+install\b|\bgo\s+install\b|\bbrew\s+install\b|\bcargo\s+install\b/g],
-  ['code run without asking', /\bnpx\s+(?:-y|--yes)\b/g],
+  ['code run without asking', /\bnpx\s+(?:-y|--yes)\b|\bpnpm\s+dlx\b|\bbunx\b|\buvx\b/g],
+  ['package run with npx', /\bnpx\s+(?!-)[\w@./-]/g],
 ];
 
 /**
@@ -516,6 +531,8 @@ export const INJECTION_PATTERNS = [
   ['secret sent elsewhere', /\b(?:exfiltrat\w*|send|upload|post|leak|forward)\b[^.\n]{0,40}\b(?:secrets?|credentials?|tokens?|api keys?|private keys?|ssh keys?|keychain|\.env)\b/gi],
   ['chat role tag', /<\/?\s*(?:system|assistant|developer|im_start|im_end)\b[^>\n]*>|\[\/?INST\]/gi],
   ['hidden HTML comment', /<!--/g],
+  ['hidden Markdown comment', /^\s*\[[^\]\n]*\]:\s*(?:#|<>)/gm],
+  ['collapsed HTML block', /<details\b/gi],
 ];
 
 const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -535,6 +552,53 @@ export function hostsIn(text) {
   const hosts = new Set();
   for (const pattern of [URL_HOST, SCP_HOST, BARE_HOST]) for (const match of text.matchAll(pattern)) hosts.add(match[1].toLowerCase().replace(/\.+$/, ''));
   return hosts;
+}
+
+/**
+ * Every place a text links to, as host plus path: URLs, scp-style git remotes and bare domains followed by a path. Two
+ * links to one host with different paths are two links, so a new repository on a known host still counts as new.
+ */
+export function linksIn(text) {
+  const links = new Set();
+  for (const pattern of [URL_LINK, SCP_LINK, BARE_LINK]) {
+    for (const match of text.matchAll(pattern)) {
+      const host = match[1].toLowerCase().replace(/\.+$/, '');
+      const tail = match[2].replace(/[.,;:!?*_~]+$/, '').replace(/\/+$/, '');
+      links.add(tail ? `${host}${tail.startsWith('/') ? '' : '/'}${tail}` : host);
+    }
+  }
+  return links;
+}
+
+/**
+ * The lines of `next` that `previous` does not have, counting repeats, how many lines of `previous` are gone, and how
+ * many of the added lines sit inside fenced code blocks of `next`.
+ */
+export function lineChanges(previous, next) {
+  const left = new Map();
+  for (const line of previous === '' ? [] : previous.split('\n')) left.set(line, (left.get(line) ?? 0) + 1);
+  const added = [];
+  let code = 0;
+  let fenced = false;
+  for (const line of next === '' ? [] : next.split('\n')) {
+    const fence = FENCE.test(line);
+    if (left.get(line)) {
+      left.set(line, left.get(line) - 1);
+    } else {
+      added.push(line);
+      if (fenced && !fence) code += 1;
+    }
+    if (fence) fenced = !fenced;
+  }
+  return { added, removed: [...left.values()].reduce((sum, count) => sum + count, 0), code };
+}
+
+/**
+ * Words that mix Latin letters with look-alike letters from Cyrillic, Greek, Armenian or Cherokee, such as a Cyrillic
+ * o inside an English word, which hide a phrase from a pattern that looks for it.
+ */
+export function mixedScriptWords(text) {
+  return [...new Set(text.split(/[^\p{L}\p{M}]+/u).filter((word) => LATIN.test(word) && LOOKALIKE.test(word)))];
 }
 
 /**
@@ -568,6 +632,71 @@ export async function upstreamHistory(repo, pin) {
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+}
+
+/**
+ * Why the staged commit `to` of a repository cannot follow its pin `from`, or null when `to` is on the upstream default
+ * branch and descends from `from`. Reads a blobless clone of the default branch.
+ */
+async function upstreamProblem(repo, from, to) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'design-pro-max-confirm-'));
+  const is = async (args) => {
+    try {
+      await git(['-C', dir, ...args]);
+      return true;
+    } catch (error) {
+      if (error.code === 1 || error.code === 128) return false;
+      throw error;
+    }
+  };
+  try {
+    await git(['clone', '--quiet', '--bare', '--single-branch', '--no-tags', '--filter=blob:none', `https://github.com/${repo}.git`, dir]);
+    if (!(await is(['cat-file', '-e', `${to}^{commit}`])) || !(await is(['merge-base', '--is-ancestor', to, 'HEAD']))) return `the staged commit ${to} is not on the upstream default branch`;
+    if (!(await is(['merge-base', '--is-ancestor', from, to]))) return `the pinned commit ${from} is not an ancestor of the staged commit ${to}`;
+    return null;
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Re-fetch every moved source of a staged update at its staged commit and compare. The staged commit must be on the
+ * upstream default branch and descend from the pin, and every moved part must match a fresh copy made the way sync
+ * makes one, record for record apart from the fetch date. A staged folder only proves itself consistent; this proves
+ * that its files are what upstream holds at the commits it names.
+ */
+export async function confirmUpdate(root, staged) {
+  const view = readStaged(root, staged);
+  if (view.problems.length) throw new Error(`The staged update in ${staged} cannot be used:\n- ${view.problems.join('\n- ')}`);
+  const problems = [];
+  const sources = [...view.moved].sort(compareStrings);
+  for (const repo of sources) {
+    const from = view.current.parts.find((part) => part.repo === repo).commit;
+    const to = view.next.parts.find((part) => part.repo === repo).commit;
+    try {
+      const problem = await upstreamProblem(repo, from, to);
+      if (problem) problems.push(`${repo}: ${problem}`);
+    } catch (error) {
+      problems.push(`${repo}: ${String(error.stderr || error.message).trim()}`);
+    }
+  }
+  const fresh = fs.mkdtempSync(path.join(os.tmpdir(), 'design-pro-max-fresh-'));
+  try {
+    const results = await syncParts(fresh, view.parts, { force: true });
+    const undated = (record) => ({ ...record, fetched: null });
+    for (const [index, part] of view.parts.entries()) {
+      if (results[index].status === 'failed') {
+        problems.push(...results[index].problems.map((problem) => `${part.id}: ${problem}`));
+        continue;
+      }
+      if (!sameJson(undated(loadUpstream(staged, part.id).record), undated(loadUpstream(fresh, part.id).record))) {
+        problems.push(`${part.id}: the staged files differ from a fresh copy of ${part.repo} at ${short(part.commit)}`);
+      }
+    }
+  } finally {
+    fs.rmSync(fresh, { recursive: true, force: true });
+  }
+  return { sources, parts: view.parts.map((part) => part.id), problems };
 }
 
 function pruneEmptyFolders(base, relative) {
@@ -688,16 +817,39 @@ function partFiles(root, id, record) {
   return new Map(record.files.map((file) => [file.path, readRegular(path.join(dir, ...file.path.split('/')))]));
 }
 
-function textSignals(files) {
-  const counts = new Map();
-  const hosts = new Set();
+function knownLinks(files) {
+  const links = new Set();
   for (const bytes of files.values()) {
     const text = bytes ? decode(bytes) : null;
-    if (text === null) continue;
-    for (const host of hostsIn(text)) hosts.add(host);
-    for (const [label, pattern] of [...REVIEW_PATTERNS, ...INJECTION_PATTERNS]) counts.set(label, (counts.get(label) ?? 0) + [...text.matchAll(pattern)].length);
+    if (text !== null) for (const link of linksIn(text.normalize('NFKC'))) links.add(link);
   }
-  return { counts, hosts };
+  return links;
+}
+
+/**
+ * What the added lines of one file bring, as review reasons: commands and phrases worth a look, words that mix
+ * scripts, fenced code and links the part did not have before. Phrases are also matched across line breaks.
+ */
+function addedSignals(label, file, change, known) {
+  const reasons = [];
+  const raw = change.added.join('\n');
+  const text = raw.normalize('NFKC');
+  const flat = text.replace(/\s+/g, ' ');
+  const count = (pattern, ...texts) => Math.max(...texts.map((item) => [...item.matchAll(pattern)].length));
+  for (const [name, pattern] of REVIEW_PATTERNS) {
+    const found = count(pattern, text);
+    if (found) reasons.push(`${label}: ${file} adds ${name} (${found})`);
+  }
+  for (const [name, pattern] of INJECTION_PATTERNS) {
+    const found = count(pattern, text, flat);
+    if (found) reasons.push(`${label}: ${file} adds ${name} (${found})`);
+  }
+  const mixed = mixedScriptWords(raw);
+  if (mixed.length) reasons.push(`${label}: ${file} adds ${mixed.length} word(s) that mix Latin letters with look-alike letters of another script`);
+  if (change.code) reasons.push(`${label}: ${file} adds ${change.code} line(s) of fenced code`);
+  const links = [...linksIn(text)].filter((link) => !known.has(link)).sort(compareStrings);
+  if (links.length) reasons.push(`${label}: ${file} adds ${links.length === 1 ? 'a link' : `${links.length} links`} to ${links.slice(0, 10).join(', ')}${links.length > 10 ? ', ...' : ''}`);
+  return reasons;
 }
 
 function isScript(file, entry, text) {
@@ -714,9 +866,11 @@ function namedByManifest(part, file) {
 
 /**
  * Why one part's upstream change needs a person's review, comparing its current record and files with the staged
- * ones. An empty list means the change only edits the text of existing files and adds no file, script edit,
- * executable bit, host, licence change, risky command, injection phrase or edit to a file that its Apple text or its
- * activation, prerequisites, risks or errata name.
+ * ones. An empty list means no file that ships in the part changed: only its pin and record move. Every added, removed
+ * or edited file, executable bit, licence and skill name is a reason of its own, because an agent reads or runs these
+ * files with the user's permissions and no pattern can prove new text safe. Each added or edited text file also lists
+ * what its added lines bring, the edit of a script or of a file that Apple text or the part's activation,
+ * prerequisites, risks or errata name, so the reviewer knows where to look.
  */
 export function compareParts(part, before, oldFiles, after, newFiles) {
   const reasons = [];
@@ -733,23 +887,29 @@ export function compareParts(part, before, oldFiles, after, newFiles) {
   for (const file of modes) reasons.push(`${label}: changes the executable bit of ${file}`);
   if (edited.includes('LICENSE') || !sameJson(before.license, after.license)) reasons.push(`${label}: changes its licence`);
   if (before.name !== after.name) reasons.push(`${label}: renames its skill from ${before.name} to ${after.name}`);
+  const changes = new Map();
   for (const file of edited) {
     if (file === 'LICENSE') continue;
     const oldText = decode(oldFiles.get(file) ?? Buffer.alloc(0));
     const newText = decode(newFiles.get(file) ?? Buffer.alloc(0));
-    if (oldText === null || newText === null) reasons.push(`${label}: edits ${file}, which is not UTF-8 text`);
+    if (oldText === null || newText === null) {
+      reasons.push(`${label}: edits ${file}, which is not UTF-8 text`);
+    } else {
+      const change = lineChanges(oldText, newText);
+      changes.set(file, change);
+      reasons.push(`${label}: edits ${file} (+${change.added.length} -${change.removed} lines)`);
+    }
     if (isScript(file, oldList.get(file), oldText) || isScript(file, newList.get(file), newText)) reasons.push(`${label}: edits the script ${file}`);
     if (part.appleText.some((quote) => quote.file === file)) reasons.push(`${label}: edits ${file}, which holds Apple text listed in appleText`);
     if (namedByManifest(part, file)) reasons.push(`${label}: edits ${file}, which its activation, prerequisites, risks or errata name; re-check their line numbers`);
   }
-  const old = textSignals(oldFiles);
-  const fresh = textSignals(newFiles);
-  const hosts = [...fresh.hosts].filter((host) => !old.hosts.has(host)).sort(compareStrings);
-  if (hosts.length) reasons.push(`${label}: adds the host${hosts.length === 1 ? '' : 's'} ${hosts.join(', ')}`);
-  for (const [name, count] of fresh.counts) {
-    const was = old.counts.get(name) ?? 0;
-    if (count > was) reasons.push(`${label}: adds ${name} (${was} -> ${count})`);
+  for (const file of added) {
+    const text = decode(newFiles.get(file) ?? Buffer.alloc(0));
+    if (text === null) reasons.push(`${label}: adds ${file}, which is not UTF-8 text`);
+    else if (file !== 'LICENSE') changes.set(file, lineChanges('', text));
   }
+  const known = knownLinks(oldFiles);
+  for (const file of [...changes.keys()].sort(compareStrings)) reasons.push(...addedSignals(label, file, changes.get(file), known));
   return { reasons, files: { added, removed, edited, modes } };
 }
 
@@ -772,9 +932,10 @@ function blockedSources(staged) {
 }
 
 /**
- * Classify a staged update: 'safe' when every moved part only edits the text of existing files and none of the review
- * rules of compareParts fires, otherwise 'needs-review'. Also returns the moved sources, the touched files, the
- * sources the stage step blocked, and the title and commit message for the pull request.
+ * Classify a staged update: 'safe' only when no file that ships in a moved part changes, so the pins move past upstream
+ * commits that touched nothing in these parts; any other change is 'needs-review' with the reasons of compareParts.
+ * Also returns the moved sources, the touched files, the sources the stage step blocked, and the title and commit
+ * message for the pull request.
  */
 export function classifyUpdate(root, staged) {
   const view = readStaged(root, staged);
@@ -826,9 +987,9 @@ export function renderProposal(result) {
   }
   lines.push('');
   if (result.verdict === 'safe') {
-    lines.push('### Verdict: safe', '', 'Only the text of existing files changed, with no new file, script edit, executable bit, host, licence change, risky command or injection phrase, and no edit to a file that Apple text or an erratum names. The workflow merges this pull request after the same checks pass in its own job.');
+    lines.push('### Verdict: safe', '', 'No file that ships in these parts changed: upstream moved past the pins without touching them, so only the pins, the records and the generated credits move. The workflow runs the CI workflow on this branch and merges this pull request only when every job passes on its head commit and main has not moved.');
   } else {
-    lines.push('### Verdict: needs review', '', ...result.reasons.map((reason) => `- ${plain(reason)}`), '', 'The workflow never merges this pull request; the owner reviews the upstream diff first. To run the CI matrix on it, run the CI workflow on the `vendor-sync` branch.');
+    lines.push('### Verdict: needs review', '', ...result.reasons.map((reason) => `- \`${plain(reason)}\``), '', 'The workflow never merges this pull request. Agents read and run these files with the user\'s permissions, so every change to them waits for the owner, who compares this pull request with the upstream diff linked above. The workflow also starts the CI workflow on this branch.');
   }
   if (result.blocked.length) {
     lines.push('', '### Blocked sources', '', 'These sources moved too, but stay at their pins until someone looks at them:', '');
@@ -873,14 +1034,14 @@ function parseArgs(argv) {
     else if (flag === '--force' && command === 'sync') options.force = true;
     else if (flag === '--check' && command === 'notices') options.check = true;
     else if (flag === '--out' && command === 'stage') options.out = path.resolve(value());
-    else if (flag === '--from' && (command === 'classify' || command === 'apply')) options.from = path.resolve(value());
+    else if (flag === '--from' && (command === 'classify' || command === 'confirm' || command === 'apply')) options.from = path.resolve(value());
     else if ((flag === '--json' || flag === '--markdown') && command === 'classify' && options.format === 'text') options.format = flag.slice(2);
     else if (flag === '--root') options.root = path.resolve(value());
     else throw new Error(`Unknown argument: ${flag}\n${USAGE}`);
   }
-  if (!['sync', 'check', 'notices', 'stage', 'classify', 'apply'].includes(command)) throw new Error(USAGE);
+  if (!['sync', 'check', 'notices', 'stage', 'classify', 'confirm', 'apply'].includes(command)) throw new Error(USAGE);
   if (command === 'stage' && !options.out) throw new Error(`stage needs --out <dir>\n${USAGE}`);
-  if ((command === 'classify' || command === 'apply') && !options.from) throw new Error(`${command} needs --from <dir>\n${USAGE}`);
+  if ((command === 'classify' || command === 'confirm' || command === 'apply') && !options.from) throw new Error(`${command} needs --from <dir>\n${USAGE}`);
   return options;
 }
 
@@ -906,6 +1067,17 @@ async function main(argv) {
     else {
       out(`Verdict: ${result.verdict} (${result.sources.map((source) => source.repo).join(', ')})`);
       for (const reason of result.reasons) out(`  - ${plain(reason, 2000)}`);
+    }
+    return;
+  }
+  if (options.command === 'confirm') {
+    const result = await confirmUpdate(options.root, options.from);
+    if (result.problems.length) {
+      for (const problem of result.problems) err(`[confirm] ${plain(problem, 2000)}`);
+      err(`The staged update does not match upstream: ${result.problems.length} problem(s).`);
+      process.exitCode = 1;
+    } else {
+      out(`Confirmed ${result.parts.length} part(s) of ${result.sources.join(', ')} against upstream.`);
     }
     return;
   }
