@@ -4,7 +4,23 @@
 
 Design skills for AI coding agents, one skill per design. The first skill is **apple**: a router for Apple-platform work that sends each task to one bundled third-party guide and has the agent read that guide in full.
 
-> **Status: pre-release.** Nothing has been released yet. Install instructions will arrive with v0.1.
+> **Status: pre-release.** Nothing has been released yet; `main` already installs as described below.
+
+## Install
+
+Install the `apple` skill folder into a skill root that your agent host reads:
+
+```sh
+npx skills add buidangminh23/design-pro-max --skill apple -g
+```
+
+From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.txt`. The ZIP holds `skills/apple` with its hidden `.vendor/` folder, which must be copied along with the rest.
+
+- Install only into a host's own skill roots, such as `~/.claude/skills/` for Claude Code or a user or repository skill folder of Codex. Hosts skip dot-folders there, so they list one skill, `apple`, and the 38 parts under `.vendor/` stay hidden.
+- Never run `npx skills` with `--full-depth`: it enters dot-folders and installs every part under `.vendor/` as a skill of its own.
+- Do not put the skill in a Codex executor environment's skill root, such as one of a remote or sandboxed executor: those roots include hidden folders, so every part would register as a skill.
+- Use one install channel per machine. Installing with `npx skills` and copying the release into another skill root makes a host list `apple` twice.
+- With a very large skill library a host may list `apple` without its description, so it will not start on its own; invoke it as `/apple` in Claude Code or `$apple` in Codex.
 
 ## Layout
 
@@ -32,6 +48,7 @@ scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and as
 scripts/release.mjs          checks, packs and verifies the release ZIP
 .github/workflows/           CI, release and the weekly vendor sync
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
+CONTRIBUTING.md              issues first, MIT-only sources, how a part is added
 ```
 
 ### Why `.vendor` is hidden

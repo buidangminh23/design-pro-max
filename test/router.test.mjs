@@ -123,3 +123,8 @@ test('rule 5 is needed: many part paths resolve only from the file that mentions
     assert.ok(!fs.existsSync(path.join(ROOT, ...VENDOR_DIR.split('/'), 'core-data-expert', name)), `${name} is not at the part root`);
   }
 });
+
+test('the router states that the project is independent of Apple', () => {
+  assert.ok(body.includes('\nIndependent project, not affiliated with Apple Inc.; see NOTICE.md.\n'));
+  assert.ok(fs.existsSync(path.join(ROOT, SKILL_DIR, 'NOTICE.md')));
+});

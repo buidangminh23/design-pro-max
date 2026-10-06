@@ -5,6 +5,8 @@ description: Apple app code (SwiftUI, Swift 6, SwiftData, Xcode, App Store). Rou
 
 # apple
 
+Independent project, not affiliated with Apple Inc.; see NOTICE.md.
+
 This skill routes Apple-platform tasks to third-party guides ("parts") bundled unmodified under `.vendor/` at pinned commits. Each part keeps its author's `SKILL.md` and `LICENSE`, plus an `UPSTREAM.json` that starts with its source, activation check, prerequisites, risks and errata and ends with its file hashes.
 
 ## Standing rules

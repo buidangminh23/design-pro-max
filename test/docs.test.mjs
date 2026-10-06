@@ -44,3 +44,17 @@ test('git keeps vendored bytes as they are', () => {
   const attributes = fs.readFileSync(path.join(ROOT, '.gitattributes'), 'utf8');
   assert.match(attributes, /^skills\/apple\/\.vendor\/\*\* -text/m);
 });
+
+test('the README says how to install the skill without exposing its parts', () => {
+  const install = readme.slice(readme.indexOf('\n## Install\n'), readme.indexOf('\n## Layout\n'));
+  assert.ok(install.length > 0, 'the README has an Install section before Layout');
+  for (const phrase of ['npx skills add buidangminh23/design-pro-max --skill apple -g', "host's own skill roots", '--full-depth', 'executor environment', 'one install channel per machine', 'hidden `.vendor/` folder', '`/apple`', '`$apple`']) {
+    assert.ok(install.includes(phrase), phrase);
+  }
+});
+
+test('CONTRIBUTING.md asks for an issue first, MIT-only sources and explains how a part is added', () => {
+  const contributing = fs.readFileSync(path.join(ROOT, 'CONTRIBUTING.md'), 'utf8');
+  for (const heading of ['## Open an issue first', '## Sources must be MIT-licensed', '## How a part is added']) assert.ok(contributing.includes(`\n${heading}\n`), heading);
+  assert.match(contributing, /node scripts\/vendor-sync\.mjs sync --only <id>/);
+});
