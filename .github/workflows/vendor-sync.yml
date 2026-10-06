@@ -1,0 +1,214 @@
+name: Vendor sync
+
+on:
+  schedule:
+    - cron: "41 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vendor-sync
+  cancel-in-progress: false
+
+env:
+  BRANCH: vendor-sync
+  BOT_NAME: github-actions[bot]
+  BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+jobs:
+  fetch:
+    name: Stage upstream changes
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    outputs:
+      changed: ${{ steps.stage.outputs.changed }}
+      blocked: ${{ steps.stage.outputs.blocked }}
+      uploaded: ${{ steps.upload.outcome == 'success' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Stage every source whose upstream HEAD moved past its pin
+        id: stage
+        run: |
+          node scripts/vendor-sync.mjs stage --out "$RUNNER_TEMP/staged"
+          {
+            echo "changed=$(jq -r '.changed' "$RUNNER_TEMP/staged/report.json")"
+            echo "blocked=$(jq '[.sources[] | select(.status == "blocked")] | length' "$RUNNER_TEMP/staged/report.json")"
+          } >> "$GITHUB_OUTPUT"
+      - name: Summarise the staged update
+        if: steps.stage.outputs.changed == 'true'
+        run: node scripts/vendor-sync.mjs classify --from "$RUNNER_TEMP/staged" --markdown >> "$GITHUB_STEP_SUMMARY"
+      - name: Apply it to this throwaway checkout and run the guard
+        if: steps.stage.outputs.changed == 'true'
+        run: |
+          node scripts/vendor-sync.mjs apply --from "$RUNNER_TEMP/staged"
+          node scripts/vendor-sync.mjs check
+          node scripts/vendor-guard.mjs
+      - name: Upload the staged update
+        id: upload
+        if: steps.stage.outputs.changed == 'true'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: vendor-sync
+          path: ${{ runner.temp }}/staged/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 3
+      - name: Fail when a source is blocked
+        if: steps.stage.outputs.blocked != '0'
+        run: |
+          {
+            echo "### Blocked sources"
+            echo
+            jq -r '.sources[] | select(.status == "blocked") | "- `\(.repo)`"' "$RUNNER_TEMP/staged/report.json"
+            echo
+            echo "They stay at their pins; the stage step's log says why."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
+  propose:
+    name: Open or update the pull request
+    needs: fetch
+    if: ${{ !cancelled() && needs.fetch.outputs.uploaded == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: vendor-sync
+          path: ${{ runner.temp }}/staged
+      - name: Classify the update
+        id: classify
+        run: |
+          node scripts/vendor-sync.mjs classify --from "$RUNNER_TEMP/staged" --json > "$RUNNER_TEMP/verdict.json"
+          node scripts/vendor-sync.mjs classify --from "$RUNNER_TEMP/staged" --markdown > "$RUNNER_TEMP/body.md"
+          jq -r '.message' "$RUNNER_TEMP/verdict.json" > "$RUNNER_TEMP/message.txt"
+          {
+            echo "verdict=$(jq -r '.verdict' "$RUNNER_TEMP/verdict.json")"
+            echo "title=$(jq -r '.title' "$RUNNER_TEMP/verdict.json")"
+            echo "base=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+      - name: Apply the update and run every check
+        run: |
+          node scripts/vendor-sync.mjs apply --from "$RUNNER_TEMP/staged"
+          node scripts/vendor-sync.mjs notices
+          node scripts/gen.mjs
+          npm test
+          node scripts/vendor-sync.mjs check
+          node scripts/vendor-guard.mjs
+          node scripts/vendor-sync.mjs notices --check
+          node scripts/gen.mjs --check
+          node scripts/release.mjs check
+      - name: Commit to the vendor-sync branch
+        id: commit
+        run: |
+          unexpected=$(git status --porcelain=v1 --untracked-files=all | cut -c4- | grep -Ev '^(vendor/sources\.json|skills/apple/\.vendor/.+|README\.md|THIRD_PARTY_NOTICES\.md|skills\.json|skills/apple/NOTICE\.md|skills/apple/references/parts-index\.md)$' || true)
+          if [ -n "$unexpected" ]; then
+            echo "The update changed files outside the vendored parts and their generated files:"
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
+          git checkout -q -B "$BRANCH"
+          git add --all -- vendor/sources.json skills README.md THIRD_PARTY_NOTICES.md skills.json
+          git commit -q -F "$RUNNER_TEMP/message.txt"
+          node scripts/check-history.mjs
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            git fetch -q origin "$BRANCH"
+            if [ "$(git log -1 --format=%ae "origin/$BRANCH")" != "$BOT_EMAIL" ]; then
+              echo "Someone else pushed to $BRANCH; leaving the branch and its pull request to them."
+              echo "state=foreign" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if git diff --quiet "origin/$BRANCH" HEAD -- vendor/sources.json; then
+              echo "$BRANCH already proposes these upstream commits."
+              echo "state=same" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          git push -q --force origin "HEAD:refs/heads/$BRANCH"
+          echo "state=pushed" >> "$GITHUB_OUTPUT"
+      - name: Open or update the pull request
+        id: pr
+        if: steps.commit.outputs.state == 'pushed'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.classify.outputs.title }}
+          VERDICT: ${{ steps.classify.outputs.verdict }}
+        run: |
+          gh label create vendor-sync --color 0e8a16 --description "Weekly sync of the vendored parts" --force > /dev/null
+          gh label create needs-review --color d93f0b --description "Upstream change the owner must review before merging" --force > /dev/null
+          number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md"
+            number=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number')
+          fi
+          if [ "$VERDICT" = safe ]; then
+            gh pr edit "$number" --add-label vendor-sync --remove-label needs-review
+          else
+            gh pr edit "$number" --add-label vendor-sync --add-label needs-review
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+      - name: Merge a safe update after the checks above passed
+        if: steps.classify.outputs.verdict == 'safe' && steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          SHA: ${{ steps.commit.outputs.sha }}
+          BASE: ${{ steps.classify.outputs.base }}
+        run: |
+          if [ "$(git ls-remote origin refs/heads/main | cut -f1)" != "$BASE" ]; then
+            echo "main moved while this job ran; the next run checks the update again."
+            exit 0
+          fi
+          gh pr merge "$NUMBER" --squash --delete-branch --match-head-commit "$SHA"
+
+  heartbeat:
+    name: Keep the schedule alive
+    needs: [fetch, propose]
+    if: ${{ !cancelled() && needs.fetch.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+      - name: Commit a heartbeat after 45 quiet days
+        run: |
+          days=$(( ($(date +%s) - $(git log -1 --format=%ct)) / 86400 ))
+          if [ "$days" -lt 45 ]; then
+            echo "main changed $days day(s) ago."
+            exit 0
+          fi
+          printf '{\n  "lastQuietCheck": "%s"\n}\n' "$(date -u +%Y-%m-%d)" > vendor/heartbeat.json
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
+          git add vendor/heartbeat.json
+          git commit -q -m "chore: keep the vendor sync schedule alive"
+          git push -q origin HEAD:main

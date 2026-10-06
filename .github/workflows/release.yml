@@ -1,0 +1,130 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing vX.Y.Z tag to publish, or to verify when it is already published
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Check and package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Check the tag and the release inputs
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          case "$TAG" in
+            v[0-9]*.[0-9]*.[0-9]*) ;;
+            *) echo "$TAG is not a vX.Y.Z tag"; exit 1 ;;
+          esac
+          node scripts/release.mjs check "$TAG"
+      - name: Tests
+        run: npm test
+      - name: Vendored parts match the manifest
+        run: node scripts/vendor-sync.mjs check
+      - name: Guard
+        run: node scripts/vendor-guard.mjs
+      - name: Notices are current
+        run: node scripts/vendor-sync.mjs notices --check
+      - name: Generated files are current
+        run: node scripts/gen.mjs --check
+      - name: No unreviewed media or vendored extras in history
+        run: node scripts/check-history.mjs
+      - name: Package and verify
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          node scripts/release.mjs pack "$TAG"
+          node scripts/release.mjs notes "$TAG" > dist/release-notes.md
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-assets
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS.txt
+            dist/release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish as Latest
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-assets
+          path: ${{ runner.temp }}/assets
+      - name: Verify the built assets
+        run: node scripts/release.mjs verify "$RUNNER_TEMP/assets"
+      - name: Create the draft release, or check the published one
+        run: |
+          state=$(gh release view "$TAG" --json isDraft --jq '.isDraft' 2>/dev/null || echo missing)
+          case "$state" in
+            missing) gh release create "$TAG" --verify-tag --draft --title "$TAG" --notes-file "$RUNNER_TEMP/assets/release-notes.md" "$RUNNER_TEMP"/assets/*.zip "$RUNNER_TEMP/assets/SHA256SUMS.txt" ;;
+            true) gh release upload "$TAG" "$RUNNER_TEMP"/assets/*.zip "$RUNNER_TEMP/assets/SHA256SUMS.txt" --clobber ;;
+            false) echo "$TAG is already published; its assets are only verified." ;;
+            *) echo "Unexpected release state: $state"; exit 1 ;;
+          esac
+      - name: Download the release and verify it again
+        run: |
+          downloaded="$RUNNER_TEMP/downloaded"
+          mkdir -p "$downloaded"
+          gh release download "$TAG" --dir "$downloaded" --pattern '*.zip' --pattern 'SHA256SUMS.txt'
+          if ! cmp -s "$downloaded/SHA256SUMS.txt" "$RUNNER_TEMP/assets/SHA256SUMS.txt"; then
+            echo "$TAG holds other assets than this build; refusing to replace them."
+            exit 1
+          fi
+          node scripts/release.mjs verify "$downloaded"
+      - name: Publish as Latest, never as a prerelease
+        run: |
+          if [ "$(gh release view "$TAG" --json isDraft --jq '.isDraft')" = true ]; then
+            gh release edit "$TAG" --draft=false --prerelease=false --latest
+          fi
+          for attempt in 1 2 3 4 5 6; do
+            location=$(curl -fsS -o /dev/null -w '%{redirect_url}' "https://github.com/$GITHUB_REPOSITORY/releases/latest" || true)
+            case "$location" in
+              */releases/tag/"$TAG") echo "releases/latest points to $TAG."; exit 0 ;;
+            esac
+            echo "releases/latest points to ${location:-nothing} (attempt $attempt)."
+            sleep 10
+          done
+          echo "$TAG is published, but releases/latest does not point to it."
+          exit 1

@@ -30,6 +30,7 @@ scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
 scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
 scripts/release.mjs          checks, packs and verifies the release ZIP
+.github/workflows/           CI, release and the weekly vendor sync
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 ```
 
@@ -137,6 +138,14 @@ Node 22 or later; no dependencies.
 | `npm test` | The test suite, including sync runs against local fake upstream repositories |
 
 To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.
+
+### Workflows
+
+- **CI** (`.github/workflows/ci.yml`) runs on pushes to `main`, on pull requests and by hand, on Ubuntu, macOS and Windows with Node 22 and 24: the tests, `vendor-sync.mjs check`, the guard, `notices --check`, `gen.mjs --check`, `check-history.mjs`, `release.mjs check` and `release.mjs pack`.
+- **Release** (`.github/workflows/release.yml`) runs when a `vX.Y.Z` tag is pushed, or by hand for an existing tag. It runs every check again and packs the ZIP, creates a draft release with the ZIP and `SHA256SUMS.txt`, downloads both again and verifies them, then publishes the release as Latest and waits until `releases/latest` points to it. It never publishes a prerelease, because installers read `releases/latest`, and it only verifies a release that is already published.
+- **Vendor sync** (`.github/workflows/vendor-sync.yml`) runs on Mondays at 02:41 UTC and by hand. A read-only job stages every source whose upstream HEAD moved past its pin, applies the update to a throwaway checkout, runs the guard and uploads the staged folder. A second job classifies the update, applies it, regenerates the notices and the generated files, runs every check, commits to the `vendor-sync` branch and opens or updates one pull request. It merges that pull request itself only when the update is `safe` and every check passed in the same job, because pull requests opened with the workflow's token start no other workflow; a `needs-review` update gets the `needs-review` label and waits for the owner. To run the CI matrix on it, start the CI workflow by hand on the `vendor-sync` branch. A blocked source fails the run and stays at its pin. After 45 quiet days on `main` the workflow commits `vendor/heartbeat.json`, so GitHub keeps the schedule enabled. The workflow needs the repository setting that lets GitHub Actions create pull requests, and branch protection on `main` must let it merge and push the heartbeat.
+
+To release: raise `version` in `package.json`, move the `[Unreleased]` notes into a dated `## [X.Y.Z] - YYYY-MM-DD` entry, run `node scripts/release.mjs check vX.Y.Z`, commit, then push the tag `vX.Y.Z`.
 
 Exclude globs in `vendor/sources.json` are matched against paths inside the part and anchored at the part's folder, unlike gitignore patterns: `agents/**` leaves out the top-level `agents` folder only, and `**/__pycache__` matches at any depth. A pattern that matches a folder leaves out everything in it, and a trailing slash is ignored.
 

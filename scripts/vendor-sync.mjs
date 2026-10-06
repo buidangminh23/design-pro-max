@@ -754,7 +754,7 @@ export function compareParts(part, before, oldFiles, after, newFiles) {
 }
 
 function plain(text, limit = 300) {
-  const flat = visiblePath(String(text).replace(/[\r\n\t]+/g, ' ')).replace(/`/g, "'");
+  const flat = visiblePath(String(text).replace(/[\r\n\t]+/g, ' ')).replace(/`/g, "'").replace(/::/g, ': :');
   return flat.length > limit ? `${flat.slice(0, limit - 3)}...` : flat;
 }
 
