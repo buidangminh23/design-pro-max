@@ -14,6 +14,8 @@ import {
   versionFindings,
 } from '../scripts/lint-ip.mjs';
 import { APPLE_MARKS } from '../scripts/gen.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
 import { ROOT } from './helpers.mjs';
 
 const design = loadDesign(ROOT);
@@ -73,4 +75,11 @@ test('versions: an erratum that names an unreleased seed fails', () => {
   assert.deepEqual(versionFindings('Fixed in iOS 28.1 beta 2.', 27).map((item) => item.version), ['iOS 28.1']);
   assert.deepEqual(versionFindings('Deprecated in SDK 26 and 27; works on macOS 15 to 26.', 27), []);
   assert.equal(versionFindings('Needs iOS 26 through 28.', 27).length, 1);
+});
+
+test('NOTICE.md states the Apple-text allowances and the corpus gap', () => {
+  const notice = fs.readFileSync(path.join(ROOT, 'skills', 'apple', 'NOTICE.md'), 'utf8');
+  assert.match(notice, new RegExp(`at most ${design.appleText.quoteWords} words`));
+  assert.match(notice, new RegExp(`run of ${design.appleText.shingleWords} words`));
+  assert.match(notice, /the Swift book, swift\.org, Swift Evolution and Apple's MIT samples are not in that comparison yet/);
 });
