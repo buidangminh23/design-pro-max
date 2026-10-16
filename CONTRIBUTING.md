@@ -1,6 +1,6 @@
 # Contributing
 
-design-pro-max ships agent skills, one per design. Today there is one, `apple`: a router over third-party guides ("parts") that are vendored byte for byte under `skills/apple/.vendor/`.
+design-pro-max ships agent skills, one per design. Today there is one, `apple`: a router over guides ("parts"). Most are third-party guides vendored byte for byte under `skills/apple/.vendor/`; the project's own parts, such as `skills/apple/launch-scroll/`, sit next to them.
 
 ## Open an issue first
 
@@ -31,6 +31,16 @@ Never edit a vendored file. Record a known error as an erratum in `vendor/source
 - No personal data: home or volume paths, email addresses, account or machine names. The guard checks for them.
 - Apple's marks only to refer to Apple's products. The trademark line in the README and in `skills/apple/NOTICE.md` is generated from the marks the project uses.
 - Commit messages follow Conventional Commits.
+
+## Own parts
+
+An own part is a `PART.md` guide, with references, assets and checkers, written in the project's own words.
+
+- Every rule a checker enforces is in `rules.json` with its level, its evidence (ledger ids), its check, its fixtures and the checker that implements it. An error rule needs a pass and a fail fixture in `fixtures/<part>/cases.json`, and `node scripts/verify.mjs` must judge both right: the fail case red for that rule, the pass case green without skipping it. Write the fail fixture first and watch it fail.
+- Every number with a unit in a part's text cites a ledger id, and the number appears in that entry's values. A ledger entry is a claim in your own words with a label, an https source or "local benchmark", and the source hash `scripts/import-findings.mjs --write` records. Never paste a third party's text, CSS, class names, media URLs or measured tokens; measured values from other sites are context, never defaults.
+- Checkers follow `skills/apple/shared/report.mjs`: JSON lines, a summary that states what they prove and what they do not, and exit codes 0, 1, 2 and 3. They resolve Playwright from `--project`, install nothing, and fetch no third-party page.
+- A `PART.md` stays under 15,000 characters with a contents list; `npm test` checks the caps and runs the citation lint.
+- Run `node scripts/gen.mjs` after changing `rules.json` or the ledger, so the part's `references/evidence.md` is current.
 
 ## Vendor updates
 

@@ -2,7 +2,7 @@
 
 <img src="skills/apple/assets/apple.svg" width="56" height="56" alt="Apple logo, the icon of the apple skill">
 
-Design skills for AI coding agents, one skill per design. The first skill is **apple**: a router for Apple-platform work that sends each task to one bundled third-party guide and has the agent read that guide in full.
+Design skills for AI coding agents, one skill per design. The first skill is **apple**: a router for Apple-platform work that sends each task to one bundled guide, either a third-party part or one of the project's own, and has the agent read that guide in full.
 
 > **Status: pre-release.** Nothing has been released yet; `main` already installs as described below.
 
@@ -32,6 +32,13 @@ skills/
     references/parts-index.md  generated: every part's group, activation, prerequisites and errata pointers
     agents/openai.yaml       display name and icon for Codex
     assets/apple.svg         the skill icon (the Apple logo)
+    shared/                  the checker runtime the project's own parts share: report contract, MP4 reader, media check, test server
+    launch-scroll/           own part: pinned and scroll-scrubbed scenes on web pages
+      PART.md                the guide the router sends to
+      references/            engines and geometry, scrub video, frame sequences, gates, generated evidence
+      assets/lib/            scene progress, seek queue and scrub loader, with their CSS contract
+      assets/reference/      three reference pages: JavaScript engine, CSS engine, scrub video
+      scripts/               probe-scene.mjs (browser checks), encode-scrub.mjs (scrub encoder)
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -46,7 +53,12 @@ scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
 scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
 scripts/release.mjs          checks, packs and verifies the release ZIP
-.github/workflows/           CI, release and the weekly vendor sync
+scripts/verify.mjs           runs every own-part fixture through the checkers, red first
+scripts/import-findings.mjs  checks the evidence ledger's source hashes against a research folder
+rules.json                   the own parts' rules: level, evidence, check, fixtures and the checker that implements each
+evidence/ledger.json         own-words claims with their label, source and source hash
+fixtures/                    pass and fail cases for every error rule, with pages; media is built at run time
+.github/workflows/           CI, release, the weekly vendor sync and the own-part verify run
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 CONTRIBUTING.md              issues first, MIT-only sources, how a part is added
 ```
@@ -61,7 +73,17 @@ The same constraint shapes the rest of the tree: `skills/apple/SKILL.md` is the 
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Active (6)
+### Own parts (1)
+
+Written for this project and released under its MIT licence. Each has a `PART.md` guide, error rules in `rules.json` that its checkers enforce, and a pass and a fail fixture for every error rule.
+
+| Part | Covers | Prerequisites |
+|---|---|---|
+| `launch-scroll` | Pinned scroll scenes and scroll-scrubbed video or frame sequences on web pages: when not to pin, the engine, geometry, gates for reduced motion, short viewports and blocked autoplay, scrub encoding and the start frame. 8 error rules and 9 warnings | Node 22 or later; ffmpeg and ffprobe for media checks and encoding; Playwright with Chromium in the user's project for browser checks |
+
+The checkers print one JSON line per finding and a summary that states what they prove and what they do not. They exit 0 when every check passes, 1 on an error, 2 when an argument or a tool is missing, and 3 when a sandbox blocks the browser or ffmpeg. They load Playwright from the project passed with `--project`, never install anything, and never fetch third-party pages.
+
+### Vendored, active (6)
 
 | Part | Covers | Prerequisites |
 |---|---|---|
@@ -72,7 +94,7 @@ The router reads a part's `SKILL.md` in full, resolves each relative path a part
 | `core-data-expert` | Core Data stacks, fetches, saving, threading, migrations, CloudKit | A Core Data project |
 | `xcode-disk-cleanup` | Auditing and reclaiming Xcode and simulator disk space | Xcode command line tools and python3 |
 
-### Inactive until their prerequisites exist (32)
+### Vendored, inactive until their prerequisites exist (32)
 
 An inactive part stays in the tree in full. The router runs its activation check first and stops with the missing prerequisites when the check fails.
 
@@ -153,13 +175,16 @@ Node 22 or later; no dependencies.
 | `node scripts/release.mjs notes vX.Y.Z` | Prints the CHANGELOG notes of that version |
 | `node scripts/release.mjs pack [vX.Y.Z]` | Builds `dist/design-pro-max-vX.Y.Z.zip` from a clean HEAD (the tag's commit when a tag is given) with git archive under `TZ=UTC`, so the bytes do not depend on the packer's time zone, plus `dist/SHA256SUMS.txt` naming it, then verifies both. The ZIP holds one `design-pro-max-vX.Y.Z/` folder with `skills/` (the hidden `.vendor/` folders included), `skills.json`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `CHANGELOG.md`; everything else is `export-ignore` |
 | `node scripts/release.mjs verify <dir>` | Checks release assets, such as a downloaded release, against the installers' contract: `SHA256SUMS.txt` names exactly one ZIP, without "plugin" in its name, and its hash matches; the ZIP holds one `SKILL.md` outside dot-folders per skill in `skills.json`, every vendored file with the hash in its `UPSTREAM.json`, one MIT `LICENSE` per part and exactly the parts of `vendor/sources.json`, no entry name over 150 characters, and no symlinks, `__pycache__` folders, compiled Python, `metadata.json` files or media other than reviewed files. It also compares the ZIP with the tracked files of the tag `vX.Y.Z` (or of HEAD before the tag exists): every tracked payload file with its exact bytes and executable bit, and nothing else, so a nested `.gitattributes`, `.git/info/attributes`, `export-subst` or a line-ending filter cannot drop or rewrite a file |
-| `npm test` | The test suite, including sync runs against local fake upstream repositories |
+| `node scripts/verify.mjs [--only <case>] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium` |
+| `node scripts/import-findings.mjs --check <research folder>` | Recomputes each ledger entry's source hash from the private research folder it was written from and fails on any difference; `--write` records new hashes. The research folder never enters the repository |
+| `npm test` | The test suite, including sync runs against local fake upstream repositories, the evidence ledger and rules, the citation lint, the own-part checkers' pure code and a red-first check of the harness |
 
 To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.
 
 ### Workflows
 
 - **CI** (`.github/workflows/ci.yml`) runs on pushes to `main`, on pull requests and by hand, on Ubuntu, macOS and Windows with Node 22 and 24: the tests, `vendor-sync.mjs check`, the guard, `notices --check`, `gen.mjs --check`, `check-history.mjs`, `release.mjs check` and `release.mjs pack`.
+- **Verify** (`.github/workflows/verify.yml`) runs on Ubuntu with ffmpeg and Playwright's headless Chromium, on pushes to `main` and pull requests that touch the shared runtime, an own part, `rules.json`, the evidence or the fixtures, on every `vX.Y.Z` tag and by hand: `node scripts/verify.mjs`, every fixture judged red first.
 - **Release** (`.github/workflows/release.yml`) runs when a `vX.Y.Z` tag is pushed, or by hand for an existing tag, one run at a time. The tag's commit must be on `main`. It runs every check again and packs the ZIP, creates a draft release with the ZIP and `SHA256SUMS.txt`, removes any other asset from the draft, downloads both again and verifies them, then publishes the release as Latest and waits until `releases/latest` points to it. It never publishes a prerelease, because installers read `releases/latest`, and it leaves a draft unpublished when a newer version is already published, so Latest never moves back. A tag that is already published is only verified: its download is checked against the tag's tree, not compared byte for byte with a rebuild.
 - **Vendor sync** (`.github/workflows/vendor-sync.yml`) runs on Mondays at 02:41 UTC and by hand. A read-only job stages every source whose upstream HEAD moved past its pin, applies the update to a throwaway checkout, runs the guard and uploads the staged folder. A second job confirms the staged files against upstream, classifies the update, applies it, regenerates the notices and the generated files, runs every check, commits to the `vendor-sync` branch, checks a clean worktree of that commit, pushes the branch with a token scoped to that one step and opens or updates one pull request from it, never a fork's. It then starts the CI workflow on the branch, because pull requests and pushes made with the workflow's token start no workflow themselves. A `safe` update, one that changes no shipped file, merges only after that CI run passes on the pull request's head commit and while `main` has not moved; a `needs-review` update gets the `needs-review` label and waits for the owner. When the branch already holds the update, the next run reuses it, so a safe update that could not merge is tried again. A blocked source fails the run and stays at its pin. After 45 quiet days on `main` the workflow enables itself again through the API, which may not reset GitHub's 60-day timer, and opens an issue; it never pushes to `main`. The workflow needs the repository setting that lets GitHub Actions create pull requests. If `main` gets branch protection with required CI checks, the CI run the workflow starts reports those checks on the pull request's head commit, which is where required checks are read; this has not been tried on GitHub yet.
 
@@ -178,7 +203,7 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 
 <!-- gen:trademarks -->
 
-Apple, the Apple logo, iOS, macOS, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
 
 <!-- /gen:trademarks -->
 
