@@ -1,0 +1,6 @@
+body { margin: 0; font-family: system-ui, sans-serif; }
+.site-nav { position: fixed; top: 0; left: 0; right: 0; height: 64px; display: flex; align-items: center; padding: 0 24px; background: #fff; z-index: 10; }
+main { padding-top: 64px; }
+.hero, .specs { padding: 120px 24px; text-align: center; }
+.laptop-section { padding: 80px 24px; text-align: center; }
+.laptop { width: min(900px, 90vw); height: auto; }

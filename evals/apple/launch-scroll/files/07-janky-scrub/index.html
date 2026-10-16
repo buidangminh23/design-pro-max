@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Film</title>
+<style>.film-section { height: 400vh; } .film-sticky { position: sticky; top: 0; height: 100vh; } .film { width: 100%; height: 100%; object-fit: cover; }</style>
+</head>
+<body>
+  <section class="film-section">
+    <div class="film-sticky">
+      <video class="film" src="/film.mp4" muted playsinline preload="auto"></video>
+    </div>
+  </section>
+  <script type="module" src="src/scrub.js"></script>
+</body>
+</html>
