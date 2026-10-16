@@ -9,8 +9,13 @@ import {
   PAYLOAD,
   PRE_RELEASE_BANNER,
   REPO_ONLY,
+  STAT_KEYS,
   SUMS_FILE,
   attributeProblems,
+  bump,
+  cardProblems,
+  pushTag,
+  releaseStats,
   changelogProblems,
   checkRelease,
   compareVersions,
@@ -292,4 +297,80 @@ test('the release commands report usage errors and results', (t) => {
   const notes = runScript(RELEASE, ['notes', 'v0.0.0', '--root', root]);
   assert.equal(notes.status, 1);
   assert.match(notes.stderr, /version 0\.0\.0 cannot be released/);
+});
+
+/** A folder holding only what releaseStats reads, copied from the repository, plus the versioned files and a card. */
+function statsRoot(t) {
+  const root = tempDir('design-pro-max-stats-');
+  t.after(() => removeTree(root));
+  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  write(root, 'package.json', `${JSON.stringify({ name: NAME, version: '0.0.0', private: true }, null, 2)}\n`);
+  write(root, '.claude-plugin/plugin.json', `${JSON.stringify({ name: NAME, version: '0.0.0' }, null, 2)}\n`);
+  write(root, '.claude-plugin/marketplace.json', `${JSON.stringify({ name: NAME, plugins: [{ name: NAME, version: '0.0.0', source: './' }] }, null, 2)}\n`);
+  const stats = STAT_KEYS.map((key) => ({ value: '?', label: key }));
+  write(root, 'web-card.json', `${JSON.stringify({ id: NAME, vi: { stats }, en: { stats }, evidence: Object.fromEntries(STAT_KEYS.map((key) => [key, key])) }, null, 2)}\n`);
+  return root;
+}
+
+test('stats count guides, active guides, sourced error rules, must-fail fixtures, eval cases and dated claims', (t) => {
+  const stats = releaseStats(ROOT);
+  assert.deepEqual(Object.keys(stats), STAT_KEYS);
+  const root = statsRoot(t);
+  assert.deepEqual(releaseStats(root), stats);
+  write(root, 'evals/routing/cases.json', `${JSON.stringify({ cases: [{ id: 'a' }, { id: 'b' }] })}\n`);
+  assert.equal(releaseStats(root).evalCases, stats.evalCases + 2);
+  const rules = JSON.parse(fs.readFileSync(path.join(root, 'rules.json'), 'utf8'));
+  const ledger = JSON.parse(fs.readFileSync(path.join(root, 'evidence', 'ledger.json'), 'utf8'));
+  for (const id of rules.rules[0].evidence) if (ledger.entries[id]) ledger.entries[id].label = 'inferred';
+  write(root, 'evidence/ledger.json', `${JSON.stringify(ledger)}\n`);
+  assert.ok(releaseStats(root).errorRules < stats.errorRules);
+});
+
+test('bump writes the version into every manifest and the stats into the card, which check then accepts', (t) => {
+  const root = statsRoot(t);
+  assert.match(cardProblems(JSON.parse(fs.readFileSync(path.join(root, 'web-card.json'), 'utf8')), releaseStats(root)).join('\n'), /vi stats are \?/);
+  const result = bump(root, '0.1.0');
+  assert.deepEqual(result.written, ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json', 'web-card.json']);
+  const read = (file) => JSON.parse(fs.readFileSync(path.join(root, ...file.split('/')), 'utf8'));
+  assert.equal(read('package.json').version, '0.1.0');
+  assert.equal(read('.claude-plugin/plugin.json').version, '0.1.0');
+  assert.equal(read('.claude-plugin/marketplace.json').plugins[0].version, '0.1.0');
+  const card = read('web-card.json');
+  assert.deepEqual(cardProblems(card, releaseStats(root)), []);
+  assert.deepEqual(card.en.stats.map((item) => item.label), STAT_KEYS);
+  assert.match(cardProblems({ ...card, evidence: {} }, releaseStats(root)).join('\n'), /evidence must have the keys guides, activeGuides/);
+  assert.throws(() => bump(root, 'v0.1.0'), /bump needs a major\.minor\.patch version/);
+});
+
+test('push-tag tags only origin/main with ready inputs, pushes the tag by name and confirms it', (t) => {
+  for (const [key, value] of [['GIT_COMMITTER_NAME', 'Fixture'], ['GIT_COMMITTER_EMAIL', ['fixture', 'users.noreply.github.com'].join('@')]]) {
+    const before = process.env[key];
+    process.env[key] = value;
+    t.after(() => (before === undefined ? delete process.env[key] : (process.env[key] = before)));
+  }
+  const root = releaseFixture(t, (base) => {
+    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'CHANGELOG.md', '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-16\n\n- First release.\n');
+  });
+  const remote = tempDir('design-pro-max-remote-');
+  t.after(() => removeTree(remote));
+  const git = gitIn(root, t);
+  execFileSync('git', ['init', '--quiet', '--bare', remote]);
+  git('remote', 'add', 'origin', remote);
+  assert.throws(() => pushTag(root, 'v0.1.0', { sleep: () => {} }), /HEAD is not origin\/main|couldn't find remote ref main/);
+  git('push', '--quiet', 'origin', 'HEAD:refs/heads/main');
+  assert.throws(() => pushTag(root, 'v0.2.0', { sleep: () => {} }), /does not match package\.json version 0\.1\.0/);
+  const result = pushTag(root, 'v0.1.0', { sleep: () => {} });
+  assert.equal(result.commit, git('rev-parse', 'HEAD'));
+  assert.equal(result.attempts, 1);
+  assert.equal(execFileSync('git', ['-C', remote, 'rev-parse', 'refs/tags/v0.1.0^{commit}'], { encoding: 'utf8' }).trim(), result.commit);
+  assert.equal(execFileSync('git', ['-C', remote, 'cat-file', '-t', 'refs/tags/v0.1.0'], { encoding: 'utf8' }).trim(), 'tag');
+  assert.deepEqual(pushTag(root, 'v0.1.0', { sleep: () => {} }).commit, result.commit);
+  fs.appendFileSync(path.join(root, 'README.md'), 'More.\n');
+  git('commit', '--quiet', '-am', 'more');
+  assert.throws(() => pushTag(root, 'v0.1.0', { sleep: () => {} }), /HEAD is not origin\/main/);
+  git('push', '--quiet', 'origin', 'HEAD:refs/heads/main');
+  assert.throws(() => pushTag(root, 'v0.1.0', { sleep: () => {} }), /v0\.1\.0 already points at/);
+  fs.appendFileSync(path.join(root, 'README.md'), 'Dirty.\n');
+  assert.throws(() => pushTag(root, 'v0.1.0', { sleep: () => {} }), /working tree is not clean/);
 });
