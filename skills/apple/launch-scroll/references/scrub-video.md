@@ -43,7 +43,7 @@ Keep sources in `data-src`, not `src`: the browser must not fetch anything befor
 
 `createSeekQueue(video, { fps })` from `assets/lib/seek-queue.js`:
 
-- Latest wins: a new target is written only when the video is not seeking; otherwise it replaces the pending target, which is written on `seeked`. Writing on every frame starves the decoder (SC-8) [LS-VID-03].
+- Latest wins: a new target is written only when the video is not seeking; otherwise it replaces the pending target, which is written on `seeked`. A `seeked` event can arrive after a newer seek has started, so the handler waits while the video is still seeking, and a direct write drops any older pending target. Writing on every frame starves the decoder (SC-8) [LS-VID-03].
 - Targets are frame centres, `(i + 0.5) / fps`, so rounding never lands on the neighbour.
 - Never `fastSeek()`: it snaps to keyframes (SC-17) [LS-VID-03].
 - Progress goes to the film unsmoothed (AM-17).

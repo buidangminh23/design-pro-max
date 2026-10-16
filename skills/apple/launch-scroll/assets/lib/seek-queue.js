@@ -1,7 +1,9 @@
 // launch-scroll seek-queue.js (design-pro-max). Copy into the project; no dependencies.
 //
 // Latest-wins seeking for a scrubbed <video>: a new target is applied only when the element is not already seeking;
-// otherwise it replaces the pending one and is applied on 'seeked'. Targets are frame centres, (i + 0.5) / fps, so a
+// otherwise it replaces the pending one and is applied on 'seeked'. A 'seeked' event can arrive after a newer seek has
+// already started, so the handler waits while the element is still seeking and a direct write drops any older pending
+// target. Targets are frame centres, (i + 0.5) / fps, so a
 // rounding error never lands on the neighbouring frame. fastSeek() is never used: it snaps to keyframes.
 
 export function frameTime(index, fps) {
@@ -22,11 +24,12 @@ export function createSeekQueue(video, { fps = 30 } = {}) {
       pending = time;
       return;
     }
+    pending = null;
     video.currentTime = time;
   };
 
   const onSeeked = () => {
-    if (pending === null) return;
+    if (pending === null || video.seeking) return;
     const time = pending;
     pending = null;
     video.currentTime = time;

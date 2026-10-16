@@ -254,3 +254,40 @@ test('an area code the script does not name resolves to the one unclaimed findin
   assert.match(areaName(folder, 'XB').problem, /2 unnamed findings files/);
   assert.ok(!Object.values(AREAS).some((name) => /notch/i.test(name)), 'no private benchmark is named in the script');
 });
+
+/** A video stand-in: writes start a seek, finish() ends it and returns the queued 'seeked' dispatch, as a browser does. */
+function fakeVideo() {
+  const listeners = [];
+  const video = {
+    seeking: false,
+    duration: 10,
+    writes: [],
+    addEventListener: (type, fn) => type === 'seeked' && listeners.push(fn),
+    removeEventListener: () => {},
+    finish() {
+      video.seeking = false;
+      return () => listeners.forEach((fn) => fn());
+    },
+  };
+  Object.defineProperty(video, 'currentTime', {
+    set(value) {
+      video.writes.push({ value, whileSeeking: video.seeking });
+      video.seeking = true;
+    },
+  });
+  return video;
+}
+
+test('the seek queue never writes while seeking, even when a seeked event arrives after a newer seek began', async () => {
+  const { createSeekQueue, frameTime } = await lib('seek-queue.js');
+  const video = fakeVideo();
+  const queue = createSeekQueue(video, { fps: 30 });
+  queue.seekToFrame(1);
+  queue.seekToFrame(2);
+  const seekedForFirst = video.finish();
+  queue.seekToFrame(3);
+  seekedForFirst();
+  video.finish()();
+  assert.deepEqual(video.writes.filter((write) => write.whileSeeking), []);
+  assert.equal(video.writes.at(-1).value, frameTime(3, 30), 'the latest target wins');
+});
