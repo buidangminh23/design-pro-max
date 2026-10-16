@@ -53,10 +53,14 @@ scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
 scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
 scripts/release.mjs          checks, packs and verifies the release ZIP; bumps versions and card stats; pushes the tag
+scripts/ci-local.mjs         runs the CI steps and the verify run locally when Actions cannot run
+scripts/lint-ip.mjs          IP and privacy lint over the project's own files
 scripts/verify.mjs           runs every own-part fixture through the checkers, red first
 scripts/import-findings.mjs  checks the evidence ledger's source hashes against a research folder
 rules.json                   the own parts' rules: level, evidence, check, fixtures and the checker that implements each
 evidence/ledger.json         own-words claims with their label, source and source hash
+evidence/ip-hashes.json      salted hashes of the private identifiers, private terms and Apple text corpus
+designs/apple.json           the apple skill's design record: marks, never-ship list, phrase gates, newest released OS
 fixtures/                    pass and fail cases for every error rule, with pages; media is built at run time
 .github/workflows/           CI, release, the weekly vendor sync and the own-part verify run
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
@@ -178,6 +182,7 @@ Node 22 or later; no dependencies.
 | `node scripts/release.mjs stats` | Prints the card stats computed from the committed files: guides (own and vendored parts), active guides, error rules with at least one non-inferred ledger entry, must-fail fixtures, eval cases in `evals/<suite>/cases.json` and dated ledger claims. `check` fails when `web-card.json` shows other values |
 | `node scripts/release.mjs bump X.Y.Z` | Writes the version into `package.json` and the plugin manifests that exist, and the computed stats into `web-card.json` |
 | `node scripts/release.mjs push-tag vX.Y.Z` | Creates the annotated tag on HEAD once HEAD is `origin/main`, the tree is clean and `check vX.Y.Z` passes; pushes the tag by name, retries up to three times, and succeeds only when `git ls-remote` lists the tag at HEAD |
+| `node scripts/ci-local.mjs [--skip-verify] [--json]` | Runs every step of CI's test job in order, read from `ci.yml`, then `scripts/verify.mjs` when ffmpeg, ffprobe and Playwright are installed, and lists what the run did not cover: the OS and Node matrix, L2 media, the GitHub-side release and sync steps, and verify when it could not run. For use when GitHub Actions is unavailable |
 | `node scripts/verify.mjs [--only <case>] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium` |
 | `node scripts/import-findings.mjs --check <research folder>` | Recomputes each ledger entry's source hash from the private research folder it was written from and fails on any difference; `--write` records new hashes. The research folder never enters the repository |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories, the evidence ledger and rules, the citation lint, the own-part checkers' pure code and a red-first check of the harness |
