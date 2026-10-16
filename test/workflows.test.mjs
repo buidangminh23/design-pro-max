@@ -57,8 +57,8 @@ function runScripts(text) {
   return scripts;
 }
 
-test('the three workflows exist', () => {
-  assert.deepEqual(files, ['ci.yml', 'release.yml', 'vendor-sync.yml']);
+test('the four workflows exist', () => {
+  assert.deepEqual(files, ['ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
 });
 
 test('every action is pinned to a full commit SHA with a version comment, the same pin everywhere', () => {
@@ -166,4 +166,20 @@ test('the vendor sync stages read-only, confirms upstream and merges only safe u
   assert.match(heartbeatText, /if \[ "\$days" -lt 45 \]/);
   assert.match(heartbeatText, /gh issue create/);
   assert.doesNotMatch(heartbeatText, /git push|contents: write/);
+});
+
+test('the verify workflow runs every fixture with ffmpeg and Playwright on own-part changes and on tags', () => {
+  const verify = read('verify.yml');
+  assert.match(verify, /tags: \["v\*"\]/);
+  for (const filter of ['"skills/apple/shared/**"', '"skills/apple/launch-*/**"', '"rules.json"', '"fixtures/**"', '"evidence/**"']) {
+    assert.equal(verify.split(filter).length - 1, 2, `${filter} filters both pushes and pull requests`);
+  }
+  const scripts = runScripts(verify).join('\n');
+  assert.match(scripts, /apt-get install -y --no-install-recommends ffmpeg/);
+  assert.match(scripts, /npm install --no-save --no-package-lock playwright@\d+\.\d+\.\d+/);
+  assert.match(scripts, /npx playwright install --with-deps --only-shell chromium/);
+  assert.ok(runScripts(verify).includes('node scripts/verify.mjs'));
+  const [job] = jobs(verify);
+  assert.ok(job.lines.some((line) => /^ {6}contents: read$/.test(line)));
+  assert.ok(!job.lines.some((line) => /: write$/.test(line)));
 });

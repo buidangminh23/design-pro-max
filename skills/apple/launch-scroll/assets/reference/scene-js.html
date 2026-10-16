@@ -1,0 +1,47 @@
+<!doctype html>
+<!-- launch-scroll reference: a pinned scene driven by one JS progress value (design-pro-max).
+     Static by default; scene-progress.js pins it when motion is allowed and the stage fits the viewport. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinned scene, JS progress</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d1d1f; background: #fbfbfd; }
+  .intro, .outro { min-height: 80vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  [data-scene] { --scene-travel: 180vh; }
+  .stage { width: min(100% - 48px, 720px); height: 480px; display: grid; grid-template-rows: auto 1fr; gap: 24px; }
+  .stage h2 { margin: 0; font-size: 32px; line-height: 40px; }
+  .device {
+    place-self: center;
+    width: 320px;
+    aspect-ratio: 4 / 3;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #2c2c30, #5a5a63);
+    transform: scale(calc(1.6 - 0.6 * var(--scene-progress)));
+    opacity: calc(0.4 + 0.6 * var(--scene-progress));
+    will-change: transform;
+  }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. The device settles into place while the section stays pinned.</p></section>
+
+<section data-scene aria-labelledby="scene-title">
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <h2 id="scene-title">One progress value drives the scene</h2>
+      <div class="device" role="img" aria-label="A device shrinking from a close-up to its full size"></div>
+    </div>
+  </div>
+</section>
+
+<section class="outro"><p>The scene ends in the same state the static layout shows.</p></section>
+
+<script type="module">
+  import { createScene } from '../lib/scene-progress.js';
+  createScene(document.querySelector('[data-scene]'), { smoothingMs: 0 });
+</script>
+</body>
+</html>

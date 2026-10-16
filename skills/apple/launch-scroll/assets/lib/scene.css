@@ -1,0 +1,64 @@
+/* launch-scroll scene.css (design-pro-max). Copy into the project with the scripts in this folder.
+ *
+ * The static layout is the default; a scene pins only once scene-progress.js sets data-scene-state="pinned".
+ * Box = travel + 100vh, sticky child = 100svh minus the sticky offset, so progress runs 0 to 1 exactly while the
+ * stage is pinned. Children read --scene-progress (0 to 1) and animate transform and opacity only.
+ */
+[data-scene] {
+  --scene-progress: 1;
+  --scene-travel: 200vh;
+  --scene-sticky-top: 0px;
+  position: relative;
+}
+
+[data-scene-sticky] {
+  top: var(--scene-sticky-top);
+}
+
+[data-scene][data-scene-state="pinned"] {
+  height: calc(var(--scene-travel) + 100vh);
+}
+
+[data-scene][data-scene-state="pinned"] > [data-scene-sticky] {
+  position: sticky;
+  height: calc(100vh - var(--scene-sticky-top));
+  height: calc(100svh - var(--scene-sticky-top));
+  display: grid;
+  place-items: center;
+  overflow: clip;
+}
+
+[data-scene-film] {
+  position: relative;
+  aspect-ratio: var(--film-ratio, 16 / 9);
+  width: min(100%, var(--film-width, 960px));
+}
+
+[data-scene-film] > img,
+[data-scene-film] > picture,
+[data-scene-film] > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+[data-scene-film] > video {
+  opacity: 0;
+}
+
+[data-scene][data-scene-state="pinned"][data-scrub-state="ready"] [data-scene-film] > video {
+  opacity: 1;
+}
+
+[data-scene]:not([data-scene-state="pinned"]) [data-scene-film] > [data-scene-startframe],
+[data-scene][data-scene-state="pinned"] [data-scene-film] > [data-scene-still] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scene] * {
+    transition-duration: 0s !important;
+  }
+}

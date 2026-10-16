@@ -1,0 +1,56 @@
+<!doctype html>
+<!-- Fail fixture for LS-VID-03: gates and loads like the reference, then writes currentTime on every progress
+     update, even while the previous seek is still running. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-VID-03 fail</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 90vh; }
+  [data-scene] { --scene-travel: 220vh; --film-width: 720px; }
+  .stage { width: min(100% - 32px, 720px); }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <div data-scene-film>
+        <img data-scene-still src="still.jpg" width="1280" height="720" alt="" loading="lazy">
+        <img data-scene-startframe src="startframe.jpg" width="1280" height="720" alt="">
+        <video data-scrub muted playsinline aria-hidden="true">
+          <source data-src="film.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { createScene } from '../lib/scene-progress.js';
+  import { loadFilm, onFirstFrame, primeFrames, probeAutoplay } from '../lib/scrub-loader.js';
+  const element = document.querySelector('[data-scene]');
+  const video = element.querySelector('video');
+  let ready = false;
+  createScene(element, {
+    gate: probeAutoplay(),
+    onProgress(progress, state) {
+      if (ready && state === 'pinned') video.currentTime = progress * video.duration;
+    },
+    async onState(state) {
+      if (state !== 'pinned' || ready) return;
+      onFirstFrame(video, () => {
+        element.dataset.scrubState = 'ready';
+      });
+      await loadFilm(video, { mode: 'blob' });
+      await primeFrames(video);
+      ready = true;
+    },
+  });
+</script>
+</body>
+</html>

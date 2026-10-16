@@ -1,0 +1,10 @@
+{
+  "description": "Characters per token for own part text. The caps use the lowest ratio: a PART.md may hold at most 5000 x charsPerToken characters. Claude's tokenizer is not available offline, so the cap keeps the router test's conservative estimate of 3 characters per token until a Claude count is recorded.",
+  "charsPerToken": 3,
+  "measured": [
+    { "date": "2026-10-16", "tokenizer": "tiktoken o200k_base", "file": "skills/apple/launch-scroll/PART.md", "characters": 8082, "tokens": 2041 },
+    { "date": "2026-10-16", "tokenizer": "tiktoken o200k_base", "file": "skills/apple/launch-scroll/references/scrub-video.md", "characters": 5320, "tokens": 1394 },
+    { "date": "2026-10-16", "tokenizer": "tiktoken o200k_base", "file": "skills/apple/launch-scroll/references/engines-and-geometry.md", "characters": 4824, "tokens": 1184 },
+    { "date": "2026-10-16", "tokenizer": "tiktoken o200k_base", "file": "skills/apple/SKILL.md", "characters": 13127, "tokens": 3133 }
+  ]
+}

@@ -24,7 +24,9 @@
     "history": "node scripts/check-history.mjs",
     "release:check": "node scripts/release.mjs check",
     "release:notes": "node scripts/release.mjs notes",
-    "release:pack": "node scripts/release.mjs pack"
+    "release:pack": "node scripts/release.mjs pack",
+    "verify": "node scripts/verify.mjs",
+    "evidence:check": "node scripts/import-findings.mjs --check"
   },
   "engines": {
     "node": ">=22"

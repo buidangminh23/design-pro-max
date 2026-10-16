@@ -7,6 +7,9 @@
  *                                            errata pointers
  *   README.md                                the credits table and the trademark line
  *   skills/apple/NOTICE.md                   the trademark line and the licences of third-party drawings it ships
+ *   skills/apple/<part>/references/evidence.md
+ *                                            for each own part: its rules and the ledger entries it cites, from
+ *                                            rules.json and evidence/ledger.json
  *
  *   node scripts/gen.mjs [--check] [--root <dir>]
  *
@@ -36,6 +39,7 @@ import {
   writeRegular,
 } from './lib/vendor.mjs';
 import { MEDIA_NOTICES } from './lib/media.mjs';
+import { OWN_PARTS, RULES_FILE, buildEvidence, loadLedger, loadRules } from './lib/evidence.mjs';
 
 export const SKILLS_FILE = 'skills.json';
 export const PARTS_INDEX_FILE = `${SKILL_DIR}/references/parts-index.md`;
@@ -134,7 +138,7 @@ function partEntry(part, shared) {
  * skills/apple/references/parts-index.md: every part by group, with its status, activation check, prerequisites and
  * the file:line pointers of its errata. Text the parts of a group share is stated once for the group.
  */
-export function buildPartsIndex(manifest) {
+export function buildPartsIndex(manifest, ownParts = []) {
   const groups = new Map();
   for (const part of manifest.parts) {
     const group = groupOf(part);
@@ -156,6 +160,22 @@ export function buildPartsIndex(manifest) {
     if (shared.activation) lines.push('', `Activation, unless a part below names its own: ${shared.activation}`);
     if (shared.prerequisites.length) lines.push('', 'Prerequisites of every part below:', '', ...shared.prerequisites.map((item) => `- ${item}`));
     for (const part of parts) lines.push('', ...partEntry(part, shared));
+  }
+  if (ownParts.length) {
+    lines.push('', '## Own parts', '', "Written for this skill and active without an activation check. Their checkers need Node 22 or later; browser checks load Playwright with Chromium from the user's project, and media checks call ffmpeg and ffprobe. A missing tool makes a checker exit 2 with the install command.");
+    for (const part of ownParts) {
+      const checkers = [...new Set(part.rules.map((rule) => rule.check).filter(Boolean))].map((file) => `\`${file}\``);
+      const count = (level) => part.rules.filter((rule) => rule.level === level).length;
+      lines.push(
+        '',
+        `### \`${part.id}\``,
+        '',
+        `- Guide: \`${part.id}/PART.md\``,
+        '- Status: active',
+        `- Rules: ${count('error')} error, ${count('warn')} warn; evidence in \`${part.id}/references/evidence.md\``,
+        `- Checkers: ${checkers.join(', ')}`,
+      );
+    }
   }
   return `${lines.join('\n')}\n`;
 }
@@ -254,7 +274,17 @@ export function generate(root = ROOT) {
   const manifest = loadSources(root);
   const files = new Map();
   files.set(SKILLS_FILE, formatJson(skillsList(root)));
-  files.set(PARTS_INDEX_FILE, buildPartsIndex(manifest));
+  const ownParts = [];
+  if (describeEntry(root, RULES_FILE)?.kind === 'file') {
+    const ledger = loadLedger(root);
+    const rules = loadRules(root);
+    for (const part of OWN_PARTS) {
+      if (describeEntry(root, `${SKILL_DIR}/${part}`)?.kind !== 'dir') continue;
+      ownParts.push({ id: part, rules: rules.filter((rule) => rule.part === part) });
+      files.set(`${SKILL_DIR}/${part}/references/evidence.md`, buildEvidence(root, part, ledger, rules));
+    }
+  }
+  files.set(PARTS_INDEX_FILE, buildPartsIndex(manifest, ownParts));
   const readme = replaceBlock(readText(root, README_FILE), 'credits', buildCredits(root, manifest), README_FILE);
   files.set(README_FILE, readme);
   const marks = usedMarks(ownText(root, files));

@@ -1,0 +1,113 @@
+{
+  "description": "launch-scroll fixtures. Each case runs one checker against a page or media files built in a temporary folder by scripts/verify.mjs; media come from the recipes in scripts/lib/fixture-media.mjs, so no media file is committed. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it.",
+  "cases": [
+    {
+      "id": "scene-js",
+      "rule": ["LS-GATE-01", "LS-GATE-02", "LS-GEOM-01"],
+      "expect": "pass",
+      "checker": "probe-scene",
+      "page": "reference/scene-js.html",
+      "server": "range",
+      "args": ["--viewport", "1440x900", "--viewport", "390x844"]
+    },
+    {
+      "id": "scrub-video",
+      "rule": ["LS-GATE-01", "LS-GATE-02", "LS-GEOM-01", "LS-VID-01", "LS-VID-02", "LS-VID-03", "LS-VID-04", "LS-VID-05"],
+      "expect": "pass",
+      "checker": "probe-scene",
+      "page": "reference/scrub-video.html",
+      "server": "200",
+      "media": { "film.mp4": "film", "film.webm": "film-webm", "startframe.jpg": "startframe", "still.jpg": "still" },
+      "args": ["--viewport", "1280x800"]
+    },
+    {
+      "id": "gate-01-ignores-motion",
+      "rule": "LS-GATE-01",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/gate-01-ignores-motion.html",
+      "server": "range",
+      "media": { "film.mp4": "film", "startframe.jpg": "startframe" },
+      "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "gate-02-ignores-height",
+      "rule": "LS-GATE-02",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/gate-02-ignores-height.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800"]
+    },
+    {
+      "id": "geom-01-unclamped",
+      "rule": "LS-GEOM-01",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/geom-01-unclamped.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800"]
+    },
+    {
+      "id": "vid-01-open-gop",
+      "rule": "LS-VID-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "files": ["film-open-gop"]
+    },
+    {
+      "id": "vid-01-02-encoded",
+      "rule": ["LS-VID-01", "LS-VID-02"],
+      "expect": "pass",
+      "checker": "check-media",
+      "files": ["film", "film-webm"]
+    },
+    {
+      "id": "vid-02-vp9-only",
+      "rule": "LS-VID-02",
+      "expect": "fail",
+      "checker": "check-media",
+      "files": ["film-vp9"]
+    },
+    {
+      "id": "vid-03-naive-seek",
+      "rule": "LS-VID-03",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/vid-03-naive-seek.html",
+      "server": "range",
+      "media": { "film.mp4": "film-long-gop", "startframe.jpg": "startframe-long-gop", "still.jpg": "still" },
+      "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "vid-04-range",
+      "rule": "LS-VID-04",
+      "expect": "pass",
+      "checker": "probe-scene",
+      "page": "pages/vid-04-plain-src.html",
+      "server": "range",
+      "media": { "film.mp4": "film", "startframe.jpg": "startframe", "still.jpg": "still" },
+      "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "vid-04-200-only",
+      "rule": "LS-VID-04",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/vid-04-plain-src.html",
+      "server": "200",
+      "media": { "film.mp4": "film", "startframe.jpg": "startframe", "still.jpg": "still" },
+      "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "vid-05-wrong-start-frame",
+      "rule": "LS-VID-05",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "reference/scrub-video.html",
+      "server": "range",
+      "media": { "film.mp4": "film", "film.webm": "film-webm", "startframe.jpg": "startframe-wrong", "still.jpg": "still" },
+      "args": ["--viewport", "1280x800"]
+    }
+  ]
+}
