@@ -39,4 +39,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 <!-- /gen:media -->
 
+Apple text: this project's own files may cite Apple titles as sources, quote Apple at most 20 words at a time with attribution, use API-call boilerplate made of public symbol names, and keep phrases of at most 12 words that a vendored part records with their source. Any other run of 8 words that matches Apple text fails the project's IP lint. The lint compares against the Apple passages the vendored parts are known to quote; Apple's documentation pages, the Swift book, swift.org, Swift Evolution and Apple's MIT samples are not in that comparison yet.
+
 The guides under `.vendor/` are their authors' work, shipped unmodified under their own MIT licences; see each part's `LICENSE` and `UPSTREAM.json`.

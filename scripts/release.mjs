@@ -9,6 +9,10 @@
  *   notes vX.Y.Z     print the CHANGELOG entry of that version
  *   pack [vX.Y.Z]    write dist/design-pro-max-vX.Y.Z.zip and dist/SHA256SUMS.txt from HEAD, then verify them
  *   verify <dir>     verify a folder holding SHA256SUMS.txt and the ZIP it names, such as downloaded release assets
+ *   stats            print the card stats computed from the committed files
+ *   bump X.Y.Z       write the version into package.json and the plugin manifests, and the stats into web-card.json
+ *   push-tag vX.Y.Z  tag HEAD (annotated) once it is origin/main and the release check passes, push the tag by name
+ *                    with retries, and confirm it with git ls-remote
  *
  * Every command takes --root <dir>. Verification reads the ZIP itself: one visible SKILL.md per skill in skills.json,
  * every vendored file equal to its UPSTREAM.json hash, one MIT LICENSE per part, exactly the parts of
@@ -29,6 +33,7 @@ import {
   VENDOR_DIR,
   compareStrings,
   describeEntry,
+  formatJson,
   fileEntryProblem,
   isMainModule,
   isMitLicence,
@@ -43,6 +48,7 @@ import { isReviewedMedia, mediaKind } from './lib/media.mjs';
 import { readBlobs } from './check-history.mjs';
 import { SKILLS_FILE, skillsList } from './gen.mjs';
 import { visiblePath } from './vendor-guard.mjs';
+import { OWN_PARTS, loadCases, loadLedger, loadRules } from './lib/evidence.mjs';
 
 export const NAME = 'design-pro-max';
 export const PUBLIC_NAME = new RegExp(`^@[a-z0-9][a-z0-9-]*/${NAME}$`);
@@ -51,6 +57,10 @@ export const SUMS_FILE = 'SHA256SUMS.txt';
 export const MAX_ENTRY_NAME = 150;
 export const PRE_RELEASE_BANNER = '**Status: pre-release.**';
 export const PAYLOAD = ['CHANGELOG.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', SKILLS_FILE, 'skills'];
+export const CARD_FILE = 'web-card.json';
+export const STAT_KEYS = ['guides', 'activeGuides', 'errorRules', 'failFixtures', 'evalCases', 'ledgerClaims'];
+export const VERSIONED_FILES = ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json', '.codex-plugin/plugin.json'];
+export const PUSH_ATTEMPTS = 3;
 export const REPO_ONLY = ['.github', '.claude-plugin', '.codex-plugin', '.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'designs', 'evals', 'evidence', 'fixtures', 'package.json', 'rules.json', 'scripts', 'test', 'vendor', 'web-card.json'];
 
 const VERSION = /^\d+\.\d+\.\d+$/;
@@ -58,7 +68,7 @@ const TAG = /^v(\d+\.\d+\.\d+)$/;
 const ZIP_NAME = new RegExp(`^${NAME}-v(\\d+\\.\\d+\\.\\d+)\\.zip$`);
 const SUM_LINE = /^([0-9a-f]{64}) [ *](\S+)$/;
 const GIT_ENV_KEYS = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_PREFIX'];
-const USAGE = 'Usage: node scripts/release.mjs <check [vX.Y.Z] | notes vX.Y.Z | pack [vX.Y.Z] | verify <dir>> [--root <dir>]';
+const USAGE = 'Usage: node scripts/release.mjs <check [vX.Y.Z] | notes vX.Y.Z | pack [vX.Y.Z] | verify <dir> | stats | bump X.Y.Z | push-tag vX.Y.Z> [--root <dir>]';
 
 function readText(base, relative) {
   let bytes;
@@ -212,6 +222,13 @@ export function checkRelease(root = ROOT, tag = null) {
     if (JSON.stringify(JSON.parse(readText(root, SKILLS_FILE))) !== JSON.stringify(skillsList(root))) problems.push(`${SKILLS_FILE} does not match the skill folders; run node scripts/gen.mjs`);
   } catch (error) {
     problems.push(error.message);
+  }
+  if (describeEntry(root, CARD_FILE) && describeEntry(root, 'evidence/ledger.json')) {
+    try {
+      problems.push(...cardProblems(JSON.parse(readText(root, CARD_FILE)), releaseStats(root)));
+    } catch (error) {
+      problems.push(`${CARD_FILE}: ${error.message}`);
+    }
   }
   if (tag !== null) {
     const match = TAG.exec(tag);
@@ -493,6 +510,111 @@ export function pack(root = ROOT, tag = null) {
   return { dist, ...verifyAssets(dist, { root }) };
 }
 
+function evalCaseCount(root) {
+  const dir = path.join(root, 'evals');
+  if (!fs.existsSync(dir)) return 0;
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(dir, entry.name, 'cases.json')))
+    .reduce((sum, entry) => sum + JSON.parse(fs.readFileSync(path.join(dir, entry.name, 'cases.json'), 'utf8')).cases.length, 0);
+}
+
+/**
+ * The card stats, computed from committed files: guides (own and vendored parts), active guides, error rules with at
+ * least one non-inferred ledger entry, must-fail fixtures, eval cases (evals/<suite>/cases.json) and dated claims.
+ */
+export function releaseStats(root = ROOT) {
+  const parts = loadSources(root).parts;
+  const ledger = loadLedger(root).entries ?? {};
+  const sourced = (rule) => rule.evidence.some((id) => ledger[id] && ledger[id].label !== 'inferred');
+  return {
+    guides: OWN_PARTS.length + parts.length,
+    activeGuides: OWN_PARTS.length + parts.filter((part) => part.active).length,
+    errorRules: loadRules(root).filter((rule) => rule.level === 'error' && sourced(rule)).length,
+    failFixtures: OWN_PARTS.flatMap((part) => loadCases(root, part)).filter((item) => item.expect === 'fail').length,
+    evalCases: evalCaseCount(root),
+    ledgerClaims: Object.values(ledger).filter((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.date ?? '')).length,
+  };
+}
+
+/** Problems with web-card.json: its evidence keys must be STAT_KEYS in order and its stat values must equal `stats`. */
+export function cardProblems(card, stats) {
+  const problems = [];
+  if (JSON.stringify(Object.keys(card.evidence ?? {})) !== JSON.stringify(STAT_KEYS)) problems.push(`${CARD_FILE}: evidence must have the keys ${STAT_KEYS.join(', ')} in that order`);
+  const expected = STAT_KEYS.map((key) => String(stats[key]));
+  for (const language of ['vi', 'en']) {
+    const values = (card[language]?.stats ?? []).map((item) => item.value);
+    if (JSON.stringify(values) !== JSON.stringify(expected)) problems.push(`${CARD_FILE}: ${language} stats are ${values.join(', ')}, expected ${expected.join(', ')}; run node scripts/release.mjs bump`);
+  }
+  return problems;
+}
+
+/** Write `version` into every versioned file that exists, and the computed stats into web-card.json when it exists. */
+export function bump(root, version) {
+  if (!VERSION.test(version ?? '')) throw new Error(`bump needs a major.minor.patch version\n${USAGE}`);
+  const written = [];
+  const update = (relative, change) => {
+    const file = path.join(root, ...relative.split('/'));
+    if (!fs.existsSync(file)) return;
+    const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+    change(data);
+    writeRegular(file, formatJson(data));
+    written.push(relative);
+  };
+  for (const relative of VERSIONED_FILES) {
+    update(relative, (data) => {
+      if (Array.isArray(data.plugins)) for (const plugin of data.plugins) plugin.version = version;
+      else data.version = version;
+    });
+  }
+  const stats = releaseStats(root);
+  update(CARD_FILE, (card) => {
+    for (const language of ['vi', 'en']) {
+      card[language].stats.forEach((item, index) => {
+        item.value = String(stats[STAT_KEYS[index]]);
+      });
+    }
+  });
+  return { written, stats };
+}
+
+const pause = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+
+/**
+ * Tag HEAD as `tag` and push it. HEAD must be origin/main with a clean tree and pass the release check for the tag.
+ * The push names the tag ref, is retried, and counts only once git ls-remote shows the tag on the remote at HEAD.
+ */
+export function pushTag(root, tag, { remote = 'origin', branch = 'main', sleep = pause } = {}) {
+  const git = gitIn(root);
+  const { problems } = checkRelease(root, tag);
+  if (problems.length) throw new Error(`The release inputs are not ready:\n- ${problems.join('\n- ')}`);
+  if (git(['status', '--porcelain'])) throw new Error('The working tree is not clean');
+  git(['fetch', '--quiet', remote, branch]);
+  const head = git(['rev-parse', 'HEAD']);
+  if (head !== git(['rev-parse', `${remote}/${branch}`])) throw new Error(`HEAD is not ${remote}/${branch}; tag only the commit CI ran on`);
+  let existing = null;
+  try {
+    existing = git(['rev-parse', '--verify', '--quiet', `refs/tags/${tag}^{commit}`]);
+  } catch {
+    existing = null;
+  }
+  if (existing && existing !== head) throw new Error(`${tag} already points at ${existing}, not HEAD`);
+  if (!existing) git(['tag', '-a', tag, '-m', `${NAME} ${tag}`]);
+  let lastError = null;
+  for (let attempt = 1; attempt <= PUSH_ATTEMPTS; attempt += 1) {
+    try {
+      git(['push', remote, `refs/tags/${tag}:refs/tags/${tag}`]);
+      const listed = git(['ls-remote', '--tags', remote, `refs/tags/${tag}^{}`]).split(/\s+/)[0];
+      if (listed === head) return { tag, commit: head, attempts: attempt };
+      lastError = new Error(`${remote} lists ${tag} at ${listed || 'nothing'}, not ${head}`);
+    } catch (error) {
+      lastError = error;
+    }
+    if (attempt < PUSH_ATTEMPTS) sleep(2000 * attempt);
+  }
+  throw lastError;
+}
+
 function parseArgs(argv) {
   const [command, ...rest] = argv;
   const options = { command, argument: null, root: ROOT };
@@ -509,8 +631,8 @@ function parseArgs(argv) {
       throw new Error(`Unknown argument: ${item}\n${USAGE}`);
     }
   }
-  if (!['check', 'notes', 'pack', 'verify'].includes(command)) throw new Error(USAGE);
-  if ((command === 'notes' || command === 'verify') && options.argument === null) throw new Error(USAGE);
+  if (!['check', 'notes', 'pack', 'verify', 'stats', 'bump', 'push-tag'].includes(command)) throw new Error(USAGE);
+  if (['notes', 'verify', 'bump', 'push-tag'].includes(command) && options.argument === null) throw new Error(USAGE);
   return options;
 }
 
@@ -533,6 +655,14 @@ function main(argv) {
   } else if (options.command === 'pack') {
     const result = pack(options.root, options.argument);
     out(`Packed ${path.join(result.dist, result.zip)} with ${result.files} files, ${result.parts} parts and the skill(s) ${result.skills.join(', ')}; ${SUMS_FILE} names it.`);
+  } else if (options.command === 'stats') {
+    out(JSON.stringify(releaseStats(options.root), null, 2));
+  } else if (options.command === 'bump') {
+    const result = bump(options.root, options.argument);
+    out(`Bumped ${result.written.join(', ') || 'nothing'} to ${options.argument}; stats: ${STAT_KEYS.map((key) => `${key} ${result.stats[key]}`).join(', ')}.`);
+  } else if (options.command === 'push-tag') {
+    const result = pushTag(options.root, options.argument);
+    out(`Pushed ${result.tag} at ${result.commit} (attempt ${result.attempts}); origin lists it.`);
   } else {
     const result = verifyAssets(path.resolve(options.argument), { root: options.root });
     out(`Verified ${result.zip}: ${result.files} files, ${result.parts} parts, the skill(s) ${result.skills.join(', ')}.`);
