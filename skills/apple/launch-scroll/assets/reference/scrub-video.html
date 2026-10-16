@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- launch-scroll reference: a scroll-scrubbed film (design-pro-max).
+     Media comes from scripts/encode-scrub.mjs: film.mp4 (H.264, closed GOP), optional film.webm, startframe.jpg
+     (frame 0) and a still (the end state for the static layout). Nothing loads until the muted play() probe passes
+     and the scene is within 200vh; then the film is fetched whole into a Blob URL. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll-scrubbed film</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d1d1f; background: #fbfbfd; }
+  .intro, .outro { min-height: 90vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  [data-scene] { --scene-travel: 220vh; --film-ratio: 16 / 9; --film-width: 880px; }
+  .stage { width: min(100% - 48px, 880px); display: grid; gap: 24px; }
+  .stage h2 { margin: 0; font-size: 32px; line-height: 40px; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. The film follows the scroll position, frame by frame.</p></section>
+
+<section data-scene aria-labelledby="film-title">
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <h2 id="film-title">The film follows your scroll</h2>
+      <div data-scene-film role="img" aria-label="Describe what the film shows, for screen readers">
+        <img data-scene-still src="still.jpg" width="1280" height="720" alt="" loading="lazy" decoding="async">
+        <img data-scene-startframe src="startframe.jpg" width="1280" height="720" alt="" decoding="async">
+        <video data-scrub muted playsinline aria-hidden="true" width="1280" height="720">
+          <source data-src="film.mp4" type='video/mp4; codecs="avc1.640028"'>
+          <source data-src="film.webm" type='video/webm; codecs="vp09.00.40.08"'>
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="outro"><p>Reduced motion, a blocked muted play() or a short viewport show the still instead.</p></section>
+
+<script type="module">
+  import { mountScrubScene } from '../lib/scrub-loader.js';
+  mountScrubScene(document.querySelector('[data-scene]'), { fps: 30 });
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- LS-VID-04 fixture: the reference scrub scene with plain src instead of a Blob URL. It passes behind a server that
+     answers Range requests with 206 and fails behind one that only sends 200. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-VID-04</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 90vh; }
+  [data-scene] { --scene-travel: 220vh; --film-width: 720px; }
+  .stage { width: min(100% - 32px, 720px); }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <div data-scene-film>
+        <img data-scene-still src="still.jpg" width="1280" height="720" alt="" loading="lazy">
+        <img data-scene-startframe src="startframe.jpg" width="1280" height="720" alt="">
+        <video data-scrub muted playsinline aria-hidden="true">
+          <source data-src="film.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { mountScrubScene } from '../lib/scrub-loader.js';
+  mountScrubScene(document.querySelector('[data-scene]'), { mode: 'src' });
+</script>
+</body>
+</html>

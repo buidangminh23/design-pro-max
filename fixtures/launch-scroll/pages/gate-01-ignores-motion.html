@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- Fail fixture for LS-GATE-01: pins and requests the film whatever the motion preference or autoplay result. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-GATE-01 fail</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 80vh; }
+  .stage { width: min(100% - 32px, 720px); height: 480px; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <div data-scene-film>
+        <img data-scene-startframe src="startframe.jpg" width="1280" height="720" alt="">
+        <video data-scrub muted playsinline aria-hidden="true" src="film.mp4"></video>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { sceneProgress } from '../lib/scene-progress.js';
+  const scene = document.querySelector('[data-scene]');
+  scene.dataset.sceneState = 'pinned';
+  scene.dataset.scrubState = 'ready';
+  const update = () => scene.style.setProperty('--scene-progress', sceneProgress(scene.getBoundingClientRect(), innerHeight));
+  addEventListener('scroll', update, { passive: true });
+  update();
+</script>
+</body>
+</html>

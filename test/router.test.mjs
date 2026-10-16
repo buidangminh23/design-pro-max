@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { SKILL_DIR, VENDOR_DIR, frontmatterProblems, loadSources, parseFrontmatter, walk } from '../scripts/lib/vendor.mjs';
+import { OWN_PARTS } from '../scripts/lib/evidence.mjs';
 import { ROOT } from './helpers.mjs';
 
 const manifest = loadSources(ROOT);
 const router = fs.readFileSync(path.join(ROOT, SKILL_DIR, 'SKILL.md'), 'utf8');
+const partsIndex = fs.readFileSync(path.join(ROOT, SKILL_DIR, 'references', 'parts-index.md'), 'utf8');
 const fields = parseFrontmatter(router);
 const body = router.slice(router.indexOf('\n---', 3) + 4);
 
@@ -31,7 +33,8 @@ test('the description opens referentially and carries the job where a short list
   assert.ok(firstSentence > 0 && firstSentence <= 68, `first sentence ends at ${firstSentence}`);
   const head = description.slice(0, 56);
   for (const word of ['Apple', 'SwiftUI', 'Xcode']) assert.ok(head.includes(word), `${word} within the first 56 characters`);
-  assert.match(description, /\bUse (?:for|when)\b/);
+  const second = description.slice(firstSentence).trim();
+  assert.ok(second.startsWith('Use when'), `the second sentence opens with "Use when": ${second.slice(0, 30)}`);
   assert.match(description, /\bNot for\b/);
 });
 
@@ -50,23 +53,32 @@ test('every path the router references exists', () => {
   for (const reference of references) assert.ok(fs.existsSync(path.join(ROOT, SKILL_DIR, reference)), reference);
 });
 
-test('every active part is routed and every inactive part shows its activation check', () => {
+test('every active part is routed and the parts index shows the activation check of every inactive part', () => {
   const routing = section('## Routing');
   for (const part of manifest.parts) {
     assert.ok(router.includes(`.vendor/${part.id}/SKILL.md`), `${part.id} is routed`);
     if (part.active) assert.ok(routing.includes(`.vendor/${part.id}/SKILL.md`), `${part.id} is in the routing table`);
-    else assert.ok(router.includes(part.activation), `${part.id} shows its activation`);
+    else assert.ok(partsIndex.includes(part.activation), `${part.id} shows its activation in the parts index`);
   }
 });
 
-test('the parts index names every part', () => {
-  const index = section('## Parts index');
-  for (const part of manifest.parts) assert.ok(index.includes(`\`${part.id.split('/').at(-1)}\``), part.id);
+test('the router points to the parts index, which names every part', () => {
+  assert.ok(section('## Parts index').includes('`references/parts-index.md`'));
+  for (const part of manifest.parts) assert.ok(partsIndex.includes(`\`${part.id.split('/').at(-1)}\``), part.id);
+  for (const part of OWN_PARTS) assert.ok(partsIndex.includes(`\`${part}/PART.md\``), part);
+});
+
+test('every own part is routed to an existing PART.md', () => {
+  const routing = section('## Routing');
+  for (const part of OWN_PARTS) {
+    assert.ok(routing.includes(`\`${part}/PART.md\``), `${part} is in the routing table`);
+    assert.ok(fs.existsSync(path.join(ROOT, SKILL_DIR, part, 'PART.md')), `${part}/PART.md exists`);
+  }
 });
 
 test('the router keeps the standing rules the parts depend on', () => {
   const rules = section('## Standing rules');
-  for (const phrase of ['in full', 'the folder of the file that mentions it', 'absolute path', 'python3 -B', 'PYTHONDONTWRITEBYTECODE=1', 'activation check', 'explicit yes', 'ASC_TELEMETRY_DISABLED=1', 'asc install-skills', 'write-swift', 'apple-design', 'xcode-disk-cleanup']) {
+  for (const phrase of ['in full', 'the folder of the file that mentions it', 'absolute path', 'python3 -B', 'PYTHONDONTWRITEBYTECODE=1', 'activation check', 'explicit yes', 'ASC_TELEMETRY_DISABLED=1', 'asc install-skills', 'write-swift', 'apple-design', 'xcode-disk-cleanup', 'PART.md', '--project', 'proof boundary', "outside Apple's public API", 'store badges']) {
     assert.ok(rules.includes(phrase), phrase);
   }
 });

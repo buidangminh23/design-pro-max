@@ -4,7 +4,7 @@ design-pro-max is an independent open-source project and has not been authorized
 
 <!-- gen:trademarks -->
 
-Apple, the Apple logo, iOS, macOS, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
 
 <!-- /gen:trademarks -->
 

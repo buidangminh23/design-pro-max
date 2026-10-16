@@ -1,0 +1,192 @@
+{
+  "description": "Rule registry for the own parts. An error rule carries non-inferred evidence, a check and both fixtures, and its check is seen failing on its fail fixture (scripts/verify.mjs). A warn rule carries evidence. Evidence ids are entries of evidence/ledger.json; check and implementedBy paths are relative to skills/apple; fixtures name cases in fixtures/<part>/cases.json.",
+  "rules": [
+    {
+      "id": "LS-GATE-01",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "Under reduced motion, or when a muted inline play() probe is rejected (blocked autoplay, iOS Low Power Mode), the scene stays in normal flow at its end state and requests no scrub film.",
+      "values": "end state = progress 1; no film request",
+      "evidence": ["AM-13", "AM-16", "AM-23", "SC-21"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["gate-01-ignores-motion"] },
+      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css"]
+    },
+    {
+      "id": "LS-GATE-02",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "The scene does not pin when the viewport is shorter than the stage's content height plus the sticky offset (the page's sticky chrome).",
+      "values": "pin only when stage height + sticky offset <= viewport height",
+      "evidence": ["AM-13"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["gate-02-ignores-height"] },
+      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js"]
+    },
+    {
+      "id": "LS-GEOM-01",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "The scene box is its travel plus 100vh, its sticky child fills the viewport below the sticky offset (100vh, lvh or svh) and stays put for the whole travel, and progress stays in [0, 1] and never runs backwards on a forward sweep.",
+      "values": "box = travel + 100vh; sticky child = 100vh minus the offset; progress in [0, 1], monotonic",
+      "evidence": ["AM-12", "ON-2"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["geom-01-unclamped"] },
+      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scene.css"]
+    },
+    {
+      "id": "LS-VID-01",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "Every scrub file has a closed GOP with a keyframe at least every 8 frames, yuv420p pixels, no audio stream and, in MP4 or MOV, the moov box before mdat.",
+      "values": "keyframe at least every 8 frames; closed GOP; yuv420p; no audio; moov before mdat",
+      "evidence": ["SC-1", "SC-7", "SC-9", "SC-10", "SC-16", "AM-19"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["vid-01-02-encoded", "scrub-video"], "fail": ["vid-01-open-gop"] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs"]
+    },
+    {
+      "id": "LS-VID-02",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "Every set of sources for one film includes an H.264 file; HEVC, VP9 or AV1 never ship alone.",
+      "values": "an H.264 source in every set",
+      "evidence": ["SC-22"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["vid-01-02-encoded", "scrub-video"], "fail": ["vid-02-vp9-only"] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs", "launch-scroll/assets/reference/scrub-video.html"]
+    },
+    {
+      "id": "LS-VID-03",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "The scrub driver never writes currentTime while the element is seeking (a latest-wins queue applies the newest target on seeked) and never calls fastSeek().",
+      "values": "0 currentTime writes while seeking; 0 fastSeek() calls",
+      "evidence": ["SC-8", "SC-17"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scrub-video"], "fail": ["vid-03-naive-seek"] },
+      "implementedBy": ["launch-scroll/assets/lib/seek-queue.js"]
+    },
+    {
+      "id": "LS-VID-04",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "The film is seekable wherever it is served: loaded into a Blob URL or MediaSource, or fetched with 206 byte-range responses.",
+      "values": "a Blob URL, MediaSource or 206 Range responses",
+      "evidence": ["SC-14"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scrub-video", "vid-04-range"], "fail": ["vid-04-200-only"] },
+      "implementedBy": ["launch-scroll/assets/lib/scrub-loader.js"]
+    },
+    {
+      "id": "LS-VID-05",
+      "part": "launch-scroll",
+      "level": "error",
+      "statement": "The start image is frame 0 of the film (SSIM at least 0.99 as displayed), and the video stays hidden until it has presented its first frame.",
+      "values": "SSIM at least 0.99; shown after the first presented frame",
+      "evidence": ["PV-4", "SC-4"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scrub-video"], "fail": ["vid-05-wrong-start-frame"] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css"]
+    },
+    {
+      "id": "LS-WARN-GOP",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Prefer a closed GOP of 6 frames, 5 above 30 fps; all-intra costs about 2.9 times the bytes for little gain on hardware decode.",
+      "values": "GOP 6, or 5 above 30 fps; all-intra about 2.9 times the bytes",
+      "evidence": ["SC-7", "TQ-N0"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs"]
+    },
+    {
+      "id": "LS-WARN-TRAVEL",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Keep a scene's travel within 70-300vh; a longer scene asks the reader to scroll through too little change.",
+      "values": "travel 70-300vh",
+      "evidence": ["AM-12"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/assets/lib/scene.css"]
+    },
+    {
+      "id": "LS-WARN-SMOOTH",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Map scroll to progress directly, or smooth it with a time constant (about 100 ms), never with a per-frame factor whose speed depends on the refresh rate.",
+      "values": "no smoothing, or time-based with a time constant of about 100 ms",
+      "evidence": ["SC-N0", "AM-10", "AM-17"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js"]
+    },
+    {
+      "id": "LS-WARN-SEQ",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Use image sequences only for short films, alpha or software-decode targets, and show the decoded-memory budget (frames x width x height x 4 bytes).",
+      "values": "2.3-5.3 times the bytes of GOP-6 video; frames x width x height x 4 bytes decoded",
+      "evidence": ["SC-11", "SC-12"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "LS-WARN-BLUR",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Test stacked backdrop blur over a moving stage on a software-rendering proxy; it can collapse to a few frames per second there.",
+      "values": "frame rate measured on a software proxy",
+      "evidence": ["ON-4"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "LS-WARN-VP9",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Do not make VP9 the default scrub codec: it seeked slowest of the measured codecs; list H.264 first.",
+      "values": "H.264 first in source order",
+      "evidence": ["SC-22"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/assets/reference/scrub-video.html"]
+    },
+    {
+      "id": "LS-WARN-SUPPORTS",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Put CSS scroll-driven animation inside @supports (animation-timeline: view()) over a finished static layout, and check that fallback in Firefox.",
+      "values": "inside @supports over the static layout",
+      "evidence": ["TQ-14"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/assets/reference/scene-css.html"]
+    },
+    {
+      "id": "LS-WARN-COLOR",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "Tag scrub files with bt709 primaries and matrix and a transfer characteristic, so the film and its sRGB start image show the same colours.",
+      "values": "bt709 primaries and matrix; sRGB transfer tag",
+      "evidence": ["AM-19"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs"]
+    },
+    {
+      "id": "LS-WARN-HEVC",
+      "part": "launch-scroll",
+      "level": "warn",
+      "statement": "An HEVC scrub file uses the hvc1 sample entry and a closed GOP.",
+      "values": "hvc1; closed GOP",
+      "evidence": ["SC-1", "SC-9"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs"]
+    }
+  ]
+}

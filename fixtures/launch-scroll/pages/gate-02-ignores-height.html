@@ -1,0 +1,36 @@
+<!doctype html>
+<!-- Fail fixture for LS-GATE-02: honours reduced motion but pins at any viewport height. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-GATE-02 fail</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 80vh; }
+  .stage { width: min(100% - 32px, 720px); height: 520px; display: grid; place-items: center; background: #eef; }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage><p>A stage taller than a short viewport.</p></div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { prefersReducedMotion, sceneProgress } from '../lib/scene-progress.js';
+  const scene = document.querySelector('[data-scene]');
+  const update = () => scene.style.setProperty('--scene-progress', sceneProgress(scene.getBoundingClientRect(), innerHeight));
+  if (prefersReducedMotion()) {
+    scene.dataset.sceneState = 'static';
+  } else {
+    scene.dataset.sceneState = 'pinned';
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- launch-scroll reference: a pinned scene on a CSS scroll timeline, no script (design-pro-max).
+     Pins only inside @supports (animation-timeline: view()) with motion allowed and a viewport tall enough for the
+     520px stage; everywhere else the static layout shows the end state. Test the fallback in Firefox. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinned scene, CSS scroll timeline</title>
+<style>
+  @property --scene-progress { syntax: '<number>'; inherits: true; initial-value: 1; }
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d1d1f; background: #fbfbfd; }
+  .intro, .outro { min-height: 80vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  [data-scene] { --scene-progress: 1; --scene-travel: 160vh; position: relative; }
+  [data-scene-sticky] { top: 0; }
+  .stage { width: min(100% - 48px, 720px); height: 520px; display: grid; grid-template-rows: auto 1fr; gap: 24px; margin: 0 auto; }
+  .stage h2 { margin: 0; font-size: 32px; line-height: 40px; }
+  .panel {
+    place-self: center;
+    width: 280px;
+    aspect-ratio: 1;
+    border-radius: 28px;
+    background: conic-gradient(from 210deg, #0a84ff, #5e5ce6, #0a84ff);
+    transform: rotate(calc(-90deg + 90deg * var(--scene-progress))) scale(calc(0.7 + 0.3 * var(--scene-progress)));
+  }
+  @keyframes scene-progress { from { --scene-progress: 0; } to { --scene-progress: 1; } }
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) and (min-height: 560px) {
+      [data-scene] {
+        height: calc(var(--scene-travel) + 100vh);
+        animation: scene-progress linear both;
+        animation-timeline: view();
+        animation-range: contain 0% contain 100%;
+      }
+      [data-scene] > [data-scene-sticky] { position: sticky; height: 100vh; height: 100svh; display: grid; place-items: center; }
+    }
+  }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. The panel turns into place while the section stays pinned.</p></section>
+
+<section data-scene data-scene-engine="css" aria-labelledby="scene-title">
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <h2 id="scene-title">A scroll timeline, no script</h2>
+      <div class="panel" role="img" aria-label="A square panel turning upright"></div>
+    </div>
+  </div>
+</section>
+
+<section class="outro"><p>Without scroll timelines the page shows this end state and never pins.</p></section>
+</body>
+</html>

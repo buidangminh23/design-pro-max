@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Fail fixture for LS-GEOM-01: gates correctly but writes progress without clamping it to [0, 1]. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-GEOM-01 fail</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 80vh; }
+  .stage { width: min(100% - 32px, 720px); height: 400px; display: grid; place-items: center; background: #efe; }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage><p>Progress runs past both ends.</p></div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { prefersReducedMotion, stageFits } from '../lib/scene-progress.js';
+  const scene = document.querySelector('[data-scene]');
+  const update = () => {
+    const rect = scene.getBoundingClientRect();
+    scene.style.setProperty('--scene-progress', (-rect.top / (rect.height - innerHeight)).toFixed(4));
+  };
+  if (prefersReducedMotion() || !stageFits(scene)) {
+    scene.dataset.sceneState = 'static';
+  } else {
+    scene.dataset.sceneState = 'pinned';
+    addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>
+</body>
+</html>

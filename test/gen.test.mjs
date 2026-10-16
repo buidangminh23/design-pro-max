@@ -78,8 +78,8 @@ test('trademarkLine credits the marks, the logo and Cisco when iOS is named', ()
 
 test('README.md and NOTICE.md carry the generated trademark line', () => {
   const { trademarks, marks } = generate(ROOT);
-  assert.deepEqual(marks, ['Apple', 'iOS', 'macOS', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store']);
-  assert.ok(trademarks.startsWith('Apple, the Apple logo, iOS, macOS, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc.'));
+  assert.deepEqual(marks, ['Apple', 'iOS', 'macOS', 'Safari', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store']);
+  assert.ok(trademarks.startsWith('Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc.'));
   assert.ok(trademarks.endsWith(CISCO_SENTENCE));
   assert.ok(read(ROOT, README_FILE).includes(trademarks));
   assert.ok(read(ROOT, NOTICE_FILE).includes(trademarks));
@@ -123,7 +123,7 @@ test('gen --check names stale files and gen rewrites them', (t) => {
   assert.equal(write.status, 0, write.stderr);
   assert.match(write.stdout, /Wrote README\.md\./);
   assert.ok(read(root, README_FILE).includes('`204dba7c6725`'));
-  assert.match(read(root, NOTICE_FILE), /iOS, macOS, iPhone, Swift/);
+  assert.match(read(root, NOTICE_FILE), /iOS, macOS, iPhone, Safari, Swift/);
   const again = runScript(GEN, ['--check', '--root', root]);
   assert.equal(again.status, 0, again.stderr);
 });

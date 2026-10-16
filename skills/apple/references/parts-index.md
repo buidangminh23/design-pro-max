@@ -445,3 +445,14 @@ Activation, unless a part below names its own: `command -v asc` succeeds, `asc a
 - Errata: none recorded
 - Risks: 1
 - Record: `.vendor/app-store-connect/asc-wall-submit/UPSTREAM.json` holds the full text of all of the above
+
+## Own parts
+
+Written for this skill and active without an activation check. Their checkers need Node 22 or later; browser checks load Playwright with Chromium from the user's project, and media checks call ffmpeg and ffprobe. A missing tool makes a checker exit 2 with the install command.
+
+### `launch-scroll`
+
+- Guide: `launch-scroll/PART.md`
+- Status: active
+- Rules: 8 error, 9 warn; evidence in `launch-scroll/references/evidence.md`
+- Checkers: `launch-scroll/scripts/probe-scene.mjs`, `shared/check-media.mjs`
