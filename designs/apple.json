@@ -1,0 +1,39 @@
+{
+  "design": "apple",
+  "skill": "skills/apple",
+  "marks": ["Apple", "iOS", "iPadOS", "macOS", "watchOS", "tvOS", "visionOS", "iPhone", "iPad", "Mac", "Apple Watch", "Safari", "Siri", "Swift", "SwiftUI", "Xcode", "TestFlight", "App Store"],
+  "referentialPhrase": "for Apple platforms",
+  "trademarkPolicy": "https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html",
+  "siteTerms": {
+    "url": "https://www.apple.com/legal/internet-services/terms/site.html",
+    "check": "No scraper and no CI job fetches Apple or other third-party pages. Values are re-measured by hand from public pages or read from Apple's public documentation, and enter the repository only as own-words claims in evidence/ledger.json. Whether Apple's site terms also cover manual collection is unverified."
+  },
+  "measuringMethod": "By hand in a browser from public pages, or from Apple's public developer documentation. Measured values from third-party sites are context, never defaults, tokens or error thresholds.",
+  "newestReleasedOS": 27.0,
+  "neverShip": [
+    "SF Pro, SF Pro Icons (including U+F301) and SF Symbols",
+    "Human Interface Guidelines text",
+    "apple.com text, code or CSS",
+    "class names, module ids or media URLs of measured sites",
+    "product or device images and store badges",
+    "palettes, type scales, tracking, radii, navigation metrics or breakpoints copied from a measured site",
+    "a replica of an Apple web page"
+  ],
+  "appleText": {
+    "shingleWords": 8,
+    "quoteWords": 20,
+    "phraseWords": 12,
+    "allowed": "Titles cited as sources, attributed quotes of at most 20 words, API-call boilerplate made of public symbol names, and phrases of at most 12 words that a part's appleText records with their source.",
+    "corpus": "The appleText passages recorded in vendor/sources.json. Apple's documentation pages, the Swift book, swift.org, Swift Evolution and Apple's MIT samples are not in the corpus yet; NOTICE.md states the gap."
+  },
+  "phraseGates": {
+    "en": ["\\bApple[- ](?:grade|like|quality|style)\\b"],
+    "endorsement": "\\b(?:official(?:ly)?|certified|approved|endorsed|sanctioned)\\b",
+    "negation": "\\b(?:not|never|no|unrelated|independent|without)\\b",
+    "vi": ["chuẩn Apple", "kiểu Apple", "phong cách Apple", "chính thức"]
+  },
+  "signOff": {
+    "date": "2026-10-06",
+    "accepted": "The owner chose the skill name apple and the Apple logo as its icon, accepting the trademark risk; the logo stays outside the MIT licence and is replaced if Apple asks."
+  }
+}

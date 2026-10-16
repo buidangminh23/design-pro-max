@@ -26,7 +26,8 @@
     "release:notes": "node scripts/release.mjs notes",
     "release:pack": "node scripts/release.mjs pack",
     "verify": "node scripts/verify.mjs",
-    "evidence:check": "node scripts/import-findings.mjs --check"
+    "evidence:check": "node scripts/import-findings.mjs --check",
+    "lint:ip": "node scripts/lint-ip.mjs"
   },
   "engines": {
     "node": ">=22"

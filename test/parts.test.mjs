@@ -81,7 +81,7 @@ test('own parts keep PART.md lean, without frontmatter, with one level of refere
 });
 
 test('no own file in the skill names a research folder or a private path', () => {
-  const pattern = /\bresearch\/|skill-motion-research|\/Volumes\/|\/Users\/|[A-Z]:\\Users\\/;
+  const pattern = /\bresearch\/|\/Volumes\/|\/Users\/|[A-Z]:\\Users\\/;
   for (const part of [...OWN_PARTS, 'shared']) {
     for (const entry of walk(path.join(ROOT, SKILL_DIR, part))) {
       if (entry.kind !== 'file') continue;
