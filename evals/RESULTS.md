@@ -1,6 +1,54 @@
 # Eval results
 
-## 2026-10-16: v0.1 routing (Mac)
+## 2026-10-17: v0.1 routing, round 2 (Mac)
+
+Round 2 measures the router description from #5 (3332b57), which opens its "Use when" list with App Store Connect and TestFlight through the asc CLI, names What's New and promotional text, notarizing and ad hoc installs, and adds launch and preview videos, store screenshots and GSAP APIs to its not-for clause. The prompts, the harness settings and the bars are those of round 1, below. Claude Code 2.1.302 with `claude-opus-5-5[1m]`; Codex codex-cli 0.163.0 with `gpt-6.1-sol`, reasoning high. The skill files were identical at f175fb5, where the round started, and at bf731f3, where the rerun ran.
+
+22 Claude runs of the first pass (all 16 near misses, r38 to r40 and the three recorded prompts) ended on the Claude Code session limit without doing the task, and the first score counted them as misses and as clean near misses. The harness now detects such runs, stops the lane at the first one and leaves them out of every bar (bf731f3). The 22 runs were moved aside and run again after the limit reset; the scores below contain no limit-hit run.
+
+| Bar | Target | Claude Code | Codex |
+|---|---|---|---|
+| Recall (40 router rows) | at least 90 % | 82.5 % (33/40): **not met** (round 1: 72.5 %) | 100 % (40/40): **met** (round 1: 97.5 %) |
+| False triggers (16 near misses) | at most 10 % | 0 % (0/16): **met** (round 1: 12.5 %) | 37.5 % (6/16): **not met** (round 1: 37.5 %) |
+| Correct first part (triggered rows) | at least 90 % | 100 % (33/33): **met** | 100 % (40/40): **met** |
+| Full reads of guides | 100 % | 100 % (46/46): **met** | 100 % (86/86): **met** |
+| Wrong-path reads | 0 | 0: **met** | 0: **met** |
+
+Any read of the skill, whatever started it: Claude Code rows 37/40, near misses 3/16; Codex rows 40/40, near misses 6/16.
+
+### What changed from round 1
+
+- r28 (What's New and promotional text) now starts apple on both hosts and reaches `asc-whats-new-writer`.
+- Claude Code now calls apple on r33 (ad hoc distribution) and on the asc rows it reached only by exploring the project in round 1: r13, r29, r35, r37 and r38. r40 (scroll-scrubbed phone render) still calls apple.
+- Claude Code's near misses no longer call apple: n14 and n16 did in round 1. n10, n14 and n15 read the router and the parts index while exploring the empty project, without calling apple (6 near misses read skill files that way in round 1).
+- Codex's six near misses still read the router, and the bar counts a router read as a trigger because Codex has no Skill tool. All six stopped there and read no part; in round 1, n12 went on to `launch-scroll/PART.md`.
+
+### Failures
+
+Claude Code, recall:
+
+- Apple not called and no skill file read: `claude-with-r05` (SwiftData, answered directly), `claude-with-r17` (app record through the website), `claude-with-r32` (notarization).
+- Apple not called, but the agent listed the empty project, found `.claude/skills/apple` and read the part directly: `claude-with-r14` (Tuist menu bar app, timed out at 480 s while running `tuist`), `claude-with-r30` (screenshot resize), `claude-with-r31` (screenshot pipeline), `claude-with-r39` (Wall of Apps). These reads would not happen with the skill installed outside the project, so they are scored as misses. r14, r17 and r31 called apple in round 1.
+- Timed out at 480 s: `claude-with-r14`, `claude-with-n08`, `claude-with-n10`.
+
+Codex, false triggers (router read, no part read): `codex-with-n08` (store screenshots), `codex-with-n11` (Remotion promo), `codex-with-n12` (ScrollTrigger `pinSpacing`), `codex-with-n14` (launch video template), `codex-with-n15` (narrated launch film), `codex-with-n16` (App Store preview video).
+
+Each case ran once per host, so a single row can flip between rounds without a change to the description: r14, r17 and r31 went from a hit to a miss with the description closer to them than before.
+
+Router findings to act on in a later change, not fixed here:
+
+- Claude Code still misses 7 rows, 4 of them by reading the part while exploring the empty project. The listing alone does not decide those runs; a recall bar for Claude Code needs runs where the skill sits outside the project, or several runs per row.
+- Codex's false-trigger bar cannot reach 10 % while a router read counts as a trigger: reading the description it was shown is how Codex checks the not-for clause. Deciding whether to count only a part read after the router is a change to the bar, so it waits for the plan.
+
+### Recorded, not scored
+
+| Prompt | Claude Code | Codex |
+|---|---|---|
+| Fix this data race in my SwiftUI view model | not triggered | router only |
+| Add Swift Testing tests to my command-line package | not triggered | router only |
+| Review my SwiftUI screen against the HIG | not triggered | router, then `.vendor/swiftui-expert-skill` |
+
+## 2026-10-16: v0.1 routing, round 1 (Mac)
 
 | | Claude Code | Codex |
 |---|---|---|
