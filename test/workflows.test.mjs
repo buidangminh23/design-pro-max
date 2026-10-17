@@ -57,8 +57,8 @@ function runScripts(text) {
   return scripts;
 }
 
-test('the four workflows exist', () => {
-  assert.deepEqual(files, ['ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
+test('the five workflows exist', () => {
+  assert.deepEqual(files, ['badges.yml', 'ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
 });
 
 test('every action is pinned to a full commit SHA with a version comment, the same pin everywhere', () => {
@@ -182,4 +182,16 @@ test('the verify workflow runs every fixture with ffmpeg and Playwright on own-p
   const [job] = jobs(verify);
   assert.ok(job.lines.some((line) => /^ {6}contents: read$/.test(line)));
   assert.ok(!job.lines.some((line) => /: write$/.test(line)));
+});
+
+test('the badges workflow renders only the view badge and pushes only to the badges branch', () => {
+  const badges = read('badges.yml');
+  assert.match(badges, /cron: "41 \*\/6 \* \* \*"/);
+  assert.match(badges, /^ {10}BADGE_SOURCES: views$/m);
+  assert.match(badges, /^ {10}ANALYTICS_TOKEN: \$\{\{ secrets\.ANALYTICS_TOKEN \}\}$/m);
+  assert.ok(runScripts(badges).includes('node scripts/badges.mjs "$RUNNER_TEMP/badges"'));
+  assert.match(badges, /git push -q origin HEAD:refs\/heads\/badges/);
+  assert.doesNotMatch(badges, /refs\/heads\/main/);
+  const [job] = jobs(badges);
+  assert.ok(job.lines.some((line) => /^ {6}contents: write$/.test(line)));
 });
