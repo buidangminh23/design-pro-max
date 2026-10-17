@@ -11,6 +11,9 @@
  *   node evals/harness.mjs trace --out <dir>                re-extract every trace from the raw output
  *   node evals/harness.mjs score --out <dir>                score the routing traces against the bars
  *
+ * A run that ends on the host's session or usage limit did no work, so it is not a result: run stops the lane at the
+ * first one, and score leaves such runs out of every bar, lists them under invalid and exits 1.
+ *
  * Raw output, traces and diffs go to <dir>, which belongs outside the repository: it holds the host's full context.
  */
 import fs from 'node:fs';
@@ -40,6 +43,13 @@ function parseArgs(argv) {
 }
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
+const HOST_LIMIT = /\byou['’]ve (?:hit|reached) your (?:session|usage|weekly|daily|rate) limit\b|\busage limit (?:reached|exceeded)\b/i;
+
+/** Whether a run ended on the host's session or usage limit instead of doing the task. */
+export function hitHostLimit(trace) {
+  return HOST_LIMIT.test(`${trace.finalText ?? ''}\n${trace.error ?? ''}`);
+}
+
 const runId = (host, condition, id) => `${host}-${condition}-${id}`;
 
 function sh(cmd, args, cwd) {
@@ -111,6 +121,11 @@ function runSuite(options) {
     fs.writeFileSync(path.join(out, 'traces', `${id}.json`), `${JSON.stringify(trace, null, 2)}\n`);
     fs.rmSync(dir, { recursive: true, force: true });
     process.stdout.write(`${id} status=${result.status} timedOut=${meta.timedOut} trigger=${trace.triggered} firstPart=${trace.firstPart ?? '-'}\n`);
+    if (trace.hostLimit) {
+      process.stderr.write(`${id} ended on the ${options.host} session or usage limit; the remaining cases were not run\n`);
+      process.exitCode = 1;
+      return;
+    }
   }
 }
 
@@ -426,6 +441,7 @@ export function extract(meta, stdout) {
   trace.wrongPathLists = [...new Set(trace.accesses.filter((access) => access.kind === 'list' && !access.exists).map((access) => access.rel))];
   trace.contaminated = meta.condition === 'without' && (trace.triggered || trace.accesses.some((access) => access.kind === 'read'));
   trace.listedApple = Array.isArray(trace.listedSkills) ? trace.listedSkills.includes('apple') : null;
+  trace.hostLimit = hitHostLimit(trace);
   return { ...meta, ...trace };
 }
 
@@ -447,8 +463,10 @@ export function scoreRouting(out) {
   const traces = fs.readdirSync(path.join(out, 'traces')).filter((name) => name.endsWith('.json')).map((name) => readJson(path.join(out, 'traces', name))).filter((trace) => trace.suite === 'routing' && trace.condition === 'with' && !trace.listing);
   const hosts = {};
   for (const host of ['claude', 'codex']) {
-    const runs = traces.filter((trace) => trace.host === host);
-    if (!runs.length) continue;
+    const all = traces.filter((trace) => trace.host === host);
+    if (!all.length) continue;
+    const invalid = all.filter(hitHostLimit);
+    const runs = all.filter((trace) => !hitHostLimit(trace));
     const rows = runs.filter((trace) => byId.get(trace.case)?.kind === 'row');
     const near = runs.filter((trace) => byId.get(trace.case)?.kind === 'near-miss');
     const triggered = rows.filter((trace) => trace.triggered);
@@ -469,6 +487,7 @@ export function scoreRouting(out) {
     ];
     hosts[host] = {
       runs: runs.length,
+      invalid: invalid.map((trace) => trace.id),
       recall: { value: pct(triggered.length, rows.length), n: `${triggered.length}/${rows.length}`, met: triggered.length / rows.length >= doc.bars.recall },
       falseTriggers: { value: pct(falseTriggers.length, near.length), n: `${falseTriggers.length}/${near.length}`, met: falseTriggers.length / near.length <= doc.bars.falseTriggers },
       firstPart: { value: pct(rightPart.length, triggered.length), n: `${rightPart.length}/${triggered.length}`, met: triggered.length > 0 && rightPart.length / triggered.length >= doc.bars.firstPart },
@@ -485,7 +504,11 @@ export function scoreRouting(out) {
 const options = parseArgs(process.argv.slice(2));
 if (options.command === 'run') runSuite(options);
 else if (options.command === 'trace') retrace(options);
-else if (options.command === 'score') process.stdout.write(`${JSON.stringify(scoreRouting(path.resolve(options.out)), null, 2)}\n`);
+else if (options.command === 'score') {
+  const hosts = scoreRouting(path.resolve(options.out));
+  process.stdout.write(`${JSON.stringify(hosts, null, 2)}\n`);
+  if (Object.values(hosts).some((host) => host.invalid.length)) process.exitCode = 1;
+}
 else if (options.command) {
   process.stderr.write('Usage: node evals/harness.mjs <run|trace|score> ...\n');
   process.exit(2);
