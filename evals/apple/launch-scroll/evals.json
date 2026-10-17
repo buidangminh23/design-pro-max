@@ -1,0 +1,160 @@
+{
+  "skill_name": "apple",
+  "part": "launch-scroll",
+  "description": "Part evals for launch-scroll in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 6,
+      "name": "pin-and-zoom",
+      "prompt": "On our product page the laptop in the middle section should stay pinned and zoom into its screen while the reader scrolls. Build it into this page (index.html and styles.css). The nav bar is fixed at the top.",
+      "expected_output": "A short scene read (what changes over which part of the scroll) before the build; a pinned scene whose travel is at most 300vh with a box of travel plus 100vh and a sticky offset for the fixed nav; a finished static layout as the fallback for reduced motion, short viewports and missing support; motion on transform and opacity only.",
+      "files": [
+        "files/06-pin-zoom/index.html",
+        "files/06-pin-zoom/styles.css"
+      ],
+      "expectations": [
+        "[scene-read] Before or with the build, it states what changes on screen across the scroll (a beat table or an equivalent list of progress windows and what each does).",
+        "[LS-WARN-TRAVEL] The pinned travel it chooses is at most 300vh.",
+        "[LS-GEOM-01] The scene box is its travel plus one viewport height, the sticky child sits below the fixed nav (a sticky offset equal to the nav height) and progress is clamped to the range 0 to 1.",
+        "[LS-GATE-01] Under prefers-reduced-motion the section does not pin and shows its end state in normal flow.",
+        "[LS-GATE-02] On a viewport shorter than the stage's content plus the nav offset, the section does not pin.",
+        "[static-baseline] The page still shows the laptop and caption without JavaScript or without scroll-timeline support, and the zoom animates transform (and opacity) only."
+      ],
+      "checks": [
+        "LS-WARN-TRAVEL",
+        "LS-GEOM-01",
+        "LS-GATE-01",
+        "LS-GATE-02"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "janky-scrub",
+      "prompt": "Our scroll-scrubbed product film is janky: it stutters and lags behind the scrollbar, and scrolling back up is even worse. The encode script is scripts/encode.sh and the driver is src/scrub.js. Fix it.",
+      "expected_output": "Both causes fixed: the encode gets a short closed GOP (a keyframe at least every 8 frames), yuv420p, no audio and moov first; the driver stops writing currentTime from the scroll handler, waits for each seek to finish and keeps only the latest target, drops fastSeek, and replaces the fixed-fraction smoothing with time-based smoothing or none.",
+      "files": [
+        "files/07-janky-scrub/index.html",
+        "files/07-janky-scrub/scripts/encode.sh",
+        "files/07-janky-scrub/src/scrub.js"
+      ],
+      "expectations": [
+        "[LS-VID-01] It names the long default keyframe interval of the encode as a cause and re-encodes with a keyframe at least every 8 frames in a closed GOP, yuv420p pixels, no audio stream and the moov box first (faststart).",
+        "[LS-VID-03] It fixes the driver so currentTime is never written while the video is still seeking (one seek at a time, latest target kept) and fastSeek is no longer called.",
+        "[LS-WARN-SMOOTH] Any smoothing it keeps or adds is time-based (scaled by elapsed time) or removed, not a fixed fraction per animation frame.",
+        "[both] It fixes both the encode and the driver, not only one of them, and does not leave preload=\"auto\" as the loading plan."
+      ],
+      "checks": [
+        "LS-VID-01",
+        "LS-VID-03",
+        "LS-WARN-SMOOTH"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "600-frame-sequence",
+      "prompt": "For the hero I want a 600-frame 1080p image sequence drawn to a canvas as you scroll, like the big product launch sites do. Set it up for me.",
+      "expected_output": "The memory math (about 8 MB per decoded 1920x1080 RGBA frame, roughly 5 GB for 600 frames) and pushback: a scrubbed video for a film this long, or a much shorter or smaller sequence decoded in a window; image sequences only for short films, alpha or software decode.",
+      "files": [],
+      "expectations": [
+        "[LS-WARN-SEQ] It shows the memory cost: roughly 8 MB per decoded 1920x1080 frame and several gigabytes for 600 decoded frames (any correct arithmetic of that order).",
+        "[pushback] It pushes back on 600 frames at 1080p and recommends a scrubbed video instead, or a much shorter or smaller sequence, saying when a sequence is the right tool (short films, alpha or software decode).",
+        "[no-blind-preload] It does not deliver a setup that decodes or keeps all 600 full-size frames in memory at once; if it keeps a sequence, it decodes a bounded window of frames and states the download size."
+      ],
+      "checks": [
+        "LS-WARN-SEQ"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "frozen-on-frame-0",
+      "prompt": "The scroll-scrubbed video works on my laptop with the dev server, but in production it stays stuck on its first frame. Production is served by server.js; the scrub code is scrub.js and NOTES.md has the setup. What is wrong and how do I fix it?",
+      "expected_output": "The production server answers every request with 200 and no Range support, so the browser cannot seek the film; fix it with 206 Range responses (Accept-Ranges and Content-Range) or by fetching the film into a Blob URL or MediaSource, and verify with a ranged request that returns 206.",
+      "files": [
+        "files/09-frozen-frame/server.js",
+        "files/09-frozen-frame/scrub.js",
+        "files/09-frozen-frame/NOTES.md"
+      ],
+      "expectations": [
+        "[LS-VID-04] It identifies that server.js answers with 200 and never with 206 Range responses, so the film is not seekable in production, and fixes it with Range support (Accept-Ranges, Content-Range, 206) or by loading the film as a Blob URL or through MediaSource.",
+        "[verify] It gives a way to confirm the fix, such as a request with a Range header that must come back 206, or checking the network panel.",
+        "[no-red-herring] It does not blame the encode or the seek queue in scrub.js as the cause."
+      ],
+      "checks": [
+        "LS-VID-04"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "pin-without-change",
+      "prompt": "Pin our testimonials section for about 200vh while the reader scrolls so it feels premium, like a product launch page. The page is index.html.",
+      "expected_output": "Advice not to pin, because nothing on screen changes continuously with scroll position; a normal section with at most a one-time reveal that respects reduced motion instead of a 200vh pinned scene.",
+      "files": [
+        "files/10-no-change/index.html",
+        "files/10-no-change/styles.css"
+      ],
+      "expectations": [
+        "[do-not-pin] It advises against pinning because nothing in the section changes continuously while the reader scrolls.",
+        "[alternative] It offers a normal section with at most a one-time reveal (or none), and any reveal respects prefers-reduced-motion.",
+        "[no-pin-shipped] It does not ship a 200vh pinned scene for the testimonials (if it asks before building, nothing pinned is written)."
+      ],
+      "checks": []
+    },
+    {
+      "id": 16,
+      "name": "short-viewport",
+      "prompt": "On a 13-inch laptop the pinned feature scene on this page gets its bottom cut off and the caption can't be reached; the sticky header is 72px tall. Files: index.html, styles.css, scene.js. Fix it without losing the effect on big screens.",
+      "expected_output": "A gate that pins only when the stage's content height plus the 72px sticky offset fits the viewport, with the end state in normal flow otherwise; the sticky child offset by the header height and sized to the viewport minus that offset.",
+      "files": [
+        "files/16-short-viewport/index.html",
+        "files/16-short-viewport/styles.css",
+        "files/16-short-viewport/scene.js"
+      ],
+      "expectations": [
+        "[LS-GATE-02] It adds a gate: the scene pins only when the stage's content height plus the 72px header fits in the viewport height, and otherwise shows the end state in normal flow.",
+        "[LS-GEOM-01] The sticky child is offset by the header height (top: 72px or a variable) and its height is the viewport minus that offset.",
+        "[keeps-effect] On tall viewports the pinned scale and caption effect still works."
+      ],
+      "checks": [
+        "LS-GATE-02",
+        "LS-GEOM-01"
+      ]
+    },
+    {
+      "id": 18,
+      "name": "av1-only",
+      "prompt": "We want to ship our scroll-scrub film only as AV1, maybe HEVC too, to keep it small. Write the video markup and the ffmpeg commands.",
+      "expected_output": "An H.264 source in every set (AV1 or HEVC never alone, H.264 as the dependable source), HEVC tagged hvc1, and scrub encodes with a short closed GOP, yuv420p, no audio and faststart.",
+      "files": [],
+      "expectations": [
+        "[LS-VID-02] It refuses AV1 or HEVC alone and includes an H.264 source in the set.",
+        "[LS-WARN-HEVC] Any HEVC command it gives tags the stream hvc1.",
+        "[LS-VID-01] Its encode commands give a keyframe at least every 8 frames in a closed GOP, yuv420p, no audio and faststart."
+      ],
+      "checks": [
+        "LS-VID-02",
+        "LS-WARN-HEVC",
+        "LS-VID-01"
+      ]
+    },
+    {
+      "id": 19,
+      "name": "reduced-motion-and-blocked-play",
+      "prompt": "People with reduced motion still get our pinned scrub scene, and on iPhones in Low Power Mode the film area is just black. Fix the scene (index.html, styles.css, scene.js).",
+      "expected_output": "Under reduced motion or a rejected muted play() probe the scene stays in normal flow at its end state and requests no film; a start image that is frame 0 of the film shows until the video has presented a frame.",
+      "files": [
+        "files/19-gates/index.html",
+        "files/19-gates/styles.css",
+        "files/19-gates/scene.js"
+      ],
+      "expectations": [
+        "[LS-GATE-01] Under prefers-reduced-motion, and when a muted play() probe is rejected (as in Low Power Mode), the scene does not pin, shows its end state in normal flow and does not request the film.",
+        "[LS-VID-05] A start image that is frame 0 of the film is shown, and the video stays hidden until it has presented a frame, so the area is never blank.",
+        "[end-state] The title or end-state content is visible in the fallback, not left at opacity 0."
+      ],
+      "checks": [
+        "LS-GATE-01",
+        "LS-VID-05"
+      ]
+    }
+  ]
+}

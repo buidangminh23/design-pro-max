@@ -1,0 +1,8 @@
+body { margin: 0; font-family: system-ui, sans-serif; }
+.topbar { position: sticky; top: 0; height: 72px; display: flex; align-items: center; padding: 0 24px; background: #fff; z-index: 5; }
+.feature-scene { height: 300vh; }
+.feature-sticky { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; overflow: hidden; }
+.feature-stage { height: 820px; display: grid; justify-items: center; align-content: start; }
+.feature-stage img { transform: scale(calc(0.8 + 0.2 * var(--p, 0))); }
+.feature-caption { margin-top: 48px; font-size: 28px; opacity: var(--p, 0); }
+.next { padding: 120px 24px; }

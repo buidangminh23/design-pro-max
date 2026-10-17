@@ -1,0 +1,590 @@
+{
+  "description": "Routing evals for the apple skill. Each prompt is self-contained: it runs in an empty project, so it never refers to files that are not there. A row case expects the apple skill to start and its first part read to be in the expected part folder (relative to skills/apple). A near-miss case expects apple not to start; instead names the skill or scope it belongs to. A recorded case is run and recorded, never scored. Prompts are written for this project.",
+  "bars": {
+    "recall": 0.9,
+    "falseTriggers": 0.1,
+    "firstPart": 0.9,
+    "fullReads": 1.0,
+    "wrongPathReads": 0
+  },
+  "cases": [
+    {
+      "id": "r01",
+      "kind": "row",
+      "row": "Write, review, refactor or migrate SwiftUI",
+      "prompt": "How do I move a SwiftUI settings screen off NavigationView and an ObservableObject with @Published properties, onto NavigationStack and the Observation framework? Show the before and after.",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/swiftui-expert-skill"
+      }
+    },
+    {
+      "id": "r02",
+      "kind": "row",
+      "row": "SwiftUI performance",
+      "prompt": "A SwiftUI list stutters while scrolling, and an Instruments trace shows long view body updates. How do I find which views re-render too often, and what usually fixes it?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/swiftui-expert-skill"
+      }
+    },
+    {
+      "id": "r03",
+      "kind": "row",
+      "row": "Swift concurrency in a configured project",
+      "prompt": "What is the safest plan for moving an iOS app target from minimal concurrency checking to Swift 6 strict concurrency, when the networking module already shows dozens of Sendable warnings?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/swift-concurrency"
+      }
+    },
+    {
+      "id": "r04",
+      "kind": "row",
+      "row": "Swift Testing: review, migrate from XCTest",
+      "prompt": "How do I migrate XCTest cases to Swift Testing while turning the table-driven ones into parameterized tests? Show a typical before and after.",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/swift-testing-pro"
+      }
+    },
+    {
+      "id": "r05",
+      "kind": "row",
+      "row": "SwiftData",
+      "prompt": "In SwiftData, how do I model a one-to-many relationship between Folder and Note with cascade delete, and filter notes by folder name with a #Predicate?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/swiftdata-pro"
+      }
+    },
+    {
+      "id": "r06",
+      "kind": "row",
+      "row": "Core Data",
+      "prompt": "A Core Data app crashes when it saves from a background context. How should the stack be set up with a background context whose changes merge into the view context?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/core-data-expert"
+      }
+    },
+    {
+      "id": "r07",
+      "kind": "row",
+      "row": "Free Xcode and simulator disk space",
+      "prompt": "My Mac is almost out of space. How do I see how much Xcode's DerivedData, archives and old simulators take, and what is safe to free? Don't delete anything yet.",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-disk-cleanup"
+      }
+    },
+    {
+      "id": "r08",
+      "kind": "row",
+      "row": "Slow Xcode builds: benchmark, diagnose, plan",
+      "prompt": "An Xcode app takes six minutes to build from clean. How do I benchmark it, work out why it is slow, and plan fixes?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/xcode-build-orchestrator"
+      }
+    },
+    {
+      "id": "r09",
+      "kind": "row",
+      "row": "Benchmark builds only",
+      "prompt": "How do I benchmark an Xcode scheme's clean and incremental build times reliably, over several runs, without changing anything yet?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/xcode-build-benchmark"
+      }
+    },
+    {
+      "id": "r10",
+      "kind": "row",
+      "row": "Compile-time hotspots in Swift sources",
+      "prompt": "How do I find which Swift functions or expressions take longest to type-check in an Xcode app, the compile-time hotspots?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/xcode-compilation-analyzer"
+      }
+    },
+    {
+      "id": "r11",
+      "kind": "row",
+      "row": "Project and build-setting audit",
+      "prompt": "Which Xcode build settings commonly slow down debug builds, and how do I audit a project for them?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/xcode-project-analyzer"
+      }
+    },
+    {
+      "id": "r12",
+      "kind": "row",
+      "row": "Swift package build cost",
+      "prompt": "How do I find out which Swift package dependencies cost the most build time in an Xcode project, and whether one is worth replacing?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/spm-build-analysis"
+      }
+    },
+    {
+      "id": "r13",
+      "kind": "row",
+      "row": "Apply build fixes the user approved",
+      "prompt": "I approved two build-time fixes for my Xcode project: no dSYM for the Debug configuration, and explicit modules. What exactly changes in the project to apply them, and how do I check the gain afterwards?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/xcode-build/xcode-build-fixer"
+      }
+    },
+    {
+      "id": "r14",
+      "kind": "row",
+      "row": "Tuist-managed menu bar app",
+      "prompt": "How do I set up a Tuist-managed macOS menu bar app: the Project.swift, LSUIElement, and scripts to run and stop it?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/macos-menubar-tuist-app"
+      }
+    },
+    {
+      "id": "r15",
+      "kind": "row",
+      "row": "asc install, auth, flags, output, pagination",
+      "prompt": "How do I install the asc command-line tool, log in with an App Store Connect API key, and page through its JSON output?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-cli-usage"
+      }
+    },
+    {
+      "id": "r16",
+      "kind": "row",
+      "row": "App Store Connect IDs from names",
+      "prompt": "With asc, how do I look up an App Store Connect app ID and the latest build ID from the app's name, say an app called Pebble Notes?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-id-resolver"
+      }
+    },
+    {
+      "id": "r17",
+      "kind": "row",
+      "row": "New App Store Connect app record, through the website",
+      "prompt": "I need a new App Store Connect app record for bundle ID com.example.pebble, and I hear the API can't create one. How do I do it through the website?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-app-create-ui"
+      }
+    },
+    {
+      "id": "r18",
+      "kind": "row",
+      "row": "Bundle IDs, capabilities, certificates, profiles",
+      "prompt": "With asc, how do I register a bundle ID with the push notifications capability and create a development provisioning profile for it?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-signing-setup"
+      }
+    },
+    {
+      "id": "r19",
+      "kind": "row",
+      "row": "Version and build numbers, archive, export, upload",
+      "prompt": "What are the steps and commands to bump the build number, archive an iOS app, export the IPA and upload it to App Store Connect?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-xcode-build"
+      }
+    },
+    {
+      "id": "r20",
+      "kind": "row",
+      "row": "Find, wait on or expire processed builds",
+      "prompt": "How do I wait until an uploaded build finishes processing in App Store Connect, then expire the two oldest TestFlight builds?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-build-lifecycle"
+      }
+    },
+    {
+      "id": "r21",
+      "kind": "row",
+      "row": "TestFlight groups, testers, What to Test",
+      "prompt": "How do I create an external TestFlight group called Beta Testers, invite three testers by email, and set the What to Test notes?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-testflight-orchestration"
+      }
+    },
+    {
+      "id": "r22",
+      "kind": "row",
+      "row": "TestFlight crashes, feedback, diagnostics",
+      "prompt": "How do I pull the TestFlight crash reports and tester feedback for build 214 and summarize the top crashes?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-crash-triage"
+      }
+    },
+    {
+      "id": "r23",
+      "kind": "row",
+      "row": "Analytics reports",
+      "prompt": "How do I download App Store Connect analytics reports for installs and sessions over the last 30 days?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-analytics-reports"
+      }
+    },
+    {
+      "id": "r24",
+      "kind": "row",
+      "row": "Why a version cannot be submitted; review status",
+      "prompt": "App Store Connect won't let me submit version 2.3 for review. How do I find out why, and see its review status?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-submission-health"
+      }
+    },
+    {
+      "id": "r25",
+      "kind": "row",
+      "row": "Stage, upload and submit for App Review",
+      "prompt": "Walk me through staging version 2.4 with build 230 and submitting it for App Review.",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-release-flow"
+      }
+    },
+    {
+      "id": "r26",
+      "kind": "row",
+      "row": "Listing metadata: pull, validate, push",
+      "prompt": "How do I pull App Store listing metadata into local files, check the field lengths, and push an edited description back?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-metadata-sync"
+      }
+    },
+    {
+      "id": "r27",
+      "kind": "row",
+      "row": "Translate listing metadata",
+      "prompt": "How do I translate an App Store listing's metadata into German, Japanese and Vietnamese and upload it?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-localize-metadata"
+      }
+    },
+    {
+      "id": "r28",
+      "kind": "row",
+      "row": "What's New and promotional text",
+      "prompt": "Write the App Store What's New and promotional text for version 2.4 of a notes app. Changes: offline mode, faster sync, a new widget, and a fix for a crash on launch.",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-whats-new-writer"
+      }
+    },
+    {
+      "id": "r29",
+      "kind": "row",
+      "row": "ASO audit of the ./metadata files",
+      "prompt": "How do I run an ASO audit on App Store metadata files (keywords, subtitle and description) kept in a ./metadata folder?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-aso-audit"
+      }
+    },
+    {
+      "id": "r30",
+      "kind": "row",
+      "row": "Fix the size or alpha of existing screenshots",
+      "prompt": "App Store Connect rejects my screenshots for the wrong size and an alpha channel. How do I fix the existing PNG files?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-screenshot-resize"
+      }
+    },
+    {
+      "id": "r31",
+      "kind": "row",
+      "row": "Capture and frame App Store screenshots from the Simulator",
+      "prompt": "How do I capture App Store screenshots of each screen from the iOS Simulator and frame them in device bezels?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-shots-pipeline"
+      }
+    },
+    {
+      "id": "r32",
+      "kind": "row",
+      "row": "Notarize a Developer ID macOS app",
+      "prompt": "How do I notarize a Developer ID signed macOS app and staple the ticket?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-notarization"
+      }
+    },
+    {
+      "id": "r33",
+      "kind": "row",
+      "row": "Private installs to registered devices",
+      "prompt": "How do I get an ad hoc build onto five registered test iPhones without going through TestFlight?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-ad-hoc-distribution"
+      }
+    },
+    {
+      "id": "r34",
+      "kind": "row",
+      "row": "Release lanes in .asc/workflow.json",
+      "prompt": "How do I set up release lanes in .asc/workflow.json, one for beta and one for production?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-workflow"
+      }
+    },
+    {
+      "id": "r35",
+      "kind": "row",
+      "row": "Apple Ads campaigns and reports",
+      "prompt": "How do I see last week's spend and taps for my Apple Ads campaigns, and pause the worst-performing keyword?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-apple-ads"
+      }
+    },
+    {
+      "id": "r36",
+      "kind": "row",
+      "row": "In-app purchase and subscription prices by territory",
+      "prompt": "How do I set a subscription's price in each territory based on purchasing-power parity?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-ppp-pricing"
+      }
+    },
+    {
+      "id": "r37",
+      "kind": "row",
+      "row": "Subscription display names",
+      "prompt": "How do I localize the display names of three subscriptions into French and Spanish?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-subscription-localization"
+      }
+    },
+    {
+      "id": "r38",
+      "kind": "row",
+      "row": "RevenueCat catalog reconciliation",
+      "prompt": "How do I reconcile RevenueCat products and offerings with the in-app purchases in App Store Connect?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-revenuecat-catalog-sync"
+      }
+    },
+    {
+      "id": "r39",
+      "kind": "row",
+      "row": "Wall of Apps entry",
+      "prompt": "I'd like to submit my app to the Wall of Apps. How do I do that?",
+      "expect": {
+        "trigger": true,
+        "part": ".vendor/app-store-connect/asc-wall-submit"
+      }
+    },
+    {
+      "id": "r40",
+      "kind": "row",
+      "row": "Web page scenes that pin, zoom or scrub on scroll",
+      "prompt": "On a landing page I want a section where a phone render stays pinned while its screen scrubs through a short video as the reader scrolls. How should I build it?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-scroll"
+      }
+    },
+    {
+      "id": "n01",
+      "kind": "near-miss",
+      "row": "write-swift split",
+      "prompt": "In Swift, when should a function return some Collection rather than any Collection?",
+      "expect": {
+        "trigger": false,
+        "instead": "write-swift"
+      }
+    },
+    {
+      "id": "n02",
+      "kind": "near-miss",
+      "row": "write-swift split",
+      "prompt": "Explain actor reentrancy in Swift with a small example of the bug it causes.",
+      "expect": {
+        "trigger": false,
+        "instead": "write-swift"
+      }
+    },
+    {
+      "id": "n03",
+      "kind": "near-miss",
+      "row": "write-swift split",
+      "prompt": "A Swift closure stored on a class captures self strongly, and the object never deallocates. How do I break the retain cycle?",
+      "expect": {
+        "trigger": false,
+        "instead": "write-swift"
+      }
+    },
+    {
+      "id": "n04",
+      "kind": "near-miss",
+      "row": "spring for a sheet drag",
+      "prompt": "I need a spring for a bottom sheet drag in a web app, so that it settles naturally when released, the way iOS sheets do. How should I tune it?",
+      "expect": {
+        "trigger": false,
+        "instead": "apple-design"
+      }
+    },
+    {
+      "id": "n05",
+      "kind": "near-miss",
+      "row": "snappier dropdown",
+      "prompt": "How do I make a dropdown menu feel snappier? Right now it fades in over 400ms.",
+      "expect": {
+        "trigger": false,
+        "instead": "animate"
+      }
+    },
+    {
+      "id": "n06",
+      "kind": "near-miss",
+      "row": "React Native motion",
+      "prompt": "In an Expo app, how do I make a card follow the finger and spring back on release with Reanimated?",
+      "expect": {
+        "trigger": false,
+        "instead": "animate-expo"
+      }
+    },
+    {
+      "id": "n07",
+      "kind": "near-miss",
+      "row": "web app that should feel native",
+      "prompt": "My web app feels like a website on the iPhone: hover styles stick after a tap and the 100vh hero jumps when the browser toolbar hides. How do I fix that?",
+      "expect": {
+        "trigger": false,
+        "instead": "mobile-native"
+      }
+    },
+    {
+      "id": "n08",
+      "kind": "near-miss",
+      "row": "App Store and Google Play screenshots",
+      "prompt": "How should I design marketing screenshots for App Store and Google Play listings, with captions over device frames?",
+      "expect": {
+        "trigger": false,
+        "instead": "app-store-screenshots"
+      }
+    },
+    {
+      "id": "n09",
+      "kind": "near-miss",
+      "row": "Play Store feature graphic",
+      "prompt": "How do I make a Google Play Store feature graphic for my app?",
+      "expect": {
+        "trigger": false,
+        "instead": "app-store-screenshots"
+      }
+    },
+    {
+      "id": "n10",
+      "kind": "near-miss",
+      "row": "Product Hunt launch",
+      "prompt": "Plan a Product Hunt launch for next Tuesday: tagline, first comment and an hour-by-hour timeline.",
+      "expect": {
+        "trigger": false,
+        "instead": "launch"
+      }
+    },
+    {
+      "id": "n11",
+      "kind": "near-miss",
+      "row": "Remotion promo composition",
+      "prompt": "How do I build a Remotion composition for a 20-second promo of an app?",
+      "expect": {
+        "trigger": false,
+        "instead": "remotion"
+      }
+    },
+    {
+      "id": "n12",
+      "kind": "near-miss",
+      "row": "ScrollTrigger pinSpacing",
+      "prompt": "With GSAP ScrollTrigger, what does pinSpacing: false do, and why does the next section overlap my pinned one?",
+      "expect": {
+        "trigger": false,
+        "instead": "gsap-scrolltrigger"
+      }
+    },
+    {
+      "id": "n13",
+      "kind": "near-miss",
+      "row": "is animation-timeline Baseline",
+      "prompt": "Is the CSS animation-timeline property Baseline yet, and which browsers still lack it?",
+      "expect": {
+        "trigger": false,
+        "instead": "modern-web-guidance"
+      }
+    },
+    {
+      "id": "n14",
+      "kind": "near-miss",
+      "row": "product launch video template",
+      "prompt": "Where can I get a product launch video template that I fill in with app screenshots, and how would I use it?",
+      "expect": {
+        "trigger": false,
+        "instead": "hyperframes"
+      }
+    },
+    {
+      "id": "n15",
+      "kind": "near-miss",
+      "row": "60 s narrated launch film",
+      "prompt": "Help me script and produce a 60-second narrated launch film for an app.",
+      "expect": {
+        "trigger": false,
+        "instead": "out of scope"
+      }
+    },
+    {
+      "id": "n16",
+      "kind": "near-miss",
+      "row": "App Store preview video",
+      "prompt": "How do I make an App Store app preview video for an iPhone app?",
+      "expect": {
+        "trigger": false,
+        "instead": "out of scope until 1.0"
+      }
+    },
+    {
+      "id": "x01",
+      "kind": "recorded",
+      "prompt": "Fix this data race in my SwiftUI view model",
+      "expect": null
+    },
+    {
+      "id": "x02",
+      "kind": "recorded",
+      "prompt": "Add Swift Testing tests to my command-line package",
+      "expect": null
+    },
+    {
+      "id": "x03",
+      "kind": "recorded",
+      "prompt": "Review my SwiftUI screen against the HIG",
+      "expect": null
+    }
+  ]
+}

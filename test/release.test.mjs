@@ -303,7 +303,7 @@ test('the release commands report usage errors and results', (t) => {
 function statsRoot(t) {
   const root = tempDir('design-pro-max-stats-');
   t.after(() => removeTree(root));
-  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
   write(root, 'package.json', `${JSON.stringify({ name: NAME, version: '0.0.0', private: true }, null, 2)}\n`);
   write(root, '.claude-plugin/plugin.json', `${JSON.stringify({ name: NAME, version: '0.0.0' }, null, 2)}\n`);
   write(root, '.claude-plugin/marketplace.json', `${JSON.stringify({ name: NAME, plugins: [{ name: NAME, version: '0.0.0', source: './' }] }, null, 2)}\n`);
@@ -317,8 +317,12 @@ test('stats count guides, active guides, sourced error rules, must-fail fixtures
   assert.deepEqual(Object.keys(stats), STAT_KEYS);
   const root = statsRoot(t);
   assert.deepEqual(releaseStats(root), stats);
+  const routing = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'routing', 'cases.json'), 'utf8')).cases.length;
+  const part = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), 'utf8')).evals.length;
+  assert.equal(stats.evalCases, routing + part);
   write(root, 'evals/routing/cases.json', `${JSON.stringify({ cases: [{ id: 'a' }, { id: 'b' }] })}\n`);
-  assert.equal(releaseStats(root).evalCases, stats.evalCases + 2);
+  write(root, 'evals/apple/other-part/evals.json', `${JSON.stringify({ skill_name: 'apple', evals: [{ id: 1 }] })}\n`);
+  assert.equal(releaseStats(root).evalCases, 2 + part + 1);
   const rules = JSON.parse(fs.readFileSync(path.join(root, 'rules.json'), 'utf8'));
   const ledger = JSON.parse(fs.readFileSync(path.join(root, 'evidence', 'ledger.json'), 'utf8'));
   for (const id of rules.rules[0].evidence) if (ledger.entries[id]) ledger.entries[id].label = 'inferred';
