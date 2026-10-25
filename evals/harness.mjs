@@ -128,11 +128,16 @@ function hostCommand(host, prompt, suite, listing, settings = { disableAllHooks:
   return ['codex', args];
 }
 
-function diffOf(dir) {
+/**
+ * Everything the run changed since the fixture commit `base`, including what the agent committed itself, plus the
+ * agent's own commits.
+ */
+export function diffOf(dir, base) {
   sh('git', ['add', '-A'], dir);
-  const names = sh('git', ['diff', '--cached', '--name-status', '--', '.', ':(exclude).claude', ':(exclude).agents'], dir);
-  const text = sh('git', ['diff', '--cached', '--no-color', '--stat=200', '-p', '--', '.', ':(exclude).claude', ':(exclude).agents', ':(exclude)node_modules', ':(exclude)package-lock.json'], dir);
-  return `${names}\n${text}`.slice(0, 400000);
+  const commits = sh('git', ['log', '--oneline', `${base}..HEAD`], dir);
+  const names = sh('git', ['diff', '--cached', '--name-status', base, '--', '.', ':(exclude).claude', ':(exclude).agents'], dir);
+  const text = sh('git', ['diff', '--cached', '--no-color', '--stat=200', '-p', base, '--', '.', ':(exclude).claude', ':(exclude).agents', ':(exclude)node_modules', ':(exclude)package-lock.json'], dir);
+  return `${commits ? `agent commits:\n${commits}\n` : ''}${names}\n${text}`.slice(0, 400000);
 }
 
 function runSuite(options) {
@@ -151,6 +156,7 @@ function runSuite(options) {
   for (const testCase of cases) {
     const id = runId(options.host, options.condition, testCase.id) + (options.listing ? '-listing' : '');
     const dir = makeProject(options.host, options.condition, testCase, path.dirname(suite.file), install);
+    const base = sh('git', ['rev-parse', 'HEAD'], dir).trim();
     const home = userInstall ? makeClaudeHome(options.condition) : null;
     const [cmd, args] = hostCommand(options.host, testCase.prompt, suite, options.listing, userInstall ? userRunSettings() : undefined);
     const started = new Date().toISOString();
@@ -158,7 +164,7 @@ function runSuite(options) {
     const meta = { id, suite: options.suite, host: options.host, condition: options.condition, case: testCase.id, started, finished: new Date().toISOString(), status: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', projectDir: dir, listing: Boolean(options.listing), install: userInstall ? 'user' : 'project' };
     fs.writeFileSync(path.join(out, 'raw', `${id}.jsonl`), result.stdout ?? '');
     fs.writeFileSync(path.join(out, 'raw', `${id}.err`), result.stderr ?? '');
-    if (options.suite !== 'routing') fs.writeFileSync(path.join(out, 'raw', `${id}.diff`), diffOf(dir));
+    if (options.suite !== 'routing') fs.writeFileSync(path.join(out, 'raw', `${id}.diff`), diffOf(dir, base));
     fs.writeFileSync(path.join(out, 'raw', `${id}.meta.json`), `${JSON.stringify(meta, null, 2)}\n`);
     const trace = extract(meta, result.stdout ?? '');
     fs.writeFileSync(path.join(out, 'traces', `${id}.json`), `${JSON.stringify(trace, null, 2)}\n`);

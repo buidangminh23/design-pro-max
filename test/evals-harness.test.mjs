@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { extract, hitHostLimit, makeClaudeHome, scoreRouting, userRunSettings } from '../evals/harness.mjs';
+import { spawnSync } from 'node:child_process';
+import { diffOf, extract, hitHostLimit, makeClaudeHome, scoreRouting, userRunSettings } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -99,4 +100,22 @@ test('a user install gives Claude a config folder with the user skills, and appl
   assert.ok(fs.lstatSync(path.join(withHome, 'rules')).isSymbolicLink());
   assert.deepEqual(userRunSettings(user), { disableAllHooks: true, model: 'opus[1m]', effortLevel: 'xhigh' });
   assert.deepEqual(userRunSettings(path.join(user, 'missing')), { disableAllHooks: true });
+});
+
+test('the diff of a run includes what the agent committed itself', (t) => {
+  const dir = tempDir();
+  t.after(() => removeTree(dir));
+  const git = (...args) => spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t', ...args], { cwd: dir, encoding: 'utf8' });
+  fs.writeFileSync(path.join(dir, 'index.html'), '<p>before</p>\n');
+  git('init', '-q');
+  git('add', '-A');
+  git('commit', '-qm', 'fixture');
+  const base = git('rev-parse', 'HEAD').stdout.trim();
+  fs.writeFileSync(path.join(dir, 'index.html'), '<p>after</p>\n');
+  git('commit', '-qam', 'feat: agent change');
+  fs.writeFileSync(path.join(dir, 'new.css'), 'p {}\n');
+  const diff = diffOf(dir, base);
+  assert.match(diff, /agent commits:\n\w+ feat: agent change/);
+  assert.match(diff, /\+<p>after<\/p>/);
+  assert.match(diff, /^A\tnew\.css$/m);
 });
