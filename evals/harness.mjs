@@ -6,8 +6,13 @@
  * the project finds and reads the folder even when the host does not list the skill. Codex runs `codex exec --json`
  * (no -s) in a temp git repo with the skill at .agents/skills/apple; its baseline has no skill folder.
  *
+ * With --install user, Claude instead finds the skill where an installer puts it, outside the project: the run gets a
+ * temporary CLAUDE_CONFIG_DIR holding copies of the user's skills, links to the user's CLAUDE.md and rules, and apple
+ * only in the with condition, so exploring the project cannot reach the skill. The user's model and effort are kept.
+ *
  *   node evals/harness.mjs run --suite routing|launch-scroll --host claude|codex --condition with|without --out <dir>
- *        [--ids a,b] [--listing]   --listing keeps the session so the host's skill listing can be read back
+ *        [--ids a,b] [--listing] [--install project|user]
+ *                                  --listing keeps the session so the host's skill listing can be read back
  *   node evals/harness.mjs trace --out <dir>                re-extract every trace from the raw output
  *   node evals/harness.mjs score --out <dir>                score the routing traces against the bars
  *
@@ -29,6 +34,8 @@ const SUITES = {
   'launch-scroll': { file: path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
 };
 const SKILL_ROOT = { claude: '.claude/skills/apple', codex: '.agents/skills/apple' };
+const USER_CLAUDE = process.env.DPM_EVAL_CLAUDE_HOME ?? path.join(os.homedir(), '.claude');
+const SKIPPED_USER_SKILLS = new Set(['apple', 'synced']);
 const NESTED_ENV = ['CLAUDECODE', 'CLAUDE_CODE_CHILD_SESSION', 'CLAUDE_CODE_MESSAGING_SOCKET', 'CLAUDE_CODE_MESSAGING_TOKEN', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE_SESSION_ATTENDED', 'CLAUDE_PID', 'CLAUDE_EFFORT', 'CLAUDE_CODE_ENTRYPOINT', 'CLAUDE_PLUGIN_DATA', 'CLAUDE_TMPDIR', 'CLAUDE_CODE_EXECPATH'];
 
 function parseArgs(argv) {
@@ -58,10 +65,42 @@ function sh(cmd, args, cwd) {
   return result.stdout;
 }
 
-function makeProject(host, condition, testCase, suiteDir) {
+/**
+ * A temporary Claude config folder for --install user: the user's skills except apple, links to the user's CLAUDE.md
+ * and rules, and apple itself only when the condition is with. The folder is named .claude so traces resolve skill
+ * paths the same way as with a project install.
+ */
+export function makeClaudeHome(condition, userHome = USER_CLAUDE) {
+  const home = path.join(fs.mkdtempSync(path.join(os.tmpdir(), `apple-eval-home-${condition}-`)), '.claude');
+  const skills = path.join(home, 'skills');
+  fs.mkdirSync(skills, { recursive: true });
+  const userSkills = path.join(userHome, 'skills');
+  if (fs.existsSync(userSkills)) {
+    for (const entry of fs.readdirSync(userSkills, { withFileTypes: true })) {
+      if (SKIPPED_USER_SKILLS.has(entry.name) || entry.name.startsWith('.')) continue;
+      fs.cpSync(path.join(userSkills, entry.name), path.join(skills, entry.name), { recursive: true, dereference: true });
+    }
+  }
+  for (const name of ['CLAUDE.md', 'rules']) if (fs.existsSync(path.join(userHome, name))) fs.symlinkSync(path.join(userHome, name), path.join(home, name));
+  if (condition === 'with') fs.cpSync(SKILL, path.join(skills, 'apple'), { recursive: true });
+  return home;
+}
+
+/** The settings a --install user run passes: hooks off, and the user's own model and effort. */
+export function userRunSettings(userHome = USER_CLAUDE) {
+  const settings = { disableAllHooks: true };
+  try {
+    const own = readJson(path.join(userHome, 'settings.json'));
+    for (const key of ['model', 'effortLevel']) if (own[key] !== undefined) settings[key] = own[key];
+  } catch {}
+  return settings;
+}
+
+function makeProject(host, condition, testCase, suiteDir, install = 'project') {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), `apple-eval-${host}-${condition}-`));
-  if (condition === 'with') fs.cpSync(SKILL, path.join(dir, ...SKILL_ROOT[host].split('/')), { recursive: true });
-  if (host === 'claude' && condition === 'without') {
+  const userInstall = host === 'claude' && install === 'user';
+  if (condition === 'with' && !userInstall) fs.cpSync(SKILL, path.join(dir, ...SKILL_ROOT[host].split('/')), { recursive: true });
+  if (host === 'claude' && condition === 'without' && !userInstall) {
     fs.mkdirSync(path.join(dir, '.claude'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.claude', 'settings.local.json'), `${JSON.stringify({ skillOverrides: { apple: 'off' } }, null, 2)}\n`);
   }
@@ -77,9 +116,9 @@ function makeProject(host, condition, testCase, suiteDir) {
   return dir;
 }
 
-function hostCommand(host, prompt, suite, listing) {
+function hostCommand(host, prompt, suite, listing, settings = { disableAllHooks: true }) {
   if (host === 'claude') {
-    const args = ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'bypassPermissions', '--settings', '{"disableAllHooks":true}', '--max-turns', String(suite.maxTurns)];
+    const args = ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'bypassPermissions', '--settings', JSON.stringify(settings), '--max-turns', String(suite.maxTurns)];
     if (!listing) args.push('--no-session-persistence');
     return ['claude', args];
   }
@@ -99,6 +138,9 @@ function diffOf(dir) {
 function runSuite(options) {
   const suite = SUITES[options.suite];
   if (!suite || !SKILL_ROOT[options.host] || !['with', 'without'].includes(options.condition) || !options.out) throw new Error('run needs --suite, --host, --condition and --out');
+  const install = options.install ?? 'project';
+  if (!['project', 'user'].includes(install)) throw new Error('--install is project or user');
+  const userInstall = options.host === 'claude' && install === 'user';
   const doc = readJson(suite.file);
   const wanted = options.ids ? new Set(options.ids.split(',')) : null;
   const cases = suite.list(doc).filter((item) => !wanted || wanted.has(String(item.id)));
@@ -108,11 +150,12 @@ function runSuite(options) {
   for (const key of NESTED_ENV) delete env[key];
   for (const testCase of cases) {
     const id = runId(options.host, options.condition, testCase.id) + (options.listing ? '-listing' : '');
-    const dir = makeProject(options.host, options.condition, testCase, path.dirname(suite.file));
-    const [cmd, args] = hostCommand(options.host, testCase.prompt, suite, options.listing);
+    const dir = makeProject(options.host, options.condition, testCase, path.dirname(suite.file), install);
+    const home = userInstall ? makeClaudeHome(options.condition) : null;
+    const [cmd, args] = hostCommand(options.host, testCase.prompt, suite, options.listing, userInstall ? userRunSettings() : undefined);
     const started = new Date().toISOString();
-    const result = spawnSync(cmd, args, { cwd: dir, env, encoding: 'utf8', input: '', timeout: suite.timeout * 1000, killSignal: 'SIGTERM', maxBuffer: 512 * 1024 * 1024 });
-    const meta = { id, suite: options.suite, host: options.host, condition: options.condition, case: testCase.id, started, finished: new Date().toISOString(), status: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', projectDir: dir, listing: Boolean(options.listing) };
+    const result = spawnSync(cmd, args, { cwd: dir, env: home ? { ...env, CLAUDE_CONFIG_DIR: home } : env, encoding: 'utf8', input: '', timeout: suite.timeout * 1000, killSignal: 'SIGTERM', maxBuffer: 512 * 1024 * 1024 });
+    const meta = { id, suite: options.suite, host: options.host, condition: options.condition, case: testCase.id, started, finished: new Date().toISOString(), status: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', projectDir: dir, listing: Boolean(options.listing), install: userInstall ? 'user' : 'project' };
     fs.writeFileSync(path.join(out, 'raw', `${id}.jsonl`), result.stdout ?? '');
     fs.writeFileSync(path.join(out, 'raw', `${id}.err`), result.stderr ?? '');
     if (options.suite !== 'routing') fs.writeFileSync(path.join(out, 'raw', `${id}.diff`), diffOf(dir));
@@ -120,6 +163,7 @@ function runSuite(options) {
     const trace = extract(meta, result.stdout ?? '');
     fs.writeFileSync(path.join(out, 'traces', `${id}.json`), `${JSON.stringify(trace, null, 2)}\n`);
     fs.rmSync(dir, { recursive: true, force: true });
+    if (home) fs.rmSync(path.dirname(home), { recursive: true, force: true });
     process.stdout.write(`${id} status=${result.status} timedOut=${meta.timedOut} trigger=${trace.triggered} firstPart=${trace.firstPart ?? '-'}\n`);
     if (trace.hostLimit) {
       process.stderr.write(`${id} ended on the ${options.host} session or usage limit; the remaining cases were not run\n`);
@@ -456,6 +500,15 @@ function retrace(options) {
 
 const pct = (n, d) => (d ? Math.round((1000 * n) / d) / 10 : null);
 
+/**
+ * Whether a near-miss run counts as a false trigger. Claude starts apple through its Skill tool. Codex has no such
+ * tool and reads the router to check its not-for clause, so for Codex only a part read counts; a near miss that read
+ * the router and stopped is reported as routerOnly instead.
+ */
+export function isFalseTrigger(trace) {
+  return trace.host === 'codex' ? trace.firstPart !== null : trace.triggered;
+}
+
 /** Routing scores per host against the bars of evals/routing/cases.json. */
 export function scoreRouting(out) {
   const doc = readJson(SUITES.routing.file);
@@ -475,13 +528,14 @@ export function scoreRouting(out) {
     const guideReads = scored.reduce((sum, trace) => sum + trace.guideReads, 0);
     const partialGuideReads = scored.reduce((sum, trace) => sum + trace.partialGuideReads.length, 0);
     const wrong = scored.reduce((sum, trace) => sum + trace.wrongPathReads.length, 0);
-    const falseTriggers = near.filter((trace) => trace.triggered);
+    const falseTriggers = near.filter(isFalseTrigger);
+    const routerOnly = near.filter((trace) => trace.triggered && !isFalseTrigger(trace));
     const readRows = rows.filter((trace) => trace.readApple || trace.triggered);
     const readNear = near.filter((trace) => trace.readApple || trace.triggered);
     const failures = [
       ...rows.filter((trace) => !trace.triggered).map((trace) => ({ run: trace.id, bar: 'recall', detail: 'apple did not start' })),
       ...triggered.filter((trace) => trace.firstPart !== byId.get(trace.case).expect.part).map((trace) => ({ run: trace.id, bar: 'firstPart', detail: `first part ${trace.firstPart ?? 'none'}, expected ${byId.get(trace.case).expect.part}` })),
-      ...falseTriggers.map((trace) => ({ run: trace.id, bar: 'falseTriggers', detail: `apple started (belongs to ${byId.get(trace.case).expect.instead})` })),
+      ...falseTriggers.map((trace) => ({ run: trace.id, bar: 'falseTriggers', detail: `apple started${trace.firstPart ? `, read ${trace.firstPart}` : ''} (belongs to ${byId.get(trace.case).expect.instead})` })),
       ...scored.filter((trace) => trace.partialGuideReads.length).map((trace) => ({ run: trace.id, bar: 'fullReads', detail: `partial read of ${trace.partialGuideReads.join(', ')}` })),
       ...scored.filter((trace) => trace.wrongPathReads.length).map((trace) => ({ run: trace.id, bar: 'wrongPathReads', detail: trace.wrongPathReads.join(', ') })),
     ];
@@ -489,7 +543,7 @@ export function scoreRouting(out) {
       runs: runs.length,
       invalid: invalid.map((trace) => trace.id),
       recall: { value: pct(triggered.length, rows.length), n: `${triggered.length}/${rows.length}`, met: triggered.length / rows.length >= doc.bars.recall },
-      falseTriggers: { value: pct(falseTriggers.length, near.length), n: `${falseTriggers.length}/${near.length}`, met: falseTriggers.length / near.length <= doc.bars.falseTriggers },
+      falseTriggers: { value: pct(falseTriggers.length, near.length), n: `${falseTriggers.length}/${near.length}`, met: falseTriggers.length / near.length <= doc.bars.falseTriggers, routerOnly: routerOnly.map((trace) => trace.id) },
       firstPart: { value: pct(rightPart.length, triggered.length), n: `${rightPart.length}/${triggered.length}`, met: triggered.length > 0 && rightPart.length / triggered.length >= doc.bars.firstPart },
       fullReads: { value: pct(guideReads - partialGuideReads, guideReads), n: `${guideReads - partialGuideReads}/${guideReads}`, met: partialGuideReads === 0 },
       wrongPathReads: { value: wrong, met: wrong <= doc.bars.wrongPathReads },

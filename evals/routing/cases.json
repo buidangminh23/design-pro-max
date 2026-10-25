@@ -1,5 +1,5 @@
 {
-  "description": "Routing evals for the apple skill. Each prompt is self-contained: it runs in an empty project, so it never refers to files that are not there. A row case expects the apple skill to start and its first part read to be in the expected part folder (relative to skills/apple). A near-miss case expects apple not to start; instead names the skill or scope it belongs to. A recorded case is run and recorded, never scored. Prompts are written for this project.",
+  "description": "Routing evals for the apple skill. Each prompt is self-contained: it runs in an empty project, so it never refers to files that are not there. A row case expects the apple skill to start and its first part read to be in the expected part folder (relative to skills/apple). A near-miss case expects apple not to start; instead names the skill or scope it belongs to. On Codex, which has no Skill tool and reads the router to check its not-for clause, a near miss is a false trigger only when it goes on to read a part; router-only reads are listed separately. A recorded case is run and recorded, never scored. Prompts are written for this project.",
   "bars": {
     "recall": 0.9,
     "falseTriggers": 0.1,

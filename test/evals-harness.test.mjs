@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { extract, hitHostLimit, scoreRouting } from '../evals/harness.mjs';
+import { extract, hitHostLimit, makeClaudeHome, scoreRouting, userRunSettings } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -48,4 +48,55 @@ test('score leaves limit runs out of every bar, lists them as invalid and exits 
   fs.rmSync(path.join(out, 'traces', 'claude-with-r02.json'));
   fs.rmSync(path.join(out, 'traces', 'claude-with-n02.json'));
   assert.equal(runScript(HARNESS, ['score', '--out', out]).status, 0);
+});
+
+const codexRun = (...commands) => commands.map((command) => JSON.stringify({ type: 'item.completed', item: { type: 'command_execution', command, exit_code: 0 } })).join('\n');
+
+test('a Codex near miss counts as a false trigger only when it reads a part', (t) => {
+  const out = tempDir();
+  t.after(() => removeTree(out));
+  fs.mkdirSync(path.join(out, 'traces'));
+  const write = (trace) => fs.writeFileSync(path.join(out, 'traces', `${trace.id}.json`), JSON.stringify(trace));
+  write(extract(meta('codex', 'n01'), codexRun('cat .agents/skills/apple/SKILL.md')));
+  write(extract(meta('codex', 'n02'), codexRun('cat .agents/skills/apple/SKILL.md', 'cat .agents/skills/apple/launch-scroll/PART.md')));
+  write(extract(meta('codex', 'n03'), codexRun('ls')));
+
+  const { codex } = scoreRouting(out);
+  assert.equal(codex.falseTriggers.n, '1/3');
+  assert.deepEqual(codex.falseTriggers.routerOnly, ['codex-with-n01']);
+  assert.deepEqual(codex.failures.filter((failure) => failure.bar === 'falseTriggers').map((failure) => failure.run), ['codex-with-n02']);
+  assert.equal(codex.anyAppleRead.nearMisses, '2/3');
+});
+
+test('a Claude near miss still counts as a false trigger when it calls apple without reading a part', (t) => {
+  const out = tempDir();
+  t.after(() => removeTree(out));
+  fs.mkdirSync(path.join(out, 'traces'));
+  fs.writeFileSync(path.join(out, 'traces', 'claude-with-n01.json'), JSON.stringify(extract(meta('claude', 'n01'), claudeRun('Use the animate skill.', { skill: 'apple' }))));
+  assert.equal(scoreRouting(out).claude.falseTriggers.n, '1/1');
+});
+
+test('a user install gives Claude a config folder with the user skills, and apple only in the with condition', (t) => {
+  const user = tempDir();
+  t.after(() => removeTree(user));
+  fs.mkdirSync(path.join(user, 'skills', 'animate'), { recursive: true });
+  fs.writeFileSync(path.join(user, 'skills', 'animate', 'SKILL.md'), '---\nname: animate\n---\n');
+  fs.mkdirSync(path.join(user, 'skills', 'apple'));
+  fs.writeFileSync(path.join(user, 'skills', 'apple', 'SKILL.md'), 'an older install\n');
+  fs.mkdirSync(path.join(user, 'skills', 'synced'));
+  fs.mkdirSync(path.join(user, 'rules'));
+  fs.writeFileSync(path.join(user, 'CLAUDE.md'), '# rules\n');
+  fs.writeFileSync(path.join(user, 'settings.json'), JSON.stringify({ model: 'opus[1m]', effortLevel: 'xhigh', hooks: { Stop: [] }, permissions: { allow: ['Bash'] } }));
+
+  const withHome = makeClaudeHome('with', user);
+  const withoutHome = makeClaudeHome('without', user);
+  t.after(() => [withHome, withoutHome].forEach((home) => removeTree(path.dirname(home))));
+  assert.equal(path.basename(withHome), '.claude');
+  assert.deepEqual(fs.readdirSync(path.join(withHome, 'skills')).sort(), ['animate', 'apple']);
+  assert.equal(fs.readFileSync(path.join(withHome, 'skills', 'apple', 'SKILL.md'), 'utf8'), fs.readFileSync(path.join(ROOT, 'skills', 'apple', 'SKILL.md'), 'utf8'));
+  assert.deepEqual(fs.readdirSync(path.join(withoutHome, 'skills')), ['animate']);
+  assert.ok(fs.lstatSync(path.join(withHome, 'CLAUDE.md')).isSymbolicLink());
+  assert.ok(fs.lstatSync(path.join(withHome, 'rules')).isSymbolicLink());
+  assert.deepEqual(userRunSettings(user), { disableAllHooks: true, model: 'opus[1m]', effortLevel: 'xhigh' });
+  assert.deepEqual(userRunSettings(path.join(user, 'missing')), { disableAllHooks: true });
 });
