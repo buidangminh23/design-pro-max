@@ -34,7 +34,7 @@ From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.t
 
 - A bundled skill is the same skill its own repository releases. Install it from one place only: a machine that already installs `spacing-skill` or `icons-pro-max` from their repositories would list the skill twice.
 
-- Install only into a host's own skill roots, such as `~/.claude/skills/` for Claude Code or a user or repository skill folder of Codex. Hosts skip dot-folders there, so they list one skill, `apple`, and the 38 parts under `.vendor/` stay hidden.
+- Install only into a host's own skill roots, such as `~/.claude/skills/` for Claude Code or a user or repository skill folder of Codex. Hosts skip dot-folders there, so they list `apple` and each bundled skill you installed, and the 38 parts under `.vendor/` stay hidden.
 - Never run `npx skills` with `--full-depth`: it enters dot-folders and installs every part under `.vendor/` as a skill of its own.
 - Do not put the skill in a Codex executor environment's skill root, such as one of a remote or sandboxed executor: those roots include hidden folders, so every part would register as a skill.
 - Use one install channel per machine. Installing with `npx skills` and copying the release into another skill root makes a host list `apple` twice.
@@ -92,7 +92,7 @@ CONTRIBUTING.md              issues first, MIT-only sources, how a part is added
 
 ### Why `.vendor` is hidden
 
-Agent hosts register every `SKILL.md` they find. Codex scans skill folders recursively but skips dot-directories, and Claude Code registers only the direct children of a skills folder. With every vendored part inside the hidden `.vendor/` folder, both hosts list exactly one skill, `apple`, while every vendored file stays byte-identical to upstream: nothing is renamed or edited to hide them.
+Agent hosts register every `SKILL.md` they find. Codex scans skill folders recursively but skips dot-directories, and Claude Code registers only the direct children of a skills folder. With every vendored part inside the hidden `.vendor/` folder, both hosts list `apple` as one skill, while every vendored file stays byte-identical to upstream: nothing is renamed or edited to hide them.
 
 The same constraint shapes the rest of the tree: each skill's own `skills/<name>/SKILL.md` is the only `SKILL.md` outside dot-directories, there are no symlinks, no `.claude-plugin` or `.codex-plugin` folder sits inside `skills/apple`, no folder is named `.claude`, `.agents`, `.codex` or `.git`, and no file is named `metadata.json`, which some installers drop. `.gitattributes` marks `skills/apple/.vendor/**` and the bundled skill folders as `-text`, so git never rewrites vendored or bundled line endings.
 
@@ -152,7 +152,7 @@ Whole skills that the owner releases from their own repositories, shipped here u
 
 ## Credits
 
-Every vendored part is MIT-licensed and every vendored file is unmodified. The excludes in `vendor/sources.json` leave out a nested plugin copy, a plugin manifest, agent UI metadata (`agents/openai.yaml`) and icon images, some of which reproduce Apple's Swift logo, so no vendored image ships; the only image in a release is the apple skill's own icon, `skills/apple/assets/apple.svg`, whose drawing is devicon's (MIT, licence in `skills/apple/NOTICE.md` and `THIRD_PARTY_NOTICES.md`). Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the MIT licences; each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`. Thanks to the authors. Full licence texts are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Every vendored part is MIT-licensed and every vendored file is unmodified. The excludes in `vendor/sources.json` leave out a nested plugin copy, a plugin manifest, agent UI metadata (`agents/openai.yaml`) and icon images, some of which reproduce Apple's Swift logo, so no vendored image ships; the images in a release are the apple skill's own icon, `skills/apple/assets/apple.svg`, whose drawing is devicon's (MIT, licence in `skills/apple/NOTICE.md` and `THIRD_PARTY_NOTICES.md`), and the brand logos of the bundled `icons-pro-max` skill (see [Bundled skills](#bundled-skills)). Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the MIT licences; each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`. Thanks to the authors. Full licence texts are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 <!-- gen:credits -->
 
