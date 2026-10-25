@@ -2,5 +2,13 @@
   {
     "name": "apple",
     "path": "skills/apple"
+  },
+  {
+    "name": "design-spacing-rhythm",
+    "path": "skills/design-spacing-rhythm"
+  },
+  {
+    "name": "icons-pro-max",
+    "path": "skills/icons-pro-max"
   }
 ]

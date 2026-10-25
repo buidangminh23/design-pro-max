@@ -1,0 +1,12 @@
+<svg role="img" aria-label="WeWeb" width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="512" height="512" rx="64" fill="url(#paint0_linear_47_22)"/>
+<path d="M150.357 256.083C119.05 256.083 93.0995 280.025 90.4208 310.997L84.8959 374.617H151.027L161.407 255.916H150.525L150.357 256.083Z" fill="white"/>
+<path d="M404.837 137.382C369.344 137.382 341.552 167.853 344.901 203.179L360.973 374.618H427.104L404.837 137.382Z" fill="white"/>
+<path d="M290.489 189.283C248.968 189.283 211.633 214.899 196.9 253.74L151.027 374.618H217.158L256 273.161L294.842 374.618H360.973L290.489 189.283Z" fill="white"/>
+<defs>
+<linearGradient id="paint0_linear_47_22" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
+<stop stop-color="#131313"/>
+<stop offset="1" stop-color="#292929"/>
+</linearGradient>
+</defs>
+</svg>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none" role="img" aria-label="Eedi">
+  <circle cx="256" cy="256" r="256" fill="#6D4FE3"/>
+  <g transform="translate(139.8 139.25) scale(1.156)" fill="#FFFFFF">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H37.6875V202H0V0ZM201 44.1875V82.0625L87.9375 82.0625V44.1875L201 44.1875ZM201 157.812V119.938L87.9375 119.937V157.812H201Z"/>
+  </g>
+</svg>

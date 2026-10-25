@@ -28,8 +28,12 @@ test('the committed generated files are up to date', () => {
   assert.deepEqual(staleFiles(ROOT), []);
 });
 
-test('skills.json lists the apple skill and its folder', () => {
-  assert.deepEqual(JSON.parse(read(ROOT, SKILLS_FILE)), [{ name: 'apple', path: 'skills/apple' }]);
+test('skills.json lists the apple skill and the bundled skills with their folders', () => {
+  assert.deepEqual(JSON.parse(read(ROOT, SKILLS_FILE)), [
+    { name: 'apple', path: 'skills/apple' },
+    { name: 'design-spacing-rhythm', path: 'skills/design-spacing-rhythm' },
+    { name: 'icons-pro-max', path: 'skills/icons-pro-max' },
+  ]);
 });
 
 test('the parts index covers every part with its group, status, activation and errata pointers', () => {

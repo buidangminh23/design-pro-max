@@ -1,0 +1,40 @@
+<svg role="img" aria-label="Black Diamond" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 472.13 472.13">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#linear-gradient);
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke-width: 0px;
+      }
+
+      .cls-2 {
+        fill: url(#linear-gradient-4);
+      }
+
+      .cls-3 {
+        fill: url(#linear-gradient-2);
+      }
+
+      .cls-4 {
+        fill: url(#linear-gradient-3);
+      }
+    </style>
+    <linearGradient id="linear-gradient" x1="488.62" y1="-724.64" x2="742.13" y2="-724.64" gradientTransform="translate(72.08 -798.25) rotate(135)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#b2d6ee" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#b2d6ee"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="675.34" y1="-598.24" x2="675.34" y2="-851.75" gradientTransform="translate(1139.53 287.74) rotate(-135)" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-3" x1="887.04" y1="-192.45" x2="962.75" y2="90.12" gradientTransform="translate(940.61 -367.33) rotate(135)" xlink:href="#linear-gradient"/>
+    <linearGradient id="linear-gradient-4" x1="947.01" y1="89.76" x2="1022.72" y2="-192.81" gradientTransform="translate(1055.62 809.25) rotate(-135)" xlink:href="#linear-gradient"/>
+  </defs>
+  <g>
+    <rect class="cls-1" x="-13.36" y="109.31" width="325.41" height="79.95" rx="39.98" ry="39.98" transform="translate(360.5 149.24) rotate(135)"/>
+    <rect class="cls-3" x="-13.36" y="282.87" width="325.41" height="79.95" rx="39.97" ry="39.97" transform="translate(272.03 -11.04) rotate(45)"/>
+  </g>
+  <g>
+    <rect class="cls-4" x="160.08" y="282.87" width="325.41" height="79.95" rx="39.98" ry="39.98" transform="translate(-133.75 322.8) rotate(-45)"/>
+    <rect class="cls-2" x="160.08" y="109.31" width="325.41" height="79.95" rx="39.97" ry="39.97" transform="translate(445.47 483.08) rotate(-135)"/>
+  </g>
+</svg>

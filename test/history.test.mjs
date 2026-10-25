@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { checkHistory } from '../scripts/check-history.mjs';
 import { REVIEWED_MEDIA, isReviewedMedia, mediaKind } from '../scripts/lib/media.mjs';
+import { loadBundles } from '../scripts/lib/bundles.mjs';
 import { ROOT, isolatedGitEnv, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const CHECK = path.join(ROOT, 'scripts', 'check-history.mjs');
@@ -67,7 +68,9 @@ function repository(t, steps) {
 test('the repository history holds no unreviewed media and no vendored agents/ or assets/ files', { skip: isShallow() && 'this clone is shallow' }, () => {
   const report = checkHistory(ROOT);
   assert.deepEqual(report.problems, []);
-  assert.equal(report.stats.reviewed, 1);
+  const bundled = loadBundles(ROOT).bundles.flatMap((bundle) => bundle.files.filter((file) => mediaKind(file.path)));
+  assert.ok(bundled.length > 0);
+  assert.ok(report.stats.reviewed >= REVIEWED_MEDIA.size + bundled.length);
 });
 
 for (const name of fs.readdirSync(FIXTURES).filter((file) => file.endsWith('.json')).sort()) {
