@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Fails when any commit reachable from HEAD adds an image, font, media file or archive that is not a reviewed file
- * with its reviewed bytes, or any file inside a vendored part's assets/ or agents/ folder. The whole history counts,
+ * with its reviewed bytes or an image of a bundled skill that vendor/bundles.json at the same commit records with
+ * those bytes, or any file inside a vendored part's assets/ or agents/ folder. The whole history counts,
  * because a file that was ever pushed can come back through a revert, an old tag or a fork.
  *
  *   node scripts/check-history.mjs [--root <dir>] [--rev <revision>]
@@ -15,6 +16,7 @@ import { execFileSync } from 'node:child_process';
 import { ROOT, isMainModule } from './lib/vendor.mjs';
 import { isReviewedMedia, mediaKind } from './lib/media.mjs';
 import { visiblePath } from './vendor-guard.mjs';
+import { BUNDLES_FILE, inBundle, parseBundles } from './lib/bundles.mjs';
 
 const GIT_ENV_KEYS = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_PREFIX', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'];
 const VENDORED_EXTRA = /^skills\/[^/]+\/\.vendor\/(?:[^/]+\/)*?(assets|agents)\//;
@@ -95,6 +97,27 @@ export function checkHistory(root = ROOT, rev = 'HEAD') {
   const blobs = readBlobs(root, [...new Set(files.map((entry) => entry.object))]);
   const problems = [];
   const seen = new Set();
+  const manifests = new Map();
+  const bundlesAt = (commit) => {
+    if (!manifests.has(commit)) {
+      let object = null;
+      try {
+        object = git(['rev-parse', '--verify', '--quiet', `${commit}:${BUNDLES_FILE}`]).toString('utf8').trim();
+      } catch {
+        object = null;
+      }
+      let manifest = null;
+      if (object) {
+        try {
+          manifest = parseBundles(readBlobs(root, [object]).get(object).toString('utf8'), `${commit.slice(0, 12)} ${BUNDLES_FILE}`);
+        } catch (error) {
+          problems.push(error.message);
+        }
+      }
+      manifests.set(commit, manifest);
+    }
+    return manifests.get(commit);
+  };
   let reviewed = 0;
   for (const entry of files) {
     const key = `${entry.path}\0${entry.object}`;
@@ -106,7 +129,9 @@ export function checkHistory(root = ROOT, rev = 'HEAD') {
     const bytes = blobs.get(entry.object);
     const kind = mediaKind(entry.path, bytes);
     if (!kind) continue;
-    if (isReviewedMedia(entry.path, bytes)) reviewed += 1;
+    const bundles = entry.path.startsWith('skills/') ? bundlesAt(entry.commit) : null;
+    if (isReviewedMedia(entry.path, bytes, bundles)) reviewed += 1;
+    else if (bundles && inBundle(bundles, entry.path)) problems.push(`${where}: ${kind} that ${BUNDLES_FILE} at that commit does not record with these bytes, or that BUNDLED_MEDIA does not allow`);
     else problems.push(`${where}: ${kind} not on the reviewed list in scripts/lib/media.mjs`);
   }
   return { ok: problems.length === 0, problems, stats: { commits, files: seen.size, reviewed } };

@@ -43,6 +43,7 @@ test('the package manifest matches the repository conventions', () => {
 test('git keeps vendored bytes as they are', () => {
   const attributes = fs.readFileSync(path.join(ROOT, '.gitattributes'), 'utf8');
   assert.match(attributes, /^skills\/apple\/\.vendor\/\*\* -text/m);
+  for (const name of ['design-spacing-rhythm', 'icons-pro-max']) assert.ok(attributes.split('\n').some((line) => line.startsWith(`skills/${name}/** -text`)), name);
 });
 
 test('the README says how to install the skill without exposing its parts', () => {

@@ -51,6 +51,8 @@ jobs:
         run: npm test
       - name: Vendored parts match the manifest
         run: node scripts/vendor-sync.mjs check
+      - name: Bundled skills match their releases
+        run: node scripts/bundle-sync.mjs check
       - name: Guard
         run: node scripts/vendor-guard.mjs
       - name: Notices are current

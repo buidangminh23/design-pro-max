@@ -5,7 +5,13 @@
 
 <img src="skills/apple/assets/apple.svg" width="56" height="56" alt="Apple logo, the icon of the apple skill">
 
-Design skills for AI coding agents, one skill per design. The first skill is **apple**: a router for Apple-platform work that sends each task to one bundled guide, either a third-party part or one of the project's own, and has the agent read that guide in full.
+Design skills for AI coding agents, one skill per design:
+
+- **apple**: a router for Apple-platform work that sends each task to one bundled guide, either a third-party part or one of the project's own, and has the agent read that guide in full.
+- **design-spacing-rhythm**: spacing, alignment and vertical rhythm for generated UI and documents, bundled from [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill).
+- **icons-pro-max**: an icon catalog with the exact brand logos, UI icons and render rules, bundled from [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max).
+
+The two bundled skills are copied byte for byte from the latest release of their own repositories and kept in step by a daily job; see [Bundled skills](#bundled-skills).
 
 > **Status: pre-release.** Nothing has been released yet; `main` already installs as described below.
 
@@ -17,9 +23,18 @@ Install the `apple` skill folder into a skill root that your agent host reads:
 npx skills add buidangminh23/design-pro-max --skill apple -g
 ```
 
-From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.txt`. The ZIP holds `skills/apple` with its hidden `.vendor/` folder, which must be copied along with the rest.
+The bundled skills install the same way, one `--skill` per skill:
 
-- Install only into a host's own skill roots, such as `~/.claude/skills/` for Claude Code or a user or repository skill folder of Codex. Hosts skip dot-folders there, so they list one skill, `apple`, and the 38 parts under `.vendor/` stay hidden.
+```sh
+npx skills add buidangminh23/design-pro-max --skill design-spacing-rhythm -g
+npx skills add buidangminh23/design-pro-max --skill icons-pro-max -g
+```
+
+From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.txt`. The ZIP holds `skills/apple` with its hidden `.vendor/` folder, which must be copied along with the rest, and the bundled skills next to it.
+
+- A bundled skill is the same skill its own repository releases. Install it from one place only: a machine that already installs `spacing-skill` or `icons-pro-max` from their repositories would list the skill twice.
+
+- Install only into a host's own skill roots, such as `~/.claude/skills/` for Claude Code or a user or repository skill folder of Codex. Hosts skip dot-folders there, so they list `apple` and each bundled skill you installed, and the 38 parts under `.vendor/` stay hidden.
 - Never run `npx skills` with `--full-depth`: it enters dot-folders and installs every part under `.vendor/` as a skill of its own.
 - Do not put the skill in a Codex executor environment's skill root, such as one of a remote or sandboxed executor: those roots include hidden folders, so every part would register as a skill.
 - Use one install channel per machine. Installing with `npx skills` and copying the release into another skill root makes a host list `apple` twice.
@@ -49,8 +64,13 @@ skills/
         UPSTREAM.json        source, commit, prerequisites, risks, errata, Apple text, file hashes and modes
       xcode-build/<part>/
       app-store-connect/<part>/
+  design-spacing-rhythm/     bundled: spacing-skill's skill folder at its release tag, plus its LICENSE
+  icons-pro-max/             bundled: icons-pro-max's skill folder at its release tag, logos included, plus its LICENSE
 skills.json                  generated: the skills in this repository, for installers
 vendor/sources.json          the 38 parts: repository, commit, path, excludes, status
+vendor/bundles.json          the bundled skills: repository, release tag, commit, licence and every file's hash
+scripts/bundle-sync.mjs      sync, check and update for the bundled skills
+scripts/lib/bundles.mjs      the bundle record, its checks and BUNDLED_MEDIA, the only bundles that may ship images
 scripts/vendor-sync.mjs      sync, check, notices, and stage, classify, confirm and apply for upstream updates
 scripts/vendor-guard.mjs     offline guard
 scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
@@ -73,9 +93,9 @@ CONTRIBUTING.md              issues first, MIT-only sources, how a part is added
 
 ### Why `.vendor` is hidden
 
-Agent hosts register every `SKILL.md` they find. Codex scans skill folders recursively but skips dot-directories, and Claude Code registers only the direct children of a skills folder. With every vendored part inside the hidden `.vendor/` folder, both hosts list exactly one skill, `apple`, while every vendored file stays byte-identical to upstream: nothing is renamed or edited to hide them.
+Agent hosts register every `SKILL.md` they find. Codex scans skill folders recursively but skips dot-directories, and Claude Code registers only the direct children of a skills folder. With every vendored part inside the hidden `.vendor/` folder, both hosts list `apple` as one skill, while every vendored file stays byte-identical to upstream: nothing is renamed or edited to hide them.
 
-The same constraint shapes the rest of the tree: `skills/apple/SKILL.md` is the only `SKILL.md` outside dot-directories, there are no symlinks, no `.claude-plugin` or `.codex-plugin` folder sits inside `skills/apple`, no folder is named `.claude`, `.agents`, `.codex` or `.git`, and no file is named `metadata.json`, which some installers drop. `.gitattributes` marks `skills/apple/.vendor/**` as `-text`, so git never rewrites vendored line endings.
+The same constraint shapes the rest of the tree: each skill's own `skills/<name>/SKILL.md` is the only `SKILL.md` outside dot-directories, there are no symlinks, no `.claude-plugin` or `.codex-plugin` folder sits inside `skills/apple`, no folder is named `.claude`, `.agents`, `.codex` or `.git`, and no file is named `metadata.json`, which some installers drop. `.gitattributes` marks `skills/apple/.vendor/**` and the bundled skill folders as `-text`, so git never rewrites vendored or bundled line endings.
 
 ## Parts
 
@@ -114,9 +134,26 @@ An inactive part stays in the tree in full. The router runs its activation check
 
 Main risks, all gated by the router: the build parts run `xcodebuild clean` and can delete a passed DerivedData folder; the App Store Connect parts can upload, submit for review, change prices, spend money on Apple Ads, revoke certificates or open a public pull request, so the router shows the exact command and waits for an explicit yes before any of these, sets `ASC_TELEMETRY_DISABLED=1` before running `asc`, and never runs `asc install-skills`. Every part's prerequisites, risks and errata are listed in `vendor/sources.json` and in its `UPSTREAM.json`.
 
+## Bundled skills
+
+Whole skills that the owner releases from their own repositories, shipped here unchanged so one install brings them along. `vendor/bundles.json` pins each to a release tag and its commit and records every file's size and hash; nothing in a bundled folder is edited here.
+
+<!-- gen:bundles -->
+
+| Skill | Repository | Release | Commit | Files | Images |
+|---|---|---|---|---|---|
+| `design-spacing-rhythm` | [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill) | [v2.16.2](https://github.com/buidangminh23/spacing-skill/releases/tag/v2.16.2) | `e86bb27dcaa5` | 8 | none |
+| `icons-pro-max` | [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max) | [v2.3.0](https://github.com/buidangminh23/icons-pro-max/releases/tag/v2.3.0) | `0e7fc74f2e61` | 801 | 799 brand images, outside the MIT licence |
+
+<!-- /gen:bundles -->
+
+- `node scripts/bundle-sync.mjs sync` fetches each pinned commit, proves that the release tag still points at it, and copies the skill folder with the repository's licence as `LICENSE`. It refuses symlinks, submodules, unsafe names, git metadata, `metadata.json`, a second visible `SKILL.md`, and any image, font, media file or archive except the images `BUNDLED_MEDIA` in `scripts/lib/bundles.mjs` allows: `.svg` and `.png` files under `icons-pro-max`'s `assets/` folder.
+- The history check and the release check accept a bundled image only with the bytes `vendor/bundles.json` records for it at the same commit, so a logo changed by hand fails like any unreviewed image.
+- The **Bundle sync** workflow moves each bundle to its repository's latest release; to move one by hand, run `node scripts/bundle-sync.mjs update --only <name>`, then `gen`, `notices` and the checks.
+
 ## Credits
 
-Every vendored part is MIT-licensed and every vendored file is unmodified. The excludes in `vendor/sources.json` leave out a nested plugin copy, a plugin manifest, agent UI metadata (`agents/openai.yaml`) and icon images, some of which reproduce Apple's Swift logo, so no vendored image ships; the only image in a release is the apple skill's own icon, `skills/apple/assets/apple.svg`, whose drawing is devicon's (MIT, licence in `skills/apple/NOTICE.md` and `THIRD_PARTY_NOTICES.md`). Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the MIT licences; each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`. Thanks to the authors. Full licence texts are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+Every vendored part is MIT-licensed and every vendored file is unmodified. The excludes in `vendor/sources.json` leave out a nested plugin copy, a plugin manifest, agent UI metadata (`agents/openai.yaml`) and icon images, some of which reproduce Apple's Swift logo, so no vendored image ships; the images in a release are the apple skill's own icon, `skills/apple/assets/apple.svg`, whose drawing is devicon's (MIT, licence in `skills/apple/NOTICE.md` and `THIRD_PARTY_NOTICES.md`), and the brand logos of the bundled `icons-pro-max` skill (see [Bundled skills](#bundled-skills)). Short passages that a part quotes from Apple, such as a sentence of Apple documentation, WWDC session titles, a few phrases or a short code listing, belong to Apple and are not covered by the MIT licences; each part lists the known ones, with their sources, under `appleText` in its `UPSTREAM.json`. Thanks to the authors. Full licence texts are in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
 
 <!-- gen:credits -->
 
@@ -178,7 +215,10 @@ Node 22 or later; no dependencies.
 | `node scripts/vendor-sync.mjs apply --from <dir>` | Copies a staged update into the tree after refusing symlinks, special files, paths outside the moved parts and any manifest change other than commits; executable bits come from each part's `UPSTREAM.json` |
 | `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, the README credits table, the trademark line in this README and in `skills/apple/NOTICE.md`, and the licences of the third-party drawings the skill ships (`MEDIA_NOTICES` in `scripts/lib/media.mjs`) in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
-| `node scripts/check-history.mjs` | Fails when any commit reachable from HEAD adds an image, font, media file or archive, recognised by extension or by its first bytes, other than a reviewed file with its reviewed bytes (`REVIEWED_MEDIA` in `scripts/lib/media.mjs`; today only `skills/apple/assets/apple.svg`), or any file in a vendored part's `assets/` or `agents/` folder. It needs the full history, so it fails in a shallow clone |
+| `node scripts/bundle-sync.mjs sync [--only <name>]` | Network. Fetches each bundle's pinned commit, proves its release tag points at it, copies its skill folder byte for byte into `skills/<name>/` with the repository's licence as `LICENSE`, and records every file in `vendor/bundles.json` |
+| `node scripts/bundle-sync.mjs check` | Offline: each bundled folder holds exactly the files `vendor/bundles.json` records, with their sizes, hashes and executable bits, plus its `LICENSE` |
+| `node scripts/bundle-sync.mjs update [--only <name>] [--report <file>]` | Network. Reads each repository's latest release from `/releases/latest`, moves the bundles whose tag changed and syncs them; the report lists what moved |
+| `node scripts/check-history.mjs` | Fails when any commit reachable from HEAD adds an image, font, media file or archive, recognised by extension or by its first bytes, other than a reviewed file with its reviewed bytes (`REVIEWED_MEDIA` in `scripts/lib/media.mjs`; today only `skills/apple/assets/apple.svg`) or a bundled image that `vendor/bundles.json` at the same commit records with those bytes, or any file in a vendored part's `assets/` or `agents/` folder. It needs the full history, so it fails in a shallow clone |
 | `node scripts/release.mjs check [vX.Y.Z]` | Validates the release inputs: the payload exists, `skills.json` is current, `.gitattributes` marks exactly the repo-only paths `export-ignore`, every top-level item is either payload or repo-only, and `package.json` names the private package `design-pro-max` before 0.2.0 and a public `@<scope>/design-pro-max` package from 0.2.0 on. With a tag, the tag must match the `package.json` version, `[Unreleased]` must be empty, the newest CHANGELOG entry must be that version, dated, with notes, and the README must have dropped the pre-release banner |
 | `node scripts/release.mjs notes vX.Y.Z` | Prints the CHANGELOG notes of that version |
 | `node scripts/release.mjs pack [vX.Y.Z]` | Builds `dist/design-pro-max-vX.Y.Z.zip` from a clean HEAD (the tag's commit when a tag is given) with git archive under `TZ=UTC`, so the bytes do not depend on the packer's time zone, plus `dist/SHA256SUMS.txt` naming it, then verifies both. The ZIP holds one `design-pro-max-vX.Y.Z/` folder with `skills/` (the hidden `.vendor/` folders included), `skills.json`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `CHANGELOG.md`; everything else is `export-ignore` |
@@ -196,10 +236,11 @@ To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `ge
 
 ### Workflows
 
-- **CI** (`.github/workflows/ci.yml`) runs on pushes to `main`, on pull requests and by hand, on Ubuntu, macOS and Windows with Node 22 and 24: the tests, `vendor-sync.mjs check`, the guard, `notices --check`, `gen.mjs --check`, `check-history.mjs`, `release.mjs check` and `release.mjs pack`.
+- **CI** (`.github/workflows/ci.yml`) runs on pushes to `main`, on pull requests and by hand, on Ubuntu, macOS and Windows with Node 22 and 24: the tests, `vendor-sync.mjs check`, `bundle-sync.mjs check`, the guard, `notices --check`, `gen.mjs --check`, `check-history.mjs`, `release.mjs check` and `release.mjs pack`.
 - **Verify** (`.github/workflows/verify.yml`) runs on Ubuntu with ffmpeg and Playwright's headless Chromium, on pushes to `main` and pull requests that touch the shared runtime, an own part, `rules.json`, the evidence or the fixtures, on every `vX.Y.Z` tag and by hand: `node scripts/verify.mjs`, every fixture judged red first.
 - **Release** (`.github/workflows/release.yml`) runs when a `vX.Y.Z` tag is pushed, or by hand for an existing tag, one run at a time. The tag's commit must be on `main`. It runs every check again and packs the ZIP, creates a draft release with the ZIP and `SHA256SUMS.txt`, removes any other asset from the draft, downloads both again and verifies them, then publishes the release as Latest and waits until `releases/latest` points to it. It never publishes a prerelease, because installers read `releases/latest`, and it leaves a draft unpublished when a newer version is already published, so Latest never moves back. A tag that is already published is only verified: its download is checked against the tag's tree, not compared byte for byte with a rebuild.
 - **Badges** (`.github/workflows/badges.yml`) runs every six hours and by hand. It renders the view badge with `BADGE_SOURCES=views` and commits it to the `badges` branch, which holds only badge SVGs and is never merged; the README reads the badge from there. Without the `ANALYTICS_TOKEN` secret it publishes nothing and the last badge stays.
+- **Bundle sync** (`.github/workflows/bundle-sync.yml`) runs every day at 03:17 UTC and by hand. It moves each bundled skill to the latest release of its repository, regenerates the generated files, runs every check, commits to the `bundle-sync` branch, checks a clean worktree of that commit, pushes the branch with a token scoped to that one step, opens or updates one pull request, starts CI on it and merges it once CI passes on its head commit and `main` has not moved. When no repository published a newer release it ends after the first step.
 - **Vendor sync** (`.github/workflows/vendor-sync.yml`) runs on Mondays at 02:41 UTC and by hand. A read-only job stages every source whose upstream HEAD moved past its pin, applies the update to a throwaway checkout, runs the guard and uploads the staged folder. A second job confirms the staged files against upstream, classifies the update, applies it, regenerates the notices and the generated files, runs every check, commits to the `vendor-sync` branch, checks a clean worktree of that commit, pushes the branch with a token scoped to that one step and opens or updates one pull request from it, never a fork's. It then starts the CI workflow on the branch, because pull requests and pushes made with the workflow's token start no workflow themselves. A `safe` update, one that changes no shipped file, merges only after that CI run passes on the pull request's head commit and while `main` has not moved; a `needs-review` update gets the `needs-review` label and waits for the owner. When the branch already holds the update, the next run reuses it, so a safe update that could not merge is tried again. A blocked source fails the run and stays at its pin. After 45 quiet days on `main` the workflow enables itself again through the API, which may not reset GitHub's 60-day timer, and opens an issue; it never pushes to `main`. The workflow needs the repository setting that lets GitHub Actions create pull requests. If `main` gets branch protection with required CI checks, the CI run the workflow starts reports those checks on the pull request's head commit, which is where required checks are read; this has not been tried on GitHub yet.
 
 To release: run `node scripts/release.mjs bump X.Y.Z`, move the `[Unreleased]` notes into a dated `## [X.Y.Z] - YYYY-MM-DD` entry, remove the pre-release banner from this README, run `node scripts/release.mjs check vX.Y.Z`, commit and push `main`, wait until CI passes on that commit, then run `node scripts/release.mjs push-tag vX.Y.Z`.
@@ -213,6 +254,7 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 - design-pro-max is an independent open-source project and has not been authorized, sponsored, or otherwise approved by Apple Inc.
 - design-pro-max is unrelated to nextlevelbuilder/ui-ux-pro-max.
 - The apple skill's icon, `skills/apple/assets/apple.svg`, is the Apple logo, a trademark of Apple Inc. It identifies the skill's subject only, is not covered by the MIT License, and must not be modified, recolored or redrawn. The drawing comes from devicon (MIT) via buidangminh23/icons-pro-max. It will be replaced with a neutral icon if Apple asks.
+- The bundled `icons-pro-max` skill ships third-party brand marks under `skills/icons-pro-max/assets/` (payment networks, social and app logos, technology logos, AI provider marks and connector icons). They belong to their owners, are not covered by any MIT licence, and must not be modified, recolored or redrawn; `skills/icons-pro-max/LICENSE` says so.
 - The vendored parts are their authors' work and are shipped as published. Known errors are recorded as errata in each part's `UPSTREAM.json` rather than edited in place.
 
 <!-- gen:trademarks -->
@@ -223,4 +265,4 @@ Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and
 
 ## License
 
-The project's own files are released under the [MIT License](LICENSE), except the Apple logo at `skills/apple/assets/apple.svg` (see Disclaimers). Each vendored part keeps its upstream MIT licence in its own `LICENSE` file.
+The project's own files are released under the [MIT License](LICENSE), except the Apple logo at `skills/apple/assets/apple.svg` (see Disclaimers). Each vendored part keeps its upstream MIT licence in its own `LICENSE` file, and each bundled skill keeps its repository's licence in `skills/<name>/LICENSE`; the brand marks in `skills/icons-pro-max/assets/` are excluded from it, as that file states.

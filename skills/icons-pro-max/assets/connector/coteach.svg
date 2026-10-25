@@ -1,0 +1,30 @@
+<svg aria-label="Coteach" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" role="img" aria-labelledby="coteach-mini-logo-title">
+  <title id="coteach-mini-logo-title">Coteach</title>
+  <g clip-path="url(#coteach-mini-logo-clip)">
+    <rect
+      fill="url(#coteach-mini-logo-gradient)"
+      height="16"
+      rx="0.5"
+      transform="rotate(45 12 0.686295)"
+      width="16"
+      x="12"
+      y="0.686295"
+    />
+  </g>
+  <defs>
+    <linearGradient
+      gradientUnits="userSpaceOnUse"
+      id="coteach-mini-logo-gradient"
+      x1="21.4567"
+      x2="20.5926"
+      y1="0.686295"
+      y2="16.6408"
+    >
+      <stop stop-color="#463ACB" />
+      <stop offset="0.678611" stop-color="#372FA2" />
+    </linearGradient>
+    <clipPath id="coteach-mini-logo-clip">
+      <rect fill="white" height="24" width="24" />
+    </clipPath>
+  </defs>
+</svg>

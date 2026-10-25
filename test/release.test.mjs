@@ -53,6 +53,53 @@ function releaseFixture(t, mutate = () => {}) {
   return root;
 }
 
+/**
+ * Add a bundled icons-pro-max skill to a release fixture: a SKILL.md, an image under assets/ and the licence, with
+ * vendor/bundles.json recording them and skills.json listing the skill.
+ */
+function addBundle(root) {
+  const files = { 'SKILL.md': '---\nname: icons-pro-max\ndescription: Icons.\n---\n', 'assets/logo.png': PNG };
+  for (const [file, data] of Object.entries(files)) write(root, `skills/icons-pro-max/${file}`, data);
+  const licence = fs.readFileSync(path.join(ROOT, 'LICENSE'));
+  write(root, 'skills/icons-pro-max/LICENSE', licence);
+  const record = (file, data) => ({ path: file, sha256: sha256(Buffer.from(data)), bytes: Buffer.from(data).length, executable: false });
+  const bundle = {
+    name: 'icons-pro-max',
+    repo: 'example/icons',
+    tag: 'v1.0.0',
+    commit: 'a'.repeat(40),
+    path: 'skills/icons-pro-max',
+    license: { file: 'LICENSE', sha256: sha256(licence), copyright: 'Copyright (c) 2026 Example' },
+    files: Object.entries(files).map(([file, data]) => record(file, data)).sort((a, b) => (a.path < b.path ? -1 : 1)),
+  };
+  write(root, 'vendor/bundles.json', `${JSON.stringify({ schema: 1, bundles: [bundle] }, null, 2)}\n`);
+  write(root, 'skills.json', `${JSON.stringify([{ name: 'apple', path: 'skills/apple' }, { name: 'icons-pro-max', path: 'skills/icons-pro-max' }], null, 2)}\n`);
+}
+
+test('pack accepts a bundled skill whose files and image match vendor/bundles.json', (t) => {
+  const root = releaseFixture(t, addBundle);
+  const { dist } = pack(root);
+  assert.deepEqual(verifyAssets(dist, { root }).skills, ['apple', 'icons-pro-max']);
+});
+
+const BROKEN_BUNDLES = [
+  ['an edited bundled file', (root) => fs.appendFileSync(path.join(root, 'skills', 'icons-pro-max', 'SKILL.md'), 'edited\n'), /skills\/icons-pro-max\/SKILL\.md: differs from vendor\/bundles\.json/],
+  ['a bundled image with other bytes', (root) => write(root, 'skills/icons-pro-max/assets/logo.png', Buffer.concat([PNG, Buffer.from([0])])), /skills\/icons-pro-max\/assets\/logo\.png: \.png file not on the reviewed list in scripts\/lib\/media\.mjs or recorded for its bundle/],
+  ['an image the bundle does not record', (root) => write(root, 'skills/icons-pro-max/assets/extra.png', PNG), /skills\/icons-pro-max\/assets\/extra\.png: \.png file not on the reviewed list/],
+  ['a file the bundle does not record', (root) => write(root, 'skills/icons-pro-max/notes.md', 'extra\n'), /skills\/icons-pro-max\/notes\.md: is not a file of example\/icons at v1\.0\.0/],
+  ['a bundle without its LICENSE', (root) => fs.rmSync(path.join(root, 'skills', 'icons-pro-max', 'LICENSE')), /skills\/icons-pro-max\/LICENSE: is missing from the archive/],
+];
+
+for (const [label, mutate, message] of BROKEN_BUNDLES) {
+  test(`pack refuses an archive with ${label}`, (t) => {
+    const root = releaseFixture(t, (fixture) => {
+      addBundle(fixture);
+      mutate(fixture);
+    });
+    assert.throws(() => pack(root), message);
+  });
+}
+
 function gitIn(root, t) {
   const home = tempDir('design-pro-max-home-');
   t.after(() => removeTree(home));
@@ -69,7 +116,7 @@ test('pack builds one ZIP with the payload, every hidden part and a checksum fil
   const result = pack(root);
   assert.equal(result.zip, `${NAME}-v0.0.0.zip`);
   assert.equal(result.parts, 38);
-  assert.deepEqual(result.skills, ['apple']);
+  assert.deepEqual(result.skills, ['apple', 'design-spacing-rhythm', 'icons-pro-max']);
   assert.match(fs.readFileSync(path.join(result.dist, SUMS_FILE), 'utf8'), /^[0-9a-f]{64} {2}design-pro-max-v0\.0\.0\.zip\n$/);
   const prefix = `${NAME}-v0.0.0/`;
   const entries = readZip(fs.readFileSync(path.join(result.dist, result.zip)));
