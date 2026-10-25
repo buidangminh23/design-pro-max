@@ -2,7 +2,7 @@
   "name": "design-pro-max",
   "version": "0.0.0",
   "private": true,
-  "description": "Design skills for AI coding agents; the first is apple, a router over vendored Apple-platform skills",
+  "description": "Design skills for AI coding agents: apple, a router over vendored Apple-platform skills, plus the bundled design-spacing-rhythm and icons-pro-max skills",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -17,6 +17,9 @@
     "test": "node --test test/*.test.mjs",
     "vendor:sync": "node scripts/vendor-sync.mjs sync",
     "vendor:check": "node scripts/vendor-sync.mjs check",
+    "bundle:sync": "node scripts/bundle-sync.mjs sync",
+    "bundle:check": "node scripts/bundle-sync.mjs check",
+    "bundle:update": "node scripts/bundle-sync.mjs update",
     "guard": "node scripts/vendor-guard.mjs",
     "notices": "node scripts/vendor-sync.mjs notices",
     "gen": "node scripts/gen.mjs",

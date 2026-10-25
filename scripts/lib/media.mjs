@@ -5,6 +5,7 @@
  */
 import path from 'node:path';
 import { MEDIA_EXTENSIONS, sha256 } from './vendor.mjs';
+import { isBundledMedia } from './bundles.mjs';
 
 /**
  * Reviewed media files by repository path, with the SHA-256 of the reviewed bytes. skills/apple/assets/apple.svg is
@@ -101,8 +102,10 @@ export function mediaKind(file, bytes = null) {
 }
 
 /**
- * True when `file` is on the reviewed list and `bytes` are exactly the reviewed bytes.
+ * True when `file` is on the reviewed list and `bytes` are exactly the reviewed bytes, or when `bundles`, a bundle
+ * manifest, records `file` as an image its bundle may ship with exactly these bytes.
  */
-export function isReviewedMedia(file, bytes) {
-  return Boolean(bytes) && REVIEWED_MEDIA.get(file) === sha256(bytes);
+export function isReviewedMedia(file, bytes, bundles = null) {
+  if (Boolean(bytes) && REVIEWED_MEDIA.get(file) === sha256(bytes)) return true;
+  return Boolean(bundles) && isBundledMedia(bundles, file, bytes);
 }

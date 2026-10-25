@@ -42,6 +42,10 @@ An own part is a `PART.md` guide, with references, assets and checkers, written 
 - A `PART.md` stays under 15,000 characters with a contents list; `npm test` checks the caps and runs the citation lint.
 - Run `node scripts/gen.mjs` after changing `rules.json` or the ledger, so the part's `references/evidence.md` is current.
 
+## Bundled skills
+
+`skills/design-spacing-rhythm/` and `skills/icons-pro-max/` are whole skills released from the owner's own repositories, buidangminh23/spacing-skill and buidangminh23/icons-pro-max. Never edit them here: open the issue or pull request in their own repository, and the daily Bundle sync brings the next release over. `node scripts/bundle-sync.mjs check` must pass, and only `icons-pro-max` may ship images, under its `assets/` folder, with the bytes `vendor/bundles.json` records.
+
 ## Vendor updates
 
 The weekly vendor sync proposes upstream changes as one pull request on the `vendor-sync` branch. Only an update that changes no shipped file, where upstream moved past the pins without touching the parts, merges itself, after the CI workflow passes on it; every update that adds, removes or edits a file waits for the maintainer, because agents read and run these files with the user's permissions. Comments on that pull request about what you checked in the upstream diff are welcome.

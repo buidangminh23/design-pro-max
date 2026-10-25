@@ -5,7 +5,7 @@
  *   skills.json                              every skill as { name, path }, for installers
  *   skills/apple/references/parts-index.md   every part with its group, status, activation check, prerequisites and
  *                                            errata pointers
- *   README.md                                the credits table and the trademark line
+ *   README.md                                the bundled skills table, the credits table and the trademark line
  *   skills/apple/NOTICE.md                   the trademark line and the licences of third-party drawings it ships
  *   skills/apple/<part>/references/evidence.md
  *                                            for each own part: its rules and the ledger entries it cites, from
@@ -39,6 +39,7 @@ import {
   writeRegular,
 } from './lib/vendor.mjs';
 import { MEDIA_NOTICES } from './lib/media.mjs';
+import { BUNDLED_MEDIA, loadBundles } from './lib/bundles.mjs';
 import { OWN_PARTS, RULES_FILE, buildEvidence, loadLedger, loadRules } from './lib/evidence.mjs';
 
 export const SKILLS_FILE = 'skills.json';
@@ -193,6 +194,21 @@ export function buildCredits(root, manifest) {
 }
 
 /**
+ * The README table of bundled skills: each one with its repository, its pinned release and commit, its file count and
+ * the images it ships, from vendor/bundles.json.
+ */
+export function buildBundles(manifest) {
+  const rows = manifest.bundles.map((bundle) => {
+    const images = BUNDLED_MEDIA.has(bundle.name) ? bundle.files.filter((file) => /\.(?:png|svg)$/i.test(file.path)).length : 0;
+    const release = `[${bundle.tag}](https://github.com/${bundle.repo}/releases/tag/${bundle.tag})`;
+    const shipped = images ? `${images} brand images, outside the MIT licence` : 'none';
+    return `| \`${bundle.name}\` | [${bundle.repo}](https://github.com/${bundle.repo}) | ${release} | \`${bundle.commit.slice(0, 12)}\` | ${bundle.files.length} | ${shipped} |`;
+  });
+  if (!rows.length) return 'No skill is bundled.';
+  return ['| Skill | Repository | Release | Commit | Files | Images |', '|---|---|---|---|---|---|', ...rows].join('\n');
+}
+
+/**
  * The Apple marks a text uses, in the order of APPLE_MARKS. A mark counts only as a whole word: Swift inside SwiftUI
  * or iPad inside iPadOS does not.
  */
@@ -285,7 +301,9 @@ export function generate(root = ROOT) {
     }
   }
   files.set(PARTS_INDEX_FILE, buildPartsIndex(manifest, ownParts));
-  const readme = replaceBlock(readText(root, README_FILE), 'credits', buildCredits(root, manifest), README_FILE);
+  const source = readText(root, README_FILE);
+  const withBundles = source.includes(startMarker('bundles')) ? replaceBlock(source, 'bundles', buildBundles(loadBundles(root)), README_FILE) : source;
+  const readme = replaceBlock(withBundles, 'credits', buildCredits(root, manifest), README_FILE);
   files.set(README_FILE, readme);
   const marks = usedMarks(ownText(root, files));
   const line = trademarkLine(marks, { logo: describeEntry(root, LOGO_FILE)?.kind === 'file' });

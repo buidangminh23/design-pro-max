@@ -57,8 +57,8 @@ function runScripts(text) {
   return scripts;
 }
 
-test('the five workflows exist', () => {
-  assert.deepEqual(files, ['badges.yml', 'ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
+test('the six workflows exist', () => {
+  assert.deepEqual(files, ['badges.yml', 'bundle-sync.yml', 'ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
 });
 
 test('every action is pinned to a full commit SHA with a version comment, the same pin everywhere', () => {
@@ -113,7 +113,7 @@ test('CI runs every check on three systems and two Node versions', () => {
   assert.match(ci, /os: \[ubuntu-latest, macos-latest, windows-latest\]/);
   assert.match(ci, /node: \[22, 24\]/);
   assert.match(ci, /fetch-depth: 0/);
-  for (const command of ['npm test', 'node scripts/vendor-sync.mjs check', 'node scripts/vendor-guard.mjs', 'node scripts/vendor-sync.mjs notices --check', 'node scripts/gen.mjs --check', 'node scripts/check-history.mjs', 'node scripts/release.mjs check', 'node scripts/release.mjs pack']) {
+  for (const command of ['npm test', 'node scripts/vendor-sync.mjs check', 'node scripts/bundle-sync.mjs check', 'node scripts/vendor-guard.mjs', 'node scripts/vendor-sync.mjs notices --check', 'node scripts/gen.mjs --check', 'node scripts/check-history.mjs', 'node scripts/release.mjs check', 'node scripts/release.mjs pack']) {
     assert.ok(runScripts(ci).includes(command), command);
   }
 });
@@ -121,7 +121,7 @@ test('CI runs every check on three systems and two Node versions', () => {
 test('the release workflow re-checks, drafts, verifies the download and publishes as Latest', () => {
   const release = read('release.yml');
   assert.match(release, /tags: \["v\*"\]/);
-  for (const command of ['npm test', 'node scripts/check-history.mjs', 'node scripts/gen.mjs --check', 'node scripts/vendor-guard.mjs']) assert.ok(release.includes(command), command);
+  for (const command of ['npm test', 'node scripts/check-history.mjs', 'node scripts/gen.mjs --check', 'node scripts/vendor-guard.mjs', 'node scripts/bundle-sync.mjs check']) assert.ok(release.includes(command), command);
   assert.match(release, /gh release create "\$TAG" --verify-tag --draft /);
   assert.match(release, /gh release download "\$TAG"/);
   assert.match(release, /node scripts\/release\.mjs verify "\$downloaded"/);
@@ -194,4 +194,19 @@ test('the badges workflow renders only the view badge and pushes only to the bad
   assert.doesNotMatch(badges, /refs\/heads\/main/);
   const [job] = jobs(badges);
   assert.ok(job.lines.some((line) => /^ {6}contents: write$/.test(line)));
+});
+
+test('the bundle sync moves bundles to their latest releases, checks everything and merges only after CI', () => {
+  const sync = read('bundle-sync.yml');
+  assert.match(sync, /cron: "17 3 \* \* \*"/);
+  assert.match(sync, /workflow_dispatch:/);
+  const [job] = jobs(sync);
+  for (const permission of ['actions: write', 'contents: write', 'pull-requests: write']) assert.ok(job.lines.includes(`      ${permission}`), permission);
+  const text = job.lines.join('\n');
+  const order = ['bundle-sync.mjs update --report', 'npm test', 'node scripts/bundle-sync.mjs check', 'node scripts/vendor-guard.mjs', 'node scripts/check-history.mjs', 'check --root "$RUNNER_TEMP/committed"', 'git push', 'gh pr create', 'gh workflow run ci.yml', 'gh run watch', 'gh pr merge'].map((item) => text.indexOf(item));
+  assert.ok(order.every((index) => index >= 0), 'the job runs every step');
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'update, check, commit, push, propose, CI, merge, in that order');
+  const merge = steps(job).find((lines) => /gh pr merge/.test(lines.join('\n')));
+  assert.ok(merge.some((line) => line.includes("if: steps.ci.outputs.passed == 'true'")));
+  assert.ok(merge.some((line) => line.includes('--match-head-commit "$HEAD_SHA"')));
 });

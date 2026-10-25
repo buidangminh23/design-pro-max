@@ -1,0 +1,177 @@
+name: Bundle sync
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bundle-sync
+  cancel-in-progress: false
+
+env:
+  BRANCH: bundle-sync
+  BOT_NAME: github-actions[bot]
+  BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+
+jobs:
+  update:
+    name: Move the bundled skills to their latest releases
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Move every bundle whose repository published a newer release
+        id: update
+        run: |
+          node scripts/bundle-sync.mjs update --report "$RUNNER_TEMP/bundles.json"
+          names=$(jq -r '[.bundles[] | "\(.name) \(.to)"] | join(", ")' "$RUNNER_TEMP/bundles.json")
+          {
+            echo "changed=$(jq -r '.changed' "$RUNNER_TEMP/bundles.json")"
+            echo "title=chore(bundles): update ${names}"
+            echo "base=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+      - name: Regenerate and run every check
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          node scripts/gen.mjs
+          node scripts/vendor-sync.mjs notices
+          npm test
+          node scripts/bundle-sync.mjs check
+          node scripts/vendor-sync.mjs check
+          node scripts/vendor-guard.mjs
+          node scripts/vendor-sync.mjs notices --check
+          node scripts/gen.mjs --check
+          node scripts/release.mjs check
+      - name: Commit the update and check the committed tree
+        id: commit
+        if: steps.update.outputs.changed == 'true'
+        env:
+          TITLE: ${{ steps.update.outputs.title }}
+        run: |
+          unexpected=$(git status --porcelain=v1 --untracked-files=all | cut -c4- | grep -Ev '^(vendor/bundles\.json|skills/(design-spacing-rhythm|icons-pro-max)/.+|skills\.json|README\.md|THIRD_PARTY_NOTICES\.md|skills/apple/NOTICE\.md)$' || true)
+          if [ -n "$unexpected" ]; then
+            echo "The update changed files outside the bundled skills and their generated files:"
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
+          ignored=$(git status --porcelain=v1 --ignored=matching --untracked-files=all -- skills vendor | grep '^!! ' || true)
+          if [ -n "$ignored" ]; then
+            echo "The update holds files that .gitignore would leave out of the commit:"
+            printf '%s\n' "$ignored"
+            exit 1
+          fi
+          git config user.name "$BOT_NAME"
+          git config user.email "$BOT_EMAIL"
+          git checkout -q -B "$BRANCH"
+          git add --all -- vendor/bundles.json skills skills.json README.md THIRD_PARTY_NOTICES.md
+          git commit -q -m "$TITLE"
+          node scripts/check-history.mjs
+          git worktree add -q --detach "$RUNNER_TEMP/committed" HEAD
+          node scripts/bundle-sync.mjs check --root "$RUNNER_TEMP/committed"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Push the bundle-sync branch
+        id: push
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          remote=$(git ls-remote --heads origin "refs/heads/$BRANCH" | cut -f1)
+          if [ -n "$remote" ]; then
+            git fetch -q --no-tags origin "refs/heads/$BRANCH"
+            if [ "$(git log -1 --format=%ae FETCH_HEAD)" != "$BOT_EMAIL" ]; then
+              echo "::warning::Someone else pushed to $BRANCH; leaving the branch and its pull request to them."
+              exit 0
+            fi
+          fi
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=http.https://github.com/.extraheader GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth" \
+            git push -q --force origin "$SHA:refs/heads/$BRANCH"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+      - name: Open or update the pull request
+        id: pr
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.update.outputs.title }}
+          HEAD_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          {
+            echo "The bundled skills moved to newer releases of their repositories:"
+            echo
+            jq -r '.bundles[] | "- `\(.name)`: [\(.repo)](https://github.com/\(.repo)/releases/tag/\(.to)) \(.from) to \(.to)"' "$RUNNER_TEMP/bundles.json"
+            echo
+            echo "Each file was copied byte for byte from the commit of the release tag; vendor/bundles.json records its hash. This pull request merges itself once CI passes on its head commit and main has not moved."
+          } > "$RUNNER_TEMP/body.md"
+          number=$(gh pr list --head "$BRANCH" --base main --state open --json number,isCrossRepository --jq '[.[] | select(.isCrossRepository == false)][0].number // empty')
+          if [ -z "$number" ]; then
+            url=$(gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md")
+            number=${url##*/}
+          fi
+          head=""
+          for _ in 1 2 3 4 5 6 7 8 9 10; do
+            head=$(gh pr view "$number" --json headRefOid,isCrossRepository --jq 'select(.isCrossRepository == false) | .headRefOid')
+            [ "$head" = "$HEAD_SHA" ] && break
+            sleep 6
+          done
+          if [ "$head" != "$HEAD_SHA" ]; then
+            echo "Pull request #$number has the head ${head:-of another repository}, not $HEAD_SHA; leaving it alone."
+            exit 1
+          fi
+          gh pr edit "$number" --title "$TITLE" --body-file "$RUNNER_TEMP/body.md" > /dev/null
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+      - name: Run CI on the pull request's head commit
+        id: ci
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.commit.outputs.sha }}
+        run: |
+          since=$(date -u -d '2 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh workflow run ci.yml --ref "$BRANCH"
+          run=""
+          for _ in $(seq 1 30); do
+            sleep 10
+            run=$(gh run list --workflow ci.yml --event workflow_dispatch --commit "$HEAD_SHA" --created ">=$since" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run" ] && break
+          done
+          if [ -z "$run" ]; then
+            echo "The CI workflow did not start on $HEAD_SHA."
+            exit 1
+          fi
+          echo "CI run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$run"
+          if ! gh run watch "$run" --exit-status --interval 30 > /dev/null; then
+            echo "CI did not pass on $HEAD_SHA; the pull request waits for the owner."
+            exit 1
+          fi
+          echo "passed=true" >> "$GITHUB_OUTPUT"
+      - name: Merge once CI passed and main has not moved
+        if: steps.ci.outputs.passed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          HEAD_SHA: ${{ steps.commit.outputs.sha }}
+          BASE: ${{ steps.update.outputs.base }}
+        run: |
+          if [ "$(git ls-remote origin refs/heads/main | cut -f1)" != "$BASE" ]; then
+            echo "main moved while this job ran; the next run rebuilds the update on the new main."
+            exit 0
+          fi
+          gh pr merge "$NUMBER" --squash --delete-branch --match-head-commit "$HEAD_SHA"

@@ -49,6 +49,7 @@ import { readBlobs } from './check-history.mjs';
 import { SKILLS_FILE, skillsList } from './gen.mjs';
 import { visiblePath } from './vendor-guard.mjs';
 import { OWN_PARTS, loadCases, loadLedger, loadRules } from './lib/evidence.mjs';
+import { BUNDLES_FILE, BUNDLE_LICENCE, bundleDir, loadBundles } from './lib/bundles.mjs';
 
 export const NAME = 'design-pro-max';
 export const PUBLIC_NAME = new RegExp(`^@[a-z0-9][a-z0-9-]*/${NAME}$`);
@@ -395,6 +396,30 @@ function partProblems(files, problems) {
 }
 
 /**
+ * Problems with the bundled skills in the archive: each one holds exactly the files vendor/bundles.json records, with
+ * their sizes and hashes, plus its LICENSE.
+ */
+function bundleProblems(files, bundles) {
+  const problems = [];
+  for (const bundle of bundles?.bundles ?? []) {
+    const folder = bundleDir(bundle.name);
+    const expected = new Map(bundle.files.map((item) => [`${folder}/${item.path}`, item]));
+    for (const [name, item] of expected) {
+      const entry = files.get(name);
+      if (!entry) problems.push(`${name}: is missing from the archive`);
+      else if (entry.data.length !== item.bytes || sha256(entry.data) !== item.sha256) problems.push(`${name}: differs from ${BUNDLES_FILE}`);
+    }
+    const licence = files.get(`${folder}/${BUNDLE_LICENCE}`);
+    if (!licence) problems.push(`${folder}/${BUNDLE_LICENCE}: is missing from the archive`);
+    else if (sha256(licence.data) !== bundle.license.sha256) problems.push(`${folder}/${BUNDLE_LICENCE}: differs from ${BUNDLES_FILE}`);
+    for (const name of files.keys()) {
+      if (name.startsWith(`${folder}/`) && name !== `${folder}/${BUNDLE_LICENCE}` && !expected.has(name)) problems.push(`${name}: is not a file of ${bundle.repo} at ${bundle.tag}`);
+    }
+  }
+  return problems;
+}
+
+/**
  * Compare the archive's files with the tracked payload of `root`: every tracked file present with its exact bytes and
  * executable bit, and nothing else. An export-ignore or export-subst attribute in a nested .gitattributes or in
  * .git/info/attributes, or a line-ending filter, shows up here.
@@ -436,6 +461,14 @@ export function verifyAssets(dir, { root = null } = {}) {
     problems.push(`${zip.name} ${error.message}`);
   }
   const prefix = `${NAME}-v${zip.version}/`;
+  let bundles = null;
+  if (root) {
+    try {
+      bundles = loadBundles(root);
+    } catch (error) {
+      problems.push(error.message);
+    }
+  }
   const files = new Map();
   const reported = new Set();
   const report = (message) => {
@@ -464,7 +497,7 @@ export function verifyAssets(dir, { root = null } = {}) {
     if (segments.at(-1) === 'metadata.json') report(`${relative}: installers drop files named metadata.json`);
     if (relative.endsWith('.pyc')) report(`${relative}: compiled Python must not ship`);
     const kind = mediaKind(relative, entry.data);
-    if (kind && !isReviewedMedia(relative, entry.data)) report(`${relative}: ${kind} not on the reviewed list in scripts/lib/media.mjs`);
+    if (kind && !isReviewedMedia(relative, entry.data, bundles)) report(`${relative}: ${kind} not on the reviewed list in scripts/lib/media.mjs or recorded for its bundle in ${BUNDLES_FILE}`);
   }
   const top = new Set([...files.keys()].map((file) => file.split('/')[0]));
   for (const item of [...top].sort(compareStrings)) if (!PAYLOAD.includes(item)) report(`${item}: is not part of the release payload`);
@@ -478,6 +511,7 @@ export function verifyAssets(dir, { root = null } = {}) {
     const missing = expected.filter((id) => !shipped.includes(id));
     const extra = shipped.filter((id) => !expected.includes(id));
     if (missing.length || extra.length) report(`the archive must hold the ${expected.length} parts of ${SOURCES_FILE}; missing: ${missing.join(', ') || 'none'}; unexpected: ${extra.join(', ') || 'none'}`);
+    for (const message of bundleProblems(files, bundles)) report(message);
   }
   if (problems.length) throw new Error(`The release assets in ${dir} fail the installer contract:\n- ${problems.join('\n- ')}`);
   return { zip: zip.name, version: zip.version, files: files.size, parts: parts.length, skills };

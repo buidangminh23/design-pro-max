@@ -1,0 +1,17 @@
+<svg role="img" aria-label="TaxAct" width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_1_36)">
+<rect width="512" height="512" fill="white"/>
+<rect x="42" y="42" width="428" height="428" rx="30" fill="url(#paint0_linear_1_36)"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M446.387 476.059L447.898 479.242H292.352L226.543 370.254L161.459 479.242H5.91357C5.91357 479.242 6.45117 477.22 7.60317 475.82C21.2224 458.532 115.959 345.926 312.482 299.223" fill="white"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M506.086 34.7579L352.137 230.888L349.815 233.951C285.09 243.091 215.663 262.129 142.865 294.675L19.8741 127.438H175.113L226.398 232.322L356.873 34.7579H506.086Z" fill="white"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_1_36" x1="-64" y1="436" x2="122.315" y2="-32.7964" gradientUnits="userSpaceOnUse">
+<stop stop-color="#33187E"/>
+<stop offset="1" stop-color="#6151E1"/>
+</linearGradient>
+<clipPath id="clip0_1_36">
+<rect width="512" height="512" fill="white"/>
+</clipPath>
+</defs>
+</svg>
