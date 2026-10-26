@@ -141,7 +141,7 @@ Whole skills that the owner releases from their own repositories, shipped here u
 
 | Skill | Repository | Release | Commit | Files | Images |
 |---|---|---|---|---|---|
-| `design-spacing-rhythm` | [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill) | [v2.16.2](https://github.com/buidangminh23/spacing-skill/releases/tag/v2.16.2) | `e86bb27dcaa5` | 8 | none |
+| `design-spacing-rhythm` | [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill) | [v2.17.0](https://github.com/buidangminh23/spacing-skill/releases/tag/v2.17.0) | `9a1fd4f5c046` | 8 | none |
 | `icons-pro-max` | [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max) | [v2.3.0](https://github.com/buidangminh23/icons-pro-max/releases/tag/v2.3.0) | `0e7fc74f2e61` | 801 | 799 brand images, outside the MIT licence |
 
 <!-- /gen:bundles -->
