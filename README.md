@@ -161,7 +161,7 @@ Every vendored part is MIT-licensed and every vendored file is unmodified. The e
 | `swiftui-expert-skill` | Antoine van der Lee | [AvdLee/SwiftUI-Agent-Skill](https://github.com/AvdLee/SwiftUI-Agent-Skill) | `204dba7c6725` | MIT |
 | `swift-concurrency` | Antoine van der Lee | [AvdLee/Swift-Concurrency-Agent-Skill](https://github.com/AvdLee/Swift-Concurrency-Agent-Skill) | `d5770817d262` | MIT |
 | `swift-testing-pro` | Paul Hudson | [twostraws/Swift-Testing-Agent-Skill](https://github.com/twostraws/Swift-Testing-Agent-Skill) | `2d6bba14a3c8` | MIT |
-| `swiftdata-pro` | Paul Hudson | [twostraws/SwiftData-Agent-Skill](https://github.com/twostraws/SwiftData-Agent-Skill) | `922d989473a9` | MIT |
+| `swiftdata-pro` | Paul Hudson | [twostraws/SwiftData-Agent-Skill](https://github.com/twostraws/SwiftData-Agent-Skill) | `8051f177a007` | MIT |
 | `core-data-expert` | Antoine van der Lee | [AvdLee/Core-Data-Agent-Skill](https://github.com/AvdLee/Core-Data-Agent-Skill) | `855ca7d0df50` | MIT |
 | `xcode-disk-cleanup` | Antoine van der Lee | [AvdLee/Xcode-Disk-Cleanup-Agent-Skill](https://github.com/AvdLee/Xcode-Disk-Cleanup-Agent-Skill) | `304e86e619ac` | MIT |
 | `xcode-build/xcode-build-orchestrator` | Antoine van der Lee | [AvdLee/Xcode-Build-Optimization-Agent-Skill](https://github.com/AvdLee/Xcode-Build-Optimization-Agent-Skill) | `6bd7b596cd68` | MIT |
@@ -170,31 +170,31 @@ Every vendored part is MIT-licensed and every vendored file is unmodified. The e
 | `xcode-build/xcode-compilation-analyzer` | Antoine van der Lee | [AvdLee/Xcode-Build-Optimization-Agent-Skill](https://github.com/AvdLee/Xcode-Build-Optimization-Agent-Skill) | `6bd7b596cd68` | MIT |
 | `xcode-build/xcode-project-analyzer` | Antoine van der Lee | [AvdLee/Xcode-Build-Optimization-Agent-Skill](https://github.com/AvdLee/Xcode-Build-Optimization-Agent-Skill) | `6bd7b596cd68` | MIT |
 | `xcode-build/spm-build-analysis` | Antoine van der Lee | [AvdLee/Xcode-Build-Optimization-Agent-Skill](https://github.com/AvdLee/Xcode-Build-Optimization-Agent-Skill) | `6bd7b596cd68` | MIT |
-| `app-store-connect/asc-cli-usage` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-id-resolver` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-app-create-ui` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-signing-setup` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-xcode-build` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-build-lifecycle` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-testflight-orchestration` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-crash-triage` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-analytics-reports` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-submission-health` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-release-flow` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-metadata-sync` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-localize-metadata` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-whats-new-writer` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-aso-audit` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-screenshot-resize` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-shots-pipeline` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-notarization` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-ad-hoc-distribution` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-workflow` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-apple-ads` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-ppp-pricing` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-subscription-localization` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-revenuecat-catalog-sync` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
-| `app-store-connect/asc-wall-submit` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `9c7e769f09a1` | MIT |
+| `app-store-connect/asc-cli-usage` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-id-resolver` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-app-create-ui` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-signing-setup` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-xcode-build` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-build-lifecycle` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-testflight-orchestration` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-crash-triage` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-analytics-reports` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-submission-health` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-release-flow` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-metadata-sync` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-localize-metadata` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-whats-new-writer` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-aso-audit` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-screenshot-resize` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-shots-pipeline` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-notarization` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-ad-hoc-distribution` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-workflow` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-apple-ads` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-ppp-pricing` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-subscription-localization` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-revenuecat-catalog-sync` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
+| `app-store-connect/asc-wall-submit` | Rudrank Riyam | [rorkai/app-store-connect-cli-skills](https://github.com/rorkai/app-store-connect-cli-skills) | `0915e9da1016` | MIT |
 | `macos-menubar-tuist-app` | Thomas Ricouard | [Dimillian/Skills](https://github.com/Dimillian/Skills) | `05ba982bfeb0` | MIT |
 
 <!-- /gen:credits -->

@@ -3,7 +3,7 @@
   "id": "app-store-connect/asc-release-flow",
   "name": "asc-release-flow",
   "repo": "rorkai/app-store-connect-cli-skills",
-  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
   "path": "skills/asc-release-flow",
   "exclude": [],
   "license": {
@@ -12,7 +12,7 @@
     "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
     "copyright": "Copyright (c) 2026 Rudrank Riyam"
   },
-  "fetched": "2026-10-06",
+  "fetched": "2026-10-26",
   "active": false,
   "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
   "prerequisites": [
@@ -39,8 +39,8 @@
     },
     {
       "path": "references/multi-item-submissions.md",
-      "sha256": "784537758568a9b09d1d88be1daf366482ee7da3cc36e3e6f612acd3ea029550",
-      "bytes": 4275,
+      "sha256": "56278e3ca61d5f2de875b11b2df3e36bae322ba670338674583f50202742abf6",
+      "bytes": 4860,
       "executable": false
     }
   ]
