@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed
+
+- Temporary test repositories disable automatic Git maintenance, and teardown retries transient filesystem errors before failing, preventing release-pack checks from failing while their temporary object directories are being removed.
+
 ### Added
 
 - Two bundled skills next to `apple`: `design-spacing-rhythm` from buidangminh23/spacing-skill v2.16.2 (8 files) and `icons-pro-max` from buidangminh23/icons-pro-max v2.3.0 (801 files, 799 of them brand logos), copied byte for byte from the commit of each release tag with the repository's licence as `LICENSE`. `vendor/bundles.json` pins each one by repository, tag and commit and records every file's size and hash. `scripts/bundle-sync.mjs` has `sync` (proves the tag still points at the pinned commit, refuses symlinks, submodules, unsafe names, git metadata, `metadata.json`, a second visible `SKILL.md` and media outside the allowed folder), an offline `check`, and `update`, which moves a bundle to its repository's latest release. `BUNDLED_MEDIA` in `scripts/lib/bundles.mjs` lets only `icons-pro-max` ship `.svg` and `.png` files, only under its `assets/` folder; the history check and the release check accept each one only with the bytes `vendor/bundles.json` records at the same commit, and the release check also requires every bundled file and licence in the ZIP with its recorded hash and nothing else. CI and the release workflow run `bundle-sync.mjs check`; `gen.mjs` writes the README table of bundled skills. Tests cover the manifest validator, the media rule, tampered bundles, sync from a fake upstream (moved tags, a wrong skill name) and the history and release checks; each new check was seen to fail with its code taken out.

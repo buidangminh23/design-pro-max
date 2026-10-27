@@ -4,8 +4,8 @@
     {
       "name": "design-spacing-rhythm",
       "repo": "buidangminh23/spacing-skill",
-      "tag": "v2.16.2",
-      "commit": "e86bb27dcaa5f09ad57b39300a5cb9b584e0e13a",
+      "tag": "v2.17.0",
+      "commit": "9a1fd4f5c0463a8312090860d9edc3ab75ff4850",
       "path": "skills/spacing-skill",
       "license": {
         "file": "LICENSE",
@@ -15,8 +15,8 @@
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "897ead474f7783db6b95f6b4ce8e00e51a2c8a1d279cc9b2c15da56f62156ade",
-          "bytes": 32609,
+          "sha256": "455e5ef51bc782515707272628d2e05a758a12957aa90934a34e110398f31ca7",
+          "bytes": 33068,
           "executable": false
         },
         {
@@ -33,8 +33,8 @@
         },
         {
           "path": "references/field-learnings.md",
-          "sha256": "12c1923541d3e13917023d7f272295c5b3fd4845df9021f17401e8d17d4db4a7",
-          "bytes": 3002,
+          "sha256": "0dc8a14e0910d54540cb1303d680109f1a5999d997a67cff1c568ac8dd307a07",
+          "bytes": 3832,
           "executable": false
         },
         {
@@ -51,8 +51,8 @@
         },
         {
           "path": "references/optical-alignment.md",
-          "sha256": "f1acfe424b04d07702547db84cd1e52cb085ab9635a749f42150a8b0518b27af",
-          "bytes": 5333,
+          "sha256": "f9a8bcb95e5b0434c6bfe33c2484386d203c0d5c3a8360c75496a1477022531b",
+          "bytes": 6441,
           "executable": false
         },
         {
