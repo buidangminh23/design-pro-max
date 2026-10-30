@@ -66,6 +66,20 @@ function sh(cmd, args, cwd) {
 }
 
 /**
+ * Links target to source. Windows refuses symlinks without Developer Mode, so a folder falls back to a junction and a
+ * file to a copy.
+ */
+export function linkOrCopy(source, target, symlink = fs.symlinkSync) {
+  try {
+    symlink(source, target);
+  } catch (error) {
+    if (process.platform !== 'win32' || error.code !== 'EPERM') throw error;
+    if (fs.statSync(source).isDirectory()) fs.symlinkSync(source, target, 'junction');
+    else fs.copyFileSync(source, target);
+  }
+}
+
+/**
  * A temporary Claude config folder for --install user: the user's skills except apple, links to the user's CLAUDE.md
  * and rules, and apple itself only when the condition is with. The folder is named .claude so traces resolve skill
  * paths the same way as with a project install.
@@ -81,7 +95,7 @@ export function makeClaudeHome(condition, userHome = USER_CLAUDE) {
       fs.cpSync(path.join(userSkills, entry.name), path.join(skills, entry.name), { recursive: true, dereference: true });
     }
   }
-  for (const name of ['CLAUDE.md', 'rules']) if (fs.existsSync(path.join(userHome, name))) fs.symlinkSync(path.join(userHome, name), path.join(home, name));
+  for (const name of ['CLAUDE.md', 'rules']) if (fs.existsSync(path.join(userHome, name))) linkOrCopy(path.join(userHome, name), path.join(home, name));
   if (condition === 'with') fs.cpSync(SKILL, path.join(skills, 'apple'), { recursive: true });
   return home;
 }

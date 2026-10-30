@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { diffOf, extract, hitHostLimit, makeClaudeHome, scoreRouting, userRunSettings } from '../evals/harness.mjs';
+import { diffOf, extract, hitHostLimit, linkOrCopy, makeClaudeHome, scoreRouting, userRunSettings } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -96,10 +96,29 @@ test('a user install gives Claude a config folder with the user skills, and appl
   assert.deepEqual(fs.readdirSync(path.join(withHome, 'skills')).sort(), ['animate', 'apple']);
   assert.equal(fs.readFileSync(path.join(withHome, 'skills', 'apple', 'SKILL.md'), 'utf8'), fs.readFileSync(path.join(ROOT, 'skills', 'apple', 'SKILL.md'), 'utf8'));
   assert.deepEqual(fs.readdirSync(path.join(withoutHome, 'skills')), ['animate']);
-  assert.ok(fs.lstatSync(path.join(withHome, 'CLAUDE.md')).isSymbolicLink());
+  assert.equal(fs.readFileSync(path.join(withHome, 'CLAUDE.md'), 'utf8'), '# rules\n');
   assert.ok(fs.lstatSync(path.join(withHome, 'rules')).isSymbolicLink());
+  assert.equal(fs.realpathSync.native(path.join(withHome, 'rules')), fs.realpathSync.native(path.join(user, 'rules')));
   assert.deepEqual(userRunSettings(user), { disableAllHooks: true, model: 'opus[1m]', effortLevel: 'xhigh' });
   assert.deepEqual(userRunSettings(path.join(user, 'missing')), { disableAllHooks: true });
+});
+
+test('linkOrCopy falls back to a junction or a copy only for a Windows EPERM', (t) => {
+  const dir = tempDir();
+  t.after(() => removeTree(dir));
+  fs.mkdirSync(path.join(dir, 'rules'));
+  fs.writeFileSync(path.join(dir, 'CLAUDE.md'), '# rules\n');
+  const denied = () => {
+    throw Object.assign(new Error('denied'), { code: 'EPERM' });
+  };
+  if (process.platform === 'win32') {
+    linkOrCopy(path.join(dir, 'rules'), path.join(dir, 'rules-link'), denied);
+    linkOrCopy(path.join(dir, 'CLAUDE.md'), path.join(dir, 'CLAUDE-copy.md'), denied);
+    assert.ok(fs.lstatSync(path.join(dir, 'rules-link')).isSymbolicLink());
+    assert.equal(fs.readFileSync(path.join(dir, 'CLAUDE-copy.md'), 'utf8'), '# rules\n');
+  } else {
+    assert.throws(() => linkOrCopy(path.join(dir, 'CLAUDE.md'), path.join(dir, 'CLAUDE-copy.md'), denied), /denied/);
+  }
 });
 
 test('the diff of a run includes what the agent committed itself', (t) => {
