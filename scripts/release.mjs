@@ -544,18 +544,19 @@ export function pack(root = ROOT, tag = null) {
   return { dist, ...verifyAssets(dist, { root }) };
 }
 
+/** Eval cases: `cases` of evals/<suite>/cases.json plus `evals` of each part's evals/<design>/<part>/evals.json. */
 function evalCaseCount(root) {
   const dir = path.join(root, 'evals');
   if (!fs.existsSync(dir)) return 0;
-  return fs
-    .readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(dir, entry.name, 'cases.json')))
-    .reduce((sum, entry) => sum + JSON.parse(fs.readFileSync(path.join(dir, entry.name, 'cases.json'), 'utf8')).cases.length, 0);
+  const count = (file, key) => (fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8'))[key].length : 0);
+  const folders = (parent) => fs.readdirSync(parent, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => path.join(parent, entry.name));
+  return folders(dir).reduce((sum, suite) => sum + count(path.join(suite, 'cases.json'), 'cases') + folders(suite).reduce((parts, part) => parts + count(path.join(part, 'evals.json'), 'evals'), 0), 0);
 }
 
 /**
  * The card stats, computed from committed files: guides (own and vendored parts), active guides, error rules with at
- * least one non-inferred ledger entry, must-fail fixtures, eval cases (evals/<suite>/cases.json) and dated claims.
+ * least one non-inferred ledger entry, must-fail fixtures, eval cases (evals/<suite>/cases.json and
+ * evals/<design>/<part>/evals.json) and dated claims.
  */
 export function releaseStats(root = ROOT) {
   const parts = loadSources(root).parts;

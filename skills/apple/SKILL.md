@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app code (SwiftUI, Xcode) and scroll-pinned web scenes. Use when a task involves App Store Connect or TestFlight via the asc CLI (builds, signing, notarizing, ad hoc installs, What's New or promo text, ASO, Apple Ads), SwiftUI views and speed, Swift 6 migration, Swift Testing, SwiftData, Core Data, Xcode builds, disk space, or scroll-scrubbed web product scenes. Not for launch or preview videos, store screenshots, GSAP APIs, web springs (apple-design) or Swift questions (write-swift).
+description: For Apple app code (SwiftUI, Xcode) and scroll-pinned web scenes. Use when a question or task needs App Store Connect (app records, TestFlight, signing, macOS notarizing, ad hoc installs, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftUI, SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or scrubbed web scenes. Not for launch or preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
 ---
 
 # apple
