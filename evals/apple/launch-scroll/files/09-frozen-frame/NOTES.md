@@ -1,0 +1,1 @@
+Locally we run `vite dev` and the film scrubs fine. In production `npm run build` writes `dist/` and `node server.js` serves it behind our CDN. The film is `dist/media/film.mp4`, encoded with a keyframe every 6 frames and faststart.

@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { buildBadges, renderBadge } from '../scripts/badges.mjs';
 
-const NAME = '@minhspark/design-pro-max';
+const NAME = '@example/design-pro-max';
 const REPO = 'buidangminh23/design-pro-max';
 const json = (body, status = 200) => ({ ok: status < 400, status, json: async () => body });
 
