@@ -121,7 +121,7 @@
     {
       "id": "swiftdata-pro",
       "repo": "twostraws/SwiftData-Agent-Skill",
-      "commit": "922d989473a9914210b41529a1ac5636aff4b8c1",
+      "commit": "8051f177a0076e7fd45bdf4ee687b070ba58fdc6",
       "path": "swiftdata-pro",
       "exclude": [
         "agents/**",
@@ -318,7 +318,7 @@
     {
       "id": "app-store-connect/asc-cli-usage",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-cli-usage",
       "exclude": [],
       "active": false,
@@ -340,7 +340,7 @@
     {
       "id": "app-store-connect/asc-id-resolver",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-id-resolver",
       "exclude": [],
       "active": false,
@@ -356,7 +356,7 @@
     {
       "id": "app-store-connect/asc-app-create-ui",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-app-create-ui",
       "exclude": [],
       "active": false,
@@ -382,7 +382,7 @@
     {
       "id": "app-store-connect/asc-signing-setup",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-signing-setup",
       "exclude": [],
       "active": false,
@@ -403,7 +403,7 @@
     {
       "id": "app-store-connect/asc-xcode-build",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-xcode-build",
       "exclude": [],
       "active": false,
@@ -423,7 +423,7 @@
     {
       "id": "app-store-connect/asc-build-lifecycle",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-build-lifecycle",
       "exclude": [],
       "active": false,
@@ -442,7 +442,7 @@
     {
       "id": "app-store-connect/asc-testflight-orchestration",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-testflight-orchestration",
       "exclude": [],
       "active": false,
@@ -462,7 +462,7 @@
     {
       "id": "app-store-connect/asc-crash-triage",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-crash-triage",
       "exclude": [],
       "active": false,
@@ -478,7 +478,7 @@
     {
       "id": "app-store-connect/asc-analytics-reports",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-analytics-reports",
       "exclude": [],
       "active": false,
@@ -497,7 +497,7 @@
     {
       "id": "app-store-connect/asc-submission-health",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-submission-health",
       "exclude": [],
       "active": false,
@@ -516,7 +516,7 @@
     {
       "id": "app-store-connect/asc-release-flow",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-release-flow",
       "exclude": [],
       "active": false,
@@ -534,7 +534,7 @@
     {
       "id": "app-store-connect/asc-metadata-sync",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-metadata-sync",
       "exclude": [],
       "active": false,
@@ -554,7 +554,7 @@
     {
       "id": "app-store-connect/asc-localize-metadata",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-localize-metadata",
       "exclude": [],
       "active": false,
@@ -574,7 +574,7 @@
     {
       "id": "app-store-connect/asc-whats-new-writer",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-whats-new-writer",
       "exclude": [],
       "active": false,
@@ -594,7 +594,7 @@
     {
       "id": "app-store-connect/asc-aso-audit",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-aso-audit",
       "exclude": [],
       "active": false,
@@ -614,7 +614,7 @@
     {
       "id": "app-store-connect/asc-screenshot-resize",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-screenshot-resize",
       "exclude": [],
       "active": false,
@@ -635,7 +635,7 @@
     {
       "id": "app-store-connect/asc-shots-pipeline",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-shots-pipeline",
       "exclude": [],
       "active": false,
@@ -657,7 +657,7 @@
     {
       "id": "app-store-connect/asc-notarization",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-notarization",
       "exclude": [],
       "active": false,
@@ -679,7 +679,7 @@
     {
       "id": "app-store-connect/asc-ad-hoc-distribution",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-ad-hoc-distribution",
       "exclude": [],
       "active": false,
@@ -699,7 +699,7 @@
     {
       "id": "app-store-connect/asc-workflow",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-workflow",
       "exclude": [],
       "active": false,
@@ -717,7 +717,7 @@
     {
       "id": "app-store-connect/asc-apple-ads",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-apple-ads",
       "exclude": [],
       "active": false,
@@ -738,7 +738,7 @@
     {
       "id": "app-store-connect/asc-ppp-pricing",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-ppp-pricing",
       "exclude": [],
       "active": false,
@@ -757,7 +757,7 @@
     {
       "id": "app-store-connect/asc-subscription-localization",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-subscription-localization",
       "exclude": [],
       "active": false,
@@ -776,7 +776,7 @@
     {
       "id": "app-store-connect/asc-revenuecat-catalog-sync",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-revenuecat-catalog-sync",
       "exclude": [],
       "active": false,
@@ -795,7 +795,7 @@
     {
       "id": "app-store-connect/asc-wall-submit",
       "repo": "rorkai/app-store-connect-cli-skills",
-      "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+      "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
       "path": "skills/asc-wall-submit",
       "exclude": [],
       "active": false,
