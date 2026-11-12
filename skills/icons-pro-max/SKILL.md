@@ -4,7 +4,7 @@ description: >
   A portable icon catalog and rendering guide for the current project:
   payment methods, QR codes, social/app brand marks, download badges, the
   lucide-react UI icon set, 145 tech-stack logos, 86 full-color AI provider
-  marks, and 516 Claude connector icons. Gives the exact asset path,
+  marks, 516 Claude connector icons, and 25 Microsoft app logos. Gives the exact asset path,
   React component, canonical size, brand color, render recipe, and accessibility
   rule for each icon — plus an anti-slop checklist so an agent never redraws a
   logo, recolors a brand mark, distorts an aspect ratio, or re-inlines a
@@ -25,7 +25,7 @@ description: >
 
 Asset roots:
 - **In the web app:** `public/…` (served at `/…`) and inline React components in `src/`.
-- **In this skill:** `assets/{payment,social,tech,badge,ai,connector}/` — a self-contained mirror so the catalog is usable outside the repo.
+- **In this skill:** `assets/{payment,social,tech,badge,ai,connector,microsoft}/` — a self-contained mirror so the catalog is usable outside the repo.
 - **Provenance:** [`assets/SOURCES.md`](assets/SOURCES.md) records where every bundled file comes from. Check it before replacing a mark.
 
 Application paths, component names, and tuned sizes below are examples from the
@@ -53,6 +53,7 @@ only when their requested task needs it.
 | An app store or OS download badge | **Download badges** | §6 | Brand-colored SVG badge, black background |
 | An AI model provider, lab, or AI tool | **AI providers** | §7 | Full-color SVG, render as-is |
 | A service Claude connects to (Drive, Slack, Notion…) | **Claude connectors** | §8 | Brand SVG, or the directory's own raster icon |
+| A Microsoft app or Office file type (Word, Excel, Teams…) | **Microsoft apps** | §8.A | Full-color SVG, render as-is |
 
 **Decision rule:** a *brand* (company, product, payment network) → its exact logo asset (§1/§3/§5–§8). A *concept* (save, delete, warning) → a lucide glyph (§4). Never substitute one for the other (a lucide `credit-card` is not the Visa logo).
 
@@ -72,6 +73,7 @@ Brand payment marks. Rendered through the shared **badge wrapper** in `src/Payme
 | MoMo | `MoMoLogo` | `/payment/momo.svg` | `assets/payment/momo.svg` | **18px** | square mark → tallest |
 | Visa | `VisaLogo` | `/payment/visa.svg` | `assets/payment/visa.svg` | **12px** | card network |
 | Mastercard | `MastercardLogo` | `/payment/mastercard.svg` | `assets/payment/mastercard.svg` | **17px** | card network |
+| PayPal | `PayPalLogo` | `/payment/paypal.svg` | `assets/payment/paypal-wordmark.svg` | **16px** | official [PayPal full-color horizontal logo](https://www.paypalobjects.com/digitalassets/c/website/logo/full-text/pp_fc_hl.svg), original blue colors |
 
 Extra marks in `assets/payment/` (not wired into the badge set, no tuned height yet): `paypal` · `stripe` · `applepay` · `googlepay` · `americanexpress` · `jcb` · `shopee` · `grab` · `zalo`, plus `zalo-icon.png`. Each carries its own white padded chip. Before shipping one on the web, add a `…Logo` component with a tuned height (§1.B) and move it into the table above.
 
@@ -271,6 +273,23 @@ App Store, Google Play, macOS, and Windows download badges. Rendered on a black 
 - A raster connector icon is small: render it at ≤48px. Do not upscale; replace it with a vector when the brand publishes one.
 - Match by domain, never by name alone — many connectors share a word with an unrelated brand (Runway, Orion, Light, Close, Craft, Loops).
 - The directory changes; a connector missing here gets its icon by the same three steps, and a row in `assets/SOURCES.md`.
+
+---
+
+## 8.A MICROSOFT 365 APPS
+
+25 official full-color product icons, byte-identical to Microsoft's own files.
+
+**Location:** skill `assets/microsoft/<name>.svg`
+
+`access` · `copilot` · `excel` · `forms` · `infopath` · `lists` · `loop` · `m365` · `office` · `onedrive` · `onenote` · `outlook` · `powerbi` · `powerpoint` · `project` · `publisher` · `sharepoint` · `stream` · `sway` · `teams` · `todo` · `visio` · `vivaengage` · `word` · `yammer`
+
+**Rules**
+- Render as-is. Each file carries its own gradients and shadows; do not recolor it, and set only one dimension so the square ratio holds.
+- For a document row, use the app that opens the file: `word` for `.docx`, `excel` for `.xlsx`, `powerpoint` for `.pptx`.
+- Gradient ids repeat between files, so reference each logo as an `<img>` or data URI. Pasting several inline in one page makes them share one gradient.
+- Name the product the sentence means: `m365` is the suite, `office` is the earlier Office mark, `copilot` here is Microsoft 365 Copilot, and `assets/ai/copilot.svg` is the AI provider row.
+- These are Microsoft's trademarks: use them to identify the product, never to imply Microsoft's endorsement.
 
 ---
 

@@ -9,7 +9,7 @@ The complete upstream license texts are included in
 Keep those notices when copying assets into another project. The source names
 below identify provenance; they do not transfer brand ownership to the publisher.
 
-## payment (16)
+## payment (17)
 
 | File | Brand | Source |
 |---|---|---|
@@ -21,6 +21,7 @@ below identify provenance; they do not transfer brand ownership to the publisher
 | `mastercard.svg` | Mastercard | original asset (bundled since 1.x) |
 | `momo.svg` | MoMo | original asset (bundled since 1.x) |
 | `paypal.svg` | PayPal | [Simple Icons](https://simpleicons.org) (CC0) |
+| `paypal-wordmark.svg` | PayPal | [PayPal full-color horizontal logo](https://www.paypalobjects.com/digitalassets/c/website/logo/full-text/pp_fc_hl.svg) |
 | `shopee.svg` | Shopee | [Simple Icons](https://simpleicons.org) (CC0) |
 | `stripe.svg` | Stripe | [Simple Icons](https://simpleicons.org) (CC0) |
 | `vietqr.svg` | VietQR | original asset (bundled since 1.x) |
@@ -316,6 +317,38 @@ below identify provenance; they do not transfer brand ownership to the publisher
 | `xai.svg` | xAI | [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT) |
 | `yi.svg` | Yi | [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT) |
 | `zhipu.svg` | Zhipu AI | [LobeHub Icons](https://github.com/lobehub/lobe-icons) (MIT) |
+
+## microsoft (25)
+
+Official product icons from Microsoft's Fluent UI brand icon CDN, release `20240610.001`, byte-identical to the served files. Microsoft owns these marks; they are not covered by any open-source license in this repository.
+
+| File | Brand | Source |
+|------|-------|--------|
+| `access.svg` | Microsoft Access | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/access_48x1.svg) |
+| `copilot.svg` | Microsoft 365 Copilot | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/copilot_48x1.svg) |
+| `excel.svg` | Microsoft Excel | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/excel_48x1.svg) |
+| `forms.svg` | Microsoft Forms | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/forms_48x1.svg) |
+| `infopath.svg` | Microsoft InfoPath | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/infopath_48x1.svg) |
+| `lists.svg` | Microsoft Lists | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/lists_48x1.svg) |
+| `loop.svg` | Microsoft Loop | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/loop_48x1.svg) |
+| `m365.svg` | Microsoft 365 | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/m365_48x1.svg) |
+| `office.svg` | Microsoft Office | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/office_48x1.svg) |
+| `onedrive.svg` | Microsoft OneDrive | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/onedrive_48x1.svg) |
+| `onenote.svg` | Microsoft OneNote | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/onenote_48x1.svg) |
+| `outlook.svg` | Microsoft Outlook | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/outlook_48x1.svg) |
+| `powerbi.svg` | Microsoft Power BI | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/powerbi_48x1.svg) |
+| `powerpoint.svg` | Microsoft PowerPoint | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/powerpoint_48x1.svg) |
+| `project.svg` | Microsoft Project | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/project_48x1.svg) |
+| `publisher.svg` | Microsoft Publisher | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/publisher_48x1.svg) |
+| `sharepoint.svg` | Microsoft SharePoint | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/sharepoint_48x1.svg) |
+| `stream.svg` | Microsoft Stream | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/stream_48x1.svg) |
+| `sway.svg` | Microsoft Sway | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/sway_48x1.svg) |
+| `teams.svg` | Microsoft Teams | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/teams_48x1.svg) |
+| `todo.svg` | Microsoft To Do | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/todo_48x1.svg) |
+| `visio.svg` | Microsoft Visio | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/visio_48x1.svg) |
+| `vivaengage.svg` | Viva Engage | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/vivaengage_48x1.svg) |
+| `word.svg` | Microsoft Word | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/word_48x1.svg) |
+| `yammer.svg` | Yammer | [Microsoft product icon](https://res.cdn.office.net/files/fabric-cdn-prod_20240610.001/assets/brand-icons/product/svg/yammer_48x1.svg) |
 
 ## connector (516)
 

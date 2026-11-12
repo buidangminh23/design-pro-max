@@ -66,25 +66,25 @@
     {
       "name": "icons-pro-max",
       "repo": "buidangminh23/icons-pro-max",
-      "tag": "v2.3.0",
-      "commit": "0e7fc74f2e61a6f42adf7ebecff696adf0efe954",
+      "tag": "v2.4.0",
+      "commit": "f197f6b78c9b5f7027a3248219b1ab3d6258fc80",
       "path": "skills/icons-pro-max",
       "license": {
         "file": "LICENSE",
-        "sha256": "2c55bc84eeefb207254bb18e7f5a09071011abf92177dd690d681a707240b7a1",
+        "sha256": "f9daf70adffbe317ecf69875711739bf8bb752165b8e1104c77850277c97829f",
         "copyright": "Copyright (c) 2026 buidangminh23"
       },
       "files": [
         {
           "path": "SKILL.md",
-          "sha256": "e8ed6d54ed706e9a79eadb96c37968ec4e74fedceff727a360d957e43da558af",
-          "bytes": 24490,
+          "sha256": "e4c9c11e3018eb28458fdefc5cbc297fbed6a0752f600b9c944be8af5c2e19e7",
+          "bytes": 26094,
           "executable": false
         },
         {
           "path": "assets/SOURCES.md",
-          "sha256": "e59c86e0089b93f231b6b24b2954a8fa9f58f6e7cd09bedef5d74f67104a0ba8",
-          "bytes": 104046,
+          "sha256": "a71fadf48d51106c14ca82a84b0f850a626109cce41d89779a5f930e18329e86",
+          "bytes": 108835,
           "executable": false
         },
         {
@@ -3748,6 +3748,156 @@
           "executable": false
         },
         {
+          "path": "assets/microsoft/access.svg",
+          "sha256": "42176d1939f39bf2a549de922dea8987fb54d4c5c7974aa2a557b7f5db55ba01",
+          "bytes": 1357,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/copilot.svg",
+          "sha256": "48ded43b6b86f36069c2795cc87347882197b84104e904afc24b0f17759acf63",
+          "bytes": 4028,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/excel.svg",
+          "sha256": "da91a550409ab355e664188a00135bc93603e5a8f53df3eeed8abc2ab3db8d71",
+          "bytes": 1485,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/forms.svg",
+          "sha256": "83ca91c92ee64f6e66ad9c26c25e6738bc962c2c59f9ea0cccaf8ae1e5800037",
+          "bytes": 1437,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/infopath.svg",
+          "sha256": "6d8edec06502a789a345da916d88f87808fe4d616b057d8d10e44252244965b7",
+          "bytes": 1525,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/lists.svg",
+          "sha256": "bf620e1c3dda1614f1ab101e952da9f6d179b90ee17de70f5f5e133cf37c946f",
+          "bytes": 3205,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/loop.svg",
+          "sha256": "bb2070e305422dcb597b2a57ace3ee85092803022cef8f03cc9ebe21dda9eea7",
+          "bytes": 3166,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/m365.svg",
+          "sha256": "e602157ff7063845d2e6befafc8319121dda9fd22b65844f3bed8024c72fd57c",
+          "bytes": 4829,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/office.svg",
+          "sha256": "de7f30877534dd6734da6c8899c7a3fc1662a28c76fa3cd2e68b2a3aeea0c3a2",
+          "bytes": 2419,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/onedrive.svg",
+          "sha256": "393fe3509c33de52e4dcfb7aece1a5ea41d8114ac1be0d68b13948cc28962f6a",
+          "bytes": 658,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/onenote.svg",
+          "sha256": "b2a79855b547ff47cd23640fb8b6cb625713ca0880e74654f018d2b88f96a3ec",
+          "bytes": 1404,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/outlook.svg",
+          "sha256": "0884e0478f7e073163febe67eaff20be97ae38373b0866c9668f81c2f6bd26c2",
+          "bytes": 3935,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/powerbi.svg",
+          "sha256": "ef65e02846567bc3db72e7e6d5f093a201c15b1022c6940fda94c0a9f308aa6a",
+          "bytes": 2716,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/powerpoint.svg",
+          "sha256": "708fa79febaf25786d84a4bd6a39c8a7345e1e927399f88761db11dab5441f84",
+          "bytes": 1791,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/project.svg",
+          "sha256": "1b4c9f741d94735e2cef138278c73fce636b736dd82ef2502865cf0e7c87e2bf",
+          "bytes": 1730,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/publisher.svg",
+          "sha256": "e0a0aa0069f62800fd2bbdc8dca81df36083f1dde459b1495c0ba47575c7fa01",
+          "bytes": 4892,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/sharepoint.svg",
+          "sha256": "7f260c54c77342eb16ce20ab132729c7e640e7ead6a4bb9e7d1b4a94bd0e8eda",
+          "bytes": 2286,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/stream.svg",
+          "sha256": "980fa18a338d435f818f1e62ecff305c0062a27ca154504ed7b304fa73bd4006",
+          "bytes": 3948,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/sway.svg",
+          "sha256": "55801cfb79307945ba285b4e4edf6029875770f2dd38c2425b4a3a8cc15e9b43",
+          "bytes": 2307,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/teams.svg",
+          "sha256": "6ec0e1afd7359a71915430bab4a49554bcfd1f1b881db5108c807ed08f1a0afb",
+          "bytes": 2094,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/todo.svg",
+          "sha256": "dc1680bbac2c9edcb0a8145b2995edf8621d60135d1487a2f2b146c34c96745a",
+          "bytes": 774,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/visio.svg",
+          "sha256": "bd9227bec33e37b26aefd116dba97e3ecb9dce92073206c571f990a83ab240d0",
+          "bytes": 2062,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/vivaengage.svg",
+          "sha256": "38004679d55e6655833312170f63b96dc9fc233a57f26926fa14958bca9bf362",
+          "bytes": 2390,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/word.svg",
+          "sha256": "fef9d7fc114f0c5d55e6d50c6d8d3fc40ed69f1122d9adf1780dfa57ad40af79",
+          "bytes": 1594,
+          "executable": false
+        },
+        {
+          "path": "assets/microsoft/yammer.svg",
+          "sha256": "8e6ac835843f3879093977ab82bf3dad3dac0d936dd36eea1abcb5971201cbe9",
+          "bytes": 2643,
+          "executable": false
+        },
+        {
           "path": "assets/payment/americanexpress.svg",
           "sha256": "c73caac48eed2d596133e8da0f3ec4e468a24bcd642d5cbd58c5889e9bf36d81",
           "bytes": 3758,
@@ -3787,6 +3937,12 @@
           "path": "assets/payment/momo.svg",
           "sha256": "118ea510bdf7e52a8f0056f7a15aabcd1f3f98032a0498552c782388ef2217a1",
           "bytes": 13266,
+          "executable": false
+        },
+        {
+          "path": "assets/payment/paypal-wordmark.svg",
+          "sha256": "036f5ec2d493c1c70c99b98eb3a666241af203a93f3fc3b8b64316794b4dcd3f",
+          "bytes": 11083,
           "executable": false
         },
         {
