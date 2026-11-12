@@ -15,7 +15,7 @@ Ask, and write the answers down as a beat table (progress window, what changes, 
 ## 2. Choose the engine
 
 - **CSS scroll timeline** (`assets/reference/scene-css.html`): no script; pins only inside `@supports (animation-timeline: view())` with motion allowed, over a finished static layout [LS-WARN-SUPPORTS]. Firefox stable gets the static page (TQ-14). Best when the stage has a fixed height and no film.
-- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`): the default when gates need script, the stage height depends on content, or a film scrubs. It writes one clamped value to `--scene-progress` and children read it.
+- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`; with a film, `assets/reference/scrub-video.html`): the default when gates need script, the stage height depends on content, or a film scrubs. It writes one clamped value to `--scene-progress` and children read it.
 - **GSAP ScrollTrigger**: only for labelled timelines with many overlapping tweens or callbacks. It is free for sites and apps but not open source (TQ-1), and GSAP with ScrollTrigger adds about 44.9 KB gzipped (TQ-23). For its API, use the `gsap-scrolltrigger` skill if it is installed.
 
 Whatever the engine, the stage animates `transform` and `opacity` only, and the static layout is the end state.
