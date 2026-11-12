@@ -68,7 +68,10 @@ function repository(t, steps) {
 test('the repository history holds no unreviewed media and no vendored agents/ or assets/ files', { skip: isShallow() && 'this clone is shallow' }, () => {
   const report = checkHistory(ROOT);
   assert.deepEqual(report.problems, []);
-  const bundled = loadBundles(ROOT).bundles.flatMap((bundle) => bundle.files.filter((file) => mediaKind(file.path)));
+  const committed = new Set(execFileSync('git', ['-C', ROOT, 'ls-tree', '-r', '--name-only', 'HEAD'], { encoding: 'utf8' }).split(/\r?\n/));
+  const bundled = loadBundles(ROOT).bundles.flatMap((bundle) =>
+    bundle.files.filter((file) => mediaKind(file.path) && committed.has(`skills/${bundle.name}/${file.path}`)),
+  );
   assert.ok(bundled.length > 0);
   assert.ok(report.stats.reviewed >= REVIEWED_MEDIA.size + bundled.length);
 });
