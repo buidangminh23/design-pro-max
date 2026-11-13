@@ -61,12 +61,24 @@ export function parseCookies(header = '') {
   return cookies;
 }
 
-const safeNext = (value, fallback) => (typeof value === 'string' && value.startsWith('/') && !value.startsWith('//') ? value : fallback);
+const SAME_ORIGIN = 'https://app.invalid';
 
-export function createLoginApp({ verify, home = '/app/', protect = '/app', cookieName = 'session', maxAgeSeconds = 8 * 60 * 60, render = defaultHome } = {}) {
+export function safeNext(value, fallback) {
+  if (typeof value !== 'string' || !value.startsWith('/') || /[\\\u0000-\u001f\u007f]/.test(value)) return fallback;
+  let resolved;
+  try {
+    resolved = new URL(value, SAME_ORIGIN);
+  } catch {
+    return fallback;
+  }
+  return resolved.origin === SAME_ORIGIN && !resolved.pathname.startsWith('//') ? resolved.pathname + resolved.search : fallback;
+}
+
+export function createLoginApp({ verify, home = '/app/', protect = '/app', cookieName = 'session', maxAgeSeconds = 8 * 60 * 60, sameSite = 'Lax', render = defaultHome } = {}) {
   if (typeof verify !== 'function') throw new TypeError('createLoginApp needs a verify(user, password) function');
+  if (!['Lax', 'Strict', 'None'].includes(sameSite)) throw new TypeError('sameSite must be Lax, Strict or None');
   const sessions = new Map();
-  const sessionCookie = (value, maxAge) => `${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+  const sessionCookie = (value, maxAge) => `${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=${sameSite}; Max-Age=${maxAge}`;
   const userOf = (request) => {
     const id = parseCookies(request.headers.cookie)[cookieName];
     const session = id && sessions.get(id);
@@ -78,7 +90,7 @@ export function createLoginApp({ verify, home = '/app/', protect = '/app', cooki
     response.end(body);
   };
   const handler = async (request, response) => {
-    const url = new URL(request.url ?? '/', 'https://app.invalid');
+    const url = new URL(request.url ?? '/', SAME_ORIGIN);
     try {
       if (url.pathname === '/login' && request.method === 'POST') {
         const form = await readForm(request);

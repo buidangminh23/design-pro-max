@@ -1,0 +1,11 @@
+{
+  "appId": "com.example.dashboard",
+  "appName": "Dashboard",
+  "webDir": "shell",
+  "server": {
+    "url": "https://app.example.com",
+    "errorPath": "offline.html",
+    "cleartext": true,
+    "allowNavigation": ["*.example.com"]
+  }
+}

@@ -96,6 +96,83 @@
       "project": "projects/web-push"
     },
     {
+      "id": "shell-ts-bundled-noise",
+      "rule": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02"
+      ],
+      "expect": "pass",
+      "checker": "check-shell",
+      "project": "projects/ts-bundled-noise",
+      "args": [
+        "--expect-origin",
+        "bundled"
+      ]
+    },
+    {
+      "id": "shell-ts-before-json",
+      "rule": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02"
+      ],
+      "expect": "pass",
+      "checker": "check-shell",
+      "project": "projects/ts-before-json",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-trailing-dot",
+      "rule": "WS-ORIGIN-02",
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/capacitor-trailing-dot"
+    },
+    {
+      "id": "shell-tauri-cgnat",
+      "rule": "WS-ORIGIN-02",
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/tauri-cgnat"
+    },
+    {
+      "id": "shell-tauri-ios-override",
+      "rule": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02"
+      ],
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/tauri-ios-override",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-cleartext",
+      "rule": "WS-ORIGIN-02",
+      "expect": "warn",
+      "checker": "check-shell",
+      "project": "projects/cleartext"
+    },
+    {
+      "id": "shell-web-push-local",
+      "rule": "WS-WARN-PUSH",
+      "expect": "warn",
+      "checker": "check-shell",
+      "project": "projects/web-push-local"
+    },
+    {
+      "id": "shell-remote-full-build",
+      "rule": "WS-WARN-BUNDLED",
+      "expect": "warn",
+      "checker": "check-shell",
+      "project": "projects/remote-full-build"
+    },
+    {
       "id": "probe-login-https",
       "rule": [
         "WS-AUTH-01",
@@ -149,7 +226,7 @@
       "rule": "WS-WARN-THIRDPARTY",
       "expect": "warn",
       "checker": "probe-webkit",
-      "app": "assets/login/app.mjs",
+      "app": "apps/login-samesite-none.mjs",
       "args": [
         "--page",
         "/app/",
@@ -160,6 +237,38 @@
         "--field",
         "password=demo",
         "--embed-cross-site"
+      ]
+    },
+    {
+      "id": "probe-login-extra-cookies",
+      "rule": [
+        "WS-AUTH-01",
+        "WS-COOKIE-01"
+      ],
+      "expect": "pass",
+      "checker": "probe-webkit",
+      "app": "apps/login-extra-cookies.mjs",
+      "args": [
+        "--page",
+        "/app/",
+        "--login",
+        "/login",
+        "--field",
+        "user=demo",
+        "--field",
+        "password=demo"
+      ]
+    },
+    {
+      "id": "probe-basic-auth-frame-fetch",
+      "rule": "WS-AUTH-01",
+      "expect": "fail",
+      "checker": "probe-webkit",
+      "app": "apps/basic-auth-embedded.mjs",
+      "expected": "apps/basic-auth-embedded.expected.json",
+      "args": [
+        "--page",
+        "/"
       ]
     }
   ]
