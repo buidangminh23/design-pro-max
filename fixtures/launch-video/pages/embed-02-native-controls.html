@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Pass fixture for LV-EMBED-02: a lazy loop that respects reduced motion and carries the native controls attribute
+     instead of a button of its own; the browser's controls pause it, from the keyboard too. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop with native controls</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  figure { width: 400px; margin: 0 auto 100vh; }
+  video { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<figure>
+  <video controls muted loop playsinline preload="none" width="640" height="360">
+    <source data-src="loop.mp4" type="video/mp4">
+  </video>
+  <figcaption>A looping clip with the browser's own controls.</figcaption>
+</figure>
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const video = document.querySelector('video');
+  const attach = () => {
+    if (video.dataset.loaded) return;
+    video.dataset.loaded = '1';
+    for (const source of video.querySelectorAll('source')) source.src = source.dataset.src;
+    video.load();
+  };
+  new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && !reduce) attach();
+  }, { rootMargin: '600px' }).observe(video);
+  new IntersectionObserver(([entry]) => {
+    if (reduce) return;
+    if (entry.intersectionRatio < 0.5) return video.pause();
+    attach();
+    video.play().catch(() => {});
+  }, { threshold: [0, 0.5, 1] }).observe(video);
+</script>
+</body>
+</html>

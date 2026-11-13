@@ -207,3 +207,16 @@ test('render.json marks an unfinished render', async () => {
   assert.equal(renderManifest(options, false).generator, RENDERER);
   assert.equal(renderManifest(options, false).frames, 60);
 });
+
+test('check-embed tries the toggle and pause-named controls first, and wants H.264 last', async () => {
+  const { orderControls, sourceOrder, DEMO_SELECTOR, FALLBACK_SELECTOR } = await part('scripts', 'check-embed.mjs');
+  const order = orderControls([{ id: 'a', name: 'Share' }, { id: 'b', name: 'Stop the demo' }, { id: 'c', name: 'Pause', toggle: true }]);
+  assert.deepEqual(order.map((control) => control.id), ['c', 'b', 'a']);
+  assert.deepEqual(sourceOrder(['av1', 'vp9', 'h264']), { h264Last: true, av1First: true });
+  assert.equal(sourceOrder(['h264', 'vp9']).h264Last, false, 'H.264 present but not last');
+  assert.equal(sourceOrder(['vp9', 'av1', 'h264']).av1First, false);
+  assert.equal(sourceOrder(['hevc', 'av1', 'h264']).av1First, true);
+  assert.equal(DEMO_SELECTOR, '[data-demo] video');
+  assert.match(FALLBACK_SELECTOR, /data-scrub/);
+  assert.match(FALLBACK_SELECTOR, /data-scene/);
+});

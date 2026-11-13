@@ -236,22 +236,22 @@
       "id": "LV-EMBED-01",
       "part": "launch-video",
       "level": "error",
-      "statement": "A clip below the fold has no autoplay attribute, preload=\"none\" and no source until it comes near, so 0 video bytes load before the reader scrolls; it gets its source once near.",
-      "values": "no autoplay attribute; preload none; no source until near; 0 video bytes before scroll",
+      "statement": "A demo clip below the fold has no autoplay attribute, preload=\"none\", no poster attribute (its start image is a lazy <img> or <picture>, since a poster is fetched at load) and no source until it comes near, so 0 video bytes load before the reader scrolls; it gets its source once near. Scrub films and videos inside a scroll scene follow launch-scroll's rules instead.",
+      "values": "no autoplay attribute; preload none; no poster attribute; no source until near; 0 video bytes before scroll",
       "evidence": ["EC-5", "PV-13", "ON-14"],
       "check": "launch-video/scripts/check-embed.mjs",
-      "fixtures": { "pass": ["demo-embed"], "fail": ["embed-01-autoplay"] },
+      "fixtures": { "pass": ["demo-embed", "embed-01-ignores-scrub-film"], "fail": ["embed-01-autoplay", "embed-01-poster"] },
       "implementedBy": ["launch-video/assets/lib/demo-embed.js", "launch-video/assets/reference/demo-embed.html"]
     },
     {
       "id": "LV-EMBED-02",
       "part": "launch-video",
       "level": "error",
-      "statement": "A clip that moves on its own for more than 5 s (any loop, or a longer one-shot) has a visible, labelled control that pauses it, and under reduced motion no clip plays by itself, also after it has loaded.",
-      "values": "a labelled pause control above 5 s; nothing autoplays under reduced motion, also after load",
+      "statement": "A clip that moves on its own for more than 5 s (any loop, or a longer one-shot) has a way to pause it: native video controls, which pause from the keyboard, or a visible, labelled control that can be reached with Tab and pauses the playing clip on Enter or Space; and under reduced motion no clip plays by itself, also after it has loaded.",
+      "values": "native controls or a labelled, keyboard-operable pause control above 5 s; nothing autoplays under reduced motion, also after load",
       "evidence": ["PV-21", "AM-23", "ON-11"],
       "check": "launch-video/scripts/check-embed.mjs",
-      "fixtures": { "pass": ["demo-embed"], "fail": ["embed-02-no-pause", "embed-02-plays-after-load"] },
+      "fixtures": { "pass": ["demo-embed", "embed-02-share-first", "embed-02-native-controls"], "fail": ["embed-02-no-pause", "embed-02-plays-after-load", "embed-02-dead-pause", "embed-02-unfocusable"] },
       "implementedBy": ["launch-video/assets/lib/demo-embed.js", "launch-video/assets/reference/demo-embed.html"]
     },
     {

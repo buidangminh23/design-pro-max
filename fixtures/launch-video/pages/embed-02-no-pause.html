@@ -23,16 +23,20 @@
 <script>
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   for (const video of document.querySelectorAll('video')) {
-    new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting || reduce || video.dataset.loaded) return;
+    const attach = () => {
+      if (video.dataset.loaded) return;
       video.dataset.loaded = '1';
       for (const source of video.querySelectorAll('source')) source.src = source.dataset.src;
       video.load();
+    };
+    new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !reduce) attach();
     }, { rootMargin: '600px' }).observe(video);
     new IntersectionObserver(([entry]) => {
       if (reduce) return;
-      if (entry.intersectionRatio >= 0.5) video.play().catch(() => {});
-      else video.pause();
+      if (entry.intersectionRatio < 0.5) return video.pause();
+      attach();
+      video.play().catch(() => {});
     }, { threshold: [0, 0.5, 1] }).observe(video);
   }
 </script>
