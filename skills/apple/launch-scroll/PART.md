@@ -69,7 +69,7 @@ Read the reference the task needs, in full:
 
 ## 7. Verify
 
-Run the probe against the page, from the project folder that holds Playwright (it never installs anything; exit 2 means a missing tool, with the install command):
+Run the probe against the page, from the project folder that holds Playwright. This folder has no `package.json` and needs no install: the scripts use Node's standard library and load Playwright from `--project` (exit 2 means a missing tool, with the install command):
 
 ```
 node <absolute path to this folder>/scripts/probe-scene.mjs --url http://localhost:5173/ --project .

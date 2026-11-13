@@ -54,6 +54,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- The routing trace parser now expands shell brace lists such as `references/{a,b}.md`; it had counted such a read as one missing file (routing round 3, Codex r07).
+- An agent looked for `launch-scroll/package.json` before running the checkers (routing round 3, Claude r40 rerun). `PART.md` now says the folder has none and needs no install.
 - `launch-scroll/PART.md` named the CSS and JS reference pages but not the film one, so an agent building a scrubbed film guessed `assets/reference/scene-film.html` (routing round 3, r40). The engine list now names `assets/reference/scrub-video.html` for a film.
 - Two errata named a pre-release macOS and SDK version; they now cite Apple's documentation or a condition instead, and a test fails any OS or SDK version past the newest release in the manifest or the project's own text.
 - The licence parser took a wrapped line starting with "COPYRIGHT HOLDERS" for a copyright notice and rejected such an MIT text; none of the vendored licences changes.

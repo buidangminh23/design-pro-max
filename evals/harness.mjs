@@ -337,6 +337,13 @@ function stageRange(verb, words) {
  * whole file. `state.cwd` is the shell's folder relative to skills/apple (null outside it); Claude's shell keeps it
  * between calls, a Codex command starts fresh.
  */
+/** A word after shell brace expansion of comma lists, as in `references/{a,b}.md`; ranges and nesting stay as written. */
+export function braceExpand(word) {
+  const match = /\{([^{}]*,[^{}]*)\}/.exec(word);
+  if (!match) return [word];
+  return match[1].split(',').flatMap((item) => braceExpand(word.slice(0, match.index) + item + word.slice(match.index + match[0].length)));
+}
+
 export function shellAccesses(command, state = { cwd: null }) {
   let tokens = tokenize(command);
   const first = tokens.filter((token) => typeof token === 'string');
@@ -352,7 +359,7 @@ export function shellAccesses(command, state = { cwd: null }) {
   const VAR = /\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?/;
   const expand = (word) => {
     const match = VAR.exec(word);
-    if (!match || vars[match[1]] === undefined) return [word];
+    if (!match || vars[match[1]] === undefined) return braceExpand(word);
     return [].concat(vars[match[1]]).flatMap((value) => expand(word.replace(match[0], value)));
   };
   for (const pipeline of pipelines) {

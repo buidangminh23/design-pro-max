@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { diffOf, extract, hitHostLimit, hostCommand, makeClaudeHome, RUN_DEFAULTS, runProfile, scoreRouting } from '../evals/harness.mjs';
+import { braceExpand, diffOf, extract, hitHostLimit, hostCommand, makeClaudeHome, RUN_DEFAULTS, runProfile, scoreRouting, shellAccesses } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -133,4 +133,12 @@ test('the diff of a run includes what the agent committed itself', (t) => {
   assert.match(diff, /agent commits:\n\w+ feat: agent change/);
   assert.match(diff, /\+<p>after<\/p>/);
   assert.match(diff, /^A\tnew\.css$/m);
+});
+
+test('brace lists in a shell command expand to every file they name', () => {
+  assert.deepEqual(braceExpand('refs/{a,b}.md'), ['refs/a.md', 'refs/b.md']);
+  assert.deepEqual(braceExpand('{x,y}/{1,2}'), ['x/1', 'x/2', 'y/1', 'y/2']);
+  assert.deepEqual(braceExpand('${HOME}'), ['${HOME}']);
+  const reads = shellAccesses('cat .agents/skills/apple/.vendor/xcode-disk-cleanup/references/{generated-data,simulators}.md').map((access) => access.path ?? access.rel ?? access);
+  assert.equal(reads.length, 2, JSON.stringify(reads));
 });
