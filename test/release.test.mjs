@@ -129,11 +129,12 @@ test('pack builds one ZIP with the payload, every hidden part and a checksum fil
   const root = copyCheckout({ commit: true });
   t.after(() => removeTree(root));
   const result = pack(root);
-  assert.equal(result.zip, `${NAME}-v0.0.0.zip`);
+  const version = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
+  assert.equal(result.zip, `${NAME}-v${version}.zip`);
   assert.equal(result.parts, 38);
   assert.deepEqual(result.skills, ['apple', 'design-spacing-rhythm', 'icons-pro-max']);
-  assert.match(fs.readFileSync(path.join(result.dist, SUMS_FILE), 'utf8'), /^[0-9a-f]{64} {2}design-pro-max-v0\.0\.0\.zip\n$/);
-  const prefix = `${NAME}-v0.0.0/`;
+  assert.equal(fs.readFileSync(path.join(result.dist, SUMS_FILE), 'utf8').replace(/^[0-9a-f]{64} {2}/, ''), `${NAME}-v${version}.zip\n`);
+  const prefix = `${NAME}-v${version}/`;
   const entries = readZip(fs.readFileSync(path.join(result.dist, result.zip)));
   assert.ok(entries.every((entry) => entry.name.startsWith(prefix)));
   const files = entries.filter((entry) => !entry.directory).map((entry) => entry.name.slice(prefix.length));

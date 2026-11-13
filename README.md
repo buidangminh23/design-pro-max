@@ -13,8 +13,6 @@ Design skills for AI coding agents, one skill per design:
 
 The two bundled skills are copied byte for byte from the latest release of their own repositories and kept in step by a daily job; see [Bundled skills](#bundled-skills).
 
-> **Status: pre-release.** Nothing has been released yet; `main` already installs as described below.
-
 ## Install
 
 Install the `apple` skill folder into a skill root that your agent host reads:

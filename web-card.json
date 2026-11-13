@@ -1,0 +1,77 @@
+{
+  "id": "design-pro-max",
+  "industry": "design",
+  "type": "myskills",
+  "vi": {
+    "nameA": "Design",
+    "nameB": "Pro Max",
+    "tagline": "Bộ skill thiết kế cho agent lập trình, mở đầu với hướng dẫn cho nền tảng Apple và cảnh cuộn ghim trên web",
+    "desc": "Dự án độc lập, không liên kết với Apple Inc. Skill apple là bộ định tuyến gửi mỗi việc tới đúng một hướng dẫn: 38 hướng dẫn MIT chép nguyên văn cho SwiftUI, Swift, Xcode và App Store Connect, phần Human Interface Guidelines viết lại bằng lời riêng cho đủ 158 trang, và phần cảnh cuộn ghim, tua video theo cuộn trên web kèm script kiểm. Đi kèm hai skill căn chỉnh khoảng cách và icon. Mọi con số có nguồn, có eval đo trên Claude Code và Codex.",
+    "stats": [
+      {
+        "value": "40",
+        "label": "Hướng dẫn"
+      },
+      {
+        "value": "8",
+        "label": "Hướng dẫn đang bật"
+      },
+      {
+        "value": "8",
+        "label": "Luật lỗi có nguồn"
+      },
+      {
+        "value": "8",
+        "label": "Fixture phải trượt"
+      },
+      {
+        "value": "75",
+        "label": "Case eval"
+      },
+      {
+        "value": "286",
+        "label": "Dữ kiện có ngày đo"
+      }
+    ]
+  },
+  "en": {
+    "nameA": "Design",
+    "nameB": "Pro Max",
+    "tagline": "Design skills for coding agents, starting with guides for Apple platforms and scroll-pinned web scenes",
+    "desc": "An independent project, not affiliated with Apple Inc. The apple skill routes each task to one guide: 38 vendored MIT guides for SwiftUI, Swift, Xcode and App Store Connect, Apple's Human Interface Guidelines restated in its own words across all 158 pages, and scroll-pinned and scroll-scrubbed web scenes with their own checkers. Spacing and icon skills ship alongside. Every number is sourced, and evals measure it on Claude Code and Codex.",
+    "stats": [
+      {
+        "value": "40",
+        "label": "Guides"
+      },
+      {
+        "value": "8",
+        "label": "Active guides"
+      },
+      {
+        "value": "8",
+        "label": "Sourced error rules"
+      },
+      {
+        "value": "8",
+        "label": "Must-fail fixtures"
+      },
+      {
+        "value": "75",
+        "label": "Eval cases"
+      },
+      {
+        "value": "286",
+        "label": "Dated claims"
+      }
+    ]
+  },
+  "evidence": {
+    "guides": "own parts (OWN_PARTS in scripts/lib/evidence.mjs) plus the parts of vendor/sources.json",
+    "activeGuides": "own parts plus the vendored parts marked active",
+    "errorRules": "error rules in rules.json with at least one non-inferred ledger entry",
+    "failFixtures": "cases with expect fail in fixtures/<part>/cases.json",
+    "evalCases": "cases of evals/routing/cases.json plus evals of evals/apple/<part>/evals.json",
+    "ledgerClaims": "entries of evidence/ledger.json with a dated measurement"
+  }
+}

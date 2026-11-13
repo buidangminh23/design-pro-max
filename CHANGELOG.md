@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-13
+
 ### Fixed
 
 - Temporary test repositories disable automatic Git maintenance, and teardown retries transient filesystem errors before failing, preventing release-pack checks from failing while their temporary object directories are being removed.

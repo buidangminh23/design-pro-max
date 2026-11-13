@@ -1,0 +1,21 @@
+{
+  "name": "design-pro-max",
+  "description": "Design skills for coding agents, starting with guides for Apple platforms and scroll-pinned web scenes",
+  "owner": {
+    "name": "buidangminh23",
+    "url": "https://github.com/buidangminh23"
+  },
+  "plugins": [
+    {
+      "name": "design-pro-max",
+      "description": "Design skills for coding agents: a router for Apple-platform work with vendored MIT guides, Apple Human Interface Guidelines in its own words and scroll-pinned web scenes, plus spacing and icon skills. Independent project, not affiliated with Apple Inc.",
+      "version": "0.1.0",
+      "source": "./",
+      "category": "design",
+      "author": {
+        "name": "buidangminh23",
+        "url": "https://github.com/buidangminh23"
+      }
+    }
+  ]
+}
