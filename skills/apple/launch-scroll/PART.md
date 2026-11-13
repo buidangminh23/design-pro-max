@@ -95,4 +95,5 @@ Give the user: the beat table; which engine and why; what the static layout show
 - GSAP APIs: `gsap-scrolltrigger` and the other GSAP skills, if installed.
 - Springs, gestures and sheet motion on the web: `apple-design`, if installed. One web animation that is not scroll-linked: `animate`, if installed.
 - Whether a CSS feature is Baseline: `modern-web-guidance`, if installed.
-- Making the film itself from code (a rendered UI or animation): not covered yet; launch-video arrives in a later release. Say so.
+- Making the film itself from code (a rendered UI or animation) and demo clips that play without scroll: `../launch-video/PART.md`.
+- The page around the scene (hero, tiles, pricing, FAQ): `../launch-page/PART.md`.
