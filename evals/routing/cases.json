@@ -469,6 +469,36 @@
       }
     },
     {
+      "id": "r47",
+      "kind": "row",
+      "row": "Launch and landing pages or a review of one",
+      "prompt": "Build a launch page for a new Mac menu-bar app: a hero, three feature tiles, pricing and an FAQ, with headlines that stay readable on phones and text that passes contrast. How should I set up the type and sections?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-page"
+      }
+    },
+    {
+      "id": "r48",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "Rebuild our app's onboarding screen in HTML and CSS and render it to a 5-second looping MP4 and WebM for a card on our product page. How do I render, encode and embed it so the page stays fast?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
+      "id": "r49",
+      "kind": "row",
+      "row": "Web page scenes that scrub a canvas image sequence on scroll",
+      "prompt": "On our product page a phone should rotate as the reader scrolls, drawn from about 120 images on a canvas. How do I keep the memory use down and still scrub smoothly?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-scroll"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",

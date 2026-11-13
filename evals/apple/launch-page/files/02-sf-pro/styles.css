@@ -1,0 +1,5 @@
+body { margin: 0; font-family: Helvetica, Arial, sans-serif; color: #1d1d1f; background: #fff; }
+.hero { padding: 96px 24px; max-width: 880px; margin: 0 auto; }
+h1 { font-size: 56px; line-height: 60px; margin: 0 0 16px; }
+.lede { font-size: 21px; line-height: 32px; color: #424245; }
+.cta { display: inline-block; margin-top: 24px; padding: 12px 24px; border-radius: 999px; background: #0a6e66; color: #fff; text-decoration: none; }

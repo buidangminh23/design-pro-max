@@ -1,0 +1,9 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #1d1d1f; }
+.hero, .feature { padding: 80px 24px; max-width: 960px; margin: 0 auto; }
+h1 { font-size: 64px; line-height: 1.05; }
+h2 { font-size: 40px; line-height: 1.1; }
+.lede { font-size: 22px; line-height: 1.4; }
+@media (max-width: 600px) {
+  h1 { font-size: 40px; }
+  h2 { font-size: 28px; }
+}

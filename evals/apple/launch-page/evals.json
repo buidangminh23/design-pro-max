@@ -1,0 +1,127 @@
+{
+  "skill_name": "apple",
+  "part": "launch-page",
+  "description": "Part evals for launch-page in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "menu-bar-launch-page",
+      "prompt": "Build a launch page for Tally, our macOS menu-bar app. The product facts are in BRIEF.md. Put it in index.html with its own CSS and script files.",
+      "expected_output": "A short page read (reader, primary action, sections, mode, whether motion helps) before or with the build; a page on the part's restrained token set with a hero, three feature tiles, pricing with the two plans and the FAQ from BRIEF.md; a font stack that starts with system-ui; content visible without script and under reduced motion; passing contrast; no invented proof.",
+      "files": [
+        "files/01-menu-bar-page/BRIEF.md"
+      ],
+      "expectations": [
+        "[page-read] Before or with the build it states the reader, the one primary action, the sections it builds and the mode, and whether motion helps the page at all.",
+        "[sections] The page has a hero, three feature tiles for the three features in BRIEF.md, a pricing section with exactly the Free and Pro plans at the stated price, and the three FAQ entries.",
+        "[LP-TYPE-01] Every font size comes from one token set (the part's tokens.css or equivalent custom properties) and every line height resolves to a whole number of pixels.",
+        "[LP-FONT-01] The font stack starts with system-ui or an openly licensed font; nothing requests or declares SF Pro or SF Symbols.",
+        "[LP-BASE-01] Headings, ledes and calls to action are visible at load without script and under reduced motion; any entrance state hides content only behind a script-set motion gate.",
+        "[LP-CONTRAST-01] Body and small text colours reach at least 4.5:1 against their backgrounds, large text at least 3:1.",
+        "[LP-WARN-PROOF] It invents no testimonials, ratings, download counts, awards or customer logos; any proof section is a marked placeholder or left out, as BRIEF.md says none exists."
+      ],
+      "checks": [
+        "LP-TYPE-01",
+        "LP-FONT-01",
+        "LP-BASE-01",
+        "LP-CONTRAST-01",
+        "LP-WARN-PROOF"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "sf-pro-from-cdn",
+      "prompt": "Load SF Pro from Apple's CDN on our landing page so it looks like an Apple product page. The page is index.html with styles.css.",
+      "expected_output": "A refusal to request SF Pro from Apple's servers or any other host, with a sentence on why (its licence does not allow web embedding), and a compliant stack in the code itself: system-ui first, which shows the system font on Apple devices, then fallbacks.",
+      "files": [
+        "files/02-sf-pro/index.html",
+        "files/02-sf-pro/styles.css"
+      ],
+      "expectations": [
+        "[LP-FONT-01] The delivered files request, declare and list no SF Pro, SF Pro Icons or SF Symbols font, from Apple's CDN or anywhere else.",
+        "[compliant-stack] It changes the font stack to start with system-ui (or an openly licensed font) followed by fallbacks, so Apple devices still show their system font.",
+        "[why] It says in a sentence or two that SF Pro's licence does not allow embedding it on a web page, and does not suggest a workaround that loads it anyway."
+      ],
+      "checks": [
+        "LP-FONT-01"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "reveal-durations",
+      "prompt": "A motion review of our page says every animation must be under 300 ms. Our section reveals take 1 s and the buttons take 400 ms. Shorten everything to match the review. The motion is in styles.css and reveal.js.",
+      "expected_output": "The control transitions (buttons, nav menu) shortened to 300 ms or less; the one-shot section reveals kept within 0.7-1.1 s, with an explanation that reveals are narrative motion that the controls limit does not cover; reveals still run once and stay visible under reduced motion.",
+      "files": [
+        "files/03-reveal-durations/styles.css",
+        "files/03-reveal-durations/reveal.js"
+      ],
+      "expectations": [
+        "[LP-WARN-CLASS] It shortens the button and nav menu transitions to 300 ms or less.",
+        "[keep-reveals] It keeps the section reveals between 0.7 s and 1.1 s instead of cutting them under 300 ms, and says the 300 ms limit is for controls, not for one-shot narrative reveals.",
+        "[LP-REVEAL-01] The reveals still run once and are not made to hide again on scroll back.",
+        "[LP-BASE-01] Under reduced motion and without script the revealed content stays visible."
+      ],
+      "checks": [
+        "LP-WARN-CLASS",
+        "LP-REVEAL-01",
+        "LP-BASE-01"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "fluid-headlines",
+      "prompt": "Make the headlines on our launch page fluid so they scale smoothly with the window. The page is index.html with styles.css.",
+      "expected_output": "Fluid hero and heading sizes taken from the part's expressive token set (data-launch-mode=\"expressive\" with tokens.css, or the same values), clamped between two sizes over a stated viewport range, with line heights rounded to whole pixels, and the values' source named.",
+      "files": [
+        "files/04-fluid-headlines/index.html",
+        "files/04-fluid-headlines/styles.css"
+      ],
+      "expectations": [
+        "[expressive] It uses the part's expressive mode (data-launch-mode=\"expressive\" on the html element with the part's tokens) or copies its fluid values, rather than inventing new clamp() values.",
+        "[LP-TYPE-01] The fluid sizes are clamped between a minimum and a maximum, and every computed line height is a whole number of pixels (rounded, for example with CSS round(), instead of unitless 1.05 or 1.1).",
+        "[source] It says where the fluid values come from and over which viewport range they scale, and what happens in browsers without the CSS feature it relies on."
+      ],
+      "checks": [
+        "LP-TYPE-01"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "gallery-and-marquee",
+      "prompt": "Add a product tour gallery of our four demo clips (clips/tour-1.mp4 to clips/tour-4.mp4, each 6 s long) that advances on its own with progress dots, and a logo marquee of our customers below it. The page is index.html with styles.css; the logo files are named in the page.",
+      "expected_output": "A gallery whose dot timer runs for each clip's own length (6 s) and a marquee, each with a visible, labelled pause control that stops it; under reduced motion nothing moves on its own and both show a still end state (first slide or a static logo row); content visible without script.",
+      "files": [
+        "files/05-gallery-marquee/index.html",
+        "files/05-gallery-marquee/styles.css"
+      ],
+      "expectations": [
+        "[LP-AMB-01] Both the gallery and the marquee have a visible pause control with an accessible label, and pressing it stops the motion.",
+        "[dot-timer] The gallery's dot timer runs for each clip's own length (6 s), not a fixed interval unrelated to the clips.",
+        "[reduced-motion] Under prefers-reduced-motion neither advances or scrolls on its own; the gallery shows one slide with its start image and the logos sit in a static row.",
+        "[LP-BASE-01] Without script the section headings, the first slide or its start image, and the logos are visible in normal flow."
+      ],
+      "checks": [
+        "LP-AMB-01",
+        "LP-BASE-01"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "social-proof-hero",
+      "prompt": "Add social proof to the hero of our launch page so it converts better. The page is index.html with styles.css.",
+      "expected_output": "Marked placeholders for proof the user must supply (a quote with a name, a rating or a customer count, logos used with permission) and a request for the real material; nothing invented in the delivered page.",
+      "files": [
+        "files/17-social-proof/index.html",
+        "files/17-social-proof/styles.css"
+      ],
+      "expectations": [
+        "[LP-WARN-PROOF] The delivered page contains no invented quotes, names, ratings, user counts, awards or customer logos.",
+        "[placeholders] Any proof element it adds is a clearly marked placeholder (for example bracketed text or a comment) for the user to fill with real, permitted material.",
+        "[ask] It tells the user which real proof it needs (quotes with permission, a verifiable number, logos the customers allow) before the placeholders can ship."
+      ],
+      "checks": [
+        "LP-WARN-PROOF"
+      ]
+    }
+  ]
+}

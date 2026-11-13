@@ -366,7 +366,8 @@ test('the release commands report usage errors and results', (t) => {
 function statsRoot(t) {
   const root = tempDir('design-pro-max-stats-');
   t.after(() => removeTree(root));
-  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const part of fs.readdirSync(path.join(ROOT, 'evals', 'apple'))) write(root, `evals/apple/${part}/evals.json`, fs.readFileSync(path.join(ROOT, 'evals', 'apple', part, 'evals.json')));
   for (const part of fs.readdirSync(path.join(ROOT, 'fixtures'))) {
     const cases = path.join(ROOT, 'fixtures', part, 'cases.json');
     if (fs.existsSync(cases)) write(root, `fixtures/${part}/cases.json`, fs.readFileSync(cases));
@@ -385,7 +386,7 @@ test('stats count guides, active guides, sourced error rules, must-fail fixtures
   const root = statsRoot(t);
   assert.deepEqual(releaseStats(root), stats);
   const routing = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'routing', 'cases.json'), 'utf8')).cases.length;
-  const part = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), 'utf8')).evals.length;
+  const part = fs.readdirSync(path.join(ROOT, 'evals', 'apple')).reduce((sum, name) => sum + JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'apple', name, 'evals.json'), 'utf8')).evals.length, 0);
   assert.equal(stats.evalCases, routing + part);
   write(root, 'evals/routing/cases.json', `${JSON.stringify({ cases: [{ id: 'a' }, { id: 'b' }] })}\n`);
   write(root, 'evals/apple/other-part/evals.json', `${JSON.stringify({ skill_name: 'apple', evals: [{ id: 1 }] })}\n`);
