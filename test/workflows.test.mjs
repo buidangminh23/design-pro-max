@@ -65,6 +65,11 @@ test('every action is pinned to a full commit SHA with a version comment, the sa
   const pins = new Map();
   for (const name of files) {
     for (const line of read(name).split('\n').filter((item) => /^\s*(?:- )?uses:/.test(item))) {
+      const local = /^ {4}uses: \.\/\.github\/workflows\/([\w-]+\.yml)$/.exec(line);
+      if (local) {
+        assert.ok(files.includes(local[1]), `${name}: ${line.trim()} calls a workflow that does not exist`);
+        continue;
+      }
       const match = /uses: ([\w.-]+\/[\w.-]+)@([0-9a-f]{40}) # v\d+(?:\.\d+)*$/.exec(line);
       assert.ok(match, `${name}: ${line.trim()}`);
       if (pins.has(match[1])) assert.equal(pins.get(match[1]), match[2], `${name}: ${match[1]} uses another pin`);
@@ -131,7 +136,8 @@ test('the release workflow re-checks, drafts, verifies the download and publishe
   assert.match(release, /git merge-base --is-ancestor HEAD origin\/main/);
   assert.match(release, /gh release delete-asset "\$TAG" "\$name" --yes/);
   assert.match(release, /sort -V \| tail -n 1/);
-  const [verify, publish] = jobs(release);
+  const verify = jobs(release).find((job) => job.name === 'verify');
+  const publish = jobs(release).find((job) => job.name === 'publish');
   assert.ok(verify.lines.some((line) => /^ {6}contents: read$/.test(line)));
   assert.ok(publish.lines.some((line) => /^ {6}contents: write$/.test(line)));
   assert.ok(!publish.lines.some((line) => /^ {6}GH_TOKEN:/.test(line)), 'the publish job sets no job-wide GH_TOKEN');
@@ -183,10 +189,11 @@ test('the vendor sync stages read-only, confirms upstream and merges only safe u
   assert.doesNotMatch(heartbeatText, /git push|contents: write/);
 });
 
-test('the verify workflow runs every fixture with ffmpeg and Playwright on own-part changes and on tags', () => {
+test('the verify workflow runs every fixture with ffmpeg and Playwright on own-part changes and when a release calls it', () => {
   const verify = read('verify.yml');
-  assert.match(verify, /tags: \["v\*"\]/);
-  for (const filter of ['"skills/apple/shared/**"', '"skills/apple/launch-*/**"', '"rules.json"', '"fixtures/**"', '"evidence/**"']) {
+  assert.doesNotMatch(verify, /tags: \["v\*"\]/, 'the release workflow runs verify for tags, a tag trigger would run it twice');
+  assert.match(verify, /^ {2}workflow_call:\n {4}inputs:\n {6}ref:\n/m);
+  for (const filter of ['"skills/apple/shared/**"', '"skills/apple/launch-*/**"', '"skills/apple/menubar-widgets/**"', '"skills/apple/web-shells/**"', '"rules.json"', '"fixtures/**"', '"evidence/**"']) {
     assert.equal(verify.split(filter).length - 1, 2, `${filter} filters both pushes and pull requests`);
   }
   const scripts = runScripts(verify).join('\n');
@@ -194,9 +201,41 @@ test('the verify workflow runs every fixture with ffmpeg and Playwright on own-p
   assert.match(scripts, /npm install --no-save --no-package-lock playwright@\d+\.\d+\.\d+/);
   assert.match(scripts, /npx playwright install --with-deps --only-shell chromium/);
   assert.ok(runScripts(verify).includes('node scripts/verify.mjs'));
-  const [job] = jobs(verify);
-  assert.ok(job.lines.some((line) => /^ {6}contents: read$/.test(line)));
+  for (const job of jobs(verify)) {
+    assert.ok(job.lines.some((line) => /^ {6}contents: read$/.test(line)), `job ${job.name} reads contents`);
+    assert.ok(!job.lines.some((line) => /: write$/.test(line)), `job ${job.name} writes nothing`);
+    for (const step of steps(job).filter((lines) => /uses: actions\/checkout@/.test(lines[0]))) {
+      assert.ok(step.includes('          ref: ${{ inputs.ref }}'), `job ${job.name} checks out the ref a release passes`);
+    }
+  }
+});
+
+test('the verify workflow judges the darwin snapshot fixtures on macOS and fails when one is skipped', () => {
+  const mac = jobs(read('verify.yml')).filter((job) => job.lines.includes('    runs-on: macos-latest'));
+  assert.equal(mac.length, 1, 'one verify job runs on macOS');
+  const [job] = mac;
+  const run = steps(job).map((lines) => lines.join('\n')).find((text) => text.includes('node scripts/verify.mjs --only MW-SNAP-01,MW-SNAP-02'));
+  assert.ok(run, 'the macOS job runs MW-SNAP-01 and MW-SNAP-02');
+  assert.match(run, /^ {8}shell: bash$/m);
+  assert.match(run, /node scripts\/verify\.mjs --only MW-SNAP-01,MW-SNAP-02 \| tee "\$RUNNER_TEMP\/snapshots\.log"/);
+  assert.match(run, /if grep -q '\^skip ' "\$RUNNER_TEMP\/snapshots\.log"; then\n\s+echo [^\n]+\n\s+exit 1\n\s+fi/);
+  assert.ok(job.lines.includes('      contents: read'));
   assert.ok(!job.lines.some((line) => /: write$/.test(line)));
+});
+
+test('the release publishes only after the verify workflow passes for the tag', () => {
+  const release = jobs(read('release.yml'));
+  const fixtures = release.filter((job) => job.lines.includes('    uses: ./.github/workflows/verify.yml'));
+  assert.equal(fixtures.length, 1, 'release.yml calls verify.yml once');
+  const [call] = fixtures;
+  assert.ok(call.lines.includes('      ref: refs/tags/${{ inputs.tag || github.ref_name }}'), 'verify runs on the tag being released');
+  assert.ok(call.lines.includes('      contents: read'));
+  assert.ok(!call.lines.some((line) => /: write$/.test(line)));
+  const publish = release.find((job) => job.name === 'publish');
+  const needs = /^ {4}needs: \[([^\]]*)\]$/m.exec(publish.lines.join('\n'));
+  assert.ok(needs, 'publish lists what it needs');
+  assert.deepEqual(needs[1].split(',').map((item) => item.trim()).sort(), [call.name, 'verify'].sort());
+  assert.match(release.find((job) => job.name === 'npm').lines.join('\n'), /^ {4}needs: publish$/m);
 });
 
 test('the badges workflow renders only the view badge and pushes only to the badges branch', () => {
