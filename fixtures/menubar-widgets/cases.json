@@ -13,6 +13,7 @@
     { "id": "probe-removed-copy", "rule": "MW-STALE-01", "expect": "fail", "checker": "probe-extension", "app": "probe/Weather.app", "installed": "2026-11-13T09:00:00", "ps": "probe/ps-removed-copy.txt", "lsof": "probe/lsof-removed-copy.txt" },
     { "id": "snapshot-baseline-same", "rule": ["MW-SNAP-01", "MW-SNAP-02"], "expect": "pass", "checker": "snapshot-widgets", "platform": "darwin", "baselineSources": ["snapshot/StepsCard.swift", "snapshot/Catalog.swift"], "sources": ["snapshot/StepsCard.swift", "snapshot/Catalog.swift"] },
     { "id": "snapshot-baseline-changed", "rule": "MW-SNAP-02", "expect": "fail", "checker": "snapshot-widgets", "platform": "darwin", "baselineSources": ["snapshot/StepsCard.swift", "snapshot/Catalog.swift"], "sources": ["snapshot/StepsCardEdited.swift", "snapshot/Catalog.swift"] },
+    { "id": "snapshot-shipped-widget", "rule": "MW-SNAP-01", "expect": "pass", "checker": "snapshot-widgets", "platform": "darwin", "sources": ["assets/ConfigurableWidget.swift", "snapshot/CityCatalog.swift"] },
     { "id": "snapshot-overflow", "rule": "MW-SNAP-01", "expect": "fail", "checker": "snapshot-widgets", "platform": "darwin", "sources": ["snapshot/OverflowCatalog.swift"] }
   ]
 }

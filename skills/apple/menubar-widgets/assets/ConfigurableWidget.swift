@@ -1,6 +1,7 @@
 // menubar-widgets ConfigurableWidget.swift (design-pro-max)
 // A widget whose options appear in Edit Widget: AppIntentConfiguration, a WidgetConfigurationIntent and an AppEntity
 // parameter with its query. The kind string lives in one constant that reloadTimelines(ofKind:) also uses.
+// No @main here: the widget bundle lives in WidgetBundle.swift, so this file also builds with SnapshotRenderer.swift.
 
 import AppIntents
 import SwiftUI
@@ -112,13 +113,6 @@ struct CityWidget: Widget {
         .configurationDisplayName("City Weather")
         .description("Shows the temperature in a city you choose.")
         .supportedFamilies([.systemSmall, .systemMedium])
-    }
-}
-
-@main
-struct WeatherWidgets: WidgetBundle {
-    var body: some Widget {
-        CityWidget()
     }
 }
 

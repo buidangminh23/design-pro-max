@@ -46,7 +46,7 @@ enum SnapshotCatalog {
 }
 ```
 
-Use the family sizes of the devices the widget ships on; `../hig/PART.md` lists them. The views must compile on their own with SwiftUI and WidgetKit: pass the view files and the model types they use, and give previews fixed data instead of reading the app group.
+Use the family sizes of the devices the widget ships on; `../hig/PART.md` lists them. The views must compile on their own with SwiftUI and WidgetKit: pass the view files and the model types they use, and give previews fixed data instead of reading the app group. Leave out the file with the `@main` widget bundle (`assets/WidgetBundle.swift` keeps it alone for this reason); two `@main` types fail the link with a duplicate `_main`.
 
 ```
 node <part folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline Snapshots/baseline --update Sources/WidgetViews Snapshots/Catalog.swift

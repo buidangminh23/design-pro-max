@@ -54,13 +54,13 @@ Read the reference the task needs, in full:
 | Static scan, offscreen snapshots, the process probe, test builds beside the installed copy, window capture | `references/testing-and-builds.md` |
 | Every rule's evidence | `references/evidence.md` |
 
-Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/StatusItemController.swift` (a coloured status item that redraws only on a light or dark change), `assets/ConfigurableWidget.swift` (an intent-configured widget with an entity parameter, its query, a kind constant and a reload call), `assets/StaleExtensionCleanup.swift` (the launch-time cleanup after an update) and `assets/SnapshotRenderer.swift` (the offscreen renderer the snapshot script builds).
+Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/StatusItemController.swift` (a coloured status item that redraws only on a light or dark change), `assets/ConfigurableWidget.swift` (an intent-configured widget with an entity parameter, its query, a kind constant and a reload call), `assets/WidgetBundle.swift` (the extension's `@main`, alone in its file), `assets/StaleExtensionCleanup.swift` (the launch-time cleanup after an update) and `assets/SnapshotRenderer.swift` (the offscreen renderer the snapshot script builds).
 
 ## 5. Build in the user's project
 
 1. List every path you will write before writing any, and stop if one exists that you did not create. Copied references start with a `menubar-widgets ... (design-pro-max)` header; rename the example identifiers (`com.example...`, `City...`) to the project's own.
 2. Status item: start from `assets/StatusItemController.swift` only when the icon needs colour; otherwise set a template image and drop the observer. For a SwiftUI app, `MenuBarExtra` with `.menu` or `.window` style replaces the controller; read the SwiftUI row of the router for the scene APIs.
-3. Widget: start from `assets/ConfigurableWidget.swift`. Put the kind in one constant and use it for every `reloadTimelines(ofKind:)` call [MW-WARN-KIND]. Reload timelines from the app when its data changes, not on a timer.
+3. Widget: start from `assets/ConfigurableWidget.swift` and `assets/WidgetBundle.swift`. Keep the `@main` widget bundle alone in its own file, apart from the views, so the views also build with the snapshot renderer, which has its own `@main`. Put the kind in one constant and use it for every `reloadTimelines(ofKind:)` call [MW-WARN-KIND]. Reload timelines from the app when its data changes, not on a timer.
 4. Self-updating apps: call `assets/StaleExtensionCleanup.swift` at launch [MW-STALE-01]; `references/widgets-and-intents.md` covers sandboxed hosts.
 5. Builds: run one Xcode or swiftc build at a time; if a build fails inside an agent sandbox on its caches, ask to run it outside the sandbox. A build without Xcode follows [MW-WARN-INTENTS] and [MW-WARN-EXTSIGN].
 6. Test as a separate debug build [MW-WARN-TESTCOPY], never by killing, replacing or re-registering the person's installed app.
