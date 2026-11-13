@@ -66,7 +66,8 @@ function buildSite(entry, skill, media, folder) {
   const pageFolder = entry.page ? path.dirname(path.join(folder, entry.page)) : folder;
   for (const [name, recipe] of Object.entries(entry.media ?? {})) {
     if (!media[recipe]) throw new Error(`${entry.id}: unknown media recipe ${recipe}`);
-    fs.copyFileSync(media[recipe], path.join(pageFolder, name));
+    if (fs.statSync(media[recipe]).isDirectory()) copyTree(media[recipe], path.join(pageFolder, name));
+    else fs.copyFileSync(media[recipe], path.join(pageFolder, name));
   }
 }
 
@@ -149,7 +150,7 @@ async function main(argv) {
   }
   const needed = new Set(cases.map((entry) => entry.part));
   const media = {
-    ...(needed.has('launch-scroll') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs') }) : {}),
+    ...(needed.has('launch-scroll') || needed.has('launch-page') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs'), makeSequence: path.join(skill, 'launch-scroll', 'scripts', 'make-sequence.mjs') }) : {}),
     ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs') }) : {}),
   };
   const results = [];

@@ -9,8 +9,8 @@
       "values": "end state = progress 1; no film request",
       "evidence": ["AM-13", "AM-16", "AM-23", "SC-21"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["gate-01-ignores-motion"] },
-      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css"]
+      "fixtures": { "pass": ["scene-js", "scrub-video", "scrub-sequence"], "fail": ["gate-01-ignores-motion", "gate-01-sequence-ignores-motion"] },
+      "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css", "launch-scroll/assets/lib/frame-window.js"]
     },
     {
       "id": "LS-GATE-02",
@@ -20,7 +20,7 @@
       "values": "pin only when stage height + sticky offset <= viewport height",
       "evidence": ["AM-13"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["gate-02-ignores-height"] },
+      "fixtures": { "pass": ["scene-js", "scrub-video", "scrub-sequence"], "fail": ["gate-02-ignores-height"] },
       "implementedBy": ["launch-scroll/assets/lib/scene-progress.js"]
     },
     {
@@ -31,7 +31,7 @@
       "values": "box = travel + 100vh; sticky child = 100vh minus the offset; progress in [0, 1], monotonic",
       "evidence": ["AM-12", "ON-2"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scene-js", "scrub-video"], "fail": ["geom-01-unclamped"] },
+      "fixtures": { "pass": ["scene-js", "scrub-video", "scrub-sequence"], "fail": ["geom-01-unclamped"] },
       "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scene.css"]
     },
     {
@@ -127,11 +127,11 @@
       "part": "launch-scroll",
       "level": "warn",
       "statement": "Use image sequences only for short films, alpha or software-decode targets, and show the decoded-memory budget (frames x width x height x 4 bytes).",
-      "values": "2.3-5.3 times the bytes of GOP-6 video; frames x width x height x 4 bytes decoded",
-      "evidence": ["SC-11", "SC-12"],
-      "check": null,
-      "fixtures": { "pass": [], "fail": [] },
-      "implementedBy": []
+      "values": "1.95-5.3 times the bytes of GOP-6 video, by content; frames x width x height x 4 bytes decoded; a window of (2 x radius + 1) decoded frames",
+      "evidence": ["SC-11", "SC-12", "TQ-N0"],
+      "check": "launch-scroll/scripts/probe-scene.mjs",
+      "fixtures": { "pass": ["scrub-sequence"], "fail": [] },
+      "implementedBy": ["launch-scroll/assets/lib/frame-window.js", "launch-scroll/scripts/make-sequence.mjs", "launch-scroll/scripts/bench-scrub.mjs", "launch-scroll/assets/reference/scrub-sequence.html"]
     },
     {
       "id": "LS-WARN-BLUR",

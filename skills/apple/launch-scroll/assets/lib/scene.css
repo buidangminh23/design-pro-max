@@ -36,7 +36,8 @@
 
 [data-scene-film] > img,
 [data-scene-film] > picture,
-[data-scene-film] > video {
+[data-scene-film] > video,
+[data-scene-film] > canvas {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -44,11 +45,13 @@
   object-fit: cover;
 }
 
-[data-scene-film] > video {
+[data-scene-film] > video,
+[data-scene-film] > canvas {
   opacity: 0;
 }
 
-[data-scene][data-scene-state="pinned"][data-scrub-state="ready"] [data-scene-film] > video {
+[data-scene][data-scene-state="pinned"][data-scrub-state="ready"] [data-scene-film] > video,
+[data-scene][data-scene-state="pinned"][data-scrub-state="ready"] [data-scene-film] > canvas {
   opacity: 1;
 }
 

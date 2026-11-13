@@ -1,6 +1,7 @@
 /**
  * Media for the launch-scroll fixtures, generated with ffmpeg from synthetic sources so no media file is ever
- * committed. The good film goes through the part's own encode-scrub.mjs, which the fixtures therefore exercise too.
+ * committed. The good film goes through the part's own encode-scrub.mjs and the image sequence through make-sequence.mjs,
+ * which the fixtures therefore exercise too.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,7 +22,7 @@ const ffmpeg = (...args) => run('ffmpeg', ['-hide_banner', '-nostats', '-logleve
 const H264 = ['-an', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart'];
 
 /** Builds every recipe into `folder` once and returns a map from recipe name to file. */
-export function buildFixtureMedia(folder, { encodeScrub }) {
+export function buildFixtureMedia(folder, { encodeScrub, makeSequence }) {
   fs.mkdirSync(folder, { recursive: true });
   const file = (name) => path.join(folder, name);
   const master = file('master.mkv');
@@ -40,6 +41,7 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
     'film-vp9': file('film-vp9.webm'),
     'clip-aac': file('clip-aac.mp4'),
     'clip-hevc': file('clip-hevc.mp4'),
+    sequence: path.join(folder, 'sequence'),
   };
   const build = (name, ...args) => {
     if (!fs.existsSync(media[name])) ffmpeg(...args, media[name]);
@@ -51,6 +53,9 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
   build('film-vp9', '-i', master, '-an', '-vf', 'scale=640:-2', '-c:v', 'libvpx-vp9', '-crf', '36', '-b:v', '0', '-g', '6', '-keyint_min', '6', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8');
   build('clip-aac', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2', '-threads', '2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart');
   build('clip-hevc', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-t', '2', '-threads', '2', '-an', '-c:v', 'libx265', '-x265-params', 'log-level=error:pools=2', '-tag:v', 'hvc1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart');
+  if (makeSequence && !fs.existsSync(path.join(media.sequence, 'sequence.json'))) {
+    run(process.execPath, [makeSequence, master, '--out', media.sequence, '--width', '640', '--format', 'jpg']);
+  }
   return media;
 }
 
