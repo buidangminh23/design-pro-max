@@ -130,6 +130,18 @@
       "args": ["--viewport", "1280x800"]
     },
     {
+      "id": "broken-launch-embed",
+      "rule": ["LV-EMBED-01"],
+      "expect": "fail",
+      "checker": "check-embed",
+      "checkerPart": "launch-video",
+      "page": "pages/broken-launch.html",
+      "server": "200",
+      "expected": "pages/broken-launch.expected.json",
+      "media": { "intro.mp4": "film", "film.mp4": "film-long-gop", "startframe.jpg": "startframe-long-gop", "film-plain.mp4": "film", "startframe-plain.jpg": "startframe", "demo.mp4": "film", "poster.jpg": "still", "clip-aac.mp4": "clip-aac", "clip-hevc.mp4": "clip-hevc" },
+      "args": ["--viewport", "1280x800", "--selector", "#clips video"]
+    },
+    {
       "id": "broken-launch-aac",
       "rule": ["LV-ENC-02"],
       "expect": "fail",
