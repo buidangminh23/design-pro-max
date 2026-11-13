@@ -54,6 +54,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Fixed
 
+- `launch-scroll/PART.md` asks for pushback before building. Round 3 pinned a still testimonials section on every run (case 10), built a 600-frame 1080p sequence without steering toward a film (case 8) and left `preload="auto"` in a fixed film (case 7, Codex). The scene read now says not to pin a still section even when asked, to explain why first and never invent beats; to show a sequence's decoded memory and download size and recommend a film unless the film is short, needs alpha or targets software decode; and to check a scene being fixed against the never-ship list.
 - The routing trace parser now expands shell brace lists such as `references/{a,b}.md`; it had counted such a read as one missing file (routing round 3, Codex r07).
 - An agent looked for `launch-scroll/package.json` before running the checkers (routing round 3, Claude r40 rerun). `PART.md` now says the folder has none and needs no install.
 - `launch-scroll/PART.md` named the CSS and JS reference pages but not the film one, so an agent building a scrubbed film guessed `assets/reference/scene-film.html` (routing round 3, r40). The engine list now names `assets/reference/scrub-video.html` for a film.

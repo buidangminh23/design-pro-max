@@ -6,11 +6,13 @@ Pinned web scenes driven by scroll: a sticky stage that changes while the reader
 
 Ask, and write the answers down as a beat table (progress window, what changes, which element):
 
-1. What changes on screen while the reader scrolls through this section? If nothing changes, or the change is one reveal that plays once, **do not pin**: use a normal section with a one-time reveal (see `../shared/motion-classes.md`) and stop here.
+1. What changes on screen while the reader scrolls through this section? Read it from the section's actual content. If nothing changes, or the change is one reveal that plays once, **do not pin, even when the user asked for a pin**: tell them why before writing anything, offer a normal section with at most a one-time reveal that respects reduced motion (see `../shared/motion-classes.md`), and build that instead. Build the pin only if they still want it after hearing this. Never invent scroll beats (quotes cycling, progress bars, counters) to give a still section something to pin for.
 2. Is the change continuous and tied to position (a device turning, a film advancing, a diagram assembling)? Then pin.
 3. How tall is the stage's content, and how tall is the page's sticky chrome (a fixed nav)? Both decide the short-viewport gate [LS-GATE-02]. Take them from this page, never from another site's measurements.
 4. How much travel does the story need? Aim for 70-300vh [LS-WARN-TRAVEL]; more asks the reader to scroll through too little change.
 5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`).
+6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). If a sequence stays, decode a bounded window of frames, never the whole set.
+7. Fixing an existing scene? Check its code against section 6 as well as the reported symptom, and replace every item it ships from there, such as `preload="auto"`.
 
 ## 2. Choose the engine
 
