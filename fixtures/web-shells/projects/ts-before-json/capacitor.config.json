@@ -1,0 +1,9 @@
+{
+  "appId": "com.example.dashboard",
+  "appName": "Dashboard",
+  "webDir": "shell",
+  "server": {
+    "url": "http://localhost:5173",
+    "cleartext": true
+  }
+}

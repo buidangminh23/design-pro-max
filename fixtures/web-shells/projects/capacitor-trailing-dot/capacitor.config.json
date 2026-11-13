@@ -1,0 +1,9 @@
+{
+  "appId": "com.example.dashboard",
+  "appName": "Dashboard",
+  "webDir": "shell",
+  "server": {
+    "url": "https://mac.local.:8443",
+    "errorPath": "offline.html"
+  }
+}
