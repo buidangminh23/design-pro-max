@@ -4369,6 +4369,84 @@
       "status": "current",
       "correction": null,
       "sourceSha": "595e7a2426e15be033c2821b28eca14d4b5800381d84b804296e1b4382a81160"
+    },
+    "IL-13": {
+      "claim": "Observing a status item button's effectiveAppearance with key-value observing and marking the button for display on every callback can loop: the menu bar's own snapshot of the item sets the appearance again, which fires the observer again, and the idle app keeps a core busy.",
+      "value": "one core held at 90-97 % CPU while idle; fixed by redrawing only when the light or dark match changes; diagnose with sample <pid> 3",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "Sampled an idle menu bar app after a dark mode switch, then compared an observer that redraws on every callback with one that first compares the best-matching appearance with the last one.",
+      "confidence": "high",
+      "remeasure": "Switch the system to dark mode, leave the app idle for a minute, read its CPU with ps or sample; apply the guard and repeat.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "f8f3214774651a352c4f496e07076cb6342936a0c58e292e6cd1f9039822b8f9"
+    },
+    "IL-14": {
+      "claim": "After an app replaces itself during an update, the old WidgetKit extension process can keep running from the removed copy, so the placed widgets show placeholders until that process stops.",
+      "value": "stale process: started before the installed bundle was written, or its executable mapping lies outside the installed app; fix at launch: stop stale extension processes, register with pluginkit -a, reload all timelines",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "Compared the extension process start time from ps with the install time of the updated app and read its executable mapping from lsof after a self-update left placeholder widgets.",
+      "confidence": "high",
+      "remeasure": "Update a test build in place while its widget is placed, then list extension processes with ps -o lstart and lsof -d txt.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "3285a9666eb04abd86fa94d88d9719cf8041a380d90987c4f2748943ad216171"
+    },
+    "IL-15": {
+      "claim": "A widget built with StaticConfiguration has no user options, so Edit Widget offers none; AppIntentConfiguration with a WidgetConfigurationIntent whose parameters use AppEntity types gives the options. Keeping the kind string keeps placed widgets. A build without Xcode must extract App Intents metadata with the entity query and package protocols included, or the metadata is incomplete.",
+      "value": "StaticConfiguration: no options; AppIntentConfiguration with a WidgetConfigurationIntent: options; kind string kept across the change",
+      "label": "documented",
+      "date": "2026-11-13",
+      "source": "https://developer.apple.com/documentation/widgetkit/appintentconfiguration",
+      "method": "Read the WidgetKit and App Intents documentation, then moved a static widget to an intent configuration on a local build made without Xcode and checked the options in Edit Widget.",
+      "confidence": "high",
+      "remeasure": "Read the documentation again; build a widget each way and open Edit Widget.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "3b0a6a9948800fb3c51f4125631bc58b61fc9f6c4dc66c1d717a0d6c00aad4bc"
+    },
+    "IL-16": {
+      "claim": "Widget views can be tested offscreen: render each entry with ImageRenderer at its size, write PNGs and compare their bytes with the previous build. Content that grows past the size breaks the export, links draw as placeholders, very many renders in one process can abort, and a command-line renderer finds bundled fonts beside its own binary.",
+      "value": "one PNG per entry and size, byte-compared with the previous build; heights capped; about 60 renders per process at most",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "Rendered a widget set offscreen with ImageRenderer from a command-line target across several builds and compared PNG bytes; noted the failure modes as they appeared.",
+      "confidence": "high",
+      "remeasure": "Render the same entries twice and compare bytes; render a view taller than its size; render a batch of 100 entries in one process.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "5b11e51e1566c3cae9cddcdeb15c89911e8e8f58ecc6a4bc493db1abde9c46c2"
+    },
+    "IL-17": {
+      "claim": "A menu bar or widget app can be tested without touching the installed copy by running a debug build under another bundle identifier with its own data folder; a packaged release registers the login item and signals the installed widget process. A screen capture over SSH sees no windows, so capture one window from inside the logged-in session.",
+      "value": "test builds: own bundle identifier and data folder; capture one window from inside the logged-in session (screencapture -x -o -l <window number>)",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "Ran debug and packaged builds beside an installed copy and compared which login items and widget processes changed; captured screens over SSH and from the logged-in session.",
+      "confidence": "high",
+      "remeasure": "Run a debug build with a separate bundle identifier and confirm the installed copy's data and widget process are untouched.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "c25d61ab4115d13f7c732e9cc1e1203b0399c2fb89f09c733023e4ed6e315625"
+    },
+    "IL-18": {
+      "claim": "An app extension such as a WidgetKit extension runs in the App Sandbox and is signed with its own entitlements, which signing the host app must not replace; it starts in the system extension entry point rather than a custom main, and a notarized build needs a secure timestamp. A bare executable that carries the app sandbox entitlement exits at launch without a message, so probe entitlements from a wrapped app bundle.",
+      "value": "extension: sandboxed, own entitlements, system entry point; secure timestamp for notarization; probe entitlements inside an app bundle",
+      "label": "documented",
+      "date": "2026-11-13",
+      "source": "https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/",
+      "method": "Read Apple's app extension and App Sandbox documentation; the silent exit of a bare sandboxed executable was seen once on a local build.",
+      "confidence": "high",
+      "remeasure": "Read the documentation again; sign a bare executable with the sandbox entitlement and run it.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "781a3cfff5f57bfdd7cdd27cba8d5f79698fada923a38306e505613ce8a58791"
     }
   }
 }
