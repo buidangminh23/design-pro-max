@@ -66,7 +66,12 @@ node <part folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline
 node <part folder>/scripts/probe-extension.mjs --app "/Applications/<App>.app"
 ```
 
-It reads each extension's executable name from its Info.plist, lists the running processes with `ps -axww -o pid=,lstart=,args=` and their executables with `lsof -a -p <pids> -d txt -Fpn`, and fails [MW-STALE-01] for a process that started before the bundle was installed or runs an executable outside it (IL-14). It never stops anything: it prints the fix for the person to run. Inside an agent sandbox the process table is hidden and the probe exits 3. To judge another machine, record both commands there and pass `--ps <file> --lsof <file>`, with `--installed <date and time>` when the bundle's modification time is not the install time.
+It reads each extension's executable name and bundle identifier from its Info.plist, lists the running processes with `ps -axww -o pid=,lstart=,args=` and their executables with `lsof -a -p <pids> -d txt -Fpn`, and fails [MW-STALE-01] for a process that started before the bundle was installed or runs an executable outside it (IL-14). It never stops anything: it prints the fix for the person to run. Inside an agent sandbox the process table is hidden and the probe exits 3.
+
+- Which processes count: the extension's executable inside a bundle with the installed extension's identifier, or inside a removed or temporary copy of an app with the same name. Another app's extension with the same executable name, and a debug copy under its own identifier, are left out.
+- The install time is the later of the change time and the birth time of the extension and its executable. Updaters keep the modification time when they copy or unpack a bundle, so the modification time can predate the install by weeks. A change of metadata alone (permissions, extended attributes) also moves the change time; at worst that marks a fresh process stale and the fix restarts it once.
+- Without an lsof mapping (lsof missing or blocked), the executable path comes from the process's arguments; a process with neither is a warning, not a pass.
+- To judge another machine, record both commands there, ps in the C locale so the start times are in English: `LC_ALL=C ps -axww -o pid=,lstart=,args= > ps.txt`. Pass `--ps ps.txt --lsof lsof.txt --tz <offset>`, where the offset (`Z` or `+07:00`) is that machine's, since `lstart` has none; a recording with no readable line, or without `--tz`, is a usage error (exit 2). `--installed <YYYY-MM-DDTHH:MM:SS>` overrides the install time; without an offset it is read in the `--tz` zone.
 
 ## Test builds beside the installed copy
 

@@ -647,7 +647,7 @@
       "values": "extension processes start after the install and run the installed copy",
       "evidence": ["IL-14"],
       "check": "menubar-widgets/scripts/probe-extension.mjs",
-      "fixtures": { "pass": ["probe-fresh"], "fail": ["probe-started-before-install", "probe-removed-copy"] },
+      "fixtures": { "pass": ["probe-fresh", "probe-other-apps", "probe-installed-with-offset"], "fail": ["probe-started-before-install", "probe-removed-copy", "probe-removed-copy-no-lsof"] },
       "implementedBy": ["menubar-widgets/assets/StaleExtensionCleanup.swift"]
     },
     {
@@ -658,7 +658,7 @@
       "values": "needed height at most the entry height; PNG of width and height times the scale",
       "evidence": ["IL-16"],
       "check": "menubar-widgets/scripts/snapshot-widgets.mjs",
-      "fixtures": { "pass": ["snapshot-baseline-same"], "fail": ["snapshot-overflow"] },
+      "fixtures": { "pass": ["snapshot-baseline-same", "snapshot-shipped-widget"], "fail": ["snapshot-overflow"] },
       "implementedBy": ["menubar-widgets/assets/SnapshotRenderer.swift"]
     },
     {
