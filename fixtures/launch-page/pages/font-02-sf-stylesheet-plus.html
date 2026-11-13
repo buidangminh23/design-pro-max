@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Fail fixture for LP-FONT-01: a stylesheet URL shaped like a hosted font service, with the family list encoded with
+     '+' for spaces (families=SF+Pro,v3|SF+Pro+Icons,v3). The request goes to fonts.invalid, which never resolves. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-FONT-01 fail: encoded family list</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="https://fonts.invalid/wss/fonts?families=SF+Pro,v3|SF+Pro+Icons,v3">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+</style>
+</head>
+<body>
+<h1>Fonts from an encoded family list</h1>
+<p>The stack itself starts with system-ui; only the stylesheet request names the font.</p>
+</body>
+</html>

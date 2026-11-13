@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Pass fixture for LP-REVEAL-01 and the shipped reveal.js: a panel taller than eight viewports and a short line at the
+     very end of the page, the two cases a 10% threshold with a 15% bottom margin never reveals. Run it at 1280x400. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reveal library edge cases</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  section { padding: var(--space-6) var(--page-gutter); }
+  h2 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .tall { height: 4000px; background: var(--color-surface); padding: var(--space-3); }
+  .closing { margin: 0; padding: 0 var(--page-gutter); }
+  [data-reveal] { transition: opacity var(--duration-reveal) var(--ease-out), translate var(--duration-reveal) var(--ease-out); }
+  html[data-motion="ok"] [data-reveal]:not([data-revealed]) { opacity: 0; translate: 0 var(--reveal-rise); }
+</style>
+</head>
+<body>
+<section><h2>A long story</h2><div class="tall" data-reveal><p>A panel taller than eight viewports.</p></div></section>
+<p class="closing" data-reveal>The closing line at the very end of the page.</p>
+<script type="module">
+  import { markMotion } from '../lib/gate.js';
+  import { createReveals } from '../lib/reveal.js';
+  markMotion();
+  createReveals(document);
+</script>
+</body>
+</html>

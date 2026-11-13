@@ -94,6 +94,122 @@
       "args": ["--viewport", "1280x800", "--rule", "LP-REVEAL-01", "--no-warn"]
     },
     {
+      "id": "contrast-02-oklch",
+      "rule": "LP-CONTRAST-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/contrast-02-oklch.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-CONTRAST-01", "--no-warn"]
+    },
+    {
+      "id": "contrast-03-dark-mode",
+      "rule": "LP-CONTRAST-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/contrast-03-dark-mode.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-CONTRAST-01", "--no-warn"]
+    },
+    {
+      "id": "contrast-04-pseudo-scrim",
+      "rule": "LP-CONTRAST-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/contrast-04-pseudo-scrim.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-CONTRAST-01", "--no-warn"]
+    },
+    {
+      "id": "reveal-02-hidden-forever",
+      "rule": "LP-REVEAL-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/reveal-02-hidden-forever.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-REVEAL-01", "--no-warn"]
+    },
+    {
+      "id": "reveal-03-library-edges",
+      "rule": "LP-REVEAL-01",
+      "expect": "pass",
+      "checker": "check-page",
+      "page": "pages/reveal-03-library-edges.html",
+      "server": "range",
+      "args": ["--viewport", "1280x400", "--rule", "LP-REVEAL-01", "--no-warn"]
+    },
+    {
+      "id": "amb-02-marquee-no-script",
+      "rule": "LP-AMB-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/amb-02-marquee-no-script.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-AMB-01", "--no-warn"]
+    },
+    {
+      "id": "amb-03-video-loop",
+      "rule": "LP-AMB-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/amb-03-video-loop.html",
+      "server": "range",
+      "media": { "loop.webm": "film-webm" },
+      "args": ["--viewport", "1280x800", "--rule", "LP-AMB-01", "--no-warn"]
+    },
+    {
+      "id": "amb-04-hidden-pause",
+      "rule": "LP-AMB-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/amb-04-hidden-pause.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-AMB-01", "--no-warn"]
+    },
+    {
+      "id": "base-02-clip-path",
+      "rule": "LP-BASE-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/base-02-clip-path.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-BASE-01", "--no-warn"]
+    },
+    {
+      "id": "base-03-unmarked",
+      "rule": "LP-BASE-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/base-03-unmarked.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-BASE-01", "--no-warn"]
+    },
+    {
+      "id": "font-02-sf-stylesheet-plus",
+      "rule": "LP-FONT-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/font-02-sf-stylesheet-plus.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-FONT-01", "--no-warn"]
+    },
+    {
+      "id": "type-02-own-tokens",
+      "rule": "LP-TYPE-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/type-02-own-tokens.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-TYPE-01", "--no-warn"]
+    },
+    {
+      "id": "lint-css-sf-plus",
+      "rule": "LP-FONT-01",
+      "expect": "fail",
+      "checker": "lint-css",
+      "sources": ["pages/font-02-sf-stylesheet-plus.html"]
+    },
+    {
       "id": "lint-css-shipped",
       "rule": "LP-FONT-01",
       "expect": "pass",

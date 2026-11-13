@@ -1,0 +1,34 @@
+<!doctype html>
+<!-- Fail fixture for LP-AMB-01: the marquee has a Pause button that would stop it, but the button is hidden, so no
+     reader can reach it. The marquee stops under reduced motion. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-AMB-01 fail: hidden pause control</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h2 { margin: 0 0 var(--heading-after); font-size: var(--type-title-size); line-height: var(--type-title-leading); }
+  .marquee { overflow: hidden; }
+  .track { display: flex; gap: var(--space-6); width: max-content; list-style: none; padding: 0; margin: 0; animation: slide 20s linear infinite; }
+  .marquee[data-paused] .track { animation-play-state: paused; }
+  @keyframes slide { to { translate: -50% 0; } }
+  @media (prefers-reduced-motion: reduce) { .track { animation: none; } }
+</style>
+</head>
+<body>
+<section class="marquee" data-marquee aria-label="customer logos">
+  <h2>Names with an unreachable pause</h2>
+  <ul class="track">
+    <li>Orchard Labs</li><li>Northfield</li><li>Kite and Co</li><li>Lumen Works</li>
+    <li aria-hidden="true">Orchard Labs</li><li aria-hidden="true">Northfield</li><li aria-hidden="true">Kite and Co</li><li aria-hidden="true">Lumen Works</li>
+  </ul>
+  <button type="button" hidden>Pause</button>
+</section>
+<script type="module">
+  const marquee = document.querySelector('[data-marquee]');
+  marquee.querySelector('button').addEventListener('click', () => marquee.toggleAttribute('data-paused'));
+</script>
+</body>
+</html>
