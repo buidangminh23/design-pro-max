@@ -191,6 +191,45 @@ test('the alpha pair warning reads the source order, not only the codecs present
   assert.deepEqual(levels(run.report, 'LV-WARN-ALPHA'), ['warn'], 'HEVC listed after VP9 alpha');
 });
 
+test('check-embed tries the toggle and pause-named controls first, and wants H.264 last', async () => {
+  const { orderControls, sourceOrder, DEMO_SELECTOR, FALLBACK_SELECTOR } = await part('scripts', 'check-embed.mjs');
+  const order = orderControls([{ id: 'a', name: 'Share' }, { id: 'b', name: 'Stop the demo' }, { id: 'c', name: 'Pause', toggle: true }]);
+  assert.deepEqual(order.map((control) => control.id), ['c', 'b', 'a']);
+  assert.deepEqual(sourceOrder(['av1', 'vp9', 'h264']), { h264Last: true, av1First: true });
+  assert.equal(sourceOrder(['h264', 'vp9']).h264Last, false, 'H.264 present but not last');
+  assert.equal(sourceOrder(['vp9', 'av1', 'h264']).av1First, false);
+  assert.equal(sourceOrder(['hevc', 'av1', 'h264']).av1First, true);
+  assert.equal(DEMO_SELECTOR, '[data-demo] video');
+  assert.match(FALLBACK_SELECTOR, /data-scrub/);
+  assert.match(FALLBACK_SELECTOR, /data-scene/);
+});
+
+test('the demo toggle keeps an icon and switches its aria-label', async () => {
+  const { setLabel } = await part('assets', 'lib', 'demo-embed.js');
+  const button = (attributes, childNodes = []) => ({
+    attributes: { ...attributes },
+    children: childNodes.filter((node) => node.nodeType === 1),
+    childNodes,
+    set textContent(value) { this.childNodes = [{ nodeType: 3, data: value }]; },
+    get textContent() { return this.childNodes.map((node) => node.data ?? '').join(''); },
+    hasAttribute(name) { return name in this.attributes; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+  });
+  const icon = { nodeType: 1 };
+  const iconOnly = button({ 'aria-label': 'Pause' }, [icon]);
+  setLabel(iconOnly, 'Play');
+  assert.equal(iconOnly.attributes['aria-label'], 'Play');
+  assert.deepEqual(iconOnly.childNodes, [icon]);
+  const text = { nodeType: 3, data: 'Pause' };
+  const mixed = button({}, [icon, text]);
+  setLabel(mixed, 'Play');
+  assert.equal(text.data, 'Play');
+  assert.deepEqual(mixed.childNodes, [icon, text]);
+  const plain = button({}, [{ nodeType: 3, data: 'Pause' }]);
+  setLabel(plain, 'Play');
+  assert.equal(plain.textContent, 'Play');
+});
+
 test('encode replaces only the files its manifest lists', async () => {
   const { foreignFiles, GENERATOR } = await part('scripts', 'encode.mjs');
   const manifest = { generator: GENERATOR, files: ['clip.mp4', 'clip.start.jpg', 'clip.encode.json'] };
@@ -208,15 +247,12 @@ test('render.json marks an unfinished render', async () => {
   assert.equal(renderManifest(options, false).frames, 60);
 });
 
-test('check-embed tries the toggle and pause-named controls first, and wants H.264 last', async () => {
-  const { orderControls, sourceOrder, DEMO_SELECTOR, FALLBACK_SELECTOR } = await part('scripts', 'check-embed.mjs');
-  const order = orderControls([{ id: 'a', name: 'Share' }, { id: 'b', name: 'Stop the demo' }, { id: 'c', name: 'Pause', toggle: true }]);
-  assert.deepEqual(order.map((control) => control.id), ['c', 'b', 'a']);
-  assert.deepEqual(sourceOrder(['av1', 'vp9', 'h264']), { h264Last: true, av1First: true });
-  assert.equal(sourceOrder(['h264', 'vp9']).h264Last, false, 'H.264 present but not last');
-  assert.equal(sourceOrder(['vp9', 'av1', 'h264']).av1First, false);
-  assert.equal(sourceOrder(['hevc', 'av1', 'h264']).av1First, true);
-  assert.equal(DEMO_SELECTOR, '[data-demo] video');
-  assert.match(FALLBACK_SELECTOR, /data-scrub/);
-  assert.match(FALLBACK_SELECTOR, /data-scene/);
+test('a server that may not listen is a sandbox block, and the rerun command is the real one', async () => {
+  const { sandboxReason, currentCommand, rethrowSandbox } = await shared('sandbox.mjs');
+  const { SandboxError } = await shared('report.mjs');
+  assert.match(sandboxReason('listen EPERM: operation not permitted 127.0.0.1'), /may not listen/);
+  assert.match(sandboxReason('listen EACCES: permission denied 127.0.0.1:80'), /may not listen/);
+  assert.equal(sandboxReason('listen EADDRINUSE: address already in use'), null);
+  assert.equal(currentCommand(['node', '/a b/check-embed.mjs', '--selector', '#clips video', '--viewport', '1280x800']), "node '/a b/check-embed.mjs' --selector '#clips video' --viewport 1280x800");
+  assert.throws(() => rethrowSandbox(new Error('listen EPERM: operation not permitted 127.0.0.1'), 'node x.mjs'), (error) => error instanceof SandboxError && error.command === 'node x.mjs');
 });
