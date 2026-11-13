@@ -1,11 +1,24 @@
+<div align="center">
+
+<img src="skills/apple/assets/apple.svg" alt="Apple logo, the icon of the apple skill" width="112" height="112">
+
 # design-pro-max
 
-[![GitHub views / 14d](https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/github-views.svg)](https://github.com/buidangminh23/design-pro-max/graphs/traffic)
-[![license](https://img.shields.io/github/license/buidangminh23/design-pro-max)](LICENSE)
+### Design Skills for AI Coding Agents
 
-<img src="skills/apple/assets/apple.svg" width="56" height="56" alt="Apple logo, the icon of the apple skill">
+*One skill per design. A router for Apple-platform work with its own HIG and scroll-scene guides, plus spacing rhythm and an exact-icon catalog, bundled.*
 
-Design skills for AI coding agents, one skill per design:
+<p align="center">
+  <a href="https://skills.sh/buidangminh23/design-pro-max"><img src="https://skills.sh/b/buidangminh23/design-pro-max?label=skills.sh" height="20" alt="skills.sh installs" /></a>
+  <a href="https://github.com/buidangminh23/design-pro-max/graphs/traffic"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/github-views.svg" height="20" alt="GitHub views / 14d" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/buidangminh23/design-pro-max" height="20" alt="license" /></a>
+</p>
+
+[CI](https://github.com/buidangminh23/design-pro-max/actions/workflows/ci.yml) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+
+</div>
+
+Three skills, one per design:
 
 - **apple**: a router for Apple-platform work that sends each task to one bundled guide, either a third-party part or one of the project's own, and has the agent read that guide in full.
 - **design-spacing-rhythm**: spacing, alignment and vertical rhythm for generated UI and documents, bundled from [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill).
