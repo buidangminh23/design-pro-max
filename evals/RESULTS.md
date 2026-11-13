@@ -1,5 +1,22 @@
 # Eval results
 
+## 2026-11-13: targeted rerun after the round 4 fixes (Mac)
+
+At 059bcaf, with the harness defaults (Claude Code 2.1.323, `claude-opus-5-5[1m]` at high; Codex codex-cli 0.167.2, `gpt-6.1-sol` at high): launch-scroll cases 6, 16, 18 and 19 with apple on both hosts, and routing rows r33 and r40 and near miss n12 on both hosts, to check the shorter router description. One grader per case, no independent recheck.
+
+| Case | Claude with, round 4 | Claude with, now | Codex with, round 4 | Codex with, now |
+|---|---|---|---|---|
+| 6 `pin-and-zoom` | 6/6 | 6/6 | 4/6 | 6/6 |
+| 16 `short-viewport` | 2/3 | 3/3 | 3/3 | 3/3 |
+| 18 `av1-only` | 3/3 | 3/3 | 2/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 3/3 | 2/3 | 2/3 |
+
+- `claude-with-16` loaded apple this time and gated the pin on the stage height plus the header.
+- `codex-with-6` gave a beat table and shipped the laptop visible in the markup.
+- `codex-with-18` still shipped AV1 and HEVC only, as asked, with H.264 recommended only in prose [LS-VID-02].
+- `codex-with-19` now uses frame 0 as the start image, but sets its source only after the video has presented a frame, so the end-state still covers the film area while it loads [LS-VID-05].
+- Routing: r33 and r40 started apple and reached the expected part on both hosts, with no wrong-path read (r40 read `assets/reference/scrub-video.html`); n12 did not start apple on Claude Code and read only the router on Codex.
+
 ## 2026-11-13: launch-scroll part evals, round 4 (Mac)
 
 All eight cases with and without apple on both hosts, at 92c55a4 (the skill as of 70cd500), with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.167.2 with `gpt-6.1-sol` at high, one run at a time. All 32 runs finished inside 60 turns and 25 minutes; none hit a host limit and no without run read the skill. One grader per case judged every expectation from each run's answer and its diff against the fixture; there was no independent recheck in this round.
