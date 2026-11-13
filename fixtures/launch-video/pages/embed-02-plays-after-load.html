@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- Fail fixture for LV-EMBED-02: a lazy loop with a labelled pause button whose visibility handler checks reduced
+     motion, but the handler that runs once the clip has loaded calls play() without that check, so the clip plays
+     under reduced motion. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop that plays after load</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  figure { width: 400px; margin: 0 auto 100vh; }
+  video { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<figure>
+  <video muted loop playsinline preload="none" width="640" height="360">
+    <source data-src="loop.mp4" type="video/mp4">
+  </video>
+  <button type="button">Pause</button>
+</figure>
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const video of document.querySelectorAll('video')) {
+    const button = video.nextElementSibling;
+    button.addEventListener('click', () => {
+      if (video.paused) video.play();
+      else video.pause();
+      button.textContent = video.paused ? 'Play' : 'Pause';
+    });
+    new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || video.dataset.loaded) return;
+      video.dataset.loaded = '1';
+      for (const source of video.querySelectorAll('source')) source.src = source.dataset.src;
+      video.addEventListener('loadeddata', () => video.play().catch(() => {}), { once: true });
+      video.load();
+    }, { rootMargin: '600px' }).observe(video);
+    new IntersectionObserver(([entry]) => {
+      if (reduce) return;
+      if (entry.intersectionRatio >= 0.5) video.play().catch(() => {});
+      else video.pause();
+    }, { threshold: [0, 0.5, 1] }).observe(video);
+  }
+</script>
+</body>
+</html>

@@ -49,3 +49,49 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
   build('film-vp9', '-i', master, '-an', '-vf', 'scale=640:-2', '-c:v', 'libvpx-vp9', '-crf', '36', '-b:v', '0', '-g', '6', '-keyint_min', '6', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8');
   return media;
 }
+
+const LV_TAGS = 'setparams=color_primaries=bt709:color_trc=iec61966-2-1:colorspace=bt709';
+const LV_SOURCE = (seconds, size = '640x360', rate = 30) => ['-f', 'lavfi', '-i', `cellauto=size=${size}:rate=${rate}:rule=110`, '-t', String(seconds)];
+const LV_THREADS = ['-threads', '2'];
+
+/**
+ * Media for the launch-video fixtures, from the same synthetic source at 640x360 or smaller. The good clips go through
+ * the part's own encode.mjs; each bad recipe breaks exactly one encode rule.
+ */
+export function buildLaunchVideoMedia(folder, { encode }) {
+  fs.mkdirSync(folder, { recursive: true });
+  const file = (name) => path.join(folder, name);
+  const masters = { clip: [file('lv-master.mkv'), 2], loop: [file('lv-loop-master.mkv'), 6] };
+  for (const [name, [master, seconds]] of Object.entries(masters)) {
+    if (!fs.existsSync(master)) ffmpeg(...LV_SOURCE(seconds), '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-crf', '12', ...LV_THREADS, master);
+    const out = path.join(folder, name);
+    if (!fs.existsSync(path.join(out, `${name}.mp4`))) run(process.execPath, [encode, master, '--out', out, '--name', name, '--profiles', 'h264,vp9', '--threads', '2']);
+  }
+  const media = {
+    'lv-clip': path.join(folder, 'clip', 'clip.mp4'),
+    'lv-clip-webm': path.join(folder, 'clip', 'clip.webm'),
+    'lv-clip-start': path.join(folder, 'clip', 'clip.start.jpg'),
+    'lv-loop': path.join(folder, 'loop', 'loop.mp4'),
+    'lv-loop-webm': path.join(folder, 'loop', 'loop.webm'),
+    'lv-loop-start': path.join(folder, 'loop', 'loop.start.jpg'),
+    'lv-yuvj': file('lv-yuvj.mp4'),
+    'lv-444': file('lv-444.mp4'),
+    'lv-moov-end': file('lv-moov-end.mp4'),
+    'lv-aac': file('lv-aac.mp4'),
+    'lv-untagged': file('lv-untagged.mp4'),
+    'lv-start-wrong': file('lv-start-wrong.jpg'),
+    'lv-recorded': file('lv-recorded.webm'),
+  };
+  const master = masters.clip[0];
+  const build = (name, ...args) => {
+    if (!fs.existsSync(media[name])) ffmpeg(...args, ...LV_THREADS, media[name]);
+  };
+  build('lv-yuvj', '-i', master, '-an', '-vf', `format=yuvj420p,${LV_TAGS}`, '-c:v', 'libx264', '-profile:v', 'high', '-movflags', '+faststart');
+  build('lv-444', '-i', master, '-an', '-vf', `format=yuv444p,${LV_TAGS}`, '-c:v', 'libx264', '-movflags', '+faststart');
+  build('lv-moov-end', '-i', master, '-an', '-vf', `format=yuv420p,${LV_TAGS}`, '-c:v', 'libx264', '-profile:v', 'high');
+  build('lv-aac', '-i', master, '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo', '-shortest', '-vf', `format=yuv420p,${LV_TAGS}`, '-c:v', 'libx264', '-profile:v', 'high', '-c:a', 'aac', '-movflags', '+faststart');
+  build('lv-untagged', '-i', master, '-an', '-vf', 'format=yuv420p', '-c:v', 'libx264', '-profile:v', 'high', '-movflags', '+faststart');
+  build('lv-start-wrong', '-ss', '1.5', '-i', media['lv-clip'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
+  build('lv-recorded', ...LV_SOURCE(2.2, '400x225', 25), '-an', '-c:v', 'libvpx', '-b:v', '1M', '-deadline', 'realtime', '-cpu-used', '8');
+  return media;
+}
