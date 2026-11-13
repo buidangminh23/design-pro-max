@@ -30,8 +30,10 @@ test('the README carries the required disclaimers', () => {
 
 test('the package manifest matches the repository conventions', () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-  assert.equal(pkg.name, 'design-pro-max');
-  assert.equal(pkg.private, true);
+  assert.match(pkg.name, /^@[a-z0-9][a-z0-9-]*\/design-pro-max$/);
+  assert.equal(pkg.private, undefined);
+  assert.deepEqual(pkg.publishConfig, { access: 'public' });
+  assert.deepEqual(pkg.files, ['skills/', 'skills.json', 'CHANGELOG.md', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md']);
   assert.equal(pkg.type, 'module');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.engines.node, '>=22');

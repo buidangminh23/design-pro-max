@@ -141,6 +141,21 @@ test('the release workflow re-checks, drafts, verifies the download and publishe
   }
 });
 
+test('the release workflow publishes to npm by trusted publishing after the GitHub release', () => {
+  const release = read('release.yml');
+  const npm = jobs(release).find((job) => job.name === 'npm');
+  assert.ok(npm, 'release.yml has an npm job');
+  const text = npm.lines.join('\n');
+  assert.match(text, /needs: publish/);
+  assert.ok(npm.lines.includes('      id-token: write'));
+  assert.ok(npm.lines.includes('      contents: read'));
+  assert.match(text, /node-version: 24/);
+  assert.match(text, /registry-url: https:\/\/registry\.npmjs\.org/);
+  assert.match(text, /npm view "\$package@\$version" version/);
+  assert.match(text, /npm publish --access public$/m);
+  assert.doesNotMatch(text, /NODE_AUTH_TOKEN|NPM_TOKEN|--provenance/);
+});
+
 test('the vendor sync stages read-only, confirms upstream and merges only safe updates after CI', () => {
   const sync = read('vendor-sync.yml');
   assert.match(sync, /cron: "41 2 \* \* 1"/);

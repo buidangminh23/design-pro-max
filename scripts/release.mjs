@@ -53,7 +53,7 @@ import { BUNDLES_FILE, BUNDLE_LICENCE, bundleDir, loadBundles } from './lib/bund
 
 export const NAME = 'design-pro-max';
 export const PUBLIC_NAME = new RegExp(`^@[a-z0-9][a-z0-9-]*/${NAME}$`);
-export const PUBLIC_FROM = '0.2.0';
+export const PUBLIC_FROM = '0.1.0';
 export const SUMS_FILE = 'SHA256SUMS.txt';
 export const MAX_ENTRY_NAME = 150;
 export const PRE_RELEASE_BANNER = '**Status: pre-release.**';
@@ -98,7 +98,7 @@ export function compareVersions(a, b) {
 }
 
 /**
- * What package.json must say for a version: the private package design-pro-max before 0.2.0, and from 0.2.0 on a
+ * What package.json must say for a version: the private package design-pro-max before 0.1.0, and from 0.1.0 on a
  * public npm package named @<scope>/design-pro-max. The release ZIP keeps the name design-pro-max either way.
  */
 export function packageProblems(pkg, version) {
