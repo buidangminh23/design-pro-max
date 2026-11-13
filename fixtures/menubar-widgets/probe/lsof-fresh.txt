@@ -1,0 +1,3 @@
+p4242
+n@APP@/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
+n/usr/lib/dyld

@@ -1,0 +1,2 @@
+p3999
+n@APP@/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget

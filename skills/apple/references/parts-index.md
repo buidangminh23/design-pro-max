@@ -477,3 +477,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 7 error, 9 warn; evidence in `launch-page/references/evidence.md`
 - Checkers: `launch-page/scripts/check-page.mjs`
+
+### `menubar-widgets`
+
+- Guide: `menubar-widgets/PART.md`
+- Status: active
+- Rules: 5 error, 6 warn; evidence in `menubar-widgets/references/evidence.md`
+- Checkers: `menubar-widgets/scripts/scan-swift.mjs`, `menubar-widgets/scripts/probe-extension.mjs`, `menubar-widgets/scripts/snapshot-widgets.mjs`
