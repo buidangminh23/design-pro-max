@@ -1,5 +1,5 @@
 {
-  "description": "Salted SHA-256 hashes of measured reference-site values for scripts/lint-tokens.mjs, one per \"<category>:<value>\" key. The values are private context and never committed in clear.",
+  "description": "Salted SHA-256 hashes of measured reference-site values for scripts/lint-tokens.mjs, one per \"<category>:<value>\" key. Hashing keeps the list from reading as a copy-paste token sheet; it does not hide the values: the salt is public and the key space is small, so anyone can recover them by trying every key. They are public measurements of public pages, kept as context for the lint, never as tokens.",
   "salt": "2cca7675ad814ba3681ee43d4cc15de2",
   "values": [
     "00993b4234ba7ed047f9b817024ca48a517cdfbc1530b89073ed5ad7b1b91cf4",
