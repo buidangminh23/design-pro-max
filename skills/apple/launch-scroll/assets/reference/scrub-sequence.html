@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- launch-scroll reference: a scroll-scrubbed image sequence on a canvas (design-pro-max).
+     Media comes from scripts/make-sequence.mjs --out sequence: sequence/sequence.json, sequence/frames/, the start
+     image (frame 0) and a still (the end state for the static layout). Nothing loads until the muted play() probe
+     passes and the scene is within 200vh; then the frames are fetched and only a window of them is decoded. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scroll-scrubbed image sequence</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d1d1f; background: #fbfbfd; }
+  .intro, .outro { min-height: 90vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  [data-scene] { --scene-travel: 200vh; --film-ratio: 16 / 9; --film-width: 880px; }
+  .stage { width: min(100% - 48px, 880px); display: grid; gap: 24px; }
+  .stage h2 { margin: 0; font-size: 32px; line-height: 40px; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. The sequence follows the scroll position, one image per step.</p></section>
+
+<section data-scene aria-labelledby="sequence-title">
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <h2 id="sequence-title">The sequence follows your scroll</h2>
+      <div data-scene-film role="img" aria-label="Describe what the sequence shows, for screen readers">
+        <img data-scene-still src="sequence/still.jpg" width="1280" height="720" alt="" loading="lazy" decoding="async">
+        <img data-scene-startframe src="sequence/startframe.jpg" width="1280" height="720" alt="" decoding="async">
+        <canvas data-sequence data-src="sequence/sequence.json" aria-hidden="true"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="outro"><p>Reduced motion, a blocked muted play() or a short viewport show the still instead.</p></section>
+
+<script type="module">
+  import { mountSequenceScene } from '../lib/frame-window.js';
+  mountSequenceScene(document.querySelector('[data-scene]'), { radius: 8 });
+</script>
+</body>
+</html>
