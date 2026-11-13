@@ -184,7 +184,7 @@ test('the planted-defect page lists 12 defects whose rules exist or belong to a 
 });
 
 test('verify compares a planted page with its committed findings', () => {
-  const entry = { part: 'launch-page', checker: 'check-page', expected: 'pages/broken-launch.expected.json' };
+  const entry = { part: 'launch-page', checker: 'check-page', rule: ['LP-FONT-01', 'LP-AMB-01', 'LP-INTRO-01', 'LP-CONTRAST-01'], expected: 'pages/broken-launch.expected.json' };
   const error = (rule, where, measured = '') => ({ rule, level: 'error', where, measured });
   const all = [
     error('LP-FONT-01', 'requested https://fonts.invalid/fonts/sf-pro-text.css'),
@@ -195,4 +195,28 @@ test('verify compares a planted page with its committed findings', () => {
   assert.deepEqual(expectedProblems(entry, all).problems, []);
   assert.match(expectedProblems(entry, all.slice(1)).problems[0], /planted defect not found: LP-FONT-01/);
   assert.match(expectedProblems(entry, [...all, error('LP-TYPE-01', 'p')]).problems[0], /unplanned error: LP-TYPE-01/);
+});
+
+test('verify runs the planted defects of a shipped part with that part\'s checker, and only those of the case\'s rules', (t) => {
+  const error = (rule, where, measured = '') => ({ rule, level: 'error', where, measured });
+  const embed = { part: 'launch-page', checker: 'check-embed', rule: ['LV-EMBED-01'], expected: 'pages/broken-launch.expected.json' };
+  const embedFindings = [error('LV-EMBED-01', 'clip 4: autoplay attribute', 'present'), error('LV-EMBED-01', 'clip 5: poster attribute', 'poster.jpg'), error('LV-EMBED-02', 'clip 4: pause control', 'none for a looping clip')];
+  const result = expectedProblems(embed, embedFindings);
+  assert.deepEqual(result, { problems: [], notRun: [] });
+  assert.match(expectedProblems(embed, embedFindings.slice(0, 2)).problems[0], /consequence not found: LV-EMBED-02/);
+  assert.match(expectedProblems(embed, embedFindings.slice(1)).problems[0], /planted defect not found: LV-EMBED-01 \(an autoplay attribute/);
+  assert.match(expectedProblems(embed, [...embedFindings, error('LV-ENC-03', 'x')]).problems[0], /unplanned error: LV-ENC-03/);
+
+  const aac = { part: 'launch-page', checker: 'check-media', rule: ['LV-ENC-02'], expected: 'pages/broken-launch.expected.json' };
+  assert.deepEqual(expectedProblems(aac, [error('LV-ENC-02', 'clip-aac.mp4: audio', '1 audio stream(s)')]).problems, []);
+  assert.match(expectedProblems(aac, [error('LV-ENC-02', 'clip-hevc.mp4: audio')]).problems[0], /planted defect not found: LV-ENC-02/);
+  assert.match(expectedProblems(aac, [error('LV-ENC-02', 'clip-aac.mp4: audio'), error('LV-ENC-01', 'sources')]).problems[0], /unplanned error: LV-ENC-01/);
+
+  const root = tempDir();
+  t.after(() => removeTree(root));
+  fs.mkdirSync(path.join(root, 'fixtures', 'launch-page', 'pages'), { recursive: true });
+  fs.copyFileSync(path.join(ROOT, 'fixtures', 'launch-page', 'pages', 'broken-launch.expected.json'), path.join(root, 'fixtures', 'launch-page', 'pages', 'broken-launch.expected.json'));
+  const absent = expectedProblems(embed, [], root);
+  assert.deepEqual(absent.problems, []);
+  assert.deepEqual(absent.notRun, ['LV-EMBED-01 (check-embed)', 'LV-EMBED-01 (check-embed)', 'LV-ENC-02 (check-media)', 'LV-ENC-01 (check-media)']);
 });

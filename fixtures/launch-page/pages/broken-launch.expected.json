@@ -1,5 +1,5 @@
 {
-  "description": "The 12 defects planted in broken-launch.html, each with the rule it breaks and the checker that finds it. scripts/verify.mjs runs every checker named here that the shipped skill holds, against the page served by a 200-only server, and requires exactly these error rules from it: each listed rule reported as an error (with the match text in its where or measured field), and no other error rule of that checker. Defects whose checker belongs to a part that is not built yet are listed and reported as not run.",
+  "description": "The 12 defects planted in broken-launch.html, each with the rule it breaks and the checker that finds it. scripts/verify.mjs runs every checker named here that the shipped skill holds, against the page served by a 200-only server, and requires exactly these error rules from it: each listed rule reported as an error (with the match text in its where or measured field), and no other error rule of that checker. A defect's alsoRaises lists errors that follow directly from it; they must be reported too and are not counted as unplanned. Each case checks the defects of its own rules; defects whose part is not in the tree are reported as not run.",
   "page": "pages/broken-launch.html",
   "server": "200",
   "defects": [
@@ -11,7 +11,7 @@
     { "defect": "a long-GOP scrub film", "rule": "LS-VID-01", "checker": "probe-scene", "match": "keyframe spacing" },
     { "defect": "a naive seek driver that writes currentTime while seeking", "rule": "LS-VID-03", "checker": "probe-scene", "match": "seeking" },
     { "defect": "a plain-src film served by a 200-only server", "rule": "LS-VID-04", "checker": "probe-scene", "match": "responses 200" },
-    { "defect": "an autoplay attribute on a below-the-fold clip", "rule": "LV-EMBED-01", "checker": "check-embed", "part": "launch-video", "match": "autoplay" },
+    { "defect": "an autoplay attribute on a below-the-fold clip", "rule": "LV-EMBED-01", "checker": "check-embed", "part": "launch-video", "match": "autoplay", "alsoRaises": [{ "rule": "LV-EMBED-02", "reason": "the autoplaying clip also loops, so it has no pause control and starts under reduced motion" }] },
     { "defect": "an eager poster on a below-the-fold clip", "rule": "LV-EMBED-01", "checker": "check-embed", "part": "launch-video", "match": "poster" },
     { "defect": "an AAC track in a muted clip", "rule": "LV-ENC-02", "checker": "check-media", "part": "launch-video", "match": "clip-aac" },
     { "defect": "a clip whose only source is HEVC", "rule": "LV-ENC-01", "checker": "check-media", "part": "launch-video", "match": "clip-hevc" }

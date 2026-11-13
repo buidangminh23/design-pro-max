@@ -23,6 +23,7 @@ function run(tool, args) {
 
 const ffmpeg = (...args) => run('ffmpeg', ['-hide_banner', '-nostats', '-loglevel', 'error', '-y', ...args]);
 
+const LV_TAGS = 'setparams=color_primaries=bt709:color_trc=iec61966-2-1:colorspace=bt709';
 const H264 = ['-an', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart'];
 
 /** Builds every recipe into `folder` once and returns a map from recipe name to file. */
@@ -55,15 +56,14 @@ export function buildFixtureMedia(folder, { encodeScrub, makeSequence }) {
   build('startframe-long-gop', '-i', media['film-long-gop'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
   build('film-open-gop', '-i', master, '-vf', 'scale=640:-2', ...H264, '-crf', '23', '-x264-params', 'keyint=6:min-keyint=6:scenecut=0:open-gop=1');
   build('film-vp9', '-i', master, '-an', '-vf', 'scale=640:-2', '-c:v', 'libvpx-vp9', '-crf', '36', '-b:v', '0', '-g', '6', '-keyint_min', '6', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8');
-  build('clip-aac', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2', '-threads', '2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart');
-  build('clip-hevc', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-t', '2', '-threads', '2', '-an', '-c:v', 'libx265', '-x265-params', 'log-level=error:pools=2', '-tag:v', 'hvc1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart');
+  build('clip-aac', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2', '-threads', '2', '-vf', `format=yuv420p,${LV_TAGS}`, '-c:v', 'libx264', '-profile:v', 'high', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart');
+  build('clip-hevc', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-t', '2', '-threads', '2', '-an', '-vf', `format=yuv420p,${LV_TAGS}`, '-c:v', 'libx265', '-x265-params', 'log-level=error:pools=2', '-tag:v', 'hvc1', '-movflags', '+faststart');
   if (makeSequence && !fs.existsSync(path.join(media.sequence, 'sequence.json'))) {
     run(process.execPath, [makeSequence, master, '--out', media.sequence, '--width', '640', '--format', 'jpg']);
   }
   return media;
 }
 
-const LV_TAGS = 'setparams=color_primaries=bt709:color_trc=iec61966-2-1:colorspace=bt709';
 const LV_SOURCE = (seconds, size = '640x360', rate = 30) => ['-f', 'lavfi', '-i', `cellauto=size=${size}:rate=${rate}:rule=110`, '-t', String(seconds)];
 const LV_THREADS = ['-threads', '2'];
 

@@ -4,6 +4,8 @@
  * folders outside the repository, so the checkers run with no repository files and no node_modules of their own,
  * builds the fixture media with ffmpeg, then runs every case of fixtures/<part>/cases.json and judges it red-first:
  * a fail case must exit 1 with an error for its rule, a pass case must check its rule and pass it.
+ * A case with checkerPart runs that part's checker against the case part's own pages; a case with an expected file
+ * must also report exactly the planted errors of its rules for its checker.
  *
  *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
@@ -79,9 +81,9 @@ function runCase(entry, skill, media, scratch) {
   } else if (entry.checker === 'check-embed') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
-    args = [path.join(skill, entry.part, 'scripts', 'check-embed.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server ?? 'range', '--project', ROOT, ...(entry.args ?? [])];
+    args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'check-embed.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server ?? 'range', '--project', ROOT, ...(entry.args ?? [])];
   } else if (entry.checker === 'render-frames') {
-    const script = path.join(skill, entry.part, 'scripts', 'render-frames.mjs');
+    const script = path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'render-frames.mjs');
     if (entry.files) {
       args = [script, '--check', media[entry.files[0]], ...(entry.args ?? [])];
     } else {
@@ -96,11 +98,11 @@ function runCase(entry, skill, media, scratch) {
   } else if (entry.checker === 'check-page') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
-    args = [path.join(skill, entry.part, 'scripts', 'check-page.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server, '--project', ROOT, ...(entry.args ?? [])];
+    args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'check-page.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server, '--project', ROOT, ...(entry.args ?? [])];
   } else if (entry.checker === 'lint-css') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
-    args = [path.join(skill, entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
+    args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
   } else {
     throw new Error(`${entry.id}: unknown checker ${entry.checker}`);
   }
@@ -109,20 +111,24 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
-  const mine = file.defects.filter((defect) => defect.checker === entry.checker && !defect.part);
-  const notRun = file.defects.filter((defect) => defect.part && !fs.existsSync(path.join(root, SKILL_DIR, defect.part))).map((defect) => `${defect.rule} (${defect.checker})`);
+  const shipped = (defect) => !defect.part || fs.existsSync(path.join(root, SKILL_DIR, defect.part));
+  const mine = file.defects.filter((defect) => defect.checker === entry.checker && shipped(defect) && rulesOf(entry).includes(defect.rule));
+  const notRun = file.defects.filter((defect) => !shipped(defect)).map((defect) => `${defect.rule} (${defect.checker})`);
   const errors = findings.filter((finding) => finding.level === 'error');
   const problems = [];
+  const found = (rule, match) => errors.some((finding) => finding.rule === rule && (!match || `${finding.where} ${finding.measured}`.includes(match)));
   for (const defect of mine) {
-    const hit = errors.some((finding) => finding.rule === defect.rule && (!defect.match || `${finding.where} ${finding.measured}`.includes(defect.match)));
-    if (!hit) problems.push(`planted defect not found: ${defect.rule} (${defect.defect})`);
+    if (!found(defect.rule, defect.match)) problems.push(`planted defect not found: ${defect.rule} (${defect.defect})`);
+    for (const effect of defect.alsoRaises ?? []) {
+      if (!found(effect.rule, effect.match)) problems.push(`consequence not found: ${effect.rule} (${effect.reason})`);
+    }
   }
   const prefix = PART_PREFIX[entry.checker] ?? '';
-  const allowed = new Set(mine.map((defect) => defect.rule));
+  const allowed = new Set(mine.flatMap((defect) => [defect.rule, ...(defect.alsoRaises ?? []).map((effect) => effect.rule)]));
   for (const rule of new Set(errors.map((finding) => finding.rule))) {
     if (rule.startsWith(prefix) && !allowed.has(rule)) problems.push(`unplanned error: ${rule}`);
   }
@@ -161,7 +167,7 @@ async function main(argv) {
       const expected = expectedProblems(entry, verdict.findings);
       verdict.problems.push(...expected.problems);
       verdict.ok = verdict.ok && !expected.problems.length;
-      if (expected.notRun.length && !json) process.stdout.write(`     not run here (their checker is not built yet): ${expected.notRun.join(', ')}\n`);
+      if (expected.notRun.length && !json) process.stdout.write(`     not run here (their part is not in this tree): ${expected.notRun.join(', ')}\n`);
     }
     results.push({ id: entry.id, expect: entry.expect, rules: rulesOf(entry), ok: verdict.ok, problems: verdict.problems, seconds: run.seconds });
     if (!json) {
