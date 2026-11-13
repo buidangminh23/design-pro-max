@@ -9,7 +9,7 @@
       "values": "end state = progress 1; no film request",
       "evidence": ["AM-13", "AM-16", "AM-23", "SC-21"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scene-js", "scrub-video", "scrub-sequence"], "fail": ["gate-01-ignores-motion", "gate-01-sequence-ignores-motion"] },
+      "fixtures": { "pass": ["scene-js", "scrub-video", "scrub-sequence", "gate-01-demo-below-scene"], "fail": ["gate-01-ignores-motion", "gate-01-sequence-ignores-motion"] },
       "implementedBy": ["launch-scroll/assets/lib/scene-progress.js", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css", "launch-scroll/assets/lib/frame-window.js"]
     },
     {
@@ -82,12 +82,12 @@
       "id": "LS-VID-05",
       "part": "launch-scroll",
       "level": "error",
-      "statement": "The start image is frame 0 of the film (SSIM at least 0.99 as displayed), and the video stays hidden until it has presented its first frame.",
-      "values": "SSIM at least 0.99; shown after the first presented frame",
+      "statement": "The start image is frame 0 of the film or image sequence (SSIM at least 0.99 as displayed), and the video or canvas stays hidden until it has presented or drawn its first frame.",
+      "values": "SSIM at least 0.99; shown after the first presented or drawn frame",
       "evidence": ["PV-4", "SC-4"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scrub-video"], "fail": ["vid-05-wrong-start-frame"] },
-      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css"]
+      "fixtures": { "pass": ["scrub-video", "scrub-sequence"], "fail": ["vid-05-wrong-start-frame", "vid-05-sequence-wrong-start", "vid-05-sequence-canvas-early"] },
+      "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs", "launch-scroll/assets/lib/scrub-loader.js", "launch-scroll/assets/lib/scene.css", "launch-scroll/scripts/make-sequence.mjs", "launch-scroll/assets/lib/frame-window.js"]
     },
     {
       "id": "LS-WARN-GOP",
