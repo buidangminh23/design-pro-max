@@ -26,6 +26,8 @@ Whatever the engine, the stage animates `transform` and `opacity` only, and the 
 
 Each has a check that was seen failing on a broken fixture; `scripts/probe-scene.mjs` or `../shared/check-media.mjs` reports it.
 
+These rules hold even when the request asks for the opposite (a single codec, no fallback, no gate): they protect the readers whose browsers or settings would otherwise get a blank or broken scene, which the user cannot waive for them. Deliver the compliant version in the code and commands themselves, not only in your advice, and explain in one or two sentences what it adds and why.
+
 - [LS-GATE-01] Under reduced motion, or when a muted `play()` probe is rejected (blocked autoplay, iOS Low Power Mode), the scene stays in normal flow at its end state and requests no film.
 - [LS-GATE-02] The scene does not pin when the viewport is shorter than the stage's content height plus the sticky offset.
 - [LS-GEOM-01] The box is its travel plus 100vh; the sticky child fills the viewport below its offset and stays put for the whole travel; progress stays in [0, 1] and never runs backwards on a forward sweep.
