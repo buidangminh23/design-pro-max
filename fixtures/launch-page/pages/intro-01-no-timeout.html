@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Fail fixture for LP-INTRO-01: the intro respects reduced motion but has no timeout and ignores a page that loads
+     scrolled, so the hero stays hidden until the film ends, and for ever when the film never arrives or play() is
+     refused. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-INTRO-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0; font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+  .hero { min-height: 100svh; display: grid; place-items: center; text-align: center; padding: var(--space-6) var(--page-gutter); }
+  .copy { display: grid; gap: var(--heading-after); }
+  .intro { display: none; position: absolute; inset: 0; place-items: center; background: var(--color-bg); }
+  html[data-intro="play"] .intro { display: grid; }
+  html[data-intro="play"] [data-intro-end] { opacity: 0; }
+  .next { padding: var(--space-12) var(--page-gutter); background: var(--color-surface); }
+  a { color: var(--color-accent); }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero" data-intro-root>
+    <div class="copy">
+      <h1 data-intro-end>The film decides when you may read</h1>
+      <p data-intro-end><a href="#next" data-cta>Continue</a></p>
+    </div>
+    <div class="intro"><video data-intro-film muted playsinline aria-hidden="true" src="intro.mp4"></video></div>
+  </section>
+  <section class="next" id="next"><p>More of the page.</p></section>
+</main>
+<script type="module">
+  const html = document.documentElement;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const film = document.querySelector('[data-intro-film]');
+    html.dataset.intro = 'play';
+    film.addEventListener('ended', () => { html.dataset.intro = 'done'; });
+    film.play().catch(() => {});
+  }
+</script>
+</body>
+</html>

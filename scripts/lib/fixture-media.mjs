@@ -38,6 +38,8 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
     'startframe-long-gop': file('startframe-long-gop.jpg'),
     'film-open-gop': file('film-open-gop.mp4'),
     'film-vp9': file('film-vp9.webm'),
+    'clip-aac': file('clip-aac.mp4'),
+    'clip-hevc': file('clip-hevc.mp4'),
   };
   const build = (name, ...args) => {
     if (!fs.existsSync(media[name])) ffmpeg(...args, media[name]);
@@ -47,5 +49,7 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
   build('startframe-long-gop', '-i', media['film-long-gop'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
   build('film-open-gop', '-i', master, '-vf', 'scale=640:-2', ...H264, '-crf', '23', '-x264-params', 'keyint=6:min-keyint=6:scenecut=0:open-gop=1');
   build('film-vp9', '-i', master, '-an', '-vf', 'scale=640:-2', '-c:v', 'libvpx-vp9', '-crf', '36', '-b:v', '0', '-g', '6', '-keyint_min', '6', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8');
+  build('clip-aac', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-t', '2', '-threads', '2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-c:a', 'aac', '-b:a', '96k', '-movflags', '+faststart');
+  build('clip-hevc', '-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-t', '2', '-threads', '2', '-an', '-c:v', 'libx265', '-x265-params', 'log-level=error:pools=2', '-tag:v', 'hvc1', '-pix_fmt', 'yuv420p', '-movflags', '+faststart');
   return media;
 }

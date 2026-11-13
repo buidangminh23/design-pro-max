@@ -1,0 +1,133 @@
+{
+  "description": "launch-page fixtures. Each case runs one checker against a page built in a temporary folder by scripts/verify.mjs (tokens.css at the site root, the part's lib/ and reference/ folders, and these pages/), with media from the recipes in scripts/lib/fixture-media.mjs, so no media file is committed. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it. A case with an expected file must also report exactly the error rules that file lists for its checker.",
+  "cases": [
+    {
+      "id": "launch-page",
+      "rule": ["LP-FONT-01", "LP-BASE-01", "LP-TYPE-01", "LP-CONTRAST-01", "LP-AMB-01", "LP-REVEAL-01"],
+      "expect": "pass",
+      "checker": "check-page",
+      "page": "reference/launch-page.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--viewport", "390x844"]
+    },
+    {
+      "id": "intro-handoff",
+      "rule": ["LP-INTRO-01", "LP-BASE-01", "LP-TYPE-01", "LP-CONTRAST-01"],
+      "expect": "pass",
+      "checker": "check-page",
+      "page": "reference/intro-handoff.html",
+      "server": "range",
+      "media": { "intro.mp4": "film" },
+      "args": ["--viewport", "1280x800", "--no-warn"]
+    },
+    {
+      "id": "expressive-mode",
+      "rule": ["LP-TYPE-01", "LP-CONTRAST-01"],
+      "expect": "pass",
+      "checker": "check-page",
+      "page": "pages/expressive-mode.html",
+      "server": "range",
+      "args": ["--viewport", "1440x900", "--viewport", "390x844", "--rule", "LP-TYPE-01", "--rule", "LP-CONTRAST-01", "--no-warn"]
+    },
+    {
+      "id": "font-01-sf-request",
+      "rule": "LP-FONT-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/font-01-sf-request.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-FONT-01", "--no-warn"]
+    },
+    {
+      "id": "base-01-hidden-by-default",
+      "rule": "LP-BASE-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/base-01-hidden-by-default.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-BASE-01", "--no-warn"]
+    },
+    {
+      "id": "type-01-off-scale",
+      "rule": "LP-TYPE-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/type-01-off-scale.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-TYPE-01", "--no-warn"]
+    },
+    {
+      "id": "contrast-01-light-grey",
+      "rule": "LP-CONTRAST-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/contrast-01-light-grey.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-CONTRAST-01", "--no-warn"]
+    },
+    {
+      "id": "amb-01-marquee-no-pause",
+      "rule": "LP-AMB-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/amb-01-marquee-no-pause.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-AMB-01", "--no-warn"]
+    },
+    {
+      "id": "intro-01-no-timeout",
+      "rule": "LP-INTRO-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/intro-01-no-timeout.html",
+      "server": "range",
+      "media": { "intro.mp4": "film" },
+      "args": ["--viewport", "1280x800", "--rule", "LP-INTRO-01", "--no-warn"]
+    },
+    {
+      "id": "reveal-01-reverses",
+      "rule": "LP-REVEAL-01",
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/reveal-01-reverses.html",
+      "server": "range",
+      "args": ["--viewport", "1280x800", "--rule", "LP-REVEAL-01", "--no-warn"]
+    },
+    {
+      "id": "lint-css-shipped",
+      "rule": "LP-FONT-01",
+      "expect": "pass",
+      "checker": "lint-css",
+      "sources": ["tokens.css", "theme.tailwind.css", "reference/launch-page.html", "reference/intro-handoff.html"]
+    },
+    {
+      "id": "lint-css-sf-font",
+      "rule": "LP-FONT-01",
+      "expect": "fail",
+      "checker": "lint-css",
+      "sources": ["pages/font-01-sf-request.html"]
+    },
+    {
+      "id": "broken-launch-page",
+      "rule": ["LP-FONT-01", "LP-AMB-01", "LP-INTRO-01", "LP-CONTRAST-01"],
+      "expect": "fail",
+      "checker": "check-page",
+      "page": "pages/broken-launch.html",
+      "server": "200",
+      "expected": "pages/broken-launch.expected.json",
+      "media": { "intro.mp4": "film", "film.mp4": "film-long-gop", "startframe.jpg": "startframe-long-gop", "film-plain.mp4": "film", "startframe-plain.jpg": "startframe", "demo.mp4": "film", "poster.jpg": "still", "clip-aac.mp4": "clip-aac", "clip-hevc.mp4": "clip-hevc" },
+      "args": ["--viewport", "1280x800", "--no-warn"]
+    },
+    {
+      "id": "broken-launch-scene",
+      "rule": ["LS-GATE-01", "LS-VID-01", "LS-VID-03", "LS-VID-04"],
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/broken-launch.html",
+      "server": "200",
+      "expected": "pages/broken-launch.expected.json",
+      "media": { "intro.mp4": "film", "film.mp4": "film-long-gop", "startframe.jpg": "startframe-long-gop", "film-plain.mp4": "film", "startframe-plain.jpg": "startframe", "demo.mp4": "film", "poster.jpg": "still", "clip-aac.mp4": "clip-aac", "clip-hevc.mp4": "clip-hevc" },
+      "args": ["--viewport", "1280x800"]
+    }
+  ]
+}

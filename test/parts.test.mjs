@@ -96,7 +96,8 @@ test('every fixture case names an existing page, a known checker and known media
   const recipes = buildFixtureMedia.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, ''));
   for (const part of OWN_PARTS) {
     for (const entry of loadCases(ROOT, part)) {
-      assert.ok(['probe-scene', 'check-media'].includes(entry.checker), entry.id);
+      assert.ok(['probe-scene', 'check-media', 'check-page', 'lint-css'].includes(entry.checker), entry.id);
+      if (entry.expected) assert.ok(fs.existsSync(path.join(ROOT, 'fixtures', part, entry.expected)), `${entry.id}: ${entry.expected}`);
       assert.ok(['pass', 'fail'].includes(entry.expect), entry.id);
       if (entry.page) {
         const page = entry.page.startsWith('reference/') ? path.join(ROOT, SKILL_DIR, part, 'assets', entry.page) : path.join(ROOT, 'fixtures', part, entry.page);

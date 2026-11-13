@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Fail fixture for LP-FONT-01: requests an SF font stylesheet, declares an SF @font-face and puts SF Pro first in the
+     stack. Every request goes to fonts.invalid, a name that never resolves, so no test reaches a real font host. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-FONT-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="https://fonts.invalid/fonts/sf-pro-display.css">
+<style>
+  @font-face { font-family: "SF Pro Display"; src: url("https://fonts.invalid/fonts/SF-Pro-Display-Regular.woff2") format("woff2"); }
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: "SF Pro Display", system-ui, sans-serif; font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+</style>
+</head>
+<body>
+<h1>Fonts copied from a platform vendor</h1>
+<p>This page asks for a font whose licence forbids use on websites.</p>
+</body>
+</html>
