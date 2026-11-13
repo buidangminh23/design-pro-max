@@ -9,12 +9,17 @@
 *One skill per design. A router for Apple-platform work with its own HIG and scroll-scene guides, plus spacing rhythm and an exact-icon catalog, bundled.*
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://img.shields.io/npm/v/@minhspark/design-pro-max?logo=npm&amp;color=CB3837" height="20" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/npm-downloads.svg" height="20" alt="npm downloads" /></a>
+  <a href="https://www.npmcharts.com/compare/%40minhspark%2Fdesign-pro-max?minimal=true"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/npm-downloads-month.svg" height="20" alt="npm downloads / 30d" /></a>
+  <br />
+  <a href="https://github.com/buidangminh23/design-pro-max/network/dependents"><img src="https://img.shields.io/librariesio/dependent-repos/npm/@minhspark/design-pro-max?label=Used%20by&amp;logo=github&amp;color=0969da" height="20" alt="Used by repositories (Libraries.io)" /></a>
   <a href="https://skills.sh/buidangminh23/design-pro-max"><img src="https://skills.sh/b/buidangminh23/design-pro-max?label=skills.sh" height="20" alt="skills.sh installs" /></a>
   <a href="https://github.com/buidangminh23/design-pro-max/graphs/traffic"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/github-views.svg" height="20" alt="GitHub views / 14d" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/buidangminh23/design-pro-max" height="20" alt="license" /></a>
 </p>
 
-[CI](https://github.com/buidangminh23/design-pro-max/actions/workflows/ci.yml) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+[Latest release](https://github.com/buidangminh23/design-pro-max/releases/latest) · [npm package](https://www.npmjs.com/package/@minhspark/design-pro-max) · [CI](https://github.com/buidangminh23/design-pro-max/actions/workflows/ci.yml) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -40,6 +45,8 @@ The bundled skills install the same way, one `--skill` per skill:
 npx skills add buidangminh23/design-pro-max --skill design-spacing-rhythm -g
 npx skills add buidangminh23/design-pro-max --skill icons-pro-max -g
 ```
+
+From v0.1 the same files are on npm as `@minhspark/design-pro-max`. `npm install @minhspark/design-pro-max` puts them under `node_modules/@minhspark/design-pro-max/skills/`; copy the skill folders you want, with `apple`'s hidden `.vendor/` folder, into a skill root.
 
 From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.txt`. The ZIP holds `skills/apple` with its hidden `.vendor/` folder, which must be copied along with the rest, and the bundled skills next to it.
 
