@@ -1,3 +1,3 @@
 p4242
-n@APP@/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
+n@APP@/Contents/PlugIns/WeatherWidget.appex/Contents/MacOS/WeatherWidget
 n/usr/lib/dyld

@@ -1,16 +1,16 @@
 import SwiftUI
 
-struct QuotaCard: View {
+struct StepsCard: View {
     let title: String
-    let used: Double
+    let done: Double
     let note: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
-            UsageBar(used: used)
-            Text("\(Int((used * 100).rounded())) % used")
+            GoalBar(done: done)
+            Text("\(Int((done * 100).rounded())) % of goal")
                 .font(.system(size: 22, weight: .bold))
                 .monospacedDigit()
             Text(note)
@@ -19,22 +19,22 @@ struct QuotaCard: View {
                 .lineLimit(2)
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(nsColor: .windowBackgroundColor))
     }
 }
 
-struct UsageBar: View {
-    let used: Double
+struct GoalBar: View {
+    let done: Double
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.secondary.opacity(0.25))
                 Capsule()
-                    .fill(used > 0.8 ? Color.orange : Color.accentColor)
-                    .frame(width: proxy.size.width * min(max(used, 0), 1))
+                    .fill(done > 0.8 ? Color.green : Color.accentColor)
+                    .frame(width: proxy.size.width * min(max(done, 0), 1))
             }
         }
         .frame(height: 6)

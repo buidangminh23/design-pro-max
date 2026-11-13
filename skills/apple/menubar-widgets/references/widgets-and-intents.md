@@ -28,7 +28,7 @@ The kind identifies the widget to the system. Placed widgets are stored against 
 `StaticConfiguration` has no user options, so Edit Widget shows nothing (IL-15). For options [MW-CONFIG-01]:
 
 1. Declare a `WidgetConfigurationIntent` with one `@Parameter` per option [MW-WARN-PARAMS].
-2. Model a list of choices (accounts, projects, places) as an `AppEntity` with an `EntityQuery` that returns the entities for identifiers, the suggested entities and, optionally, a default.
+2. Model a list of choices (cities, projects, lists) as an `AppEntity` with an `EntityQuery` that returns the entities for identifiers, the suggested entities and, optionally, a default.
 3. Use `AppIntentConfiguration(kind:intent:provider:)` with an `AppIntentTimelineProvider`, whose snapshot and timeline methods receive the configured intent.
 4. Keep the kind string from the static version, so placed widgets survive the change (IL-15).
 

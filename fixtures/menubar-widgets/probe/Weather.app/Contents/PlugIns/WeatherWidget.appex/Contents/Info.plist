@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>UsageWidget</string>
+	<string>WeatherWidget</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.example.usage.widget</string>
+	<string>com.example.weather.widget</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>NSExtension</key>

@@ -13,7 +13,7 @@
       ],
       "expectations": [
         "[diagnosis] It names the observer of effectiveAppearance that sets the title and marks the button for display on every callback as the cause, and explains that the redraw fires the observer again.",
-        "[MW-APPEAR-01] The fixed handler compares the light or dark match (bestMatch or an equivalent) with the last value and returns without redrawing when it has not changed; usage changes still redraw.",
+        "[MW-APPEAR-01] The fixed handler compares the light or dark match (bestMatch or an equivalent) with the last value and returns without redrawing when it has not changed; progress changes still redraw.",
         "[confirm] It says how to confirm the loop and the fix on the running app, such as sample <pid> or Activity Monitor's CPU column after a dark mode switch.",
         "[template] It mentions that a monochrome icon or title could use a template image or the system's own tinting and need no appearance observer, or explains why this item keeps colour (the orange warning).",
         "[scope] It changes StatusItem.swift only where the loop is, keeps the monospaced title and the warning colour, and adds no timer that polls the appearance."
@@ -44,16 +44,16 @@
     {
       "id": 3,
       "name": "edit-widget-shows-nothing",
-      "prompt": "Right-clicking our widget and choosing Edit Widget shows nothing. Users want to pick which account it shows; the accounts come from AccountStore.all. The widget is in UsageWidget.swift. Make the account choosable.",
-      "expected_output": "A conversion from StaticConfiguration to AppIntentConfiguration with a WidgetConfigurationIntent that has an account parameter typed as an AppEntity with an EntityQuery over AccountStore.all; an AppIntentTimelineProvider that reads the chosen account; the kind string kept as it was and moved into one constant that the reload call also uses.",
+      "prompt": "Right-clicking our widget and choosing Edit Widget shows nothing. Users want to pick which city it shows; the cities come from CityStore.all. The widget is in WeatherWidget.swift. Make the city choosable.",
+      "expected_output": "A conversion from StaticConfiguration to AppIntentConfiguration with a WidgetConfigurationIntent that has a city parameter typed as an AppEntity with an EntityQuery over CityStore.all; an AppIntentTimelineProvider that reads the chosen city; the kind string kept as it was and moved into one constant that the reload call also uses.",
       "files": [
-        "files/03-edit-widget/UsageWidget.swift"
+        "files/03-edit-widget/WeatherWidget.swift"
       ],
       "expectations": [
-        "[MW-CONFIG-01] The widget uses AppIntentConfiguration with a WidgetConfigurationIntent instead of StaticConfiguration, and the provider is an AppIntentTimelineProvider whose entries use the configured account.",
-        "[MW-WARN-PARAMS] The intent declares an @Parameter for the account, typed as an AppEntity with an EntityQuery that returns entities for identifiers and suggested entities from AccountStore.all.",
-        "[MW-WARN-KIND] The kind stays \"UsageWidget\" so placed widgets survive, and it is written once as a constant used by both the configuration and reloadTimelines(ofKind:).",
-        "[default] A widget with no account chosen yet still shows a sensible default account."
+        "[MW-CONFIG-01] The widget uses AppIntentConfiguration with a WidgetConfigurationIntent instead of StaticConfiguration, and the provider is an AppIntentTimelineProvider whose entries use the configured city.",
+        "[MW-WARN-PARAMS] The intent declares an @Parameter for the city, typed as an AppEntity with an EntityQuery that returns entities for identifiers and suggested entities from CityStore.all.",
+        "[MW-WARN-KIND] The kind stays \"WeatherWidget\" so placed widgets survive, and it is written once as a constant used by both the configuration and reloadTimelines(ofKind:).",
+        "[default] A widget with no city chosen yet still shows a sensible default city."
       ],
       "checks": [
         "MW-CONFIG-01",

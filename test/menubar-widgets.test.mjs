@@ -83,9 +83,9 @@ test('the scan judges an intent declared beside a StaticConfiguration and a widg
 test('the probe parses ps and lsof, matches only the extension executable and allows a second of clock rounding', async () => {
   const { parsePs, parseLsof, extensionProcesses, judge, plistString } = await script('probe-extension.mjs');
   const processes = parsePs([
-    '  7 Thu Nov 13 09:00:00 2026 /Applications/My App.app/Contents/PlugIns/W.appex/Contents/MacOS/W --flag',
-    '  8 Thu Nov 13 09:00:00 2026 /Applications/My App.app/Contents/PlugIns/W.appex/Contents/MacOS/WHelper',
-    '  9 Thu Nov 13 09:00:00 2026 /usr/bin/W',
+    '  7 Fri Nov 13 09:00:00 2026 /Applications/My App.app/Contents/PlugIns/W.appex/Contents/MacOS/W --flag',
+    '  8 Fri Nov 13 09:00:00 2026 /Applications/My App.app/Contents/PlugIns/W.appex/Contents/MacOS/WHelper',
+    '  9 Fri Nov 13 09:00:00 2026 /usr/bin/W',
     'garbage line',
   ].join('\n'));
   assert.equal(processes.length, 3);
@@ -133,8 +133,8 @@ test('the checkers run from a copy outside the repository, exit 2 on bad usage a
   assert.equal(green.status, 0, green.stdout);
   const probe = path.join(scripts, 'probe-extension.mjs');
   assert.equal(runScript(probe, []).status, 2);
-  const app = path.join(outside, 'Usage.app');
-  fs.cpSync(path.join(fixtures, 'probe', 'Usage.app'), app, { recursive: true });
+  const app = path.join(outside, 'Weather.app');
+  fs.cpSync(path.join(fixtures, 'probe', 'Weather.app'), app, { recursive: true });
   const record = (name) => {
     const file = path.join(outside, name);
     fs.writeFileSync(file, fs.readFileSync(path.join(fixtures, 'probe', name), 'utf8').replaceAll('@APP@', app));
@@ -160,8 +160,8 @@ test('off macOS the snapshot runner and the live probe skip their rules and exit
   assert.deepEqual(findings.map(({ rule, level }) => `${rule} ${level}`), ['MW-SNAP-01 skip', 'MW-SNAP-02 skip']);
   assert.match(findings[0].measured, /need macOS; this is linux/);
   assert.ok(!fs.existsSync(path.join(outside, 'png')), 'nothing was rendered');
-  const app = path.join(outside, 'Usage.app');
-  fs.cpSync(path.join(ROOT, 'fixtures', 'menubar-widgets', 'probe', 'Usage.app'), app, { recursive: true });
+  const app = path.join(outside, 'Weather.app');
+  fs.cpSync(path.join(ROOT, 'fixtures', 'menubar-widgets', 'probe', 'Weather.app'), app, { recursive: true });
   const probe = runAs('linux', path.join(scripts, 'probe-extension.mjs'), ['--app', app]);
   assert.equal(probe.status, 0, probe.stderr);
   assert.deepEqual(lines(probe.stdout).filter((line) => line.rule).map(({ rule, level }) => `${rule} ${level}`), ['MW-STALE-01 skip']);
@@ -176,8 +176,8 @@ test('verify skips platform cases elsewhere and builds menubar-widgets arguments
   const skill = path.join(scratch, 'skill');
   const scan = menubarWidgetsArgs({ part: 'menubar-widgets', checker: 'scan-swift', args: ['--configurable'], sources: ['assets/ConfigurableWidget.swift', 'swift/config-02-static-only.swift'] }, skill, scratch);
   assert.deepEqual(scan, [path.join(skill, 'menubar-widgets', 'scripts', 'scan-swift.mjs'), '--configurable', path.join(skill, 'menubar-widgets', 'assets', 'ConfigurableWidget.swift'), path.join(ROOT, 'fixtures', 'menubar-widgets', 'swift', 'config-02-static-only.swift')]);
-  const probe = menubarWidgetsArgs({ id: 'p', part: 'menubar-widgets', checker: 'probe-extension', app: 'probe/Usage.app', installed: '2026-11-13T09:00:00', ps: 'probe/ps-fresh.txt', lsof: 'probe/lsof-fresh.txt' }, skill, scratch);
+  const probe = menubarWidgetsArgs({ id: 'p', part: 'menubar-widgets', checker: 'probe-extension', app: 'probe/Weather.app', installed: '2026-11-13T09:00:00', ps: 'probe/ps-fresh.txt', lsof: 'probe/lsof-fresh.txt' }, skill, scratch);
   const app = probe[probe.indexOf('--app') + 1];
-  assert.ok(fs.existsSync(path.join(app, 'Contents', 'PlugIns', 'UsageWidget.appex', 'Contents', 'Info.plist')));
+  assert.ok(fs.existsSync(path.join(app, 'Contents', 'PlugIns', 'WeatherWidget.appex', 'Contents', 'Info.plist')));
   assert.ok(fs.readFileSync(probe[probe.indexOf('--ps') + 1], 'utf8').includes(`${app}/Contents/PlugIns`));
 });

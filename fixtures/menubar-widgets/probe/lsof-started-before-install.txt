@@ -1,2 +1,2 @@
 p3999
-n@APP@/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
+n@APP@/Contents/PlugIns/WeatherWidget.appex/Contents/MacOS/WeatherWidget

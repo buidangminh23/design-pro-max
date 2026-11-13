@@ -58,7 +58,7 @@ Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/
 
 ## 5. Build in the user's project
 
-1. List every path you will write before writing any, and stop if one exists that you did not create. Copied references start with a `menubar-widgets ... (design-pro-max)` header; rename the example identifiers (`com.example...`, `Account...`) to the project's own.
+1. List every path you will write before writing any, and stop if one exists that you did not create. Copied references start with a `menubar-widgets ... (design-pro-max)` header; rename the example identifiers (`com.example...`, `City...`) to the project's own.
 2. Status item: start from `assets/StatusItemController.swift` only when the icon needs colour; otherwise set a template image and drop the observer. For a SwiftUI app, `MenuBarExtra` with `.menu` or `.window` style replaces the controller; read the SwiftUI row of the router for the scene APIs.
 3. Widget: start from `assets/ConfigurableWidget.swift`. Put the kind in one constant and use it for every `reloadTimelines(ofKind:)` call [MW-WARN-KIND]. Reload timelines from the app when its data changes, not on a timer.
 4. Self-updating apps: call `assets/StaleExtensionCleanup.swift` at launch [MW-STALE-01]; `references/widgets-and-intents.md` covers sandboxed hosts.

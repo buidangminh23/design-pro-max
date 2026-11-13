@@ -38,9 +38,9 @@ enum SnapshotCatalog {
     @MainActor
     static func entries() -> [SnapshotEntry] {
         [
-            SnapshotEntry("small-light", width: 170, height: 170) { UsageView(entry: .preview) },
-            SnapshotEntry("small-dark", width: 170, height: 170, colorScheme: .dark) { UsageView(entry: .preview) },
-            SnapshotEntry("medium-light", width: 364, height: 170) { UsageView(entry: .preview) },
+            SnapshotEntry("small-light", width: 170, height: 170) { StepsView(entry: .preview) },
+            SnapshotEntry("small-dark", width: 170, height: 170, colorScheme: .dark) { StepsView(entry: .preview) },
+            SnapshotEntry("medium-light", width: 364, height: 170) { StepsView(entry: .preview) },
         ]
     }
 }

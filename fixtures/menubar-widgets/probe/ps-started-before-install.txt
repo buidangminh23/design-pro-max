@@ -1,3 +1,3 @@
-  101 Thu Nov 13 08:41:02 2026 /usr/libexec/someservice
-  3999 Thu Nov 13 08:12:55 2026 @APP@/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
-  4300 Thu Nov 13 09:04:40 2026 @APP@/Contents/MacOS/Usage
+  101 Fri Nov 13 08:41:02 2026 /usr/libexec/someservice
+  3999 Fri Nov 13 08:12:55 2026 @APP@/Contents/PlugIns/WeatherWidget.appex/Contents/MacOS/WeatherWidget
+  4300 Fri Nov 13 09:04:40 2026 @APP@/Contents/MacOS/Weather
