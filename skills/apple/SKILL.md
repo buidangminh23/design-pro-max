@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app code (SwiftUI, Xcode) and scroll-pinned web scenes. Use when a question or task needs App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftUI, SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or any pinned or scrubbed web section. Not for launch or preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
+description: For Apple app UI and code (SwiftUI, Xcode, HIG) and scroll scenes. Use when a question or task needs HIG reviews, App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or pinned or scrubbed web sections. Not for launch/preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
 ---
 
 # apple
@@ -26,6 +26,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 13. If an Xcode tool fails inside an agent sandbox (xcrun cache errors, packages that cannot resolve), ask to run it outside the sandbox. Run one heavy build or trace at a time.
 14. Own parts: read `<part>/PART.md` in full like any part; paths in it are relative to its folder. Run its checkers with `node` by absolute path and `--project` set to the user's project, which must hold Playwright; the checkers never install anything. Exit 2 means a missing tool (relay the printed install command), 3 a sandbox block (ask the user to approve a rerun outside it). Report the proof boundary the checker prints.
 15. asc web-session and browser automation (asc web commands, `asc-app-create-ui`, App Groups and App Privacy pages) only on the user's explicit request, after saying it works outside Apple's public API and may breach Apple's terms or risk the developer account. Framed screenshots only for the user's own App Store listing. Output for users never takes Apple logos or store badges from an icon library.
+16. Native interface work follows the Human Interface Guidelines: when a task builds, changes or reviews a screen, a component or a flow of an app on an Apple platform, also read `hig/PART.md` in full and the reference sections it names, next to the code part.
 
 ## Routing
 
@@ -71,6 +72,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | RevenueCat catalog reconciliation | `.vendor/app-store-connect/asc-revenuecat-catalog-sync/SKILL.md` | inactive |
 | Wall of Apps entry, on an explicit request only | `.vendor/app-store-connect/asc-wall-submit/SKILL.md` | inactive |
 | Web page scenes that pin, zoom or scrub video or an image sequence on scroll; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
+| Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
 
 Routing notes:
 
@@ -84,8 +86,8 @@ Not covered by any part:
 
 - Launch pages and demo video rendered from code: not in this release; say so. A later release adds them.
 - Screen recording: not covered. Offer to rebuild the UI in HTML and CSS, or to embed a clip the user already has.
-- WidgetKit, App Intents, Live Activities: no part; suggest Xcode's own coding assistant inside Xcode. SMAppService login items, AppKit status items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
-- Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`). HIG review stays link-only.
+- WidgetKit, App Intents, Live Activities: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, AppKit status items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
+- Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Never stretch a part to fit.
 
 Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native on a phone to `mobile-native`; store marketing images to `app-store-screenshots`, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
@@ -94,7 +96,7 @@ Near misses: web springs, gestures and sheets go to `apple-design`; one web anim
 
 `references/parts-index.md` lists every part with its group, status, activation check, prerequisites and errata pointers; each part's `UPSTREAM.json` holds the full text. Read a part's entry there before using it.
 
-- Active (7): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own part `launch-scroll`.
+- Active (8): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll` and `hig`.
 - `xcode-build/` (6): inactive until `xcodebuild -list`, run outside the agent sandbox, lists a scheme. They need python3; say that `xcodebuild clean` will run before it does.
 - `macos-menubar-tuist-app`: inactive until Tuist.swift and Project.swift exist and `tuist version` succeeds.
 - `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public pull requests.

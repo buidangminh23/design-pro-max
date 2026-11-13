@@ -29,6 +29,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { OWN_PARTS } from '../scripts/lib/evidence.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILL = path.join(ROOT, 'skills', 'apple');
@@ -191,7 +192,7 @@ const lineCount = (rel) => {
 /** The part folder of a path relative to skills/apple, or null when the path is not inside a part. */
 export function partOf(rel) {
   const parts = rel.split('/');
-  if (parts[0] === 'launch-scroll') return 'launch-scroll';
+  if (OWN_PARTS.includes(parts[0])) return parts[0];
   if (parts[0] !== '.vendor' || parts.length < 3) return null;
   if (['xcode-build', 'app-store-connect'].includes(parts[1])) return parts.length >= 4 ? parts.slice(0, 3).join('/') : null;
   return parts.slice(0, 2).join('/');

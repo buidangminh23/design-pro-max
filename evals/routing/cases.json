@@ -409,6 +409,66 @@
       }
     },
     {
+      "id": "r41",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "Review a SwiftUI settings screen against Apple's Human Interface Guidelines: it is a List with custom 30-point rows, a gray-on-white footer in 10-point text and an icon-only trash button with no label. What fails, and how do I fix each one?",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
+      "id": "r42",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "For an iPad app, when should I use a tab bar and when a sidebar, according to the HIG, and how many tabs is too many?",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
+      "id": "r43",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "What should the small, medium and Lock Screen widgets of a habit-tracking iPhone app show, following Apple's widget design guidelines?",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
+      "id": "r44",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "How should a macOS app organize its menu bar and its window toolbar so it feels like a native Mac app?",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
+      "id": "r45",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "Before deleting a document in an iOS app, should I show an alert or an action sheet, and how should its buttons be labeled?",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
+      "id": "r46",
+      "kind": "row",
+      "row": "Design or review a native app screen, component or flow against the Human Interface Guidelines",
+      "prompt": "Plan Dark Mode, Dynamic Type and VoiceOver support for an iOS app's onboarding flow so it meets Apple's accessibility guidelines.",
+      "expect": {
+        "trigger": true,
+        "part": "hig"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",
@@ -566,6 +626,26 @@
       "expect": {
         "trigger": false,
         "instead": "out of scope until 1.0"
+      }
+    },
+    {
+      "id": "n17",
+      "kind": "near-miss",
+      "row": "Material Design split",
+      "prompt": "Review an Android app's bottom navigation bar against the Material Design guidelines.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n18",
+      "kind": "near-miss",
+      "row": "web contrast split",
+      "prompt": "Check a React web dashboard's text and icon colors against the WCAG 2.2 contrast requirements.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
       }
     },
     {

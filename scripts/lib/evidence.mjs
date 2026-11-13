@@ -13,14 +13,14 @@ import { SKILL_DIR } from './vendor.mjs';
 
 export const LEDGER_FILE = 'evidence/ledger.json';
 export const RULES_FILE = 'rules.json';
-export const OWN_PARTS = ['launch-scroll'];
+export const OWN_PARTS = ['launch-scroll', 'hig'];
 export const LABELS = ['measured', 'documented', 'inferred', 'policy'];
 export const ENTRY_KEYS = ['claim', 'value', 'label', 'date', 'source', 'method', 'confidence', 'remeasure', 'status', 'correction', 'sourceSha'];
 export const RULE_KEYS = ['id', 'part', 'level', 'statement', 'values', 'evidence', 'check', 'fixtures', 'implementedBy'];
 
-export const LEDGER_ID = /\b(?:AM|AD|ON|TQ|PV|SC|EC)-N?\d+\b|\bPOL-\d+\b/g;
+export const LEDGER_ID = /\b(?:AM|AD|ON|TQ|PV|SC|EC|HG)-N?\d+\b|\bPOL-\d+\b/g;
 export const RULE_ID = /\b(?:LS|LV|LP)-[A-Z]+-(?:\d{2}|[A-Z]+)\b|\b(?:LS|LV|LP)-WARN-[A-Z0-9]+\b/g;
-const UNIT_NUMBER = /(?<![\w.-])(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?\s?(ms|s|vh|lvh|svh|dvh|px|fps|Hz|%|KB|MB|GB|MiB|GiB|frames?|times|bytes?)(?![\w])/g;
+const UNIT_NUMBER = /(?<![\w.-])(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?\s?(ms|s|vh|lvh|svh|dvh|px|fps|Hz|%|KB|MB|GB|MiB|GiB|frames?|times|bytes?|pt|points?|pixels?|mm|degrees?|characters?|feet|foot|inches?)(?![\w])/g;
 const LOCAL_PATH = /[A-Za-z]:[\\/]|\/(?:Users|Volumes|private|home|tmp)\/|\bresearch\/|scratchpad/;
 
 const readJson = (root, file) => JSON.parse(fs.readFileSync(path.join(root, ...file.split('/')), 'utf8'));

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { braceExpand, diffOf, extract, hitHostLimit, hostCommand, makeClaudeHome, RUN_DEFAULTS, runProfile, scoreRouting, shellAccesses } from '../evals/harness.mjs';
+import { braceExpand, diffOf, extract, hitHostLimit, hostCommand, makeClaudeHome, partOf, RUN_DEFAULTS, runProfile, scoreRouting, shellAccesses } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -141,4 +141,12 @@ test('brace lists in a shell command expand to every file they name', () => {
   assert.deepEqual(braceExpand('${HOME}'), ['${HOME}']);
   const reads = shellAccesses('cat .agents/skills/apple/.vendor/xcode-disk-cleanup/references/{generated-data,simulators}.md').map((access) => access.path ?? access.rel ?? access);
   assert.equal(reads.length, 2, JSON.stringify(reads));
+});
+
+test('own parts count as parts wherever their files are read', () => {
+  assert.equal(partOf('hig/PART.md'), 'hig');
+  assert.equal(partOf('hig/references/foundations.md'), 'hig');
+  assert.equal(partOf('launch-scroll/assets/lib/seek-queue.js'), 'launch-scroll');
+  assert.equal(partOf('.vendor/swiftui-expert-skill/SKILL.md'), '.vendor/swiftui-expert-skill');
+  assert.equal(partOf('references/parts-index.md'), null);
 });
