@@ -23,14 +23,14 @@
       "id": 12,
       "name": "rebuild-and-export",
       "prompt": "Rebuild our app's search panel in HTML and CSS from the description in SEARCH.md and export a 6-second MP4 of a search being typed, for the card on our landing page that SEARCH.md describes.",
-      "expected_output": "One HTML and CSS mock that runs live and renders, driven by one clock; a beat table; frames stepped at device pixel ratio 2 for the 640 px card (1280x720, 180 frames at 30 fps); an H.264 High, yuv420p, faststart MP4 with no audio and colour tags; a start image taken from frame 0.",
+      "expected_output": "One HTML and CSS mock that runs live and renders, driven by one clock; a beat table; frames stepped at device pixel ratio 2 for the 640 px card (1280x720, 6 s times the frame rate it states: 180 frames at the 30 fps the part recommends); an H.264 High, yuv420p, faststart MP4 with no audio and colour tags; a start image taken from frame 0.",
       "files": [
         "files/12-rebuild-search/SEARCH.md"
       ],
       "expectations": [
         "[one-mock] The rebuild is one HTML and CSS page that runs live in a browser and is also what gets rendered, with its motion on one timeline or clock.",
         "[LV-WARN-DIRECTION] It writes the beats (typing at a readable speed, a hold of at least 1 s on the result) before or with the build.",
-        "[LV-RENDER-01] Frames are stepped with a paused clock at device pixel ratio 2, giving 1280x720 frames and 180 frames for 6 s at 30 fps, never the built-in page recording.",
+        "[LV-RENDER-01] Frames are stepped with a paused clock at device pixel ratio 2, giving 1280x720 frames and 6 s times the frame rate it states (180 frames at 30 fps, the rate the part recommends), never the built-in page recording.",
         "[LV-ENC-01] The MP4 is H.264 High in yuv420p with limited range and the moov box first.",
         "[LV-ENC-02] The MP4 has no audio stream.",
         "[LV-ENC-03] The encode writes bt709 colour tags.",
@@ -84,14 +84,14 @@
       "id": 15,
       "name": "transparent-css-animation",
       "prompt": "I need a transparent video of the CSS animation in badge.html that plays in Safari and Chrome over our gradient hero.",
-      "expected_output": "First the question whether the animation can simply run live on the page; if a video is still wanted, frames rendered with a transparent background and the alpha set: HEVC with alpha first, VP9 with alpha, then H.264 flattened over the hero colour, all muted. HEVC with alpha needs VideoToolbox on macOS, which an agent sandbox blocks: it asks to run that step outside the sandbox or gives the command.",
+      "expected_output": "First the question whether the animation can simply run live on the page; if a video is still wanted, frames rendered with a transparent background and the alpha set: HEVC with alpha first, VP9 with alpha, then H.264 flattened over the hero colour, all muted. HEVC with alpha needs VideoToolbox on macOS, which an agent sandbox may block: if the encode fails with the sandbox error it asks to run that step outside the sandbox or gives the command; where the encode succeeds it delivers the HEVC-with-alpha file.",
       "files": [
         "files/15-alpha-badge/badge.html"
       ],
       "expectations": [
         "[live-replica] It points out that this CSS animation could run live on the page with no video bytes, and says why a video is still wanted or recommends the live version.",
         "[LV-WARN-ALPHA] Sources are listed HEVC with alpha first, then VP9 with alpha, then H.264 flattened over the hero's colour; it says VP9 alone turns opaque in Safari.",
-        "[sandbox] It says the HEVC-with-alpha encode needs macOS VideoToolbox and asks to run it outside the agent sandbox (or gives the user the command) instead of skipping or faking it.",
+        "[sandbox] It produces the HEVC-with-alpha file through macOS VideoToolbox; if that encode fails with the sandbox error (exit 3), it asks to run it outside the agent sandbox or gives the user the command, instead of skipping or faking it. Where the encode succeeds, no question is needed.",
         "[LV-RENDER-01] The frames are stepped from the paused animation with a transparent background, not taken from the built-in page recording.",
         "[LV-ENC-02] No file carries an audio stream."
       ],
@@ -99,6 +99,29 @@
         "LV-WARN-ALPHA",
         "LV-RENDER-01",
         "LV-ENC-02"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "av1-only-card",
+      "prompt": "Our product page has a 5-second looping demo in a card, described in CARD.md. AV1 is so much smaller that we want to ship only the AV1 file. Set up the encode and the <video> markup.",
+      "expected_output": "AV1 first but never alone: an H.264 High file always ends the source list because WebKit plays AV1 only with a hardware decoder; every file inside the card budget of 400 KB; markup with muted playsinline preload=\"none\", no autoplay attribute, sources in data-src set when near, a lazy start image that is frame 0, and a labelled pause control for the loop.",
+      "files": [
+        "files/20-av1-card/CARD.md"
+      ],
+      "expectations": [
+        "[LV-WARN-AV1] It keeps an H.264 file and lists it last, with AV1 first, and says why: WebKit plays AV1 only with a hardware decoder, so an AV1-only set shows nothing on many Apple devices.",
+        "[LV-ENC-01] The H.264 file is High profile in yuv420p with limited range and the moov box first.",
+        "[LV-WARN-BUDGET] It states the card budget of 400 KB per file and checks or plans the files against it.",
+        "[LV-EMBED-01] The markup has no autoplay attribute, uses preload=\"none\" and gives the sources only when the card comes near the viewport.",
+        "[LV-EMBED-02] The looping clip has a visible, labelled pause control, and under reduced motion it does not play on its own."
+      ],
+      "checks": [
+        "LV-WARN-AV1",
+        "LV-ENC-01",
+        "LV-WARN-BUDGET",
+        "LV-EMBED-01",
+        "LV-EMBED-02"
       ]
     }
   ]
