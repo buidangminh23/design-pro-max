@@ -35,7 +35,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - `scripts/lib/fixture-media.mjs` adds `buildLaunchVideoMedia` and the `clip-aac`, `clip-hevc` and `sequence` recipes; the two planted clips carry bt709 colour tags, so each breaks only its own encode rule. `shared/motion-classes.md` fills the Panels, Narrative reveals, Hero intro, Ambient and Media rows.
 - `release.mjs stats` and its test count every part's evals.
 
-- The router's description (499 characters) adds widgets, Capacitor, PWAs and WebKit, restores the v0.1 triggers app records, captioned screenshots and Play Store art, and names Remotion and template videos in its not-for clause; routing rows send menu bar and WidgetKit code to `menubar-widgets`, widget design to `hig` and web apps on the Home Screen or in a shell to `web-shells`.
+- The router's description (499 characters) adds widgets and Capacitor, keeps "a question or task" and restores the v0.1 triggers app records, captioned screenshots and Play Store art, and names Remotion and template videos in its not-for clause; routing rows send menu bar and WidgetKit code to `menubar-widgets`, widget design to `hig` and web apps on the Home Screen or in a shell to `web-shells`.
 - `scripts/verify.mjs` runs the menubar-widgets and web-shells checkers, lists platform-bound cases as skipped on other platforms, and `verify.yml` installs WebKit.
 
 ### Fixed

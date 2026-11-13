@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app UI (SwiftUI, Xcode, HIG) and launch pages. Use when work needs App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist, widgets, Capacitor, PWAs, WebKit, demo clips, scroll scenes. Not for narrated, preview, Remotion, template videos, captioned screenshots, Play Store art, GSAP, springs (apple-design), Swift questions (write-swift).
+description: For Apple app UI (SwiftUI, Xcode, HIG) and launch pages. Use when a question or task needs App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist, widgets, Capacitor, demo clips, scroll scenes. Not for narrated, preview, Remotion, template videos, captioned screenshots, Play Store art, GSAP, springs (apple-design), Swift questions (write-swift).
 ---
 
 # apple
