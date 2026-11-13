@@ -5,9 +5,11 @@
  *   node make-sequence.mjs <master> --out <folder> [--width 960] [--fps 30] [--format jpg|png|webp|avif]
  *                          [--quality 80] [--radius 8] [--budget-mb 512] [--dry-run] [--force]
  *
- * Writes <out>/frames/f0000.<ext> onwards, startframe.jpg (frame 0), still.jpg (the last frame, for the static
- * layout) and sequence.json (count, size, format and the frame template that frame-window.js reads). It lists every
- * path first and stops when one exists that it did not write. Decoded memory is frames x width x height x 4 bytes;
+ * Writes <out>/frames/f0000.<ext> onwards, startframe.jpg (frame 0; for jpg a copy of f0000.jpg), still.jpg (the
+ * last frame, for the static layout) and sequence.json (count, size, format and the frame template that
+ * frame-window.js reads). It lists every path first and stops when one exists that it did not write. Everything is
+ * made in a staging folder inside <out> and moved into place only once ffmpeg has written every frame, so a failed run
+ * leaves an earlier sequence untouched. Decoded memory is frames x width x height x 4 bytes;
  * above --budget-mb it refuses (exit 2) unless --force. --dry-run prints the decoded totals and writes nothing.
  * webp needs an ffmpeg built with libwebp and avif one with libsvtav1 or libaom-av1; jpg and png always work.
  */
@@ -76,20 +78,28 @@ export function budgetFor({ frames, width, height, radius, budgetMb }) {
   return { frames, width, height, total, window, budget: budgetMb * MB, over: total > budgetMb * MB };
 }
 
-export function costLines(cost, downloadBytes = null) {
+const LOSSY = new Set(['jpg', 'webp', 'avif']);
+
+export function costLines(cost, downloadBytes = null, { format = DEFAULTS.format, quality = DEFAULTS.quality } = {}) {
   const lines = [
     `decoded, every frame: ${cost.frames} x ${cost.width} x ${cost.height} x 4 bytes = ${megabytes(cost.total)} MB (budget ${megabytes(cost.budget)} MB)`,
     `decoded, frame-window.js at this radius: ${megabytes(cost.window)} MB`,
   ];
   if (downloadBytes !== null) {
     lines.push(`download, every frame: ${megabytes(downloadBytes)} MB`);
-    lines.push(`a closed GOP-6 film of the same clip would be about ${megabytes(downloadBytes / 5.3)}-${megabytes(downloadBytes / 1.95)} MB, depending on content`);
+    if (LOSSY.has(format) && quality === DEFAULTS.quality) {
+      lines.push(`a closed GOP-6 film of the same clip at matched quality would be about ${megabytes(downloadBytes / 5.3)}-${megabytes(downloadBytes / 1.95)} MB, depending on content (SC-11, a rough guide)`);
+    }
   }
   return lines;
 }
 
-export function plan(options, count) {
-  const out = path.resolve(options.out);
+export const FRAME_FILE = /^f(\d{4,})\.(?:jpg|png|webp|avif)$/;
+const SCRATCH_FRAME = /^p(\d{4,})\.png$/;
+
+export const byFrameNumber = (pattern) => (a, b) => Number(pattern.exec(a)[1]) - Number(pattern.exec(b)[1]);
+
+export function plan(options, count, out = path.resolve(options.out)) {
   const last = String(Math.max(0, count - 1)).padStart(4, '0');
   return {
     out,
@@ -156,21 +166,29 @@ export function frameArgs(format, encoder, quality) {
     : ['-vf', AVIF_COLOUR, '-c:v', 'libaom-av1', '-still-picture', '1', '-crf', crf, '-frames:v', '1', '-f', 'avif'];
 }
 
-function writeFrames(options, outputs, encoder, scratch) {
-  const video = `fps=${options.fps},scale=${options.width}:-2:${FROM_FILM},format=rgb24`;
+function writeFrames(options, size, outputs, encoder, scratch) {
+  const video = `fps=${options.fps},scale=${size.width}:${size.height}:${FROM_FILM},format=rgb24`;
   ffmpeg(['-i', options.master, '-an', '-vf', video, '-start_number', '0', path.join(scratch, 'p%04d.png')]);
-  const pngs = fs.readdirSync(scratch).filter((name) => /^p\d{4}\.png$/.test(name)).sort();
+  const pngs = fs.readdirSync(scratch).filter((name) => SCRATCH_FRAME.test(name)).sort(byFrameNumber(SCRATCH_FRAME));
   if (!pngs.length) throw new UsageError(`ffmpeg wrote no frames from ${options.master}.`);
   fs.mkdirSync(outputs.framesDir, { recursive: true });
-  for (const name of fs.readdirSync(outputs.framesDir)) if (/^f\d{4}\.(?:jpg|png|webp|avif)$/.test(name)) fs.rmSync(path.join(outputs.framesDir, name));
   if (options.format === 'avif') {
     pngs.forEach((name, index) => ffmpeg(['-i', path.join(scratch, name), ...frameArgs('avif', encoder, options.quality), path.join(outputs.framesDir, `f${String(index).padStart(4, '0')}.avif`)]));
   } else {
     ffmpeg(['-start_number', '0', '-i', path.join(scratch, 'p%04d.png'), ...frameArgs(options.format, encoder, options.quality), '-start_number', '0', path.join(outputs.out, outputs.template)]);
   }
-  ffmpeg(['-i', path.join(scratch, pngs[0]), '-q:v', '2', outputs.startframe]);
+  if (options.format === 'jpg') fs.copyFileSync(path.join(outputs.framesDir, 'f0000.jpg'), outputs.startframe);
+  else ffmpeg(['-i', path.join(scratch, pngs[0]), '-q:v', '2', outputs.startframe]);
   ffmpeg(['-i', path.join(scratch, pngs.at(-1)), '-q:v', '2', outputs.still]);
   return pngs.length;
+}
+
+export function commit(staged, outputs) {
+  fs.mkdirSync(outputs.framesDir, { recursive: true });
+  const fresh = new Set(fs.readdirSync(staged.framesDir));
+  for (const name of fresh) fs.renameSync(path.join(staged.framesDir, name), path.join(outputs.framesDir, name));
+  for (const name of fs.readdirSync(outputs.framesDir)) if (FRAME_FILE.test(name) && !fresh.has(name)) fs.rmSync(path.join(outputs.framesDir, name));
+  for (const key of ['startframe', 'still', 'manifest']) fs.renameSync(staged[key], outputs[key]);
 }
 
 function measure(outputs, count, format) {
@@ -212,34 +230,46 @@ async function main() {
     throw new UsageError(`Stopped: ${existing.join(', ')} already exist and were not written by make-sequence.`, 'Choose another --out, or pass --force to replace them.');
   }
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'make-sequence-'));
+  const created = !fs.existsSync(outputs.out);
+  fs.mkdirSync(outputs.out, { recursive: true });
+  const staging = fs.mkdtempSync(path.join(outputs.out, '.make-sequence-'));
+  const staged = plan(options, estimate, staging);
   let count;
+  let bytes;
+  let final;
+  let done = false;
   try {
-    count = writeFrames(options, outputs, encoder, scratch);
+    count = writeFrames(options, size, staged, encoder, scratch);
+    const measured = measure(staged, count, options.format);
+    if (measured.missing.length) throw new UsageError(`ffmpeg did not write ${measured.missing.slice(0, 3).join(', ')}${measured.missing.length > 3 ? ` and ${measured.missing.length - 3} more` : ''}.`);
+    bytes = measured.bytes;
+    final = budgetFor({ frames: count, ...size, radius: options.radius, budgetMb: options.budgetMb });
+    const manifest = {
+      generator: GENERATOR,
+      version: VERSION,
+      master: path.basename(options.master),
+      count,
+      width: size.width,
+      height: size.height,
+      fps: options.fps,
+      format: options.format,
+      frames: outputs.template,
+      startframe: 'startframe.jpg',
+      still: 'still.jpg',
+      radius: options.radius,
+      decodedBytes: final.total,
+      windowBytes: final.window,
+      downloadBytes: bytes,
+    };
+    fs.writeFileSync(staged.manifest, `${JSON.stringify(manifest, null, 2)}\n`);
+    commit(staged, outputs);
+    done = true;
   } finally {
     fs.rmSync(scratch, { recursive: true, force: true });
+    fs.rmSync(staging, { recursive: true, force: true });
+    if (!done && created) fs.rmSync(outputs.out, { recursive: true, force: true });
   }
-  const { bytes, missing } = measure(outputs, count, options.format);
-  if (missing.length) throw new UsageError(`ffmpeg did not write ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? ` and ${missing.length - 3} more` : ''}.`);
-  const final = budgetFor({ frames: count, ...size, radius: options.radius, budgetMb: options.budgetMb });
-  const manifest = {
-    generator: GENERATOR,
-    version: VERSION,
-    master: path.basename(options.master),
-    count,
-    width: size.width,
-    height: size.height,
-    fps: options.fps,
-    format: options.format,
-    frames: outputs.template,
-    startframe: 'startframe.jpg',
-    still: 'still.jpg',
-    radius: options.radius,
-    decodedBytes: final.total,
-    windowBytes: final.window,
-    downloadBytes: bytes,
-  };
-  fs.writeFileSync(outputs.manifest, `${JSON.stringify(manifest, null, 2)}\n`);
-  process.stderr.write(`wrote ${count} frames\n${costLines(final, bytes).map((line) => `  ${line}`).join('\n')}\n`);
+  process.stderr.write(`wrote ${count} frames\n${costLines(final, bytes, options).map((line) => `  ${line}`).join('\n')}\n`);
   report.pass('LS-WARN-SEQ', 'download', `${count} frames, ${megabytes(bytes)} MB`, 'shown to the user with the decoded memory');
   report.check('LS-WARN-SEQ', !final.over, 'decoded memory', `${megabytes(final.total)} MB for every frame; ${megabytes(final.window)} MB in the decode window`, `at most ${megabytes(final.budget)} MB, or a scrubbed film`, 'warn');
   return report.summary();
