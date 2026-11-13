@@ -731,7 +731,7 @@
       "id": "MW-WARN-EXTSIGN",
       "part": "menubar-widgets",
       "level": "warn",
-      "statement": "A widget extension is sandboxed and signed with its own entitlements before the host app, whose signature must not replace them; it starts from its WidgetBundle in the system extension entry point, a notarized build carries a secure timestamp, and entitlements are probed from inside an app bundle.",
+      "statement": "A widget extension is sandboxed and signed with its own entitlements before the host app, whose signature must not replace them; it starts from its @main WidgetBundle, a notarized build carries a secure timestamp, and entitlements are probed from inside an app bundle.",
       "values": "sandboxed extension with its own entitlements; WidgetBundle entry point; secure timestamp",
       "evidence": ["IL-18"],
       "check": null,

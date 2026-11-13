@@ -25,7 +25,7 @@ The kind identifies the widget to the system. Placed widgets are stored against 
 
 ## Configurable widgets
 
-`StaticConfiguration` has no user options, so Edit Widget shows nothing (IL-15). For options [MW-CONFIG-01]:
+`StaticConfiguration` describes a widget with no user-configurable options, and `AppIntentConfiguration` one whose custom intent provides them ([StaticConfiguration](https://developer.apple.com/documentation/widgetkit/staticconfiguration), [AppIntentConfiguration](https://developer.apple.com/documentation/widgetkit/appintentconfiguration)), so a static widget shows nothing in Edit Widget (IL-15). For options [MW-CONFIG-01]:
 
 1. Declare a `WidgetConfigurationIntent` with one `@Parameter` per option [MW-WARN-PARAMS].
 2. Model a list of choices (cities, projects, lists) as an `AppEntity` with an `EntityQuery` that returns the entities for identifiers, the suggested entities and, optionally, a default.
@@ -53,8 +53,14 @@ When an app replaces itself during an update, the old extension process can keep
 A build made with swiftc or SwiftPM and a script must do what Xcode does for widgets:
 
 - Run the App Intents metadata extraction for the extension, and list the protocols it gathers constants for, including `EntityQuery`, `TransientEntity`, `AppIntentsPackage` and `DynamicOptionsProvider`; otherwise the extracted metadata is incomplete and options stay empty (IL-15) [MW-WARN-INTENTS].
-- Keep the extension's `Info.plist` with its extension point, and let the `WidgetBundle` marked `@main` start it in the system extension entry point, never a custom `main` (IL-18).
+- Keep the extension's `Info.plist` with its extension point, and the `WidgetBundle` marked `@main` (`assets/WidgetBundle.swift`) as its entry point, as Xcode's widget template does; do not write a custom `main` for the extension.
 
 ## Extension sandboxing and signing
 
-A widget extension runs in the App Sandbox and is signed with its own entitlements before the host app is signed; signing the app with `--deep` or with the app's entitlements must not replace the extension's (IL-18) [MW-WARN-EXTSIGN]. A notarized build needs a secure timestamp on every signature. A bare executable that carries the sandbox entitlement exits at launch without a message, so probe entitlements from inside a wrapped app bundle (IL-18). Notarization itself is the router's notarization row.
+[MW-WARN-EXTSIGN] The extension and its containing app are both code signed, the same way ([App Extension Programming Guide](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionCreation.html)), and Xcode's macOS extension templates turn on the App Sandbox for the extension (same page). A script build should therefore:
+
+- sign the extension first, with its own entitlements including the App Sandbox, then sign the app without `--deep`, so the app's signature and entitlements do not replace the extension's;
+- add a secure timestamp (`codesign --timestamp`) to every signature of a build that will be notarized ([Notarizing macOS software](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution));
+- probe sandboxed entitlements from inside an app bundle: a bare executable that carries the App Sandbox entitlement exits at launch without any output (IL-18).
+
+Notarization itself is the router's notarization row.

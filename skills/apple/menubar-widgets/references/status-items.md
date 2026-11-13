@@ -17,7 +17,7 @@
 
 ## What sits in the menu bar
 
-The menu bar is 24 pt tall (HG-112), shared with every other app and shortened on displays with a camera housing. Put one icon, one short value or both there, never a sentence. Long values belong in the menu or the popover. Give the button an accessibility label that says what the value is (`setAccessibilityLabel`), since VoiceOver reads the icon otherwise as an unnamed image.
+The menu bar is 24 pt tall (HG-112) on a display without a camera housing, and shared with every other app. On a display with a camera housing it is taller and the room for status items is narrower: items that do not fit are hidden, and an item can end up behind the housing. Put one icon, one short value or both there, never a sentence. Long values belong in the menu or the popover. Give the button an accessibility label that says what the value is (`setAccessibilityLabel`), since VoiceOver reads the icon otherwise as an unnamed image.
 
 ## Template images and appearance
 
