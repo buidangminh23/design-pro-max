@@ -76,7 +76,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
-| macOS menu bar apps and WidgetKit widgets: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, widget design, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
+| macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
 
 Routing notes:
 
@@ -84,7 +84,7 @@ Routing notes:
 - Swift Testing: async test structure starts in `.vendor/swift-testing-pro/references/async-tests.md`; concurrency bugs found there follow the concurrency row.
 - SwiftData migrations: the part has one migration rule; use Apple's VersionedSchema documentation as well.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
-- A menu bar app or a widget starts at `menubar-widgets/PART.md`; a question about one SwiftUI scene or view API alone, such as a MenuBarExtra modifier, goes to the SwiftUI row.
+- Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design or HIG review goes to `hig`, Tuist manifests to the Tuist row, one SwiftUI API (a MenuBarExtra modifier) to SwiftUI.
 - Keywords in App Store metadata are limited to 100 bytes, not 100 characters.
 - A launch page with a scroll scene or demo clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
 
