@@ -11,7 +11,7 @@ A laptop, a 27-inch display and a desktop mini on a white background, with anima
 | `render.mjs` | Opens the scene in headless Chromium, captures frames at a fixed time step and encodes them with ffmpeg |
 | `assets/` | The device frame images; see `NOTICE.md` |
 | `preview.jpg` | A 1920-pixel preview of the still |
-| `output/` | Where renders are written: `devices-4k.png` (3840 x 1906) and `devices-8s.mp4` (2560 x 1270, 30 fps, H.264). Not tracked: the repository caps files at 512 KB, and a render is reproducible from this folder |
+| `output/` | The current renders: `devices-4k.png` (3840 x 1906) and `devices-8s.mp4` (2560 x 1270, 30 fps, H.264) |
 
 ## Render
 
