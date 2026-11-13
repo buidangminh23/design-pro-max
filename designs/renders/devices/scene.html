@@ -1,0 +1,193 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { macMini } from './devices.js';
+const params = new URLSearchParams(location.search);
+const W = Number(params.get('w') || 2560);
+const SS = W / 2560;
+const LW = 2560, LH = 1270;
+const out = document.createElement('canvas');
+out.width = Math.round(LW * SS); out.height = Math.round(LH * SS);
+document.body.appendChild(out);
+const ctx = out.getContext('2d');
+ctx.imageSmoothingQuality = 'high';
+
+const MW = 700, MH = 400, MSS = Math.max(2, SS * 1.5);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(MW * MSS, MH * MSS);
+renderer.setClearColor(0x000000, 0);
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.2;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+function studioEnvironment() {
+  const s = new THREE.Scene();
+  const tint = (v) => new THREE.Color(v * 0.98, v * 0.99, v);
+  s.add(new THREE.Mesh(new THREE.BoxGeometry(40, 40, 40), new THREE.MeshBasicMaterial({ color: tint(0.5), side: THREE.BackSide })));
+  const panel = (w, h, pos, intensity) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: tint(intensity), side: THREE.DoubleSide }));
+    m.position.set(...pos); m.lookAt(0, 0, 0); s.add(m);
+  };
+  panel(24, 7, [0, 11, 19], 1.45);
+  panel(24, 8, [0, 3.5, 19], 1.12);
+  panel(24, 10, [0, -5.5, 19], 0.85);
+  panel(30, 30, [0, 19, 0], 2.4);
+  panel(40, 40, [0, -19, 0], 0.85);
+  panel(6, 34, [-18.5, 0, 6], 0.2);
+  panel(6, 34, [18.5, 0, 6], 0.2);
+  panel(1.2, 30, [-13.5, 0, 19.5], 2.4);
+  return pmrem.fromScene(s, 0.09).texture;
+}
+scene.environment = studioEnvironment();
+scene.environmentIntensity = 0.95;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d8dc, 0.5));
+const mini = macMini();
+scene.add(mini);
+const UNIT = 477 / 12.7;
+const fw = MW / UNIT, fh = MH / UNIT, floorY = -0.6;
+const cam = new THREE.OrthographicCamera(-fw / 2, fw / 2, floorY + fh, floorY, 1, 500);
+cam.position.set(0, 0, 100);
+cam.lookAt(0, 0, 0);
+
+function clamp01(x) { return Math.min(1, Math.max(0, x)); }
+function ease(x) { x = clamp01(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function pillPath(ctx, w, h, pw, ph) { rr(ctx, (w - pw) / 2, (h - ph) / 2, pw, ph, ph / 2); }
+function capsuleScreen(ctx, w, h, t) {
+  const g = ctx.createLinearGradient(0, 0, w, h);
+  g.addColorStop(0, '#5c82ea');
+  g.addColorStop(0.4, '#2c55d2');
+  g.addColorStop(1, '#1d3cb0');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w * 0.12, h * 0.1, 0, w * 0.12, h * 0.1, w * 0.6);
+  glow.addColorStop(0, 'rgba(170,195,255,0.4)');
+  glow.addColorStop(1, 'rgba(190,210,255,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
+  const b = 1 + 0.02 * Math.sin(t * 1.3);
+  const ow = w * 0.8 * b, oh = h * 0.76 * b;
+  ctx.save();
+  ctx.shadowColor = 'rgba(8,20,100,0.5)'; ctx.shadowBlur = 90; ctx.shadowOffsetY = 30;
+  const of = ctx.createLinearGradient(0, (h - oh) / 2, 0, (h + oh) / 2);
+  of.addColorStop(0, 'rgba(95,130,235,0.6)');
+  of.addColorStop(1, 'rgba(38,70,195,0.6)');
+  ctx.fillStyle = of; pillPath(ctx, w, h, ow, oh); ctx.fill();
+  ctx.restore();
+  const os = ctx.createLinearGradient(0, (h - oh) / 2, 0, (h + oh) / 2);
+  os.addColorStop(0, 'rgba(235,242,255,0.9)');
+  os.addColorStop(0.5, 'rgba(170,195,255,0.25)');
+  os.addColorStop(1, 'rgba(120,150,240,0.6)');
+  ctx.strokeStyle = os; ctx.lineWidth = 4; pillPath(ctx, w, h, ow - 4, oh - 4); ctx.stroke();
+  ctx.globalAlpha = 0.45; ctx.lineWidth = 2.5; pillPath(ctx, w, h, ow - 34, oh - 34); ctx.stroke(); ctx.globalAlpha = 1;
+  const iw = w * 0.5 / b, ih = h * 0.31 / b;
+  ctx.save();
+  pillPath(ctx, w, h, iw, ih); ctx.clip();
+  const inf = ctx.createLinearGradient(0, (h - ih) / 2, 0, (h + ih) / 2);
+  inf.addColorStop(0, '#1b3bab');
+  inf.addColorStop(1, '#2b55cf');
+  ctx.fillStyle = inf; ctx.fillRect(0, 0, w, h);
+  ctx.shadowColor = 'rgba(4,12,70,0.85)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 22;
+  ctx.strokeStyle = 'rgba(4,12,70,0.9)'; ctx.lineWidth = 30;
+  pillPath(ctx, w, h, iw + 30, ih + 30); ctx.stroke();
+  ctx.restore();
+  const is = ctx.createLinearGradient(0, (h - ih) / 2, 0, (h + ih) / 2);
+  is.addColorStop(0, 'rgba(90,120,225,0.5)');
+  is.addColorStop(1, 'rgba(215,228,255,0.85)');
+  ctx.strokeStyle = is; ctx.lineWidth = 3; pillPath(ctx, w, h, iw, ih); ctx.stroke();
+  const dotX = w / 2 - iw * 0.3, pulse = 0.5 + 0.5 * Math.sin(t * 2.2);
+  ctx.save();
+  ctx.shadowColor = 'rgba(255,255,255,0.9)'; ctx.shadowBlur = 20 + 25 * pulse;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath(); ctx.arc(dotX, h / 2, 11 + 2 * pulse, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function waveScreen(ctx, w, h, t) {
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, w, h);
+  ctx.save();
+  const r = 26;
+  ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(0, r); ctx.arcTo(0, 0, r, 0, r); ctx.lineTo(w - r, 0); ctx.arcTo(w, 0, w, r, r); ctx.lineTo(w, h); ctx.closePath(); ctx.clip();
+  const bg = ctx.createLinearGradient(0, 0, w * 0.7, h);
+  bg.addColorStop(0, '#f7e4a0');
+  bg.addColorStop(0.3, '#cfe0e6');
+  bg.addColorStop(1, '#4b97ea');
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h);
+  const colors = [['#a9d6fa', '#5aa6f2'], ['#4f9df3', '#1f66da'], ['#2a72e2', '#0f46b4'], ['#6db6f7', '#2a7ae4'], ['#1c58cf', '#0b3496'], ['#3f8cee', '#1650c4'], ['#123fa8', '#082a7c']];
+  colors.forEach(([top, bottom], i) => {
+    const base = 0.3 + i * 0.125;
+    const curve = (u) => h * (base + 0.22 - 0.5 * u + 0.075 * Math.sin(u * 3.6 + i * 1.15 + t * 0.55) + 0.028 * Math.sin(u * 8.5 - t * 0.38 + i * 2.1));
+    ctx.beginPath();
+    ctx.moveTo(0, h + 80);
+    for (let x = -20; x <= w + 20; x += 6) ctx.lineTo(x, curve(x / w));
+    ctx.lineTo(w + 20, h + 80);
+    ctx.closePath();
+    const fill = ctx.createLinearGradient(0, h * (base - 0.3), 0, h * (base + 0.45));
+    fill.addColorStop(0, top);
+    fill.addColorStop(1, bottom);
+    ctx.save();
+    ctx.shadowColor = 'rgba(5,25,100,0.55)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = -14;
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.restore();
+    ctx.beginPath();
+    for (let x = -20; x <= w + 20; x += 6) { const y = curve(x / w) + 2; if (x === -20) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+    ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 2.5; ctx.stroke();
+  });
+  ctx.restore();
+}
+
+
+function load(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+const scratch = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const dispC = scratch(2104, 1184), lapC = scratch(1535, 995);
+const DISP = { s: 1.187, x: 994, y: 168, sx: 27, sy: 27, sw: 1052, sh: 592 };
+const LAP = { s: 0.527, x: 191, y: 514, sx: 232, sy: 152, sw: 1535, sh: 995 };
+function floorShadow(cx, y, w, h, a) {
+  ctx.save();
+  ctx.translate(cx, y); ctx.scale(w / 2, h / 2);
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  g.addColorStop(0, `rgba(0,0,0,${a})`); g.addColorStop(0.6, `rgba(0,0,0,${a * 0.35})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 1, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+let macbook, display;
+const DURATION = 8;
+window.renderAt = (t) => {
+  capsuleScreen(dispC.getContext('2d'), dispC.width, dispC.height, t);
+  waveScreen(lapC.getContext('2d'), lapC.width, lapC.height, t);
+  renderer.render(scene, cam);
+  const z = 1 + 0.03 * ease(t / DURATION);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, out.width, out.height);
+  ctx.setTransform(SS * z, 0, 0, SS * z, SS * (1 - z) * 1240, SS * (1 - z) * 760);
+  floorShadow(700, 1186, 1100, 26, 0.16);
+  floorShadow(1647, 1174, 520, 20, 0.16);
+  ctx.drawImage(lapC, LAP.x + LAP.sx * LAP.s, LAP.y + LAP.sy * LAP.s, LAP.sw * LAP.s, LAP.sh * LAP.s);
+  const nx = LAP.x + 1000 * LAP.s, ny = LAP.y + 152 * LAP.s, nw = 155 * LAP.s, nh = 33 * LAP.s;
+  ctx.fillStyle = '#060606';
+  ctx.beginPath(); ctx.moveTo(nx - nw / 2, ny - 2); ctx.lineTo(nx - nw / 2, ny + nh - 5); ctx.arcTo(nx - nw / 2, ny + nh, nx - nw / 2 + 5, ny + nh, 5); ctx.lineTo(nx + nw / 2 - 5, ny + nh); ctx.arcTo(nx + nw / 2, ny + nh, nx + nw / 2, ny + nh - 5, 5); ctx.lineTo(nx + nw / 2, ny - 2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#1c2230'; ctx.beginPath(); ctx.arc(nx, ny + nh * 0.42, 2.2, 0, Math.PI * 2); ctx.fill();
+  ctx.drawImage(macbook, LAP.x, LAP.y, 2000 * LAP.s, 1300 * LAP.s);
+  ctx.drawImage(display, DISP.x, DISP.y, 1106 * DISP.s, 868 * DISP.s);
+  ctx.drawImage(dispC, DISP.x + DISP.sx * DISP.s, DISP.y + DISP.sy * DISP.s, DISP.sw * DISP.s, DISP.sh * DISP.s);
+  floorShadow(1182, 1236, 520, 22, 0.3);
+  ctx.drawImage(renderer.domElement, 1182 - MW / 2, 1235 + 0.6 * UNIT - MH, MW, MH);
+  return true;
+};
+window.sceneDuration = DURATION;
+Promise.all([load('./assets/macbook.png'), load('./assets/display.png'), document.fonts.ready]).then(([a, b]) => { macbook = a; display = b; window.renderAt(4); window.sceneReady = true; });
+</script></body></html>

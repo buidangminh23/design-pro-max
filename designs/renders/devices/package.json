@@ -1,0 +1,13 @@
+{
+  "name": "device-render",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "still": "node render.mjs still",
+    "video": "node render.mjs video"
+  },
+  "dependencies": {
+    "playwright": "1.61.0",
+    "three": "0.170.0"
+  }
+}

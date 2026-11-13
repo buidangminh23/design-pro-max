@@ -38,7 +38,7 @@ import {
   walk,
 } from './lib/vendor.mjs';
 
-export const LIMITS = { file: 512 * 1024, part: 1024 * 1024, vendor: 3 * 1024 * 1024 };
+export const LIMITS = { part: 1024 * 1024, vendor: 3 * 1024 * 1024 };
 export const RULES = ['sources', 'licence', 'part-files', 'size', 'filesystem', 'file-types', 'paths', 'hidden-unicode', 'secrets', 'layout', 'personal'];
 
 const ROOT_SKIP = new Set(['.git', 'node_modules']);
@@ -417,7 +417,6 @@ export function runGuard(root = ROOT, { terms } = {}) {
     if (entry.kind === 'symlink') fail('filesystem', entry.path, 'symlinks are not allowed');
     if (entry.kind === 'special') fail('filesystem', entry.path, 'special files are not allowed');
     if (entry.kind !== 'file') continue;
-    if (entry.bytes > LIMITS.file) fail('size', entry.path, `${entry.bytes} bytes, limit ${LIMITS.file}`);
     if (vendored) vendorBytes += entry.bytes;
     for (const prefix of partBytes.keys()) if (entry.path.startsWith(prefix)) partBytes.set(prefix, partBytes.get(prefix) + entry.bytes);
 

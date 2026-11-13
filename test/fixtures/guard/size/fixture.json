@@ -3,7 +3,7 @@
   "generate": [
     {
       "path": "skills/apple/.vendor/demo-part/references/big.md",
-      "bytes": 600000
+      "bytes": 1100000
     }
   ]
 }
