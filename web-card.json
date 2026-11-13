@@ -5,8 +5,8 @@
   "vi": {
     "nameA": "Design",
     "nameB": "Pro Max",
-    "tagline": "Bộ skill thiết kế cho agent lập trình, mở đầu với hướng dẫn cho nền tảng Apple và cảnh cuộn ghim trên web",
-    "desc": "Dự án độc lập, không liên kết với Apple Inc. Skill apple là bộ định tuyến gửi mỗi việc tới đúng một hướng dẫn: 38 hướng dẫn MIT chép nguyên văn cho SwiftUI, Swift, Xcode và App Store Connect, phần Human Interface Guidelines viết lại bằng lời riêng cho đủ 158 trang, và phần cảnh cuộn ghim, tua video theo cuộn trên web kèm script kiểm. Đi kèm hai skill căn chỉnh khoảng cách và icon. Mọi con số có nguồn, có eval đo trên Claude Code và Codex.",
+    "tagline": "Bộ skill thiết kế cho agent lập trình: ứng dụng Apple, trang ra mắt và web",
+    "desc": "Dự án độc lập, không liên kết với Apple Inc. Skill apple là bộ định tuyến gửi mỗi việc tới đúng một hướng dẫn: 38 hướng dẫn MIT chép nguyên văn cho SwiftUI, Swift, Xcode và App Store Connect, phần Human Interface Guidelines viết lại bằng lời riêng cho đủ 158 trang, và các hướng dẫn riêng kèm script kiểm cho trang ra mắt, clip demo dựng từ code, cảnh cuộn ghim và tua video theo cuộn trên web, ứng dụng thanh menu và widget, ứng dụng web trên Màn hình chính hoặc trong vỏ Capacitor, Tauri. Đi kèm hai skill căn chỉnh khoảng cách và icon. Mọi con số có nguồn; eval đã đo phần định tuyến v0.1 và phần cảnh cuộn trên Claude Code và Codex, eval của các phần thêm ở bản 0.2 chưa chạy.",
     "stats": [
       {
         "value": "40",
@@ -37,8 +37,8 @@
   "en": {
     "nameA": "Design",
     "nameB": "Pro Max",
-    "tagline": "Design skills for coding agents, starting with guides for Apple platforms and scroll-pinned web scenes",
-    "desc": "An independent project, not affiliated with Apple Inc. The apple skill routes each task to one guide: 38 vendored MIT guides for SwiftUI, Swift, Xcode and App Store Connect, Apple's Human Interface Guidelines restated in its own words across all 158 pages, and scroll-pinned and scroll-scrubbed web scenes with their own checkers. Spacing and icon skills ship alongside. Every number is sourced, and evals measure it on Claude Code and Codex.",
+    "tagline": "Design skills for coding agents: Apple apps, launch pages and web scenes",
+    "desc": "An independent project, not affiliated with Apple Inc. The apple skill routes each task to one guide: 38 vendored MIT guides for SwiftUI, Swift, Xcode and App Store Connect, Apple's Human Interface Guidelines restated in its own words across all 158 pages, and its own guides with checkers for launch pages, demo clips rendered from code, scroll-pinned and scroll-scrubbed web scenes, menu bar apps and widgets, and web apps on the Home Screen or in a Capacitor or Tauri shell. Spacing and icon skills ship alongside. Every number is sourced; evals measured the v0.1 routing and the scroll-scene part on Claude Code and Codex, and the evals of the parts added in 0.2 have not run yet.",
     "stats": [
       {
         "value": "40",
