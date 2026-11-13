@@ -41,14 +41,14 @@ The sections of a launch page and how each is built on the tokens. `../assets/re
 ## Gallery
 
 - Slides are `[data-slide]` elements toggled with `hidden`; one dot button per slide and one labelled pause button (`[data-gallery-toggle]`), from `../assets/lib/gallery.js`.
-- Each slide stays for its own `data-duration`, the clip length for a video slide, and the active dot fills over the same time, so the dot is the timer.
-- Autoplay only with motion allowed; it pauses off screen and in a hidden tab. Anything advancing for over 5 s needs the pause control [LP-AMB-01] (PV-21). Under reduced motion the first slide shows and the dots still work.
+- Each slide stays for its own `data-duration`, the clip length for a video slide, and the active dot fills over the same time, so the dot is the timer. The dot animation runs only while the gallery carries `data-running="true"`, which the script sets only while the timer counts, and restarts only when a slide is shown, so a pause, an off-screen stretch or a hidden tab freezes dot and timer together.
+- Autoplay only with motion allowed; it pauses off screen and in a hidden tab. A video in a slide plays only while its slide shows and the gallery runs, never under reduced motion. Anything advancing for over 5 s needs the pause control [LP-AMB-01] (PV-21). The toggle changes its label between Pause and Play and carries no `aria-pressed`, which would make a screen reader announce "Play, pressed". Under reduced motion the first slide shows and the dots still work.
 - Without script every slide shows in order, which is a complete page.
 
 ## Logo marquee
 
 - Only logos the user has permission to show; otherwise a marked placeholder [LP-WARN-PROOF]. Names in text or the user's own logo files; logos of third parties through `icons-pro-max` when installed, never Apple logos or store badges.
-- A CSS animation over a duplicated list (the copy `aria-hidden`), a labelled pause button with `aria-controls` on the track, and under reduced motion a static wrapped list with the duplicate removed [LP-AMB-01]. Pausing on hover alone is not a control: a reader on touch or keyboard cannot use it (ON-24).
+- A CSS animation over a duplicated list (the copy `aria-hidden`), a labelled pause button with `aria-controls` on the track, and the animation, the duplicate and the button all behind `html[data-motion="ok"]`, so without script and under reduced motion it is a static wrapped list [LP-AMB-01]. Pausing on hover alone is not a control: a reader on touch or keyboard cannot use it (ON-24).
 
 ## Pricing and FAQ
 
