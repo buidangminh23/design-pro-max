@@ -20,7 +20,7 @@ Measured demo clips move in short beats separated by readable holds, type at a s
 - One pointer move of 0.3-0.8 s per target, straight and eased, then a short press (PV-N0).
 - Loops of 4-8 s with one idea each (PV-N0); split a longer story into several clips.
 
-These are media timings. They are not control timings, so a review never flags them for running longer than a button press should (`../shared/motion-classes.md`).
+These are media timings. They are not control timings, so a review never flags them for running longer than a button press should (`../../shared/motion-classes.md`).
 
 ## A worked beat table
 

@@ -9,7 +9,7 @@
 <title>Pinned scene, CSS scroll timeline</title>
 <style>
   @property --scene-progress { syntax: '<number>'; inherits: true; initial-value: 1; }
-  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d1d1f; background: #fbfbfd; }
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #15171a; background: #ffffff; }
   .intro, .outro { min-height: 80vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
   [data-scene] { --scene-progress: 1; --scene-travel: 160vh; position: relative; }
   [data-scene-sticky] { top: 0; }
@@ -20,7 +20,7 @@
     width: 280px;
     aspect-ratio: 1;
     border-radius: 28px;
-    background: conic-gradient(from 210deg, #0a84ff, #5e5ce6, #0a84ff);
+    background: conic-gradient(from 210deg, #0b6670, #5ccfd9, #0b6670);
     transform: rotate(calc(-90deg + 90deg * var(--scene-progress))) scale(calc(0.7 + 0.3 * var(--scene-progress)));
   }
   @keyframes scene-progress { from { --scene-progress: 0; } to { --scene-progress: 1; } }

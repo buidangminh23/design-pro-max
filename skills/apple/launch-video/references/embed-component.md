@@ -37,12 +37,13 @@ The caption says in words what the clip shows, for readers who never play it; th
 
 1. Nothing loads at first except the lazy start image. It sets `preload="none"`, removes any `autoplay` attribute and keeps sources in `data-src` [LV-EMBED-01].
 2. When a clip comes within the load margin of the viewport, 600px by default, its sources get their `src` (ON-11). A margin does not reach through a scrolling carousel's clipped edge, so where the browser supports the observer's `scrollMargin` option a second observer loads a carousel clip once the carousel is in view and the clip is within the margin of its edge; elsewhere such a clip loads once it scrolls into the carousel's box. The two margins are kept in separate observers because together they add up.
-3. It plays a clip while at least half of it is visible and pauses it otherwise; only the most visible clip plays (`maxActive: 1`).
-4. Every `play()` checks reduced motion, Save-Data and the reader's own pause at that moment, including the call that follows loading [LV-EMBED-02].
+3. It plays a clip while at least half of it is visible and pauses it otherwise [LV-WARN-PLAYBACK]. By default only the most visible clip plays (`maxActive: 1`), a choice of the component rather than a measured rule.
+4. Every `play()` checks reduced motion and the reader's own pause at that moment, including the call that follows loading [LV-EMBED-02].
 5. The video is shown over the start image only after its first presented frame, so there is never a blank box.
 6. Any loop, and any one-shot longer than 5 s, gets a labelled Pause button if the markup has none [LV-EMBED-02]. Its label switches between Pause and Play (an icon-only button keeps its icon and switches its `aria-label`), and the reader's choice sticks. A one-shot that has ended stays on its last frame; scrolling or returning to the tab does not restart it, only the Play button does.
-7. Under reduced motion or Save-Data, nothing loads or plays; the button reads Play and starts the clip on request.
-8. A `[data-demo]` without a `<video>` (a still) is left alone.
+7. Under reduced motion, nothing loads or plays; the button reads Play and starts the clip on request.
+8. Under Save-Data the component does the same, and every `play()` checks Save-Data at that moment too. Like `maxActive`, this is a choice of the component rather than a measured rule; only Chromium browsers send the signal (PV-24).
+9. A `[data-demo]` without a `<video>` (a still) is left alone.
 
 Options: `mountDemos(root, { loadMargin, playRatio, maxActive, pauseAfterSeconds, labels })`; it returns a function that stops the observers.
 
@@ -76,4 +77,4 @@ node <absolute path to this part>/scripts/check-embed.mjs --url http://localhost
 node <absolute path to this part>/scripts/check-embed.mjs --serve dist --page index.html --viewport 1280x800 --viewport 390x844 --project .
 ```
 
-It checks the demo clips (`[data-demo] video`, or when the page has none every video that is not a scrub film or inside a scroll scene; `--selector` picks others). It loads the page three times per viewport (normal, reduced motion, Save-Data), scrolls each clip into view, and reports the autoplay and poster attributes, `preload`, sources and video bytes before scrolling, playback at half visibility, the pause control, playback under reduced motion after loading, Save-Data, density [LV-WARN-DENSITY] and source order [LV-WARN-AV1]. For a clip it saw moving on its own past the limit, it starts the clip, focuses each labelled control (the `data-demo-toggle` first, then ones named pause, play or stop) and presses Enter, then Space, until one pauses it; a control that Tab cannot reach fails, and native `controls` count as a pause control.
+It checks the demo clips (`[data-demo] video`, or when the page has none every video that is not a scrub film or inside a scroll scene; `--selector` picks others). It loads the page twice per viewport (normal and reduced motion), scrolls each clip into view, and reports the autoplay and poster attributes, `preload`, sources and video bytes before scrolling, playback at half visibility [LV-WARN-PLAYBACK], the pause control, playback under reduced motion after loading, density [LV-WARN-DENSITY] and source order [LV-WARN-AV1]. For a clip it saw moving on its own past the limit, it starts the clip, focuses each labelled control (the `data-demo-toggle` first, then ones named pause, play or stop) and presses Enter, then Space, until one pauses it; a control that Tab cannot reach fails, and native `controls` count as a pause control.

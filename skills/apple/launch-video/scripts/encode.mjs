@@ -19,9 +19,9 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkDemoFile, checkDemoSet, probeMedia, runTool } from '../../shared/check-media.mjs';
-import { createReport, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
-import { sandboxReason } from '../../shared/sandbox.mjs';
+import { checkDemoFile, checkDemoSet, MEDIA_BOUNDARY, probeMedia, runTool } from '../../shared/check-media.mjs';
+import { createReport, dropProject, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
+import { currentCommand, sandboxReason } from '../../shared/sandbox.mjs';
 
 export const GENERATOR = 'design-pro-max launch-video encode';
 export const VERSION = '0.2.0';
@@ -175,8 +175,8 @@ function writeManifest(options, outputs, master, complete) {
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
-  const command = `node ${process.argv.slice(1).join(' ')}`;
+  const options = parseArgs(dropProject(process.argv.slice(2)));
+  const command = currentCommand();
   const master = readMaster(options.master);
   if (options.alpha && !master.alpha) throw new UsageError(`${options.master} has no alpha channel; render it with render-frames.mjs --alpha or export a master with alpha.`);
   if (options.alpha && options.hevcAlpha && process.platform !== 'darwin') {
@@ -193,7 +193,7 @@ async function main() {
   writeManifest(options, outputs, master, false);
   for (const job of encodeJobs(options, outputs, master)) ffmpeg(job.args, command);
   writeManifest(options, outputs, master, true);
-  const report = createReport({ tool: 'encode' });
+  const report = createReport({ tool: 'encode', boundary: MEDIA_BOUNDARY });
   const infos = SOURCE_ROLES.filter((role) => outputs[role]).map((role) => probeMedia(outputs[role]));
   for (const info of infos) checkDemoFile(info, report);
   checkDemoSet(infos, report, { poster: outputs.start, where: 'encoded sources' });

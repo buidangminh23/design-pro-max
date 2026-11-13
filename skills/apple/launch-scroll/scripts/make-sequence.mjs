@@ -17,13 +17,17 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { runTool } from '../../shared/check-media.mjs';
-import { createReport, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { createReport, dropProject, isMain, runMain, UsageError } from '../../shared/report.mjs';
 
 export const GENERATOR = 'design-pro-max launch-scroll make-sequence';
 export const VERSION = '0.2.0';
 export const FORMATS = Object.freeze(['jpg', 'png', 'webp', 'avif']);
 export const DEFAULTS = Object.freeze({ width: 960, fps: 30, format: 'jpg', quality: 80, radius: 8, budgetMb: 512 });
 
+export const BOUNDARY =
+  'Proof boundary: ffprobe and ffmpeg prove the frame count, size and format of the sequence and the decoded-memory ' +
+  'estimate is arithmetic on them. No browser ran, so they do not prove decode speed or memory on a device, iOS Safari, ' +
+  'Low Power Mode or taste.';
 const MB = 1024 * 1024;
 const FROM_FILM = 'in_color_matrix=bt709:in_range=tv:flags=lanczos+accurate_rnd+full_chroma_int';
 const AVIF_COLOUR = 'scale=out_color_matrix=bt709:out_range=tv,format=yuv420p,setparams=color_primaries=bt709:color_trc=iec61966-2-1:colorspace=bt709:range=tv';
@@ -203,13 +207,13 @@ function measure(outputs, count, format) {
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseArgs(dropProject(process.argv.slice(2)));
   if (!fs.existsSync(options.master)) throw new UsageError(`${options.master} does not exist.`);
   const clip = probeClip(options.master);
   const size = outputSize(clip, Math.min(options.width, clip.width - (clip.width % 2)));
   const estimate = estimateFrames(clip.duration, options.fps);
   const cost = budgetFor({ frames: estimate, ...size, radius: options.radius, budgetMb: options.budgetMb });
-  const report = createReport({ tool: 'make-sequence' });
+  const report = createReport({ tool: 'make-sequence', boundary: BOUNDARY });
   process.stderr.write(`make-sequence ${VERSION}: ${estimate} frames at ${size.width}x${size.height}, ${options.format}\n${costLines(cost).map((line) => `  ${line}`).join('\n')}\n`);
   if (options.dryRun) {
     report.check('LS-WARN-SEQ', !cost.over, 'decoded memory (estimate)', `${megabytes(cost.total)} MB for ${estimate} frames; ${megabytes(cost.window)} MB in the decode window`, `at most ${megabytes(cost.budget)} MB, or a scrubbed film`, 'warn');

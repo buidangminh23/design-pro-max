@@ -20,7 +20,7 @@ const levels = (report, rule) => report.findings.filter((finding) => finding.rul
 test('launch-video has the seven error rules of the plan, each with fixtures, and the warnings', () => {
   const own = loadRules(ROOT).filter((rule) => rule.part === 'launch-video');
   assert.deepEqual(own.filter((rule) => rule.level === 'error').map((rule) => rule.id), ['LV-ENC-01', 'LV-ENC-02', 'LV-ENC-03', 'LV-POSTER-01', 'LV-EMBED-01', 'LV-EMBED-02', 'LV-RENDER-01']);
-  assert.deepEqual(own.filter((rule) => rule.level === 'warn').map((rule) => rule.id), ['LV-WARN-DIRECTION', 'LV-WARN-BUDGET', 'LV-WARN-DENSITY', 'LV-WARN-FPS', 'LV-WARN-AV1', 'LV-WARN-SEAM', 'LV-WARN-ALPHA']);
+  assert.deepEqual(own.filter((rule) => rule.level === 'warn').map((rule) => rule.id), ['LV-WARN-DIRECTION', 'LV-WARN-BUDGET', 'LV-WARN-DENSITY', 'LV-WARN-FPS', 'LV-WARN-AV1', 'LV-WARN-SEAM', 'LV-WARN-ALPHA', 'LV-WARN-PLAYBACK']);
   const cases = JSON.parse(fs.readFileSync(path.join(ROOT, 'fixtures', 'launch-video', 'cases.json'), 'utf8')).cases;
   for (const recipe of ['lv-yuvj', 'lv-444', 'lv-aac', 'lv-untagged', 'lv-moov-end']) {
     assert.ok(cases.some((entry) => entry.expect === 'fail' && entry.files?.includes(recipe)), `bad recipe ${recipe} is a fail case`);
@@ -255,4 +255,18 @@ test('a server that may not listen is a sandbox block, and the rerun command is 
   assert.equal(sandboxReason('listen EADDRINUSE: address already in use'), null);
   assert.equal(currentCommand(['node', '/a b/check-embed.mjs', '--selector', '#clips video', '--viewport', '1280x800']), "node '/a b/check-embed.mjs' --selector '#clips video' --viewport 1280x800");
   assert.throws(() => rethrowSandbox(new Error('listen EPERM: operation not permitted 127.0.0.1'), 'node x.mjs'), (error) => error instanceof SandboxError && error.command === 'node x.mjs');
+});
+
+test('the playback guidance cites LV-WARN-PLAYBACK, and the Save-Data hold is a component choice that cites only PV-24', () => {
+  const doc = (...file) => fs.readFileSync(path.join(ROOT, SKILL_DIR, 'launch-video', ...file), 'utf8').split('\n');
+  const guidance = [...doc('PART.md'), ...doc('references', 'embed-component.md')];
+  const saveData = guidance.filter((line) => line.includes('Save-Data') && !line.includes('check-embed'));
+  assert.ok(saveData.length >= 3, 'found the Save-Data guidance');
+  for (const line of saveData) {
+    assert.match(line, /\(PV-24\)/, line);
+    assert.doesNotMatch(line, /\[LV-WARN-PLAYBACK\]|\[LV-EMBED-02\]/, line);
+  }
+  const halfVisible = guidance.filter((line) => /half (?:of it )?(?:is )?visib/.test(line));
+  assert.ok(halfVisible.length >= 3, 'found the half-visible guidance in PART.md, the component item and the checker description');
+  for (const line of halfVisible) assert.match(line, /\[LV-WARN-PLAYBACK\]/, line);
 });

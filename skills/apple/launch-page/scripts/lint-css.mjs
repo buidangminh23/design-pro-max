@@ -15,7 +15,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { createReport, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { createReport, dropProject, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { currentCommand } from '../../shared/sandbox.mjs';
 import { APPLE_FONT_HOST, SF_FONT, readableUrl } from './check-page.mjs';
 
 export { SF_FONT };
@@ -146,7 +147,7 @@ export function lintText(text, file, report) {
 }
 
 async function main() {
-  const inputs = process.argv.slice(2);
+  const inputs = dropProject(process.argv.slice(2));
   if (!inputs.length || inputs.some((arg) => arg.startsWith('--'))) throw new UsageError('Usage: node lint-css.mjs <file or folder> [...]');
   const files = listFiles(inputs);
   if (!files.length) throw new UsageError('No .css or .html file found.');
@@ -155,4 +156,4 @@ async function main() {
   return report.summary();
 }
 
-if (isMain(import.meta.url)) await runMain(main, { command: `node ${process.argv.slice(1).join(' ')}` });
+if (isMain(import.meta.url)) await runMain(main, { command: currentCommand() });

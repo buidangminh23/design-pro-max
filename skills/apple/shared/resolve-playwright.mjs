@@ -27,10 +27,10 @@ export function findPlaywright(project = process.cwd()) {
   return null;
 }
 
-export async function loadPlaywright(project = process.cwd()) {
-  if (!fs.existsSync(path.resolve(project))) throw new UsageError(`Project folder ${project} does not exist.`, INSTALL_HINT);
+export async function loadPlaywright(project = process.cwd(), hint = INSTALL_HINT) {
+  if (!fs.existsSync(path.resolve(project))) throw new UsageError(`Project folder ${project} does not exist.`, hint);
   const found = findPlaywright(project);
-  if (!found) throw new UsageError(`Playwright is not installed in ${path.resolve(project)} or any folder above it.`, INSTALL_HINT);
+  if (!found) throw new UsageError(`Playwright is not installed in ${path.resolve(project)} or any folder above it.`, hint);
   const module = await import(pathToFileURL(found.entry).href);
   return module.default?.chromium ? module.default : module;
 }

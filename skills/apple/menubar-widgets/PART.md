@@ -78,7 +78,7 @@ Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/
 
 ## 7. Verify
 
-These scripts need Node and, for snapshots, `swiftc` on macOS; they take no `--project`, install nothing and need no Playwright:
+These scripts need Node and, for snapshots, `swiftc` on macOS; they install nothing and need no Playwright, and they accept `--project` and ignore it:
 
 ```
 node <absolute path to this folder>/scripts/scan-swift.mjs Sources

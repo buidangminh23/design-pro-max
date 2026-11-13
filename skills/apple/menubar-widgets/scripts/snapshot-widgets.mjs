@@ -21,7 +21,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { createReport, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
+import { createReport, dropProject, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
 import { currentCommand } from '../../shared/sandbox.mjs';
 import { listFiles, stripComments } from './scan-swift.mjs';
 
@@ -194,7 +194,7 @@ export function snapshot(options, report) {
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseArgs(dropProject(process.argv.slice(2)));
   const report = createReport({ tool: 'snapshot-widgets', boundary: BOUNDARY });
   if (process.platform !== 'darwin') {
     report.skip('MW-SNAP-01', options.sources.join(' '), `ImageRenderer and swiftc need macOS; this is ${process.platform}`);

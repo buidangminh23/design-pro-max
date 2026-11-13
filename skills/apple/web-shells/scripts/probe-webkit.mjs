@@ -387,7 +387,7 @@ export async function probe(options, report, { playwright }) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const playwright = await loadPlaywright(options.project);
+  const playwright = await loadPlaywright(options.project, WEBKIT_HINT);
   if (!playwright.webkit) throw new UsageError('This Playwright build has no WebKit.', WEBKIT_HINT);
   const report = createReport({ tool: 'probe-webkit', boundary: BOUNDARY });
   await probe(options, report, { playwright });

@@ -343,6 +343,17 @@
       "implementedBy": ["launch-video/scripts/encode.mjs"]
     },
     {
+      "id": "LV-WARN-PLAYBACK",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "A demo clip scrolled into view plays once at least half of it is visible.",
+      "values": "plays at half visible or more",
+      "evidence": ["ON-11"],
+      "check": "launch-video/scripts/check-embed.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/assets/lib/demo-embed.js"]
+    },
+    {
       "id": "LP-FONT-01",
       "part": "launch-page",
       "level": "error",

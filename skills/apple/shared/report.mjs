@@ -34,6 +34,16 @@ export class SandboxError extends Error {
   }
 }
 
+export function dropProject(args) {
+  const rest = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] !== '--project') rest.push(args[index]);
+    else if (index + 1 >= args.length) throw new UsageError('--project needs a value.');
+    else index += 1;
+  }
+  return rest;
+}
+
 const clean = (value) => (value === undefined ? null : value);
 
 export function createReport({ tool, boundary = DEFAULT_BOUNDARY, write = (line) => process.stdout.write(`${line}\n`) } = {}) {

@@ -289,3 +289,14 @@ test('verify fails a snapshot case whose baseline run failed, with that run\'s o
   assert.equal(run.status, 4);
   assert.match(run.stderr, /baseline run exited 2[\s\S]*missing\.swift/);
 });
+
+test('a missing plutil gets the PATH rerun on macOS and, elsewhere, a conversion that leaves the signed app untouched', async () => {
+  const { plutilHint } = await script('probe-extension.mjs');
+  const inBundle = "Contents/PlugIns/It's.appex/Contents/Info.plist";
+  assert.match(plutilHint(`/a/Copy.app/${inBundle}`, inBundle, 'darwin'), /PATH="\/bin:\/usr\/bin:\/usr\/sbin:\$PATH"/);
+  const elsewhere = plutilHint(`/a b/Copy.app/${inBundle}`, inBundle, 'linux');
+  assert.match(elsewhere, /plutil -convert xml1 -o Info\.xml '<path to the installed \.app>\/Contents\/PlugIns\/It'\\''s\.appex\/Contents\/Info\.plist'/);
+  assert.match(elsewhere, /in place of '\/a b\/Copy\.app\/Contents\/PlugIns\/It'\\''s\.appex\/Contents\/Info\.plist' in the copy here/);
+  assert.doesNotMatch(elsewhere, /plutil -convert xml1 '/);
+  assert.doesNotMatch(elsewhere, /PATH=|record ps/);
+});

@@ -10,7 +10,7 @@ import http from 'node:http';
 import https from 'node:https';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { UsageError, isMain } from './report.mjs';
+import { EXIT, UsageError, isMain, runMain } from './report.mjs';
 import { rethrowSandbox } from './sandbox.mjs';
 
 export const MODES = ['range', '200'];
@@ -68,7 +68,7 @@ export function createSelfSignedCert(folder, hosts = ['localhost', '127.0.0.1'])
   const names = hosts.map((name) => (/^[\d.]+$|:/.test(name) ? `IP:${name}` : `DNS:${name}`)).join(',');
   const result = spawnSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-keyout', key, '-out', cert, '-days', '1', '-subj', '/CN=localhost', '-addext', `subjectAltName=${names}`], { encoding: 'utf8', windowsHide: true });
   if (result.error || result.status !== 0 || !fs.existsSync(cert)) {
-    throw new UsageError('openssl could not make a self-signed certificate for the local HTTPS server.', 'Install OpenSSL (macOS and most Linux distributions ship it) and run the check again.');
+    throw new UsageError('openssl could not make a self-signed certificate for the local HTTPS server.', 'Install OpenSSL (macOS and most Linux distributions ship it; otherwise macOS: brew install openssl; Windows: winget install ShiningLight.OpenSSL.Light; Debian or Ubuntu: apt install openssl) and run the check again.');
   }
   return { key: fs.readFileSync(key), cert: fs.readFileSync(cert) };
 }
@@ -140,13 +140,10 @@ async function main(argv) {
   const mode = option('--mode', 'range');
   const port = Number(option('--port', '0'));
   const root = args[0];
-  if (!root || !MODES.includes(mode) || !Number.isInteger(port)) {
-    process.stderr.write('Usage: node server.mjs <folder> [--mode range|200] [--port <n>]\n');
-    process.exitCode = 2;
-    return;
-  }
+  if (!root || !MODES.includes(mode) || !Number.isInteger(port)) throw new UsageError('Usage: node server.mjs <folder> [--mode range|200] [--port <n>]');
   const served = await startServer({ root, mode, port });
   process.stdout.write(`${served.url} (${mode})\n`);
+  return EXIT.pass;
 }
 
-if (isMain(import.meta.url)) await main(process.argv);
+if (isMain(import.meta.url)) await runMain(() => main(process.argv));

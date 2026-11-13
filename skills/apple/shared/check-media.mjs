@@ -13,9 +13,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { inspectMp4, maxKeyframeDistance } from './mp4.mjs';
-import { createReport, isMain, runMain, UsageError } from './report.mjs';
+import { createReport, dropProject, isMain, runMain, UsageError } from './report.mjs';
 
 export const FFMPEG_HINT = 'Install ffmpeg, which provides ffprobe (macOS: brew install ffmpeg; Windows: winget install Gyan.FFmpeg; Debian or Ubuntu: apt install ffmpeg).';
+export const MEDIA_BOUNDARY =
+  'Proof boundary: ffprobe, ffmpeg and the MP4 box reader prove the files themselves: box order, streams, pixel format and ' +
+  'range, colour tags, keyframe spacing and, with a poster, the start image against frame 0. No browser ran, so they do ' +
+  'not prove how a page loads, picks or plays these files, iOS Safari, Low Power Mode, real device decoding or taste.';
 export const PROFILES = ['scrub', 'demo'];
 export const SCRUB = Object.freeze({ maxKeyframeDistance: 8, preferredDistance: 6, preferredDistanceAbove30: 5 });
 
@@ -241,7 +245,7 @@ export function checkFiles(files, report, { profile = 'scrub', ...demo } = {}) {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
+  const args = dropProject(process.argv.slice(2));
   const usage = 'Usage: node check-media.mjs [--profile scrub] <file> [<file> ...]\n       node check-media.mjs --profile demo [--poster <image>] [--slot <type>] [--loop] <file> [<file> ...]';
   let profile = 'scrub';
   const demo = {};
@@ -262,7 +266,7 @@ async function main() {
   if (!files.length) throw new UsageError(usage);
   if (profile !== 'demo' && Object.keys(demo).length) throw new UsageError('--poster, --slot and --loop need --profile demo.', usage);
   if (demo.slot) slotBudget(demo.slot);
-  const report = createReport({ tool: 'check-media' });
+  const report = createReport({ tool: 'check-media', boundary: MEDIA_BOUNDARY });
   checkFiles(files, report, { profile, ...demo });
   return report.summary();
 }

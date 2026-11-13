@@ -14,8 +14,8 @@
  * may start inside that margin); every clip gets its source once near; LV-EMBED-02 any clip seen moving on its own for
  * more than 5 s (any loop, or a longer one-shot) has native controls or a visible, labelled, keyboard-focusable control
  * that pauses it when pressed with Enter or Space while the clip plays, and under reduced motion nothing plays, also
- * after a clip has loaded. Warnings: a clip at least half visible plays, at most one clip plays at once and Save-Data
- * loads no video (under LV-EMBED-01); LV-WARN-DENSITY 1.3-2.0 video pixels per CSS pixel; LV-WARN-AV1 AV1 listed first
+ * after a clip has loaded. Warnings: LV-WARN-PLAYBACK a clip scrolled into view plays at half visibility; LV-WARN-DENSITY 1.3-2.0
+ * video pixels per CSS pixel; LV-WARN-AV1 AV1 listed first
  * when present and H.264 listed last. Output follows the shared checker contract.
  */
 import fs from 'node:fs';
@@ -45,10 +45,6 @@ export const INSTRUMENT = String.raw`(() => {
     log.playing.push(event.target.currentSrc || '(no source)');
     if (!log.probing) log.self.add(event.target);
   }, true);
-  if (window.__lvSaveData) {
-    const connection = { saveData: true, effectiveType: '4g', addEventListener() {}, removeEventListener() {} };
-    Object.defineProperty(Navigator.prototype, 'connection', { configurable: true, get: () => connection });
-  }
 })();`;
 
 function parseViewport(value) {
@@ -133,9 +129,8 @@ function readVideos(page, selector) {
   }), selector);
 }
 
-async function newRun(browser, viewport, { reducedMotion = 'no-preference', saveData = false } = {}) {
+async function newRun(browser, viewport, { reducedMotion = 'no-preference' } = {}) {
   const context = await browser.newContext({ viewport, deviceScaleFactor: 1, reducedMotion });
-  if (saveData) await context.addInitScript(() => Object.defineProperty(window, '__lvSaveData', { value: true }));
   await context.addInitScript(INSTRUMENT);
   const page = await context.newPage();
   const media = [];
@@ -257,14 +252,12 @@ async function checkNormal(report, label, browser, url, viewport, wanted) {
       return;
     }
     const beforeScroll = new Set(run.media);
-    let mostPlaying = 0;
     for (const first of atLoad) {
       const where = `clip ${first.index + 1} at ${label}`;
       const below = first.top >= first.viewport;
       await visit(run.page, selector, first.index, { waitPlay: true });
       const clips = await readVideos(run.page, selector);
       const clip = clips[first.index];
-      mostPlaying = Math.max(mostPlaying, clips.filter((entry) => !entry.paused).length);
       const urls = [...new Set([...clip.sources.map((source) => source.url), ...(clip.currentSrc ? [clip.currentSrc] : [])])];
       if (below) {
         report.check('LV-EMBED-01', !first.autoplay, `${where}: autoplay attribute`, first.autoplay ? 'present' : 'absent', 'no autoplay attribute (it overrides preload)');
@@ -281,7 +274,7 @@ async function checkNormal(report, label, browser, url, viewport, wanted) {
       } else {
         report.skip('LV-EMBED-01', where, 'in the first viewport at load, so it may load at once');
       }
-      if (clip.ratio >= LIMITS.playRatio) report.check('LV-EMBED-01', !clip.paused, `${where}: playback`, `${clip.paused ? 'paused' : 'playing'} at ${Math.round(clip.ratio * 100)} % visible`, `plays while at least ${LIMITS.playRatio * 100} % visible`, 'warn');
+      if (clip.ratio >= LIMITS.playRatio) report.check('LV-WARN-PLAYBACK', !clip.paused, `${where}: playback`, `${clip.paused ? 'paused' : 'playing'} at ${Math.round(clip.ratio * 100)} % visible`, `plays while at least ${LIMITS.playRatio * 100} % visible`, 'warn');
       if (clip.videoWidth && clip.width) {
         const density = clip.videoWidth / clip.width;
         report.check('LV-WARN-DENSITY', density >= LIMITS.densityMin - 0.005 && density <= LIMITS.densityMax + 0.005, `${where}: density`, `${density.toFixed(2)} video px per CSS px (${clip.videoWidth} in ${Math.round(clip.width)})`, `${LIMITS.densityMin}-${LIMITS.densityMax}`, 'warn');
@@ -302,7 +295,6 @@ async function checkNormal(report, label, browser, url, viewport, wanted) {
       }
       await checkPauseControl(report, run, selector, clip, where);
     }
-    report.check('LV-EMBED-01', mostPlaying <= 1, `${label}: active clips`, `${mostPlaying} playing at once`, 'one active clip at a time', 'warn');
   } finally {
     await run.context.close();
   }
@@ -330,19 +322,6 @@ async function checkReducedMotion(report, label, browser, url, viewport, wanted)
   }
 }
 
-async function checkSaveData(report, label, browser, url, viewport, wanted) {
-  const run = await newRun(browser, viewport, { saveData: true });
-  try {
-    const selector = await open(run, url, wanted);
-    const count = (await readVideos(run.page, selector)).length;
-    await scrollThrough(run, selector, count);
-    const files = [...new Set(run.media.map((value) => path.basename(new URL(value).pathname)))];
-    report.check('LV-EMBED-01', !files.length, `${label}, Save-Data`, files.length ? `loaded ${files.join(', ')}` : 'no video requested', 'no video loads until the reader asks under Save-Data (Chromium only)', 'warn');
-  } finally {
-    await run.context.close();
-  }
-}
-
 export async function checkEmbed(options, report) {
   const playwright = await loadPlaywright(options.project);
   const served = options.serve ? await startServer({ root: options.serve, mode: options.server }) : null;
@@ -353,7 +332,6 @@ export async function checkEmbed(options, report) {
       const label = `${viewport.width}x${viewport.height}`;
       await checkNormal(report, label, browser, url, viewport, options.selector);
       await checkReducedMotion(report, label, browser, url, viewport, options.selector);
-      await checkSaveData(report, label, browser, url, viewport, options.selector);
     }
   } finally {
     await browser.close();

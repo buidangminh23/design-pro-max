@@ -17,7 +17,7 @@
 - Update animations, such as `.contentTransition(.numericText())` on a changing number, last up to 2 seconds (HG-156).
 - Content fits its family at the family's size with no scrolling and no clipped text [MW-SNAP-01]. When it does not fit, shorten it, cap it with `lineLimit`, or offer it only in a larger family.
 - Give the widget a `containerBackground(for: .widget)` so the system can remove or tint it, and test the light and dark schemes.
-- `../hig/PART.md` has the full widget guidelines, including sizes per device.
+- `../../hig/PART.md` has the full widget guidelines, including sizes per device.
 
 ## The kind string
 

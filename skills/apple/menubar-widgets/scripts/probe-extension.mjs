@@ -14,7 +14,8 @@
  *
  * --ps and --lsof read recorded output of `LC_ALL=C ps -axww -o pid=,lstart=,args=` and `lsof -a -p <pids> -d txt -Fpn`
  * instead of running them, so the probe can judge a report from another machine; --tz gives that machine's UTC offset
- * (Z or +hh:mm), which a recording needs. Without them it runs both, on macOS only; elsewhere it reports the rule as
+ * (Z or +hh:mm), which a recording needs; a recorded --ps without --lsof never runs lsof on this machine and takes the
+ * executable path from the ps arguments. Without them it runs both, on macOS only; elsewhere it reports the rule as
  * skipped. Error: MW-STALE-01. Output follows the shared checker contract.
  */
 import fs from 'node:fs';
@@ -33,17 +34,29 @@ const LOCAL_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/;
 
 const quote = (value) => `'${String(value).replace(/'/g, "'\\''")}'`;
 const pad = (value) => String(value).padStart(2, '0');
+const SYSTEM_PATH = 'PATH="/bin:/usr/bin:/usr/sbin:$PATH"';
+
+export function systemToolHint(command, argv = process.argv) {
+  return `${command} ships with macOS in /bin, /usr/bin or /usr/sbin, which are missing from PATH. Run the probe again with them: ${SYSTEM_PATH} ${currentCommand(argv)}. Off macOS, run the probe on the Mac, or record ps and lsof there and pass --ps, --tz and --lsof.`;
+}
+
+export function plutilHint(file, inBundle, platform = process.platform) {
+  if (platform === 'darwin') return systemToolHint('plutil');
+  const installed = quote(`<path to the installed .app>/${inBundle}`);
+  return `Off macOS there is no plutil to install. On the Mac, write an XML copy to another file, leaving the installed app untouched because its code signature seals this file: plutil -convert xml1 -o Info.xml ${installed}. Then put that Info.xml in place of ${quote(file)} in the copy here and run the probe again, or run the probe on the Mac.`;
+}
 
 export function plistString(text, key) {
   const match = new RegExp(`<key>${key}</key>\\s*<string>([^<]*)</string>`).exec(text);
   return match ? match[1] : null;
 }
 
-function readPlist(file) {
+function readPlist(file, inBundle) {
   const bytes = fs.readFileSync(file);
   if (bytes.subarray(0, 6).toString('latin1') !== 'bplist') return bytes.toString('utf8');
   const result = spawnSync('plutil', ['-convert', 'xml1', '-o', '-', file], { encoding: 'utf8' });
-  if (result.error || result.status !== 0) throw new UsageError(`Cannot read the binary property list ${file}; plutil is needed on macOS.`);
+  if (result.error?.code === 'ENOENT') throw new UsageError(`Cannot read the binary property list ${file}: plutil is not on PATH.`, plutilHint(file, inBundle));
+  if (result.error || result.status !== 0) throw new UsageError(`Cannot read the binary property list ${file}: ${String(result.stderr || result.error?.message || '').trim()}`);
   return result.stdout;
 }
 
@@ -53,7 +66,7 @@ export function findExtensions(app) {
   return fs.readdirSync(folder).filter((name) => name.endsWith('.appex')).sort().map((name) => {
     const appex = path.join(folder, name);
     const info = path.join(appex, 'Contents', 'Info.plist');
-    const plist = fs.existsSync(info) ? readPlist(info) : '';
+    const plist = fs.existsSync(info) ? readPlist(info, path.relative(app, info).split(path.sep).join('/')) : '';
     const executable = plistString(plist, 'CFBundleExecutable') ?? name.replace(/\.appex$/, '');
     return { name, app, appex, identifier: plistString(plist, 'CFBundleIdentifier'), executable, binary: path.join(appex, 'Contents', 'MacOS', executable) };
   });
@@ -153,7 +166,7 @@ export function fixCommands(extension, pids) {
 
 function runTool(command, args) {
   const result = spawnSync(command, args, { encoding: 'utf8', env: { ...process.env, LC_ALL: 'C' }, maxBuffer: 64 * 1024 * 1024 });
-  if (result.error?.code === 'ENOENT') throw new UsageError(`${command} is not on PATH.`);
+  if (result.error?.code === 'ENOENT') throw new UsageError(`${command} is not on PATH.`, systemToolHint(command));
   const blocked = ['EPERM', 'EACCES'].includes(result.error?.code) || (/not permitted|sandbox/i.test(result.stderr ?? '') && !result.stdout);
   if (blocked) throw new SandboxError(`Blocked: ${command} could not read the process table.`, currentCommand());
   if (result.error) throw result.error;
@@ -216,7 +229,7 @@ async function main() {
   if (psFile && !parsePs(psText, tz).length) throw new UsageError(`No process line in ${psFile} could be read. Record it with LC_ALL=C ps -axww -o pid=,lstart=,args= so the start times are in English.`);
   if (!psFile && !parsePs(psText).length) throw new SandboxError('Blocked: ps listed no process at all, so the process table is hidden from this session.', currentCommand());
   let lsofText = lsofFile ? fs.readFileSync(lsofFile, 'utf8') : '';
-  if (!lsofFile) {
+  if (!lsofFile && !psFile) {
     const pids = findExtensions(app).flatMap((extension) => extensionProcesses(parsePs(psText), extension)).map((item) => item.pid);
     if (pids.length) lsofText = runTool('lsof', ['-a', '-p', pids.join(','), '-d', 'txt', '-Fpn']);
   }
@@ -224,4 +237,4 @@ async function main() {
   return report.summary();
 }
 
-if (isMain(import.meta.url)) await runMain(main, { command: `node ${process.argv.slice(1).join(' ')}` });
+if (isMain(import.meta.url)) await runMain(main, { command: currentCommand() });

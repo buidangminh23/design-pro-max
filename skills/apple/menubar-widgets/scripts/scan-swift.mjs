@@ -16,7 +16,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { createReport, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { createReport, dropProject, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { currentCommand } from '../../shared/sandbox.mjs';
 
 export const BOUNDARY = 'Proof boundary: a static read of Swift text in the files given; it follows calls one file deep, does not build or run the code, and cannot see handlers in other files, generated code or runtime appearance changes. Profile the running app with sample for the CPU loop and open Edit Widget for the options.';
 
@@ -383,7 +384,7 @@ export function parseArguments(args) {
 }
 
 async function main() {
-  const { inputs, configurable } = parseArguments(process.argv.slice(2));
+  const { inputs, configurable } = parseArguments(dropProject(process.argv.slice(2)));
   const files = listFiles(inputs);
   if (!files.length) throw new UsageError('No .swift file found.');
   const report = createReport({ tool: 'scan-swift', boundary: BOUNDARY });
@@ -391,4 +392,4 @@ async function main() {
   return report.summary();
 }
 
-if (isMain(import.meta.url)) await runMain(main, { command: `node ${process.argv.slice(1).join(' ')}` });
+if (isMain(import.meta.url)) await runMain(main, { command: currentCommand() });

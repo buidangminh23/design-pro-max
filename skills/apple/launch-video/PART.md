@@ -27,7 +27,7 @@ Library choices and their terms are in `references/paths-and-licenses.md`: GSAP 
 
 ## 2. Direct the clip
 
-Write the beats as a table (start, end, what moves, what the viewer reads) before building. One idea per clip. Defaults [LV-WARN-DIRECTION]: transitions 300-500 ms, holds of at least 1 s and 1.5 s on a result, typing at 8-12 characters per second, one cursor move of 0.3-0.8 s per target, loops of 4-8 s (PV-N0); measured demos never cut or zoom inside a clip (PV-20). Render at 30 fps unless the motion is fast [LV-WARN-FPS]. End a loop where it began, so the seam does not jump [LV-WARN-SEAM]. Details: `references/direction.md`.
+Write the beats as a table (start, end, what moves, what the viewer reads) before building. One idea per clip. Defaults [LV-WARN-DIRECTION]: transitions 300-500 ms, holds of at least 1 s and 1.5 s on a result, typing at 8-12 characters per second, one cursor move of 0.3-0.8 s per target, loops of 4-8 s (PV-N0); measured demos never cut or zoom inside a clip (PV-20). Render at 30 fps unless the motion is fast [LV-WARN-FPS]. End a loop where it began, so the seam does not jump [LV-WARN-SEAM]. Details: `references/direction.md`. Clips are the Media class in `../shared/motion-classes.md`: their timings are media timings, so a review never holds them to control limits.
 
 ## 3. Rebuild the UI in HTML and CSS
 
@@ -53,8 +53,9 @@ Never use the browser's built-in page recording for a master: it writes VP8 at 2
 Copy `assets/lib/demo-embed.js` and follow `assets/reference/demo-embed.html` and `references/embed-component.md`:
 
 - Markup ships `muted playsinline preload="none"`, no `autoplay` attribute, sources in `data-src`, best codec first and H.264 last [LV-WARN-AV1], and a lazy `<img>` start image instead of the `poster` attribute, which loads eagerly (PV-13).
-- The component gives a clip its sources when it comes within the load margin, plays it while at least half is visible, pauses it otherwise, runs one clip at a time, and reveals the video only after its first presented frame.
-- A clip that moves on its own for over 5 s, which includes every loop, gets a labelled pause button that a keyboard reaches and presses [LV-EMBED-02]. Under reduced motion or Save-Data nothing loads or plays until the reader presses Play.
+- The component gives a clip its sources when it comes within the load margin, plays it while at least half is visible and pauses it otherwise [LV-WARN-PLAYBACK], and reveals the video only after its first presented frame. By default it also lets one clip play at a time (`maxActive: 1`); that is a choice of the component, not a measured rule.
+- A clip that moves on its own for over 5 s, which includes every loop, gets a labelled pause button that a keyboard reaches and presses [LV-EMBED-02]. Under reduced motion nothing loads or plays until the reader presses Play.
+- Under Save-Data, too, nothing loads or plays until the reader presses Play; like `maxActive`, that is a choice of the component, not a measured rule, and only Chromium browsers send the signal (PV-24).
 
 ## 7. Hard rules
 
