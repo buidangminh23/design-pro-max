@@ -11,13 +11,13 @@ Ask, and write the answers down as a beat table (progress window, what changes, 
 3. How tall is the stage's content, and how tall is the page's sticky chrome (a fixed nav)? Both decide the short-viewport gate [LS-GATE-02]. Take them from this page, never from another site's measurements.
 4. How much travel does the story need? Aim for 70-300vh [LS-WARN-TRAVEL]; more asks the reader to scroll through too little change.
 5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`). The sources always include H.264, listed first, even when the user asks for AV1 or HEVC only: write the H.264 source into the markup and the commands you deliver, not only into your advice, and say why [LS-VID-02]. The start image is frame 0 of the film, in the markup with its `src` set from the start (never set by script after the video plays): the static layout shows the still, and once the scene pins the start image covers the film area until the video has presented a frame [LS-VID-05].
-6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). If a sequence stays, decode a bounded window of frames, never the whole set.
+6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). `scripts/make-sequence.mjs --dry-run` prints the decoded totals. If a sequence stays, decode a bounded window of frames with `assets/lib/frame-window.js`, never the whole set.
 7. Fixing an existing scene? Check its code against section 6 as well as the reported symptom, and replace every item it ships from there, such as `preload="auto"`.
 
 ## 2. Choose the engine
 
 - **CSS scroll timeline** (`assets/reference/scene-css.html`): no script; pins only inside `@supports (animation-timeline: view())` with motion allowed, over a finished static layout [LS-WARN-SUPPORTS]. Firefox stable gets the static page (TQ-14). Best when the stage has a fixed height and no film.
-- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`; with a film, `assets/reference/scrub-video.html`): the default when gates need script, the stage height depends on content, or a film scrubs. It writes one clamped value to `--scene-progress` and children read it.
+- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`; with a film, `assets/reference/scrub-video.html`; with an image sequence, `assets/reference/scrub-sequence.html`): the default when gates need script, the stage height depends on content, or a film or sequence scrubs. It writes one clamped value to `--scene-progress` and children read it.
 - **GSAP ScrollTrigger**: only for labelled timelines with many overlapping tweens or callbacks. It is free for sites and apps but not open source (TQ-1), and GSAP with ScrollTrigger adds about 44.9 KB gzipped (TQ-23). For its API, use the `gsap-scrolltrigger` skill if it is installed.
 
 Whatever the engine, the stage animates `transform` and `opacity` only, and the static layout is the end state.
@@ -47,7 +47,7 @@ Read the reference the task needs, in full:
 |---|---|
 | Box geometry, progress, sticky offsets, the CSS and JS engines | `references/engines-and-geometry.md` |
 | Encoding, loading, seeking and revealing a scrubbed film | `references/scrub-video.md` |
-| Image sequences instead of video, memory budgets | `references/frame-sequences.md` |
+| Image sequences instead of video: memory budgets, the frame window, making and benchmarking the frames | `references/frame-sequences.md` |
 | Gates, reduced motion, keyboard and screen readers | `references/gates-and-a11y.md` |
 | Motion classes: which motion may run long and which must stay short | `../shared/motion-classes.md` |
 | Every rule's evidence | `references/evidence.md` |
@@ -55,10 +55,10 @@ Read the reference the task needs, in full:
 ## 5. Build in the user's project
 
 1. List every path you will write before writing any, and stop if one exists that you did not create. The library files start with a `launch-scroll ... (design-pro-max)` header; an older header means an earlier release, so ask once whether to upgrade them.
-2. Copy `assets/lib/scene.css`, `assets/lib/scene-progress.js`, and for a film `assets/lib/seek-queue.js` and `assets/lib/scrub-loader.js` into the project. They have no dependencies.
+2. Copy `assets/lib/scene.css`, `assets/lib/scene-progress.js`, and for a film `assets/lib/seek-queue.js` and `assets/lib/scrub-loader.js` into the project; for an image sequence those two plus `assets/lib/frame-window.js`. They have no dependencies.
 3. Mark up the scene: `[data-scene]` (the tall box), `[data-scene-sticky]` (its child), `[data-scene-stage]` (the content whose height the gate measures). Set `--scene-travel` and, under a fixed nav, `--scene-sticky-top`. For a film add `[data-scene-film]` holding the still, the start image and `<video data-scrub>` with `<source data-src>` children, H.264 first. Ship every piece of the stage's content visible in the markup: no `hidden`, `display: none` or zero opacity that only script removes; script may only add the pinned state.
-4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output). The start image is always frame 0 of that encode: when the master film is not in the project, point the markup at the encoder's `startframe.jpg` and say it still has to be generated; never draw or substitute an illustration.
-5. Mount: `createScene(element)` for a plain scene, `mountScrubScene(element)` for a film.
+4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output). The start image is always frame 0 of that encode: when the master film is not in the project, point the markup at the encoder's `startframe.jpg` and say it still has to be generated; never draw or substitute an illustration. For an image sequence, `scripts/make-sequence.mjs` writes the frames, the same start image and still, and `sequence.json`, and prints the memory and download totals to show the user.
+5. Mount: `createScene(element)` for a plain scene, `mountScrubScene(element)` for a film, `mountSequenceScene(element)` for a sequence.
 6. Verify (section 7).
 
 ## 6. Never ship
@@ -79,7 +79,10 @@ Run the probe against the page, from the project folder that holds Playwright. T
 node <absolute path to this folder>/scripts/probe-scene.mjs --url http://localhost:5173/ --project .
 node <absolute path to this folder>/scripts/probe-scene.mjs --serve dist --page index.html --server 200 --project .
 node <absolute path to this folder>/../shared/check-media.mjs public/film.mp4 public/film.webm
+node <absolute path to this folder>/scripts/bench-scrub.mjs --film public/film.mp4 --sequence public/sequence/sequence.json --project .
 ```
+
+The probe also checks an image sequence: no manifest or frame requested behind a gate, and a bounded window of decoded frames. `bench-scrub.mjs` is advisory and never fails: it counts the frames a fast sweep shows for a film and for a sequence of the same clip, to help choose between them.
 
 `--server 200` serves the folder like an origin without Range support. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own.
 
