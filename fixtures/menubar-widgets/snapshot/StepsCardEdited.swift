@@ -6,7 +6,7 @@ struct StepsCard: View {
     let note: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
             GoalBar(done: done)
@@ -19,7 +19,6 @@ struct StepsCard: View {
                 .lineLimit(2)
             Spacer(minLength: 0)
         }
-        .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background(Color(nsColor: .windowBackgroundColor))
     }

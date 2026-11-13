@@ -654,11 +654,11 @@
       "id": "MW-SNAP-01",
       "part": "menubar-widgets",
       "level": "error",
-      "statement": "Every widget snapshot entry fits its size at its width and renders to a PNG of that size times the scale; content that needs more height than the widget has is capped or shortened before it ships.",
-      "values": "needed height at most the entry height; PNG of width and height times the scale",
+      "statement": "Every widget snapshot entry fits its width and height inside its content margins and renders to a PNG of that size times the scale; content that needs more width or height than the widget has is capped or shortened before it ships, and every entry of a non-empty catalog writes its own PNG.",
+      "values": "needed width and height, margins included, at most the entry size; PNG of width and height times the scale; unique PNG names",
       "evidence": ["IL-16"],
       "check": "menubar-widgets/scripts/snapshot-widgets.mjs",
-      "fixtures": { "pass": ["snapshot-baseline-same", "snapshot-shipped-widget"], "fail": ["snapshot-overflow"] },
+      "fixtures": { "pass": ["snapshot-baseline-same", "snapshot-shipped-widget"], "fail": ["snapshot-overflow", "snapshot-too-wide", "snapshot-content-margins", "snapshot-empty-catalog", "snapshot-duplicate-names", "snapshot-crash-blames-entry"] },
       "implementedBy": ["menubar-widgets/assets/SnapshotRenderer.swift"]
     },
     {

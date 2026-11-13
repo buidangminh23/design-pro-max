@@ -188,7 +188,11 @@ test('the probe rejects a recording it cannot read and one without its time zone
 });
 
 test('the snapshot runner splits batches, judges sizes and compares bytes', async () => {
-  const { batches, judgeResult, compareWithBaseline, parseResults } = await script('snapshot-widgets.mjs');
+  const { batches, judgeResult, compareWithBaseline, parseResults, duplicateFiles, platformControls, orphanBaselines } = await script('snapshot-widgets.mjs');
+  assert.deepEqual(duplicateFiles([{ name: 'a/b', file: 'a-b.png' }, { name: 'a:b', file: 'a-b.png' }, { name: 'c', file: 'c.png' }]), [['a-b.png', ['a/b', 'a:b']]]);
+  assert.deepEqual(platformControls([path.join(ROOT, 'fixtures', 'menubar-widgets', 'snapshot', 'PlaceholderCatalog.swift')]).map(({ control }) => control), ['ProgressView', 'Link']);
+  assert.deepEqual(platformControls([path.join(ROOT, 'fixtures', 'menubar-widgets', 'snapshot', 'StepsCard.swift')]), []);
+  assert.equal(judgeResult({ width: 170, height: 170, contentMargins: 16, neededWidth: 120, neededHeight: 120, pixels: [340, 340] }, 2).measured, '340x340 px; content needs 120x120 of 170x170 pt with 16 pt margins');
   assert.deepEqual(batches(0, 40), []);
   assert.deepEqual(batches(85, 40), [[0, 40], [40, 80], [80, 85]]);
   assert.equal(judgeResult({ width: 170, height: 170, neededHeight: 120, pixels: [340, 340] }, 2).ok, true);
@@ -203,6 +207,8 @@ test('the snapshot runner splits batches, judges sizes and compares bytes', asyn
     assert.equal(compareWithBaseline(path.join(folder, 'a.png'), path.join(folder, 'b.png')), 'same');
     assert.equal(compareWithBaseline(path.join(folder, 'a.png'), path.join(folder, 'c.png')), 'changed');
     assert.equal(compareWithBaseline(path.join(folder, 'a.png'), path.join(folder, 'none.png')), 'missing');
+    assert.deepEqual(orphanBaselines(folder, ['a.png']), ['b.png', 'c.png']);
+    assert.deepEqual(orphanBaselines(path.join(folder, 'none'), ['a.png']), []);
   } finally {
     removeTree(folder);
   }
