@@ -517,6 +517,127 @@
       "check": "launch-page/scripts/check-page.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": []
+    },
+    {
+      "id": "MW-APPEAR-01",
+      "part": "menubar-widgets",
+      "level": "error",
+      "statement": "A handler that observes effectiveAppearance (KVO, a Combine publisher or observeValue) marks a view for display or replaces its image or title only after comparing the light or dark match with the last one; an observer that redraws on every callback can feed itself through the menu bar snapshot and keep a core busy.",
+      "values": "redraw only when the light or dark match changes; the loop held one core at 90-97 % CPU",
+      "evidence": ["IL-13"],
+      "check": "menubar-widgets/scripts/scan-swift.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets"], "fail": ["appear-01-kvo-redraw", "appear-02-publisher-image"] },
+      "implementedBy": ["menubar-widgets/assets/StatusItemController.swift"]
+    },
+    {
+      "id": "MW-CONFIG-01",
+      "part": "menubar-widgets",
+      "level": "error",
+      "statement": "A widget that should offer options uses AppIntentConfiguration with a WidgetConfigurationIntent whose parameters use AppEntity types, keeping its kind string; StaticConfiguration offers nothing in Edit Widget, so it is wrong wherever the sources declare a configuration intent no AppIntentConfiguration uses, or the task asks for options.",
+      "values": "AppIntentConfiguration with a WidgetConfigurationIntent; kind string unchanged",
+      "evidence": ["IL-15"],
+      "check": "menubar-widgets/scripts/scan-swift.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets", "config-03-static-not-requested"], "fail": ["config-01-static-with-intent", "config-02-static-when-configurable"] },
+      "implementedBy": ["menubar-widgets/assets/ConfigurableWidget.swift"]
+    },
+    {
+      "id": "MW-STALE-01",
+      "part": "menubar-widgets",
+      "level": "error",
+      "statement": "After an install or self-update, no process of the app's extensions started before the bundle was installed or runs an executable outside it; the app stops stale extension processes, re-registers the extension with pluginkit -a and reloads all timelines at launch.",
+      "values": "extension processes start after the install and run the installed copy",
+      "evidence": ["IL-14"],
+      "check": "menubar-widgets/scripts/probe-extension.mjs",
+      "fixtures": { "pass": ["probe-fresh"], "fail": ["probe-started-before-install", "probe-removed-copy"] },
+      "implementedBy": ["menubar-widgets/assets/StaleExtensionCleanup.swift"]
+    },
+    {
+      "id": "MW-SNAP-01",
+      "part": "menubar-widgets",
+      "level": "error",
+      "statement": "Every widget snapshot entry fits its size at its width and renders to a PNG of that size times the scale; content that needs more height than the widget has is capped or shortened before it ships.",
+      "values": "needed height at most the entry height; PNG of width and height times the scale",
+      "evidence": ["IL-16"],
+      "check": "menubar-widgets/scripts/snapshot-widgets.mjs",
+      "fixtures": { "pass": ["snapshot-baseline-same"], "fail": ["snapshot-overflow"] },
+      "implementedBy": ["menubar-widgets/assets/SnapshotRenderer.swift"]
+    },
+    {
+      "id": "MW-SNAP-02",
+      "part": "menubar-widgets",
+      "level": "error",
+      "statement": "Each widget snapshot PNG is byte-equal to the previous build's, or the difference is looked at and accepted by writing a new baseline.",
+      "values": "byte-equal to the baseline, or a reviewed --update",
+      "evidence": ["IL-16"],
+      "check": "menubar-widgets/scripts/snapshot-widgets.mjs",
+      "fixtures": { "pass": ["snapshot-baseline-same"], "fail": ["snapshot-baseline-changed"] },
+      "implementedBy": ["menubar-widgets/assets/SnapshotRenderer.swift"]
+    },
+    {
+      "id": "MW-WARN-KIND",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "Write each widget kind once, as a shared constant that the widget and every reloadTimelines(ofKind:) call use, and never rename it after release: a new kind drops the widgets people placed.",
+      "values": "one kind constant per widget, unchanged after release",
+      "evidence": ["IL-15"],
+      "check": "menubar-widgets/scripts/scan-swift.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "MW-WARN-PARAMS",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "A WidgetConfigurationIntent used by AppIntentConfiguration declares at least one @Parameter; a list of choices is an AppEntity with an EntityQuery.",
+      "values": "at least one @Parameter; choices as an AppEntity with a query",
+      "evidence": ["IL-15"],
+      "check": "menubar-widgets/scripts/scan-swift.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "MW-WARN-INTENTS",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "A build made without Xcode runs the App Intents metadata extraction itself and lists the entity query, transient entity, intents package and dynamic options protocols, or the extracted metadata is incomplete and the options do not show.",
+      "values": "metadata extraction lists EntityQuery, TransientEntity, AppIntentsPackage and DynamicOptionsProvider",
+      "evidence": ["IL-15"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "MW-WARN-BATCH",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "Render widget snapshots in several processes rather than one long run, since very many renders in one process can abort; the runner renders 40 entries per process by default and refuses more than 60.",
+      "values": "40 entries per process by default; at most 60",
+      "evidence": ["IL-16"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["menubar-widgets/scripts/snapshot-widgets.mjs"]
+    },
+    {
+      "id": "MW-WARN-TESTCOPY",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "Test a menu bar or widget app as a debug build with its own bundle identifier and data folder, never by replacing, stopping or re-registering the installed copy; capture its windows from inside the logged-in session.",
+      "values": "own bundle identifier and data folder; window capture from inside the session",
+      "evidence": ["IL-17"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "MW-WARN-EXTSIGN",
+      "part": "menubar-widgets",
+      "level": "warn",
+      "statement": "A widget extension is sandboxed and signed with its own entitlements before the host app, whose signature must not replace them; it starts from its WidgetBundle in the system extension entry point, a notarized build carries a secure timestamp, and entitlements are probed from inside an app bundle.",
+      "values": "sandboxed extension with its own entitlements; WidgetBundle entry point; secure timestamp",
+      "evidence": ["IL-18"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
     }
   ]
 }

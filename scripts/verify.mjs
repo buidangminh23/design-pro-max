@@ -9,6 +9,8 @@
  *
  *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
+ * A case with platform runs only on that platform (menubar-widgets snapshots need macOS) and is listed as skipped elsewhere.
+ *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
  * playwright, then npx playwright install chromium-headless-shell). Exit codes: 0 every case judged right, 1 a case
  * judged wrong, 2 a missing tool.
@@ -20,7 +22,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -73,9 +75,42 @@ function buildSite(entry, skill, media, folder) {
   }
 }
 
+const MENUBAR_CHECKERS = ['scan-swift', 'probe-extension', 'snapshot-widgets'];
+
+/** Arguments for a menubar-widgets case: Swift sources, a recorded process table, or a snapshot run with a baseline. */
+export function menubarWidgetsArgs(entry, skill, scratch, root = ROOT) {
+  const script = (name) => path.join(skill, entry.part, 'scripts', `${name}.mjs`);
+  const fixture = (file) => path.join(root, 'fixtures', entry.part, ...file.split('/'));
+  const sources = (list) => list.map((file) => (file.startsWith('assets/') ? path.join(skill, entry.part, ...file.split('/')) : fixture(file)));
+  if (entry.checker === 'scan-swift') return [script('scan-swift'), ...(entry.args ?? []), ...sources(entry.sources)];
+  if (entry.checker === 'probe-extension') {
+    const folder = path.join(scratch, 'probe', entry.id);
+    const app = path.join(folder, path.basename(entry.app));
+    copyTree(fixture(entry.app), app);
+    const recording = (file) => {
+      const target = path.join(folder, path.basename(file));
+      fs.writeFileSync(target, fs.readFileSync(fixture(file), 'utf8').replaceAll('@APP@', app));
+      return target;
+    };
+    return [script('probe-extension'), '--app', app, '--installed', entry.installed, '--ps', recording(entry.ps), '--lsof', recording(entry.lsof)];
+  }
+  const folder = path.join(scratch, 'snapshots', entry.id);
+  const args = [script('snapshot-widgets'), '--out', path.join(folder, 'png'), ...(entry.args ?? [])];
+  if (entry.baselineSources) {
+    const baseline = path.join(folder, 'baseline');
+    spawnSync(process.execPath, [script('snapshot-widgets'), '--out', path.join(folder, 'baseline-png'), '--baseline', baseline, '--update', ...sources(entry.baselineSources)], { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024, timeout: 10 * 60 * 1000 });
+    args.push('--baseline', baseline);
+  }
+  return [...args, ...sources(entry.sources)];
+}
+
+export const runsHere = (entry, platform = process.platform) => !entry.platform || entry.platform === platform;
+
 function runCase(entry, skill, media, scratch) {
   let args;
-  if (entry.checker === 'check-media') {
+  if (MENUBAR_CHECKERS.includes(entry.checker)) {
+    args = menubarWidgetsArgs(entry, skill, scratch);
+  } else if (entry.checker === 'check-media') {
     const demo = [...(entry.profile ? ['--profile', entry.profile] : []), ...(entry.poster ? ['--poster', media[entry.poster]] : [])];
     args = [path.join(skill, 'shared', 'check-media.mjs'), ...demo, ...(entry.args ?? []), ...entry.files.map((recipe) => media[recipe])];
   } else if (entry.checker === 'check-embed') {
@@ -149,10 +184,14 @@ async function main(argv) {
   const skill = path.join(scratch, 'skill');
   for (const folder of SHIPPED) copyTree(path.join(ROOT, SKILL_DIR, folder), path.join(skill, folder));
   const wanted = only ? only.split(',') : [];
-  const cases = loadCases().filter((entry) => !only || wanted.some((name) => entry.id === name || rulesOf(entry).includes(name)));
-  if (!cases.length) {
+  const selected = loadCases().filter((entry) => !only || wanted.some((name) => entry.id === name || rulesOf(entry).includes(name)));
+  if (!selected.length) {
     process.stderr.write(`no case matches ${only}\n`);
     return 2;
+  }
+  const cases = selected.filter((entry) => runsHere(entry));
+  for (const entry of selected.filter((item) => !runsHere(item))) {
+    if (!json) process.stdout.write(`skip ${entry.expect.padEnd(4)} ${entry.id} (${rulesOf(entry).join(', ')}) needs ${entry.platform}\n`);
   }
   const needed = new Set(cases.map((entry) => entry.part));
   const media = {

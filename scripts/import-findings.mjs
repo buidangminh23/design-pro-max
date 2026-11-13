@@ -10,7 +10,8 @@
  * JSON. A notes id <AREA>-N<k> is a section of research/<area>.md, hashed from its heading to the next heading of the
  * same or a higher level. Policies (POL-<k>) have no source file and keep a hash of their own claim. An area code that
  * AREAS does not name, such as one for a private benchmark, resolves to the one findings file in the folder that no
- * named area claims, so its name stays out of the repository.
+ * named area claims, so its name stays out of the repository. IL-<n> = research.inventory.lessons[n] of the one inputs
+ * file in the research folder, hashed as that lesson object as JSON; the file name stays out of the repository too.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,6 +21,15 @@ import { ROOT, formatJson, isMainModule, sha256 } from './lib/vendor.mjs';
 export const AREAS = { AM: 'apple-motion', AD: 'apple-design', TQ: 'techniques-2026', PV: 'product-video', SC: 'scroll-cinema', EC: 'ecosystem', HG: 'apple-hig' };
 
 const FINDINGS_SUFFIX = '.findings.json';
+const INPUTS_SUFFIX = '.inputs.json';
+
+/** The lesson behind IL-<n>: research.inventory.lessons[n] of the one inputs file in the research folder. */
+export function lessonHash(folder, id, index) {
+  const inputs = fs.readdirSync(folder).filter((file) => file.endsWith(INPUTS_SUFFIX));
+  if (inputs.length !== 1) return { problem: `${id}: ${inputs.length} inputs files, expected one` };
+  const lesson = JSON.parse(fs.readFileSync(path.join(folder, inputs[0]), 'utf8')).research?.inventory?.lessons?.[Number(index)];
+  return lesson ? { sha: sha256(Buffer.from(JSON.stringify(lesson))) } : { problem: `${id}: the inputs file has no lesson ${index}` };
+}
 
 /** The area name behind a code: from AREAS, or the single findings file in the folder that no named area claims. */
 export function areaName(folder, code) {
@@ -61,6 +71,7 @@ function section(text, heading) {
 export function sourceHash(folder, id, entry) {
   if (id.startsWith('POL-')) return { sha: sha256(Buffer.from(entry.claim)) };
   const [area, index] = id.split('-');
+  if (area === 'IL') return lessonHash(folder, id, index);
   const { name, problem } = areaName(folder, area);
   if (problem) return { problem: `${id}: ${problem}` };
   if (index.startsWith('N')) {
