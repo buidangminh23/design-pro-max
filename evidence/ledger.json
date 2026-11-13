@@ -4369,6 +4369,32 @@
       "status": "current",
       "correction": null,
       "sourceSha": "595e7a2426e15be033c2821b28eca14d4b5800381d84b804296e1b4382a81160"
+    },
+    "IL-26": {
+      "claim": "A Capacitor shell keeps the server URL it was built with: syncing the project updates the native project's copy of the config but not an app that was already built, so a stale URL survives until the app is rebuilt, and the WebView then fails to connect. A WKWebView shell gets no Web Push, which Safari gives only to web apps added to the Home Screen; and a simulator runtime newer than the installed Xcode's SDK is reported as not installed.",
+      "value": "built app keeps its bundled config until rebuilt (WKWebView error -1004, could not connect to the server); no Web Push inside WKWebView shells; a simulator runtime newer than the SDK reads as not installed",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "Found while shipping a Capacitor shell that pointed at a remote origin: the built app still loaded an old URL after a sync; reading the capacitor.config.json inside the built bundle showed the old value until a rebuild. Consistent with Capacitor's documented copy step and WebKit's announcement that Web Push is for Home Screen web apps. Re-checked statically by this part's check-shell fixtures.",
+      "confidence": "high",
+      "remeasure": "Change server.url, run cap sync without rebuilding, and read capacitor.config.json inside the previously built .app; then rebuild and read it again.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "052756930515cee47bf8ceaa7b3da66bf4fb29fe2fbc65798e7921fc8cedb92e"
+    },
+    "IL-27": {
+      "claim": "Web apps opened from the Home Screen, in-app browsers and iframes on iOS cannot show an HTTP Basic Auth prompt, so a page behind it renders the error body, often blank, and a fetch to it never prompts; a login page with a session cookie works instead. In WebKit a Secure cookie set over plain http is stored but never sent, localhost included, unlike the localhost exception other engines make, so tests must run over HTTPS; and Safari blocks cookies for cross-site iframes.",
+      "value": "no Basic or Digest prompt in home-screen web apps, in-app browsers, iframes or fetch; Secure cookie over plain http stored but never sent in WebKit, localhost included; cookies blocked in cross-site iframes",
+      "label": "measured",
+      "date": "2026-11-13",
+      "source": "local benchmark",
+      "method": "First seen on a dashboard behind Basic Auth that stayed blank when opened from the Home Screen. Re-measured on 2026-11-13 with this part's probe in Playwright's WebKit build: a 401 Basic challenge rendered the error body with no prompt in a page, an iframe and a fetch; a login cookie marked Secure came back over https but not over http on localhost; the same cookie was not sent inside an iframe on another site. Consistent with MDN on WWW-Authenticate and Set-Cookie and with WebKit's announcement of full third-party cookie blocking.",
+      "confidence": "high",
+      "remeasure": "Run probe-webkit.mjs on fixtures/web-shells: the Basic Auth app, the login reference over https and over http, and the login reference with --embed-cross-site.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "1534197084b86a5a1b9991aa372b7cbbde79bec5bf0b2b5b9335aa96edd5bbee"
     }
   }
 }
