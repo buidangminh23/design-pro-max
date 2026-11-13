@@ -82,13 +82,13 @@ These scripts need Node and, for snapshots, `swiftc` on macOS; they take no `--p
 
 ```
 node <absolute path to this folder>/scripts/scan-swift.mjs Sources
-node <absolute path to this folder>/scripts/scan-swift.mjs --configurable Sources/Widgets
+node <absolute path to this folder>/scripts/scan-swift.mjs --configurable com.example.app.widget Sources/Widgets
 node <absolute path to this folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline Snapshots/baseline Sources/WidgetViews Snapshots/Catalog.swift
 node <absolute path to this folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline Snapshots/baseline --update Sources/WidgetViews Snapshots/Catalog.swift
 node <absolute path to this folder>/scripts/probe-extension.mjs --app "/Applications/<App>.app"
 ```
 
-`scan-swift.mjs` reports [MW-APPEAR-01], [MW-CONFIG-01] (pass `--configurable` when the widget should have options), [MW-WARN-KIND] and [MW-WARN-PARAMS]. `snapshot-widgets.mjs` reports [MW-SNAP-01] and, with a baseline, [MW-SNAP-02]; `--update` writes the baseline after you have looked at the PNGs. `probe-extension.mjs` is read-only: it reports [MW-STALE-01] and prints the commands to fix it, which the person runs or approves. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Off macOS the snapshot and live probe report their rules as skipped.
+`scan-swift.mjs` reports [MW-APPEAR-01], [MW-CONFIG-01] (pass `--configurable <kind>[,<kind>]` naming the widgets that should have options), [MW-WARN-KIND] and [MW-WARN-PARAMS]. `snapshot-widgets.mjs` reports [MW-SNAP-01] and, with a baseline, [MW-SNAP-02]; `--update` writes the baseline after you have looked at the PNGs. `probe-extension.mjs` is read-only: it reports [MW-STALE-01] and prints the commands to fix it, which the person runs or approves. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Off macOS the snapshot and live probe report their rules as skipped.
 
 ## 8. Report
 

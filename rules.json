@@ -625,7 +625,7 @@
       "values": "redraw only when the light or dark match changes; the loop held one core at 90-97 % CPU",
       "evidence": ["IL-13"],
       "check": "menubar-widgets/scripts/scan-swift.mjs",
-      "fixtures": { "pass": ["scan-shipped-assets"], "fail": ["appear-01-kvo-redraw", "appear-02-publisher-image"] },
+      "fixtures": { "pass": ["scan-shipped-assets", "appear-08-remove-duplicates", "appear-09-project-type-guard"], "fail": ["appear-01-kvo-redraw", "appear-02-publisher-image", "appear-03-redraw-before-guard", "appear-04-compare-not-guarding", "appear-05-map-then-sink", "appear-06-receive-value-reference", "appear-07-rooted-key-path", "appear-10-tint-layer-display"] },
       "implementedBy": ["menubar-widgets/assets/StatusItemController.swift"]
     },
     {
@@ -636,7 +636,7 @@
       "values": "AppIntentConfiguration with a WidgetConfigurationIntent; kind string unchanged",
       "evidence": ["IL-15"],
       "check": "menubar-widgets/scripts/scan-swift.mjs",
-      "fixtures": { "pass": ["scan-shipped-assets", "config-03-static-not-requested"], "fail": ["config-01-static-with-intent", "config-02-static-when-configurable"] },
+      "fixtures": { "pass": ["scan-shipped-assets", "config-03-static-not-requested", "config-05-other-kind-requested", "config-06-qualified-intent"], "fail": ["config-01-static-with-intent", "config-02-static-when-configurable", "config-04-one-of-two-statics"] },
       "implementedBy": ["menubar-widgets/assets/ConfigurableWidget.swift"]
     },
     {

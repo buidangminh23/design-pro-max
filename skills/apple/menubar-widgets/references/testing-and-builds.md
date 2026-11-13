@@ -20,10 +20,13 @@
 ## The static scan
 
 ```
-node <part folder>/scripts/scan-swift.mjs [--configurable] <file or folder> [...]
+node <part folder>/scripts/scan-swift.mjs [--configurable <kind>[,<kind>...]] <file or folder> [...]
 ```
 
-It reads `.swift` files (skipping build folders), follows calls from an appearance handler into functions of the same file, and reports [MW-APPEAR-01], [MW-CONFIG-01], [MW-WARN-KIND] and [MW-WARN-PARAMS]. Pass `--configurable` when the person asked for widget options, so a `StaticConfiguration` fails even with no intent declared yet. A handler in another file is beyond it; it says so in its proof boundary.
+It reads `.swift` files (skipping build folders), follows calls from an appearance handler into functions of the same file, and reports [MW-APPEAR-01], [MW-CONFIG-01], [MW-WARN-KIND] and [MW-WARN-PARAMS]. A handler in another file is beyond it; it says so in its proof boundary.
+
+- Appearance: it finds `observe(\.effectiveAppearance)` (also with a root type, `\NSStatusBarButton.effectiveAppearance`) with a trailing closure or a `changeHandler:` function, a `publisher(for:)` chain up to its `sink` closure, its `receiveValue:` function or an `assign(to:on:)`, and `observeValue(forKeyPath:)`. A redraw (display, needs display, image, title, tint, layer contents) passes only after a `guard` comparing a value with a stored property with `!=`, inside an `if` that does, after an `if ... == <stored> { return }`, or behind `removeDuplicates()` in the chain. A comparison after the redraw, or one that guards something else, does not count. A file that observes something and mentions `effectiveAppearance` with no observation the scan can follow gets a warning.
+- Options: pass `--configurable <kind>[,<kind>...]` with the widgets the person asked to make configurable, by kind string, constant (`Kinds.city`) or constant name, so their `StaticConfiguration` fails even with no intent declared yet; other widgets in the folder stay static. A kind that matches no configuration in the files is a warning.
 
 ## Offscreen widget snapshots
 

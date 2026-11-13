@@ -37,7 +37,7 @@ To diagnose a running app, sample it for a few seconds and look for the observer
 sample <pid> 3
 ```
 
-`scripts/scan-swift.mjs` finds the pattern in source: an observation through `observe(\.effectiveAppearance)`, a Combine `publisher(for: \.effectiveAppearance)` or `observeValue(forKeyPath:)`, whose handler, or a function it calls in the same file, redraws without a light or dark comparison.
+`scripts/scan-swift.mjs` finds the pattern in source: an observation through `observe(\.effectiveAppearance)`, a Combine `publisher(for: \.effectiveAppearance)` chain or `observeValue(forKeyPath:)`, whose handler, or a function it calls in the same file, redraws before any guard that compares a value with a stored last one. `removeDuplicates()` before the `sink` counts as that comparison.
 
 ## Menus, popovers and windows
 

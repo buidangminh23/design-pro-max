@@ -49,7 +49,7 @@ test('the Swift scan strips comments, keeps strings and follows a handler into t
   assert.equal(blockAfter('f { a { b } c } d', 0).body, '{ a { b } c }');
   const loop = 'x.observe(\\.effectiveAppearance) { b, _ in self.paint(b) }\nfunc paint(_ b: NSButton) { b.needsDisplay = true }';
   assert.deepEqual(appearanceObservations(loop).map(({ redraws, guarded }) => ({ redraws, guarded })), [{ redraws: true, guarded: false }]);
-  const guarded = 'x.observe(\\.effectiveAppearance) { b, _ in self.paint(b) }\nfunc paint(_ b: NSButton) { let d = b.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua\n guard d != last else { return }\n last = d\n b.needsDisplay = true }';
+  const guarded = 'var last: Bool?\nx.observe(\\.effectiveAppearance) { b, _ in self.paint(b) }\nfunc paint(_ b: NSButton) { let d = b.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua\n guard d != last else { return }\n last = d\n b.needsDisplay = true }';
   assert.deepEqual(appearanceObservations(guarded).map(({ redraws, guarded: ok }) => ({ redraws, ok })), [{ redraws: true, ok: true }]);
   const commented = '// x.observe(\\.effectiveAppearance) { b, _ in b.needsDisplay = true }';
   assert.deepEqual(appearanceObservations(commented), []);
@@ -68,8 +68,17 @@ test('the scan judges an intent declared beside a StaticConfiguration and a widg
     scanSources([file], plain);
     assert.deepEqual(plain.findings.map(({ rule, level }) => `${rule} ${level}`), ['MW-CONFIG-01 pass']);
     const asked = silent();
-    scanSources([file], asked, { configurable: true });
+    scanSources([file], asked, { configurable: ['Kinds.w'] });
     assert.deepEqual(asked.findings.map(({ rule, level }) => `${rule} ${level}`), ['MW-CONFIG-01 error']);
+    fs.writeFileSync(path.join(folder, 'K.swift'), 'enum Kinds { static let w = "com.example.w" }\n');
+    for (const kind of ['com.example.w', 'w', 'Kinds.w']) {
+      const named = silent();
+      scanSources([file, path.join(folder, 'K.swift')], named, { configurable: [kind] });
+      assert.deepEqual(named.findings.map(({ rule, level }) => `${rule} ${level}`), ['MW-CONFIG-01 error'], kind);
+    }
+    const other = silent();
+    scanSources([file, path.join(folder, 'K.swift')], other, { configurable: ['com.example.other'] });
+    assert.deepEqual(other.findings.map(({ rule, level }) => `${rule} ${level}`), ['MW-CONFIG-01 pass', 'MW-CONFIG-01 warn']);
     fs.writeFileSync(path.join(folder, 'I.swift'), 'struct Pick: WidgetConfigurationIntent { @Parameter(title: "A") var a: E? }\n');
     const unused = silent();
     scanSources([file, path.join(folder, 'I.swift')], unused);
@@ -78,6 +87,30 @@ test('the scan judges an intent declared beside a StaticConfiguration and a widg
   } finally {
     removeTree(folder);
   }
+});
+
+test('the scan follows publisher chains, method references and rooted key paths, and needs a dominating guard', async () => {
+  const { appearanceObservations, untracedObservation, widgetFacts, parseArguments } = await script('scan-swift.mjs');
+  const judged = (source) => appearanceObservations(source).map(({ redraws, guarded }) => `${redraws ? 'redraws' : 'quiet'} ${guarded ? 'guarded' : 'unguarded'}`);
+  const head = 'final class T {\n var last: Bool?\n var seen = 0\n';
+  const observe = (handler, rest = '') => `${head} init() { o = b.observe(\\.effectiveAppearance) { b, _ in self.paint(b) } }\n func paint(_ b: NSButton) { ${handler} }${rest} }`;
+  assert.deepEqual(judged(`${head} init() { b.publisher(for: \\.effectiveAppearance).map { $0.name }.sink { _ in self.b.needsDisplay = true } } }`), ['redraws unguarded']);
+  assert.deepEqual(judged(`${head} init() { b.publisher(for: \\.effectiveAppearance).map(\\.name).removeDuplicates().sink { _ in self.b.needsDisplay = true } } }`), ['redraws guarded']);
+  assert.deepEqual(judged(`${head} init() { b.publisher(for: \\.effectiveAppearance).sink(receiveValue: apply).store(in: &s) }\n func other() { print(1) }\n func apply(_ a: NSAppearance) { b.image = nil } }`), ['redraws unguarded']);
+  assert.deepEqual(judged(`${head} init() { b.publisher(for: \\.effectiveAppearance).assign(to: \\.image, on: b) } }`), ['redraws unguarded']);
+  assert.deepEqual(judged(`${head} init() { o = b.observe(\\NSStatusBarButton.effectiveAppearance) { b, _ in b.displayIfNeeded() } } }`), ['redraws unguarded']);
+  assert.deepEqual(judged(`${head} init() { o = b.observe(\\.effectiveAppearance, changeHandler: paint) }\n func paint(_ b: NSButton, _ c: Any) { b.layer?.contents = nil } }`), ['redraws unguarded']);
+  assert.deepEqual(judged(observe('b.needsDisplay = true\n let d = true\n guard d != last else { return }\n last = d')), ['redraws unguarded']);
+  assert.deepEqual(judged(observe('let d = true\n if d != last { seen += 1 }\n b.contentTintColor = nil')), ['redraws unguarded']);
+  assert.deepEqual(judged(observe('let d = true\n if d != last { b.needsDisplay = true }')), ['redraws guarded']);
+  assert.deepEqual(judged(observe('let d = true\n if d == self.last { return }\n b.needsDisplay = true')), ['redraws guarded']);
+  assert.deepEqual(judged(observe('let d = true\n let e = false\n guard d != e else { return }\n b.needsDisplay = true')), ['redraws unguarded']);
+  assert.equal(untracedObservation('NotificationCenter.default.addObserver(self, selector: #selector(f), name: n, object: nil)\nlet x = b.effectiveAppearance'), true);
+  assert.equal(untracedObservation('let x = b.effectiveAppearance.bestMatch(from: [.aqua])'), false);
+  assert.deepEqual(widgetFacts('AppIntentConfiguration(kind: K.a, intent: Shared.Pick.self, provider: P()) { _ in }').configurations.map(({ intent, kind }) => ({ intent, kind })), [{ intent: 'Pick', kind: 'K.a' }]);
+  assert.deepEqual(parseArguments(['--configurable', 'a, b', 'Sources']), { inputs: ['Sources'], configurable: ['a', 'b'] });
+  assert.throws(() => parseArguments(['--configurable', 'Sources']), /Usage/);
+  assert.throws(() => parseArguments(['--configurable', '--x', 'Sources']), /--configurable needs/);
 });
 
 test('the probe parses ps and lsof, matches only the extension executable and allows a second of clock rounding', async () => {
