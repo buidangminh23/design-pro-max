@@ -11,7 +11,7 @@
 
 ## Why HTTP Basic Auth fails here
 
-A server answers HTTP Basic or Digest Auth with 401 and a `WWW-Authenticate` header, and a browser is expected to prompt for a user name and password and retry. A web app opened from the Home Screen, an in-app browser, a WKWebView shell and an iframe on iOS cannot show that prompt: the 401 body renders instead, usually an empty page, and a `fetch` to the protected URL resolves with 401 and never asks (IL-27). Nothing the user does on the device gets past it.
+A server answers HTTP Basic or Digest Auth with 401 and a `WWW-Authenticate` header, and a browser is expected to prompt for a user name and password and retry. A web app opened from the Home Screen, an in-app browser, a WKWebView shell and an iframe on iOS cannot show that prompt: the 401 body renders instead, usually an empty page (seen on a dashboard opened from the Home Screen, IL-27). In Playwright's WebKit, which has no credentials to give, a page and an iframe behind Basic Auth render the 401 body and a `fetch` receives the 401 (IL-27); the probe cannot show whether a device would prompt, because Playwright never does. Nothing the user does on the device gets past it.
 
 So every page, frame and request such an app makes must answer without a challenge [WS-AUTH-01]. The same applies to Basic Auth on a reverse proxy or a hosting provider's password protection in front of a staging site: move it behind the app's own login, or keep that staging site out of anything a device opens.
 
@@ -39,7 +39,7 @@ Token-based apps work too, provided the token is not sent through an HTTP challe
 | Attribute | Use | Why |
 |---|---|---|
 | `HttpOnly` | always for a session | scripts cannot read it |
-| `Secure` | always | sent only over HTTPS; in WebKit a Secure cookie set over plain http is stored but never sent, localhost included, unlike the localhost exception other engines make (IL-27) |
+| `Secure` | always | sent only over HTTPS; in WebKit a Secure cookie set over plain http is stored but never sent, localhost included (IL-27), whereas Chromium and Firefox exempt localhost from that rule (MDN, Set-Cookie) |
 | `SameSite=Lax` | the default choice | sent on top-level navigation and same-site requests, including a same-site iframe |
 | `Path=/` | usually | one session for the whole app |
 | `Max-Age` | a bounded lifetime | long-lived web apps need a renewal path, not a session that never ends |
@@ -48,7 +48,7 @@ The consequence for tests: an app with Secure session cookies must be served ove
 
 ## Iframes on another site
 
-Safari blocks cookies for cross-site resources by default, so an app signed in inside an iframe on another site sees no session, whatever its SameSite value (IL-27) [WS-WARN-THIRDPARTY]. Options, in order:
+Safari blocks cookies for cross-site resources by default (WebKit documents it), so an app signed in inside an iframe on another site sees no session, whatever its SameSite value: in Playwright's WebKit a `SameSite=None; Secure` session cookie was withheld from a cross-site iframe (IL-27) [WS-WARN-THIRDPARTY]. A `SameSite=Lax` cookie is withheld there by every browser, so test with `SameSite=None; Secure` to see WebKit's own blocking. Options, in order:
 
 1. Open the app first-party (a link or a new window) instead of framing it.
 2. Embed it from a page on the same site (the same registrable domain).
@@ -63,3 +63,4 @@ Links opened inside other apps often load in that app's own WebView or browser v
 - MDN, WWW-Authenticate: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/WWW-Authenticate
 - MDN, Set-Cookie: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie
 - WebKit, full third-party cookie blocking: https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/
+- MDN, secure contexts and localhost: https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts

@@ -13,9 +13,9 @@
 | Check | Proves | Does not prove |
 |---|---|---|
 | `check-shell.mjs` | which origin each Capacitor or Tauri config, native copy and built bundle names; dev hosts and stale bundles [WS-ORIGIN-01] [WS-ORIGIN-02] [WS-BUNDLE-01] | what a device loads at run time, a URL computed at build time, a Tauri binary's embedded config |
-| `probe-webkit.mjs` | HTTP challenges, whether a session cookie comes back, cookies in a cross-site iframe, in Playwright's WebKit [WS-AUTH-01] [WS-COOKIE-01] | iOS Safari, a home-screen web app, WKWebView inside the shell, in-app browsers, devices |
+| `probe-webkit.mjs` | HTTP challenges on the page, its frames and its requests, whether the session cookie comes back, cookies in a cross-site iframe, in Playwright's WebKit [WS-AUTH-01] [WS-COOKIE-01] | whether a device shows a credential prompt (Playwright never does), iOS Safari, a home-screen web app, WKWebView inside the shell, in-app browsers, devices |
 
-Playwright's WebKit is close to Safari's engine and treats Secure cookies, challenges and cross-site frames the way the device does (IL-27), which Chromium does not, so test sign-in there before blaming the shell.
+Playwright's WebKit is close to Safari's engine: it withholds a Secure cookie over plain http on localhost and a session cookie in a cross-site iframe (IL-27), where Chromium sends the first, so test sign-in there before blaming the shell.
 
 ## Running the probe
 
@@ -29,8 +29,8 @@ node <part folder>/scripts/probe-webkit.mjs --app server/handler.mjs --page /app
 
 - `--url` probes a server that is already running; a loopback HTTPS server may use a self-signed certificate.
 - `--app` imports a module whose default export is a Node request handler and serves it over HTTPS with a certificate made at run time (`--http` serves plain http, to show what WebKit does then).
-- `--login` opens that path, fills each `--field` by its `name`, submits the form and reloads the page; the probe then checks the session cookie came back [WS-COOKIE-01].
-- `--embed-cross-site` loads the page inside an iframe on another site after the login [WS-WARN-THIRDPARTY].
+- `--login` opens that path, fills each `--field` by its `name`, submits the form and reloads the page; the probe then checks the session cookie came back [WS-COOKIE-01]. The session cookie is a host-only cookie the app's own origin set, not deleted, whose path covers the page; other cookies the login sets (a CSRF cookie scoped to `/login`, third-party cookies, deleted ones) are listed as not counted. Name it with `--session-cookie <name>` when it is another.
+- `--embed-cross-site` loads the page inside an iframe on another site after a successful login; the probe serves that page itself through Playwright's routing, on the target's scheme, so it needs no second server or certificate [WS-WARN-THIRDPARTY].
 
 Use test credentials the user provides for this, never real ones, and leave them out of the report.
 
@@ -38,11 +38,12 @@ Use test credentials the user provides for this, never real ones, and leave them
 
 | Finding | Meaning | Fix |
 |---|---|---|
-| WS-AUTH-01 error, 401 with a Basic challenge | the page or a request needs a credential prompt no web app or shell can show | a login page and a session cookie (`auth-and-cookies.md`) |
+| WS-AUTH-01 error, 401 with a Basic challenge | the page, a frame or a request needs a credential prompt no web app or shell can show; the finding says what rendered and whether any request carried credentials | a login page and a session cookie (`auth-and-cookies.md`) |
 | WS-COOKIE-01 error, Secure over plain http | the cookie was stored but never sent, so the app looks signed out | serve over HTTPS, a self-signed certificate is enough |
 | WS-COOKIE-01 error, not stored | Domain, Path, SameSite or expiry stops the cookie | set it host-only with `Path=/`, `Secure`, `HttpOnly`, `SameSite=Lax` |
 | WS-COOKIE-01 error, no cookie set | the login failed or the field names are wrong | check `--field` names against the form |
-| WS-WARN-THIRDPARTY | the session is missing inside an iframe on another site | open first-party, embed same-site, or request storage access from a tap |
+| WS-COOKIE-01 error, no session cookie | the login set cookies, but none from the app's origin covers the page | read the not-counted list; set the session cookie host-only with `Path=/`, or pass `--session-cookie` |
+| WS-WARN-THIRDPARTY | the session is missing inside an iframe on another site; the finding says whether SameSite or WebKit's third-party blocking withheld it | open first-party, embed same-site, or request storage access from a tap |
 
 ## HTTPS for tests
 
