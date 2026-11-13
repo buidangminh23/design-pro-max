@@ -88,6 +88,16 @@ skills/
       assets/reference/      an original UI mock, a demo embed page and generic CSS device frames
       scripts/               render-frames.mjs (frame-stepped render), encode.mjs (encode profiles), check-embed.mjs
     hig/                     own part: Apple's Human Interface Guidelines for native app interfaces
+    menubar-widgets/         own part: macOS menu bar apps and WidgetKit widgets
+      PART.md                the guide the router sends to
+      references/            status items, widgets and App Intents configuration, testing and builds, generated evidence
+      assets/                Swift references: a status item, a configurable widget, its bundle, stale-extension cleanup, a snapshot renderer
+      scripts/               scan-swift.mjs (static Swift scan), probe-extension.mjs (read-only process probe), snapshot-widgets.mjs
+    web-shells/              own part: web apps on the Home Screen and in Capacitor or Tauri shells
+      PART.md                the guide the router sends to
+      references/            shells and origins, sign-in and cookies, WebKit testing, generated evidence
+      assets/                a login page with a session cookie, remote-shell configs for Capacitor and Tauri, a web app manifest
+      scripts/               check-shell.mjs (the origin a shell loads), probe-webkit.mjs (WebKit sign-in and cookie probe)
       PART.md                how to read, build to and review against the guidelines
       references/            own-words digest of every guideline page by section, with generated evidence
     .vendor/                 third-party parts, byte-for-byte at pinned commits
@@ -136,7 +146,7 @@ The same constraint shapes the rest of the tree: each skill's own `skills/<name>
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Own parts (4)
+### Own parts (6)
 
 Written for this project and released under its MIT licence. Each has a `PART.md` guide; a part with checkers has error rules in `rules.json` that they enforce, and a pass and a fail fixture for every error rule.
 
@@ -145,6 +155,8 @@ Written for this project and released under its MIT licence. Each has a `PART.md
 | `launch-scroll` | Pinned scroll scenes and scroll-scrubbed video or frame sequences on web pages: when not to pin, the engine, geometry, gates for reduced motion, short viewports and blocked autoplay, scrub encoding and the start frame. 8 error rules and 9 warnings | Node 22 or later; ffmpeg and ffprobe for media checks and encoding; Playwright with Chromium in the user's project for browser checks |
 | `launch-page` | Launch and landing pages (hero, feature tiles, galleries and marquees, pricing, FAQ), built on the part's own restrained or expressive token sets and the user's brand, or reviewed read-only: no SF fonts on the web, text in normal flow without JavaScript or motion, sizes from one token set, contrast on the real background, pause controls for self-moving content, a hero intro that always ends and reveals that stay. 7 error rules and 9 warnings | Node 22 or later; Playwright with Chromium in the user's project for browser checks |
 | `launch-video` | Demo clips rendered from code, never screen recordings: whether a still or a live replica is enough, an HTML and CSS rebuild of the UI rendered frame by frame at 2x, H.264, VP9, AV1 and transparent encodes with a frame-0 start image, and a lazy embed that starts late, plays one clip at a time and can be paused. 7 error rules and 7 warnings | Node 22 or later; ffmpeg and ffprobe; Playwright with Chromium in the user's project; macOS outside an agent sandbox for HEVC with alpha |
+| `menubar-widgets` | macOS menu bar apps and WidgetKit widgets: whether a menu or a window is enough, status items that redraw only when light or dark changes, Edit Widget options through AppIntentConfiguration, stale extension processes after a self-update, offscreen widget snapshots with byte baselines, and testing beside the installed copy. 5 error rules and 6 warnings | Node 22 or later; on macOS, Swift for the snapshot checks (they skip elsewhere); `ps` and `lsof` for the read-only probe |
+| `web-shells` | Web apps on iPhone, iPad and Mac: a home-screen web app or a Capacitor or Tauri shell, the origin a built shell really loads, sign-in with a login page and a session cookie instead of HTTP Basic Auth, and cookies in WebKit tests. 5 error rules and 4 warnings | Node 22 or later; Playwright with WebKit in the user's project for the probe; openssl for its local HTTPS server |
 | `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
 
 Known limit, measured in `evals/RESULTS.md`: asked for a scroll-scrub film in AV1 or HEVC only, Codex reads the part's rule and still delivers those codecs alone, recommending H.264 only in its advice; Claude Code adds the H.264 source. Check the delivered `<source>` list with `skills/apple/shared/check-media.mjs` before shipping.
