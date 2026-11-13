@@ -499,6 +499,16 @@
       }
     },
     {
+      "id": "r50",
+      "kind": "row",
+      "row": "macOS menu bar apps and WidgetKit widgets",
+      "prompt": "My Mac menu bar app's widget shows grey placeholders after the app updates itself, and Edit Widget has no options. How do I fix both?",
+      "expect": {
+        "trigger": true,
+        "part": "menubar-widgets"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",
@@ -673,6 +683,16 @@
       "kind": "near-miss",
       "row": "web contrast split",
       "prompt": "Check a React web dashboard's text and icon colors against the WCAG 2.2 contrast requirements.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "near-miss",
+      "row": "Electron tray icon split",
+      "prompt": "Add a tray icon with a context menu to our Electron app that works on Windows and Linux.",
       "expect": {
         "trigger": false,
         "instead": "no skill"
