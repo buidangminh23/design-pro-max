@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="skills/apple/assets/apple.svg" alt="Apple logo, the icon of the apple skill" width="112" height="112">
-
-# design-pro-max
+<h1><img src="designs/brand/logo.png" alt="design-pro-max" width="360"></h1>
 
 ### Design Skills for AI Coding Agents
 
