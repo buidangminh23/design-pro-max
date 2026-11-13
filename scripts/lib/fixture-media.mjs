@@ -1,7 +1,11 @@
 /**
- * Media for the launch-scroll fixtures, generated with ffmpeg from synthetic sources so no media file is ever
- * committed. The good film goes through the part's own encode-scrub.mjs and the image sequence through make-sequence.mjs,
- * which the fixtures therefore exercise too.
+ * Media for the own parts' fixtures, generated with ffmpeg from synthetic sources so no media file is ever committed.
+ *
+ *   buildFixtureMedia(folder, { encodeScrub, makeSequence })  launch-scroll and launch-page cases
+ *   buildLaunchVideoMedia(folder, { encode })                 launch-video cases
+ *
+ * Good media go through the parts' own encode-scrub.mjs, make-sequence.mjs and encode.mjs, which the fixtures therefore
+ * exercise too; each bad recipe breaks one rule.
  */
 import fs from 'node:fs';
 import path from 'node:path';
