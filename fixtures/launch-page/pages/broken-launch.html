@@ -1,0 +1,130 @@
+<!doctype html>
+<!-- Planted-defect page for the launch parts. It holds the 12 defects listed in broken-launch.expected.json, each found
+     by the checker named there, and nothing else that an error rule flags. The SF font request goes to fonts.invalid,
+     a name that never resolves, so no test reaches a real font host. Served by a 200-only server. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Broken launch page</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="https://fonts.invalid/fonts/sf-pro-text.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: "SF Pro Text", system-ui, sans-serif; font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: #ffffff; }
+  h1, h2, p, figure { margin: 0; }
+  h1 { font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+  h2 { font-size: var(--type-title-size); line-height: var(--type-title-leading); }
+  a { color: var(--color-accent); }
+  .wrap { width: min(100% - 2 * var(--page-gutter), var(--content-max)); margin-inline: auto; }
+  .section { padding-block: var(--space-8); display: grid; gap: var(--stack); }
+
+  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; text-align: center; }
+  .hero-copy { display: grid; gap: var(--heading-after); }
+  .fine-print { color: #878787; }
+  .intro { display: none; position: absolute; inset: 0; place-items: center; background: #ffffff; }
+  html[data-intro="play"] .intro { display: grid; }
+  html[data-intro="play"] [data-intro-end] { opacity: 0; }
+
+  .marquee { overflow: hidden; }
+  .track { display: flex; gap: var(--space-6); width: max-content; list-style: none; padding: 0; margin: 0; animation: slide 20s linear infinite; }
+  @keyframes slide { to { translate: -50% 0; } }
+
+  [data-scene] { position: relative; }
+  [data-scene][data-scene-state="pinned"] { height: calc(220vh + 100vh); }
+  [data-scene][data-scene-state="pinned"] [data-scene-sticky] { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; }
+  .stage { width: min(100% - 32px, 720px); margin-inline: auto; }
+  [data-scene-film] { position: relative; }
+  [data-scene-film] img, [data-scene-film] video { display: block; width: 100%; height: auto; }
+  [data-scene-film] video { position: absolute; inset: 0; opacity: 0; }
+  [data-scene][data-scrub-state="ready"] [data-scene-film] video { opacity: 1; }
+
+  .clips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: var(--tile-gap); }
+  .clips video { display: block; width: 100%; aspect-ratio: 16 / 9; background: var(--color-surface); }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero" data-intro-root>
+    <div class="hero-copy wrap">
+      <h1 data-intro-end>A launch page with every mistake</h1>
+      <p class="fine-print" data-intro-end>Body copy in a pale grey that most readers struggle with.</p>
+      <p data-intro-end><a href="#clips" data-cta>See the clips</a></p>
+    </div>
+    <div class="intro"><video data-intro-film muted playsinline aria-hidden="true" src="intro.mp4"></video></div>
+  </section>
+
+  <section class="section wrap marquee" aria-label="customer logos">
+    <h2>Names that never stop</h2>
+    <ul class="track">
+      <li>Orchard Labs</li><li>Northfield</li><li>Kite and Co</li><li>Lumen Works</li>
+      <li aria-hidden="true">Orchard Labs</li><li aria-hidden="true">Northfield</li><li aria-hidden="true">Kite and Co</li><li aria-hidden="true">Lumen Works</li>
+    </ul>
+  </section>
+
+  <section data-scene data-load="blob">
+    <div data-scene-sticky>
+      <div class="stage" data-scene-stage>
+        <div data-scene-film>
+          <img data-scene-startframe src="startframe.jpg" width="1280" height="720" alt="">
+          <video data-scrub muted playsinline aria-hidden="true"><source data-src="film.mp4" type="video/mp4"></video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section data-scene data-load="src">
+    <div data-scene-sticky>
+      <div class="stage" data-scene-stage>
+        <div data-scene-film>
+          <img data-scene-startframe src="startframe-plain.jpg" width="1280" height="720" alt="">
+          <video data-scrub muted playsinline aria-hidden="true" preload="auto" src="film-plain.mp4"></video>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="clips">
+    <h2>Demo clips loaded the wrong way</h2>
+    <div class="clips">
+      <video autoplay muted loop playsinline src="demo.mp4" aria-label="Autoplaying demo"></video>
+      <video poster="poster.jpg" muted playsinline aria-label="Clip with an eager poster" src="demo.mp4"></video>
+      <video muted playsinline preload="none" src="clip-aac.mp4" aria-label="Muted clip with an audio track"></video>
+      <video muted playsinline preload="none" aria-label="Clip with an HEVC source only"><source src="clip-hevc.mp4" type='video/mp4; codecs="hvc1"'></video>
+    </div>
+  </section>
+</main>
+<script type="module">
+  const html = document.documentElement;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const film = document.querySelector('[data-intro-film]');
+    html.dataset.intro = 'play';
+    film.addEventListener('ended', () => { html.dataset.intro = 'done'; });
+    film.play().catch(() => {});
+  }
+
+  for (const scene of document.querySelectorAll('[data-scene]')) {
+    const stage = scene.querySelector('[data-scene-stage]');
+    const video = scene.querySelector('video[data-scrub]');
+    const update = () => {
+      const rect = scene.getBoundingClientRect();
+      const travel = rect.height - innerHeight;
+      const progress = scene.dataset.sceneState === 'pinned' && travel > 0 ? Math.min(1, Math.max(0, -rect.top / travel)) : 1;
+      scene.style.setProperty('--scene-progress', String(progress));
+      if (scene.dataset.sceneState === 'pinned' && video.duration) video.currentTime = progress * video.duration;
+    };
+    const layout = () => {
+      scene.dataset.sceneState = stage.offsetHeight <= innerHeight ? 'pinned' : 'static';
+      update();
+    };
+    video.requestVideoFrameCallback?.(() => { scene.dataset.scrubState = 'ready'; });
+    if (scene.dataset.load === 'blob') {
+      fetch(video.querySelector('source').dataset.src).then((response) => response.blob()).then((blob) => { video.src = URL.createObjectURL(blob); });
+    }
+    addEventListener('scroll', update, { passive: true });
+    addEventListener('resize', layout);
+    layout();
+  }
+</script>
+</body>
+</html>

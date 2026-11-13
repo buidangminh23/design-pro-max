@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Fail fixture for LP-REVEAL-01: content is visible by default and fades in with motion allowed, but the observer
+     fades it out again whenever it leaves the viewport, so scrolling back finds it hidden. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-REVEAL-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  section { min-height: 90vh; padding: var(--space-12) var(--page-gutter); }
+  h2 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  [data-reveal] { transition: opacity var(--duration-reveal) var(--ease-out); }
+  html[data-motion="ok"] [data-reveal]:not(.in) { opacity: 0; }
+</style>
+</head>
+<body>
+<section><h2 data-reveal>First section</h2><p data-reveal>Shown on arrival.</p></section>
+<section><h2 data-reveal>Second section</h2><p data-reveal>Shown on arrival, hidden on leaving.</p></section>
+<section><h2 data-reveal>Third section</h2><p data-reveal>Shown on arrival, hidden on leaving.</p></section>
+<script type="module">
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.dataset.motion = 'ok';
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) entry.target.classList.toggle('in', entry.isIntersecting);
+    });
+    document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
+  }
+</script>
+</body>
+</html>

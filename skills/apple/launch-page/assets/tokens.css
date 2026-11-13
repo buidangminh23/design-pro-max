@@ -1,0 +1,311 @@
+/* launch-page tokens.css (design-pro-max). Generated from tokens.json; copy it into the project as it is.
+ * Restrained set on :root; expressive set on :root[data-launch-mode="expressive"]. Components read the custom
+ * properties only, so a mode switch, a dark scheme, reduced motion or a :lang() override edits no component. */
+:root {
+  color-scheme: light dark;
+  --font-sans: system-ui, "Segoe UI", Roboto, "Noto Sans", "Inter", sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, "Noto Sans Mono", monospace;
+  --space-0-5: 4px;
+  --space-1: 8px;
+  --space-1-5: 12px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-6: 48px;
+  --space-8: 64px;
+  --space-12: 96px;
+  --space-16: 128px;
+  --space-20: 160px;
+  --type-caption-size: 13px;
+  --type-caption-leading: 20px;
+  --type-caption-tracking: 0.008em;
+  --type-caption-weight: 400;
+  --type-body-size: 16px;
+  --type-body-leading: 24px;
+  --type-body-tracking: 0em;
+  --type-body-weight: 400;
+  --type-lede-size: 20px;
+  --type-lede-leading: 32px;
+  --type-lede-tracking: -0.004em;
+  --type-lede-weight: 400;
+  --type-title-size: 25px;
+  --type-title-leading: 28px;
+  --type-title-tracking: -0.008em;
+  --type-title-weight: 600;
+  --type-heading-size: 31px;
+  --type-heading-leading: 36px;
+  --type-heading-tracking: -0.012em;
+  --type-heading-weight: 600;
+  --type-display-size: 39px;
+  --type-display-leading: 44px;
+  --type-display-tracking: -0.016em;
+  --type-display-weight: 600;
+  --type-hero-size: 39px;
+  --type-hero-leading: 44px;
+  --type-hero-tracking: -0.016em;
+  --type-hero-weight: 600;
+  --color-bg: #ffffff;
+  --color-surface: #f6f5f2;
+  --color-ink: #15171a;
+  --color-muted: #575d65;
+  --color-line: #d9d8d3;
+  --color-accent: #0b6670;
+  --color-accent-fill: #0b6670;
+  --color-on-accent: #ffffff;
+  --color-focus: #0b6670;
+  --page-gutter: clamp(16px, 5vw, 64px);
+  --content-max: 1200px;
+  --measure: 65ch;
+  --nav-height: 56px;
+  --section-space: 64px;
+  --tile-inset: 24px;
+  --tile-gap: 16px;
+  --stack-tight: 8px;
+  --stack: 16px;
+  --stack-loose: 32px;
+  --heading-after: 16px;
+  --heading-before: 48px;
+  --cta-gap: 16px;
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-tile: 24px;
+  --radius-pill: 9999px;
+  --focus-width: 3px;
+  --focus-offset: 2px;
+  --duration-control: 120ms;
+  --duration-panel-min: 260ms;
+  --duration-panel-max: 460ms;
+  --duration-reveal: 800ms;
+  --reveal-stagger: 80ms;
+  --reveal-rise: 16px;
+  --duration-marquee: 40s;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --scene-progress: 1;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --type-display-size: 49px;
+    --type-display-leading: 56px;
+    --type-display-tracking: -0.02em;
+    --type-display-weight: 600;
+    --type-hero-size: 49px;
+    --type-hero-leading: 56px;
+    --type-hero-tracking: -0.02em;
+    --type-hero-weight: 600;
+    --tile-inset: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --type-heading-size: 39px;
+    --type-heading-leading: 44px;
+    --type-heading-tracking: -0.016em;
+    --type-heading-weight: 600;
+    --type-hero-size: 61px;
+    --type-hero-leading: 68px;
+    --type-hero-tracking: -0.022em;
+    --type-hero-weight: 600;
+    --section-space: 96px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --type-hero-size: 76px;
+    --type-hero-leading: 84px;
+    --type-hero-tracking: -0.024em;
+    --type-hero-weight: 600;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0f1113;
+    --color-surface: #1b1e21;
+    --color-ink: #f3f4f5;
+    --color-muted: #a5abb3;
+    --color-line: #33373c;
+    --color-accent: #5ccfd9;
+    --color-accent-fill: #0b6670;
+    --color-on-accent: #ffffff;
+    --color-focus: #5ccfd9;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #0f1113;
+  --color-surface: #1b1e21;
+  --color-ink: #f3f4f5;
+  --color-muted: #a5abb3;
+  --color-line: #33373c;
+  --color-accent: #5ccfd9;
+  --color-accent-fill: #0b6670;
+  --color-on-accent: #ffffff;
+  --color-focus: #5ccfd9;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root[data-launch-mode="expressive"] {
+  --type-lede-size: clamp(1.25rem, 1.1404rem + 0.4494vw, 1.5rem);
+  --type-lede-leading: round(up, calc(var(--type-lede-size) * 1.5), 4px);
+  --type-lede-tracking: -0.006em;
+  --type-heading-size: clamp(2rem, 1.1236rem + 3.5955vw, 4rem);
+  --type-heading-leading: round(up, calc(var(--type-heading-size) * 1.1), 4px);
+  --type-heading-tracking: -0.024em;
+  --type-hero-size: clamp(2.75rem, 1.3258rem + 5.8427vw, 6rem);
+  --type-hero-leading: round(up, calc(var(--type-hero-size) * 1.1), 4px);
+  --type-hero-tracking: -0.028em;
+  --duration-reveal: 1000ms;
+  --reveal-stagger: 120ms;
+  --reveal-rise: 24px;
+  --section-space: 80px;
+  --section-accent: var(--color-accent);
+}
+
+@media (min-width: 1024px) {
+  :root[data-launch-mode="expressive"] {
+    --section-space: 128px;
+  }
+}
+
+:root[data-launch-mode="expressive"] [data-section-accent="amber"] {
+  --section-accent: #8a4b0f;
+}
+
+:root[data-launch-mode="expressive"] [data-section-accent="violet"] {
+  --section-accent: #6b4bb0;
+}
+
+:root[data-launch-mode="expressive"] [data-section-accent="rose"] {
+  --section-accent: #a33a5c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-launch-mode="expressive"]:not([data-theme="light"]) [data-section-accent="amber"] {
+    --section-accent: #f0a868;
+  }
+  :root[data-launch-mode="expressive"]:not([data-theme="light"]) [data-section-accent="violet"] {
+    --section-accent: #b8a2f0;
+  }
+  :root[data-launch-mode="expressive"]:not([data-theme="light"]) [data-section-accent="rose"] {
+    --section-accent: #f29bb8;
+  }
+}
+
+:root[data-launch-mode="expressive"][data-theme="dark"] [data-section-accent="amber"] {
+  --section-accent: #f0a868;
+}
+
+:root[data-launch-mode="expressive"][data-theme="dark"] [data-section-accent="violet"] {
+  --section-accent: #b8a2f0;
+}
+
+:root[data-launch-mode="expressive"][data-theme="dark"] [data-section-accent="rose"] {
+  --section-accent: #f29bb8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root, :root[data-launch-mode="expressive"] {
+    --duration-control: 0ms;
+    --duration-panel-min: 0ms;
+    --duration-panel-max: 0ms;
+    --duration-reveal: 0ms;
+    --reveal-stagger: 0ms;
+    --reveal-rise: 0px;
+    --duration-marquee: 0s;
+    --scene-progress: 1;
+  }
+}
+
+:root.reduced-motion, :root[data-launch-mode="expressive"].reduced-motion {
+  --duration-control: 0ms;
+  --duration-panel-min: 0ms;
+  --duration-panel-max: 0ms;
+  --duration-reveal: 0ms;
+  --reveal-stagger: 0ms;
+  --reveal-rise: 0px;
+  --duration-marquee: 0s;
+  --scene-progress: 1;
+}
+
+:lang(ja), :root[data-launch-mode="expressive"]:lang(ja) {
+  --font-sans: system-ui, "Noto Sans JP", sans-serif;
+  --type-caption-tracking: 0em;
+  --type-caption-leading: round(up, calc(var(--type-caption-size) * 1.75), 4px);
+  --type-body-tracking: 0em;
+  --type-body-leading: round(up, calc(var(--type-body-size) * 1.75), 4px);
+  --type-lede-tracking: 0em;
+  --type-lede-leading: round(up, calc(var(--type-lede-size) * 1.75), 4px);
+  --type-title-tracking: 0em;
+  --type-title-leading: round(up, calc(var(--type-title-size) * 1.4), 4px);
+  --type-heading-tracking: 0em;
+  --type-heading-leading: round(up, calc(var(--type-heading-size) * 1.4), 4px);
+  --type-display-tracking: 0em;
+  --type-display-leading: round(up, calc(var(--type-display-size) * 1.4), 4px);
+  --type-hero-tracking: 0em;
+  --type-hero-leading: round(up, calc(var(--type-hero-size) * 1.4), 4px);
+}
+
+:lang(ko), :root[data-launch-mode="expressive"]:lang(ko) {
+  --font-sans: system-ui, "Noto Sans KR", sans-serif;
+  --type-caption-tracking: 0em;
+  --type-caption-leading: round(up, calc(var(--type-caption-size) * 1.75), 4px);
+  --type-body-tracking: 0em;
+  --type-body-leading: round(up, calc(var(--type-body-size) * 1.75), 4px);
+  --type-lede-tracking: 0em;
+  --type-lede-leading: round(up, calc(var(--type-lede-size) * 1.75), 4px);
+  --type-title-tracking: 0em;
+  --type-title-leading: round(up, calc(var(--type-title-size) * 1.4), 4px);
+  --type-heading-tracking: 0em;
+  --type-heading-leading: round(up, calc(var(--type-heading-size) * 1.4), 4px);
+  --type-display-tracking: 0em;
+  --type-display-leading: round(up, calc(var(--type-display-size) * 1.4), 4px);
+  --type-hero-tracking: 0em;
+  --type-hero-leading: round(up, calc(var(--type-hero-size) * 1.4), 4px);
+}
+
+:lang(th), :root[data-launch-mode="expressive"]:lang(th) {
+  --font-sans: system-ui, "Noto Sans Thai", sans-serif;
+  --type-caption-tracking: 0em;
+  --type-caption-leading: round(up, calc(var(--type-caption-size) * 1.75), 4px);
+  --type-body-tracking: 0em;
+  --type-body-leading: round(up, calc(var(--type-body-size) * 1.75), 4px);
+  --type-lede-tracking: 0em;
+  --type-lede-leading: round(up, calc(var(--type-lede-size) * 1.75), 4px);
+  --type-title-tracking: 0em;
+  --type-title-leading: round(up, calc(var(--type-title-size) * 1.4), 4px);
+  --type-heading-tracking: 0em;
+  --type-heading-leading: round(up, calc(var(--type-heading-size) * 1.4), 4px);
+  --type-display-tracking: 0em;
+  --type-display-leading: round(up, calc(var(--type-display-size) * 1.4), 4px);
+  --type-hero-tracking: 0em;
+  --type-hero-leading: round(up, calc(var(--type-hero-size) * 1.4), 4px);
+}
+
+:lang(zh), :root[data-launch-mode="expressive"]:lang(zh) {
+  --font-sans: system-ui, "Noto Sans SC", "Noto Sans TC", sans-serif;
+  --type-caption-tracking: 0em;
+  --type-caption-leading: round(up, calc(var(--type-caption-size) * 1.75), 4px);
+  --type-body-tracking: 0em;
+  --type-body-leading: round(up, calc(var(--type-body-size) * 1.75), 4px);
+  --type-lede-tracking: 0em;
+  --type-lede-leading: round(up, calc(var(--type-lede-size) * 1.75), 4px);
+  --type-title-tracking: 0em;
+  --type-title-leading: round(up, calc(var(--type-title-size) * 1.4), 4px);
+  --type-heading-tracking: 0em;
+  --type-heading-leading: round(up, calc(var(--type-heading-size) * 1.4), 4px);
+  --type-display-tracking: 0em;
+  --type-display-leading: round(up, calc(var(--type-display-size) * 1.4), 4px);
+  --type-hero-tracking: 0em;
+  --type-hero-leading: round(up, calc(var(--type-hero-size) * 1.4), 4px);
+}

@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Fail fixture for LP-TYPE-01: the page loads the token set, then sets one paragraph to a size outside it and a
+     heading to a unitless leading that lands between pixels. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-TYPE-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: 1.13; }
+  .odd { font-size: 15px; line-height: 22px; }
+</style>
+</head>
+<body>
+<h1>Sizes picked by eye</h1>
+<p>This paragraph follows the token set.</p>
+<p class="odd">This one was nudged to a size the set does not have.</p>
+</body>
+</html>

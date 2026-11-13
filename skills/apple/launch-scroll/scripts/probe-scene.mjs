@@ -75,6 +75,7 @@ export const INSTRUMENT = String.raw`(() => {
   const tick = () => {
     for (const video of document.querySelectorAll('video')) {
       watch(video);
+      if (window.__lsSceneSelector && !video.closest(window.__lsSceneSelector)) continue;
       if (!presented.has(video) && !flagged.has(video) && visible(video) && onScreen(video)) {
         flagged.add(video);
         log.earlyVisible.push(video.currentSrc || video.getAttribute('src') || '(no source yet)');
@@ -363,6 +364,7 @@ export async function probe(options, report) {
     for (const viewport of options.viewports) {
       const label = `${viewport.width}x${viewport.height}`;
       const run = await newPage(browser, viewport);
+      await run.context.addInitScript(`window.__lsSceneSelector = ${JSON.stringify(options.scene)};`);
       let count = 0;
       try {
         await run.page.goto(url, { waitUntil: 'load' });

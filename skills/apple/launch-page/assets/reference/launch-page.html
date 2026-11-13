@@ -1,0 +1,340 @@
+<!doctype html>
+<!-- launch-page reference: a launch page on the restrained token set (design-pro-max). Every visual is drawn in CSS.
+     Content is visible without script and under reduced motion; reveals run once; the gallery and the marquee move
+     on their own only with motion allowed and always carry a labelled pause control. Copy is placeholder text. -->
+<html lang="en" data-launch-mode="restrained">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beacon: a launch page reference</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--color-bg); color: var(--color-ink); }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-leading);
+    letter-spacing: var(--type-body-tracking);
+    font-weight: var(--type-body-weight);
+  }
+  button, input, select, textarea { font: inherit; letter-spacing: inherit; color: inherit; }
+  h1, h2, h3, p, ul, ol, figure, dl, dd { margin: 0; }
+  a { color: var(--color-accent); }
+  :focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset); }
+  .skip { position: absolute; left: var(--space-2); top: calc(-1 * var(--nav-height)); padding: var(--space-1) var(--space-2); background: var(--color-bg); }
+  .skip:focus { top: var(--space-1); }
+
+  .wrap { width: min(100% - 2 * var(--page-gutter), var(--content-max)); margin-inline: auto; }
+  .section { padding-block: var(--section-space); display: grid; gap: var(--stack-loose); }
+  .band { background: var(--color-surface); }
+  .section-head { display: grid; gap: var(--heading-after); max-width: var(--measure); }
+
+  .t-caption { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); letter-spacing: var(--type-caption-tracking); font-weight: var(--type-caption-weight); }
+  .t-lede { font-size: var(--type-lede-size); line-height: var(--type-lede-leading); letter-spacing: var(--type-lede-tracking); font-weight: var(--type-lede-weight); color: var(--color-muted); }
+  .t-title { font-size: var(--type-title-size); line-height: var(--type-title-leading); letter-spacing: var(--type-title-tracking); font-weight: var(--type-title-weight); }
+  .t-heading { font-size: var(--type-heading-size); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); font-weight: var(--type-heading-weight); text-wrap: balance; }
+  .t-hero { font-size: var(--type-hero-size); line-height: var(--type-hero-leading); letter-spacing: var(--type-hero-tracking); font-weight: var(--type-hero-weight); text-wrap: balance; }
+  .muted { color: var(--color-muted); }
+
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: var(--nav-height);
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-line);
+  }
+  @supports (backdrop-filter: blur(1px)) {
+    .nav { background: color-mix(in srgb, var(--color-bg) 85%, transparent); backdrop-filter: saturate(1.5) blur(16px); }
+  }
+  .nav-row { display: flex; align-items: center; gap: var(--space-3); min-height: var(--nav-height); }
+  .nav-name { font-weight: var(--type-title-weight); margin-inline-end: auto; color: var(--color-ink); text-decoration: none; }
+  .nav-links { display: flex; gap: var(--space-3); list-style: none; padding: 0; }
+  .nav-links a { color: var(--color-ink); text-decoration: none; }
+  .nav-links a:hover { color: var(--color-accent); }
+  .menu-toggle { display: none; }
+  .menu-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--panel-duration, var(--duration-panel-min)) var(--ease-standard); }
+  .menu-panel[data-open] { grid-template-rows: 1fr; }
+  .menu-panel > div { overflow: hidden; }
+  .menu-panel ul { list-style: none; padding: 0 0 var(--space-2); display: grid; gap: var(--space-1); }
+  @media (max-width: 639px) {
+    .nav-links--wide { display: none; }
+    .menu-toggle { display: inline-flex; }
+  }
+  @media (min-width: 640px) { .menu-panel { display: none; } }
+
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-1-5) var(--space-3);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-accent-fill);
+    background: var(--color-accent-fill);
+    color: var(--color-on-accent);
+    text-decoration: none;
+    transition: background-color var(--duration-control) linear, color var(--duration-control) linear;
+    cursor: pointer;
+  }
+  .button--quiet { background: transparent; color: var(--color-accent); border-color: currentColor; }
+  .button--small { min-height: 32px; padding: var(--space-0-5) var(--space-2); }
+  .ctas { display: flex; flex-wrap: wrap; gap: var(--cta-gap); }
+
+  .hero { padding-block: var(--section-space); display: grid; gap: var(--stack-loose); justify-items: center; text-align: center; }
+  .hero .section-head { justify-items: center; max-width: 40ch; }
+  .device { width: min(100%, 720px); aspect-ratio: 16 / 10; position: relative; }
+  .device-screen {
+    position: absolute;
+    inset: 0 6% 9%;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    background: var(--color-ink);
+    padding: 3%;
+  }
+  .device-screen::before {
+    content: "";
+    position: absolute;
+    inset: 3%;
+    border-radius: var(--radius-control);
+    background:
+      linear-gradient(90deg, var(--color-accent) 0 22%, transparent 22%) 0 12% / 100% 6% no-repeat,
+      linear-gradient(90deg, var(--color-muted) 0 64%, transparent 64%) 0 28% / 100% 4% no-repeat,
+      linear-gradient(90deg, var(--color-line) 0 48%, transparent 48%) 0 38% / 100% 4% no-repeat,
+      linear-gradient(var(--color-surface), var(--color-surface));
+  }
+  .device-base { position: absolute; inset: auto 0 0; height: 9%; border-radius: 0 0 var(--radius-card) var(--radius-card); background: linear-gradient(var(--color-line), var(--color-muted)); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--tile-gap); }
+  .tile { display: grid; align-content: start; gap: var(--stack); padding: var(--tile-inset); border-radius: var(--radius-tile); background: var(--color-bg); }
+  .tile--feature { background: linear-gradient(160deg, var(--color-accent-fill), var(--color-ink)); color: var(--color-on-accent); }
+  .tile--feature .muted { color: var(--color-on-accent); }
+  .tile--feature .button--quiet { color: var(--color-on-accent); }
+  .tile-art { aspect-ratio: 4 / 3; border-radius: var(--radius-card); background: var(--color-surface); position: relative; overflow: hidden; }
+  .tile-art::after { content: ""; position: absolute; inset: 20% 15%; border-radius: var(--radius-control); background: linear-gradient(var(--color-line) 0 0) 0 0 / 60% 12% no-repeat, linear-gradient(var(--color-accent) 0 0) 0 30% / 35% 12% no-repeat; }
+
+  .gallery { display: grid; gap: var(--stack); }
+  .slide { display: grid; gap: var(--stack); }
+  .slide-art { aspect-ratio: 16 / 9; border-radius: var(--radius-tile); background: var(--color-surface); position: relative; overflow: hidden; }
+  .slide-art::before { content: ""; position: absolute; inset: 12%; border-radius: var(--radius-card); background: var(--slide-fill, var(--color-line)); }
+  .gallery-controls { display: flex; align-items: center; gap: var(--space-2); }
+  .dots { display: flex; gap: var(--space-1); }
+  .dot { position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; cursor: pointer; }
+  .dot::before { content: ""; position: absolute; inset: 18px 8px; border-radius: var(--radius-pill); background: var(--color-line); }
+  .dot::after { content: ""; position: absolute; inset: 18px 8px; border-radius: var(--radius-pill); background: var(--color-accent); transform-origin: left; transform: scaleX(0); }
+  .dot[aria-current="true"]::after { transform: scaleX(1); }
+  html[data-motion="ok"] [data-gallery][data-playing="true"] .dot[aria-current="true"]::after { animation: dot-fill var(--slide-duration) linear both; }
+  @keyframes dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  .marquee { overflow: hidden; }
+  .marquee-track { display: flex; gap: var(--space-6); width: max-content; list-style: none; padding: 0; animation: marquee var(--duration-marquee) linear infinite; }
+  .marquee[data-paused] .marquee-track { animation-play-state: paused; }
+  .marquee-track li { color: var(--color-muted); white-space: nowrap; }
+  @keyframes marquee { to { translate: -50% 0; } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
+    .marquee-track [data-marquee-dup] { display: none; }
+  }
+  html.reduced-motion .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
+  html.reduced-motion .marquee-track [data-marquee-dup] { display: none; }
+
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--tile-gap); }
+  .plan { display: grid; gap: var(--stack); padding: var(--tile-inset); border: 1px solid var(--color-line); border-radius: var(--radius-tile); align-content: start; }
+  .plan ul { padding-inline-start: var(--space-3); display: grid; gap: var(--stack-tight); }
+  .placeholder { border: 1px dashed var(--color-muted); border-radius: var(--radius-card); padding: var(--space-3); color: var(--color-muted); }
+
+  .faq { display: grid; gap: var(--stack-tight); max-width: var(--measure); }
+  .faq details { border-bottom: 1px solid var(--color-line); padding-block: var(--space-2); }
+  .faq summary { cursor: pointer; font-weight: var(--type-title-weight); }
+  .faq details p { padding-block-start: var(--space-1); color: var(--color-muted); }
+
+  .footer { padding-block: var(--section-space); border-top: 1px solid var(--color-line); }
+
+  [data-reveal] {
+    transition: opacity var(--duration-reveal) var(--ease-out), translate var(--duration-reveal) var(--ease-out);
+    transition-delay: calc(var(--reveal-index, 0) * var(--reveal-stagger));
+  }
+  html[data-motion="ok"] [data-reveal]:not([data-revealed]) { opacity: 0; translate: 0 var(--reveal-rise); }
+</style>
+</head>
+<body>
+<a class="skip t-caption" href="#main">Skip to content</a>
+<header class="nav">
+  <div class="wrap nav-row">
+    <a class="nav-name" href="#top">Beacon</a>
+    <ul class="nav-links nav-links--wide t-caption">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#gallery">Tour</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+    </ul>
+    <button class="button button--quiet button--small menu-toggle t-caption" type="button" aria-expanded="false" aria-controls="menu-panel">Menu</button>
+    <a class="button button--small t-caption" href="#pricing" data-cta>Download</a>
+  </div>
+  <div class="menu-panel wrap" id="menu-panel">
+    <div>
+      <ul class="t-caption">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#gallery">Tour</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero wrap" id="top" aria-labelledby="hero-title">
+    <div class="section-head">
+      <h1 class="t-hero" id="hero-title">Know where your afternoon went</h1>
+      <p class="t-lede" data-lede>Beacon sits in the menu bar, notes which app holds your focus, and turns each day into one honest timeline you can read in ten seconds.</p>
+    </div>
+    <div class="ctas">
+      <a class="button" href="#pricing" data-cta>Download free</a>
+      <a class="button button--quiet" href="#gallery" data-cta>Take the tour</a>
+    </div>
+    <div class="device" role="img" aria-label="A laptop showing the Beacon timeline" data-reveal>
+      <div class="device-screen"></div>
+      <div class="device-base"></div>
+    </div>
+  </section>
+
+  <section class="band" id="features" aria-labelledby="features-title">
+    <div class="wrap section">
+      <div class="section-head" data-reveal>
+        <h2 class="t-heading" id="features-title">Three things it does quietly</h2>
+      </div>
+      <div class="tiles" data-reveal-group>
+        <article class="tile" data-tile data-reveal>
+          <div class="tile-art" aria-hidden="true"></div>
+          <h3 class="t-title">A timeline, not a dashboard</h3>
+          <p class="muted">Every hour reads as one line of colour. Click a block to see which windows were open and for how long.</p>
+          <div class="ctas"><a class="button button--quiet button--small t-caption" href="#gallery" data-cta>See the timeline</a></div>
+        </article>
+        <article class="tile tile--feature" data-tile data-reveal>
+          <h3 class="t-title">Private by default</h3>
+          <p class="muted">Nothing leaves the computer. Beacon stores its log in one file you can open, export or delete.</p>
+          <div class="ctas">
+            <a class="button button--quiet button--small t-caption" href="#faq" data-cta>Read how</a>
+          </div>
+        </article>
+        <article class="tile" data-tile data-reveal>
+          <div class="tile-art" aria-hidden="true"></div>
+          <h3 class="t-title">Quiet weekly notes</h3>
+          <p class="muted">On Friday it writes three sentences about your week. You decide whether to read them.</p>
+          <div class="ctas">
+            <a class="button button--small t-caption" href="#pricing" data-cta>Try it</a>
+            <a class="button button--quiet button--small t-caption" href="#faq" data-cta>Learn more</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="gallery" aria-labelledby="gallery-title">
+    <div class="section-head" data-reveal>
+      <h2 class="t-heading" id="gallery-title">See a whole day at a glance</h2>
+    </div>
+    <div class="gallery" data-gallery aria-label="product tour" aria-roledescription="carousel">
+      <figure class="slide" data-slide data-duration="6000">
+        <div class="slide-art" aria-hidden="true" style="--slide-fill: var(--color-accent)"></div>
+        <figcaption class="muted">Morning: the timeline fills in as you work.</figcaption>
+      </figure>
+      <figure class="slide" data-slide data-duration="5000">
+        <div class="slide-art" aria-hidden="true" style="--slide-fill: var(--color-muted)"></div>
+        <figcaption class="muted">Afternoon: one click shows the windows behind a block.</figcaption>
+      </figure>
+      <figure class="slide" data-slide data-duration="7000">
+        <div class="slide-art" aria-hidden="true" style="--slide-fill: var(--color-line)"></div>
+        <figcaption class="muted">Friday: three sentences about the week.</figcaption>
+      </figure>
+      <div class="gallery-controls">
+        <div class="dots">
+          <button class="dot" type="button" data-gallery-dot aria-label="Show slide 1"></button>
+          <button class="dot" type="button" data-gallery-dot aria-label="Show slide 2"></button>
+          <button class="dot" type="button" data-gallery-dot aria-label="Show slide 3"></button>
+        </div>
+        <button class="button button--quiet button--small t-caption" type="button" data-gallery-toggle aria-label="Pause product tour"><span data-toggle-text>Pause</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="logos-title">
+    <div class="wrap section marquee" data-marquee aria-label="customer logos">
+      <div class="section-head">
+        <h2 class="t-title" id="logos-title">Logos you have permission to show</h2>
+        <p class="placeholder t-caption">Placeholder: replace these names with customers who agreed to be named.</p>
+      </div>
+      <ul class="marquee-track t-title" id="logo-track">
+        <li>Orchard Labs</li><li>Northfield</li><li>Kite and Co</li><li>Lumen Works</li><li>Pinecrest</li>
+        <li data-marquee-dup aria-hidden="true">Orchard Labs</li><li data-marquee-dup aria-hidden="true">Northfield</li><li data-marquee-dup aria-hidden="true">Kite and Co</li><li data-marquee-dup aria-hidden="true">Lumen Works</li><li data-marquee-dup aria-hidden="true">Pinecrest</li>
+      </ul>
+      <div><button class="button button--quiet button--small t-caption" type="button" data-marquee-toggle aria-controls="logo-track" aria-label="Pause customer logos"><span data-toggle-text>Pause</span></button></div>
+    </div>
+  </section>
+
+  <section class="section wrap" id="pricing" aria-labelledby="pricing-title">
+    <div class="section-head" data-reveal>
+      <h2 class="t-heading" id="pricing-title">Simple pricing for one or many</h2>
+    </div>
+    <div class="plans" data-reveal-group>
+      <article class="plan" data-reveal>
+        <h3 class="t-title">Personal</h3>
+        <p class="t-heading">Free</p>
+        <ul><li>One computer</li><li>Daily timeline</li><li>Export to CSV</li></ul>
+        <div class="ctas"><a class="button" href="#top" data-cta>Download</a></div>
+      </article>
+      <article class="plan" data-reveal>
+        <h3 class="t-title">Team</h3>
+        <p class="t-heading">Placeholder price</p>
+        <ul><li>Shared weekly notes</li><li>Up to 25 people</li><li>Priority email</li></ul>
+        <div class="ctas"><a class="button" href="#faq" data-cta>Contact sales</a></div>
+      </article>
+    </div>
+    <p class="placeholder">Placeholder: a customer quote goes here once a customer has written one and agreed to its use.</p>
+  </section>
+
+  <section class="band" id="faq" aria-labelledby="faq-title">
+    <div class="wrap section">
+      <div class="section-head" data-reveal>
+        <h2 class="t-heading" id="faq-title">Questions people ask before installing</h2>
+      </div>
+      <div class="faq">
+        <details><summary>Does Beacon read what I type?</summary><p>No. It records which app is in front and for how long, nothing inside the windows.</p></details>
+        <details><summary>Can I delete my history?</summary><p>Yes. The log is one file; delete it from the settings or the file system.</p></details>
+        <details><summary>Does it slow the computer down?</summary><p>It wakes once a minute and writes a single line.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap muted t-caption">Beacon is a fictional product used to show this reference page.</div>
+</footer>
+
+<script type="module">
+  import { markMotion } from '../lib/gate.js';
+  import { createReveals } from '../lib/reveal.js';
+  import { createGallery, createMarquee } from '../lib/gallery.js';
+
+  markMotion();
+  createReveals(document);
+  document.querySelectorAll('[data-gallery]').forEach((element) => createGallery(element));
+  document.querySelectorAll('[data-marquee]').forEach((element) => createMarquee(element));
+
+  const toggle = document.querySelector('.menu-toggle');
+  const panel = document.getElementById('menu-panel');
+  const root = getComputedStyle(document.documentElement);
+  const span = (name) => Number.parseFloat(root.getPropertyValue(name)) || 0;
+  toggle.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    const distance = panel.firstElementChild.scrollHeight;
+    const duration = Math.min(span('--duration-panel-max'), Math.max(span('--duration-panel-min'), distance * 2));
+    panel.style.setProperty('--panel-duration', `${Math.round(duration)}ms`);
+    toggle.setAttribute('aria-expanded', String(open));
+    panel.toggleAttribute('data-open', open);
+  });
+</script>
+</body>
+</html>

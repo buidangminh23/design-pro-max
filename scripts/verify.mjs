@@ -5,7 +5,7 @@
  * builds the fixture media with ffmpeg, then runs every case of fixtures/<part>/cases.json and judges it red-first:
  * a fail case must exit 1 with an error for its rule, a pass case must check its rule and pass it.
  *
- *   node scripts/verify.mjs [--only <case id or rule id>] [--keep] [--json]
+ *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
  * playwright, then npx playwright install chromium-headless-shell). Exit codes: 0 every case judged right, 1 a case
@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -56,10 +56,14 @@ function toolMissing() {
 
 function buildSite(entry, skill, media, folder) {
   const part = path.join(skill, entry.part);
+  fs.mkdirSync(folder, { recursive: true });
+  for (const item of fs.readdirSync(path.join(part, 'assets'), { withFileTypes: true })) {
+    if (item.isFile()) fs.copyFileSync(path.join(part, 'assets', item.name), path.join(folder, item.name));
+  }
   copyTree(path.join(part, 'assets', 'lib'), path.join(folder, 'lib'));
   copyTree(path.join(part, 'assets', 'reference'), path.join(folder, 'reference'));
   copyTree(path.join(ROOT, 'fixtures', entry.part, 'pages'), path.join(folder, 'pages'));
-  const pageFolder = path.dirname(path.join(folder, entry.page));
+  const pageFolder = entry.page ? path.dirname(path.join(folder, entry.page)) : folder;
   for (const [name, recipe] of Object.entries(entry.media ?? {})) {
     if (!media[recipe]) throw new Error(`${entry.id}: unknown media recipe ${recipe}`);
     fs.copyFileSync(media[recipe], path.join(pageFolder, name));
@@ -87,13 +91,41 @@ function runCase(entry, skill, media, scratch) {
   } else if (entry.checker === 'probe-scene') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
-    args = [path.join(skill, entry.part, 'scripts', 'probe-scene.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server, '--project', ROOT, ...(entry.args ?? [])];
+    args = [path.join(skill, 'launch-scroll', 'scripts', 'probe-scene.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server, '--project', ROOT, ...(entry.args ?? [])];
+  } else if (entry.checker === 'check-page') {
+    const site = path.join(scratch, 'sites', entry.id);
+    buildSite(entry, skill, media, site);
+    args = [path.join(skill, entry.part, 'scripts', 'check-page.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server, '--project', ROOT, ...(entry.args ?? [])];
+  } else if (entry.checker === 'lint-css') {
+    const site = path.join(scratch, 'sites', entry.id);
+    buildSite(entry, skill, media, site);
+    args = [path.join(skill, entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
   } else {
     throw new Error(`${entry.id}: unknown checker ${entry.checker}`);
   }
   const started = Date.now();
   const result = spawnSync(process.execPath, args, { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024, timeout: 10 * 60 * 1000 });
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
+}
+
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-' };
+
+export function expectedProblems(entry, findings, root = ROOT) {
+  const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
+  const mine = file.defects.filter((defect) => defect.checker === entry.checker && !defect.part);
+  const notRun = file.defects.filter((defect) => defect.part && !fs.existsSync(path.join(root, SKILL_DIR, defect.part))).map((defect) => `${defect.rule} (${defect.checker})`);
+  const errors = findings.filter((finding) => finding.level === 'error');
+  const problems = [];
+  for (const defect of mine) {
+    const hit = errors.some((finding) => finding.rule === defect.rule && (!defect.match || `${finding.where} ${finding.measured}`.includes(defect.match)));
+    if (!hit) problems.push(`planted defect not found: ${defect.rule} (${defect.defect})`);
+  }
+  const prefix = PART_PREFIX[entry.checker] ?? '';
+  const allowed = new Set(mine.map((defect) => defect.rule));
+  for (const rule of new Set(errors.map((finding) => finding.rule))) {
+    if (rule.startsWith(prefix) && !allowed.has(rule)) problems.push(`unplanned error: ${rule}`);
+  }
+  return { problems, notRun };
 }
 
 async function main(argv) {
@@ -109,7 +141,8 @@ async function main(argv) {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'dpm-verify-'));
   const skill = path.join(scratch, 'skill');
   for (const folder of SHIPPED) copyTree(path.join(ROOT, SKILL_DIR, folder), path.join(skill, folder));
-  const cases = loadCases().filter((entry) => !only || entry.id === only || rulesOf(entry).includes(only));
+  const wanted = only ? only.split(',') : [];
+  const cases = loadCases().filter((entry) => !only || wanted.some((name) => entry.id === name || rulesOf(entry).includes(name)));
   if (!cases.length) {
     process.stderr.write(`no case matches ${only}\n`);
     return 2;
@@ -123,6 +156,12 @@ async function main(argv) {
   for (const entry of cases) {
     const run = runCase(entry, skill, media, scratch);
     const verdict = evaluateRun(entry, run);
+    if (entry.expected) {
+      const expected = expectedProblems(entry, verdict.findings);
+      verdict.problems.push(...expected.problems);
+      verdict.ok = verdict.ok && !expected.problems.length;
+      if (expected.notRun.length && !json) process.stdout.write(`     not run here (their checker is not built yet): ${expected.notRun.join(', ')}\n`);
+    }
     results.push({ id: entry.id, expect: entry.expect, rules: rulesOf(entry), ok: verdict.ok, problems: verdict.problems, seconds: run.seconds });
     if (!json) {
       process.stdout.write(`${verdict.ok ? 'ok  ' : 'FAIL'} ${entry.expect.padEnd(4)} ${entry.id} (${rulesOf(entry).join(', ')}) ${run.seconds.toFixed(1)} s\n`);
