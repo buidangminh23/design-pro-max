@@ -1,5 +1,32 @@
 # Eval results
 
+## 2026-11-13: launch-scroll part evals, round 4 (Mac)
+
+All eight cases with and without apple on both hosts, at 92c55a4 (the skill as of 70cd500), with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.167.2 with `gpt-6.1-sol` at high, one run at a time. All 32 runs finished inside 60 turns and 25 minutes; none hit a host limit and no without run read the skill. One grader per case judged every expectation from each run's answer and its diff against the fixture; there was no independent recheck in this round.
+
+| Case | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| 6 `pin-and-zoom` | 6/6 | 4/6 | 4/6 | 4/6 |
+| 7 `janky-scrub` | 4/4 | 3/4 | 4/4 | 3/4 |
+| 8 `600-frame-sequence` | 3/3 | 2/3 | 3/3 | 1/3 |
+| 9 `frozen-on-frame-0` | 3/3 | 3/3 | 3/3 | 3/3 |
+| 10 `pin-without-change` | 3/3 | 0/3 | 3/3 | 0/3 |
+| 16 `short-viewport` | 2/3 | 2/3 | 3/3 | 3/3 |
+| 18 `av1-only` | 3/3 | 3/3 | 2/3 | 1/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 1/3 | 2/3 | 1/3 |
+| **Expectations passed** | **27/28 (96.4 %)** | **18/28 (64.3 %)** | **24/28 (85.7 %)** | **16/28 (57.1 %)** |
+
+Round 3 (xhigh, `gpt-6-astra`, before 70cd500) gave 78.6 % against 64.3 % on Claude Code and 75.0 % against 67.9 % on Codex. The without columns barely move between rounds, so the gain is in the with runs: the pushback cases (8, 10) and the preload fix (7) now pass on both hosts.
+
+Failures with apple:
+
+- `claude-with-16`: kept the scene sticky at every height and shrank the stage instead of gating the pin on the stage height plus the 72px header [LS-GATE-02]. This run did not load apple; it answered from the project alone. `claude-with-9` also did not load apple and passed.
+- `codex-with-6`: gave no beat table, and its real laptop image ships `hidden` until script reveals it, so the page has no product image without JavaScript.
+- `codex-with-18`: wrote H.264 next to AV1 but then said the H.264 line could be dropped if the user insists on AV1 or HEVC only [LS-VID-02].
+- `codex-with-19`: used an SVG illustration as the start image instead of frame 0 of the film [LS-VID-05].
+
+Without apple, every run pinned the still testimonials section (10), and three of four left a frame-0 start image or a correct blocked-play gate out (19).
+
 ## 2026-11-13: launch-scroll cases 7, 8 and 10 after the pushback change (Mac)
 
 A targeted check of 70cd500, which tells the part to push back before pinning a still section, to show a sequence's memory and download cost and recommend a film, and to check a scene being fixed against the never-ship list. Only the with condition ran, once per host, with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.167.2 with `gpt-6.1-sol` at high. Round 3 ran xhigh and `gpt-6-astra`, so a change of model and effort is mixed in with the change to `PART.md`. One grader (the session's agent) judged these six runs, with no independent recheck.
