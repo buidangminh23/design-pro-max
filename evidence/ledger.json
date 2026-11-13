@@ -4254,7 +4254,7 @@
       "sourceSha": "9d96e99ba06803546109cfe459cc7d5b2552fa4ed2db88193bf7bb5f7f65945e"
     },
     "PV-N2": {
-      "claim": "Clips on a reference page look like downscaled Retina screen recordings: a full-size system cursor, real desktop wallpapers and no camera moves. The look alone does not show how the clips were made.",
+      "claim": "Clips on a reference page look like downscaled screen recordings from a high-density, 2x screen capture: a full-size system cursor, real desktop wallpapers and no camera moves. The look alone does not show how the clips were made.",
       "value": "a cursor about 27 px tall in a 1280 px frame suggests a downscaled 2x capture; appearance is not proof",
       "label": "inferred",
       "date": "2026-10-06",

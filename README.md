@@ -281,7 +281,7 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 
 <!-- gen:trademarks -->
 
-Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari, Siri, Swift, SwiftUI, Xcode, TestFlight, App Store, AirPlay, Apple Pay, Apple Pencil, Apple TV, Apple Vision Pro, CarPlay, CareKit, Digital Crown, Dynamic Island, Face ID, FaceTime, HealthKit, HomeKit, iCloud, iMessage, Live Photos, Mac Catalyst, ResearchKit, SharePlay, Spotlight, Touch ID, Retina, SF Symbols, Apple Wallet, Live Activities, Handoff, Multi-Touch, Finder, Mission Control and Apple Music are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari, Siri, Swift, SwiftUI, Xcode, TestFlight, App Store, AirPlay, Apple Pay, Apple Pencil, Apple TV, Apple Vision Pro, CarPlay, CareKit, Digital Crown, Dynamic Island, Face ID, FaceTime, HealthKit, HomeKit, iCloud, iMessage, Live Photos, Mac Catalyst, ResearchKit, SharePlay, Spotlight, Touch ID, SF Symbols, Apple Wallet, Live Activities, Handoff, Multi-Touch, Finder, Mission Control and Apple Music are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
 
 <!-- /gen:trademarks -->
 
