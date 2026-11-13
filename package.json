@@ -1,7 +1,6 @@
 {
-  "name": "design-pro-max",
-  "version": "0.0.0",
-  "private": true,
+  "name": "@minhspark/design-pro-max",
+  "version": "0.1.0",
   "description": "Design skills for AI coding agents: apple, a router over vendored Apple-platform skills, plus the bundled design-spacing-rhythm and icons-pro-max skills",
   "license": "MIT",
   "type": "module",
@@ -13,6 +12,27 @@
   "bugs": {
     "url": "https://github.com/buidangminh23/design-pro-max/issues"
   },
+  "keywords": [
+    "skills",
+    "agent-skills",
+    "claude",
+    "codex",
+    "apple",
+    "hig",
+    "swiftui",
+    "design"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "skills/",
+    "skills.json",
+    "CHANGELOG.md",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "vendor:sync": "node scripts/vendor-sync.mjs sync",

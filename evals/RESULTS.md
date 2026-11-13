@@ -1,5 +1,45 @@
 # Eval results
 
+## 2026-11-13: v0.1 round 9, routing and part evals on main (Mac)
+
+The release round: every routing row and all eight launch-scroll cases on both hosts at 61a3939 (main after #4 and #13, later than the last `PART.md` change in 16c1373), with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.168.0 with `gpt-6.1-sol` at high. The first Claude routing pass stopped at the weekly host limit and was run again in full after the reset; only the complete pass is scored. All 32 part runs exited 0 within 9.8 minutes each, none timed out, and no run without apple read the skill. One grader per case judged every expectation from each run's answer and its diff; there was no independent recheck.
+
+### Routing
+
+| Bar | Claude Code | Codex |
+|---|---|---|
+| Recall (≥ 90 %) | 42/46 (91.3 %) | 46/46 (100 %) |
+| False triggers (≤ 10 %) | 0/18 | 0/18 (12 near misses read the router only) |
+| First part (≥ 90 %) | 42/42 | 46/46 |
+| Full reads (100 %) | 45/45 | 104/104 |
+| Wrong-path reads (0) | 0 | **1** |
+
+- Claude Code did not start apple on r03, r04, r10 and r45. The listing run lists apple. Recorded prompt x03 (a HIG review) now starts apple; x01 starts `write-swift` and x02 starts nothing.
+- Codex's one wrong-path read is `codex-with-r06`: a single `cat` of four files, one of them `references/core-data-stack.md`, guessed before it had read `SKILL.md`, which names `references/stack-setup.md`. Three reruns of r06 read only real paths and chose the same part, so the bar misses on one run of one row. Codex starts apple on all three recorded prompts.
+
+### launch-scroll part evals
+
+| Case | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| 6 `pin-and-zoom` | 6/6 | 4/6 | 6/6 | 3/6 |
+| 7 `janky-scrub` | 4/4 | 4/4 | 2/4 | 2/4 |
+| 8 `600-frame-sequence` | 3/3 | 0/3 | 2/3 | 2/3 |
+| 9 `frozen-on-frame-0` | 3/3 | 3/3 | 3/3 | 3/3 |
+| 10 `pin-without-change` | 3/3 | 0/3 | 3/3 | 0/3 |
+| 16 `short-viewport` | 3/3 | 2/3 | 3/3 | 3/3 |
+| 18 `av1-only` | 3/3 | 3/3 | 2/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 1/3 | 1/3 | 3/3 | 1/3 |
+| **Expectations passed** | **26/28 (92.9 %)** | **17/28 (60.7 %)** | **24/28 (85.7 %)** | **16/28 (57.1 %)** |
+
+Failures with apple:
+
+- `claude-with-19` did not start apple and answered from the project alone: its blocked-play probe calls `play()` on the film with `preload="auto"`, so the film is requested before a rejection is known [LS-GATE-01], and its poster is a chosen frame, not frame 0 [LS-VID-05]. `claude-with-9` also did not start apple and passed. Both prompts name only the project's files and the symptom.
+- `codex-with-7` fixed the encode and the driver but left `index.html` untouched, so `preload="auto"` stays the loading plan [both], and its answer does not name the long keyframe interval as a cause [LS-VID-01]. Round 4 passed this case 4/4; `PART.md` section 1 step 7 already says to replace `preload="auto"`.
+- `codex-with-8` computed the decoded memory and bounded the frame window, but recommended a film only in one README line and never said when a sequence fits [pushback]. Round 4 passed it 3/3.
+- `codex-with-18` delivered AV1 and HEVC sources only, as in every Codex run since round 3 [LS-VID-02]; the README records it as a known limit.
+
+Against round 4 the with columns move by one or two expectations per host, and the without columns stay within two. With apple loaded, Claude Code passed every expectation; the two Codex regressions (7, 8) are instructions `PART.md` already gives, so they are recorded rather than fixed in this release.
+
 ## 2026-11-13: cases 18 and 19 after 16c1373 (Mac)
 
 16c1373 states in `launch-scroll/PART.md` section 3 that the hard rules hold even when the request asks for the opposite, and that the compliant version goes into the delivered code and commands; 7057031 had corrected the start-image sentence to match `scene.css`. Runs with apple, harness defaults, one grader:

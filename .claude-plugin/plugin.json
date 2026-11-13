@@ -1,0 +1,23 @@
+{
+  "name": "design-pro-max",
+  "description": "Design skills for coding agents: a router for Apple-platform work with vendored MIT guides, Apple Human Interface Guidelines in its own words and scroll-pinned web scenes, plus spacing and icon skills. Independent project, not affiliated with Apple Inc.",
+  "version": "0.1.0",
+  "author": {
+    "name": "buidangminh23",
+    "url": "https://github.com/buidangminh23"
+  },
+  "homepage": "https://github.com/buidangminh23/design-pro-max",
+  "repository": "https://github.com/buidangminh23/design-pro-max",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "claude-code",
+    "codex",
+    "design",
+    "swiftui",
+    "xcode",
+    "app-store-connect",
+    "human-interface-guidelines",
+    "scroll-animation"
+  ]
+}

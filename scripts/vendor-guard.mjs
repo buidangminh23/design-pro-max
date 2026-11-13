@@ -127,8 +127,10 @@ const codePointLabel = (char) => `U+${char.codePointAt(0).toString(16).toUpperCa
  * Words the project itself uses: the base vocabulary, every part id word and every skill folder name. An account or
  * host name equal to one of them cannot be told apart from the project's own text, so it is not a private term.
  */
-export function projectVocabulary(parts = [], skillFolders = []) {
+export function projectVocabulary(parts = [], skillFolders = [], packageName = '') {
   const words = new Set(BASE_VOCABULARY);
+  const scope = /^@([a-z0-9][a-z0-9-]*)\//.exec(packageName)?.[1];
+  if (scope) words.add(scope);
   for (const text of [...parts.map((part) => part.id), ...skillFolders]) {
     for (const word of text.toLowerCase().split(/[^a-z0-9]+/)) if (word) words.add(word);
   }
@@ -138,7 +140,8 @@ export function projectVocabulary(parts = [], skillFolders = []) {
 /**
  * Account and machine names that must not appear in the project's own files: the current user name, the first label
  * of the host name and any extra terms from DESIGN_PRO_MAX_PRIVATE_TERMS. Short and generic names, and names that are
- * words of the project's own vocabulary, are skipped.
+ * words of the project's own vocabulary, are skipped. The vocabulary holds the npm scope of package.json, which is
+ * public by definition.
  */
 export function privateTerms({ env = process.env, username, hostname, vocabulary = new Set() } = {}) {
   const terms = new Set();
@@ -381,6 +384,14 @@ function checkSkills(root, entries, fail) {
   return [...folders].map((folder) => folder.split('/')[1]);
 }
 
+function packageName(root) {
+  try {
+    return String(JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).name ?? '');
+  } catch {
+    return '';
+  }
+}
+
 /**
  * Run every rule against a checkout and return the hard problems, the warnings and a few totals.
  */
@@ -392,7 +403,7 @@ export function runGuard(root = ROOT, { terms } = {}) {
   const parts = readSources(root, fail);
   for (const part of parts) checkPart(root, part, fail);
   const skillFolders = checkSkills(root, entries, fail);
-  const privateWords = terms ?? privateTerms({ vocabulary: projectVocabulary(parts, skillFolders) });
+  const privateWords = terms ?? privateTerms({ vocabulary: projectVocabulary(parts, skillFolders, packageName(root)) });
 
   let vendorBytes = 0;
   const partBytes = new Map(parts.map((part) => [`${VENDOR_DIR}/${part.id}/`, 0]));

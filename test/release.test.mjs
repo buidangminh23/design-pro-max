@@ -129,11 +129,12 @@ test('pack builds one ZIP with the payload, every hidden part and a checksum fil
   const root = copyCheckout({ commit: true });
   t.after(() => removeTree(root));
   const result = pack(root);
-  assert.equal(result.zip, `${NAME}-v0.0.0.zip`);
+  const version = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
+  assert.equal(result.zip, `${NAME}-v${version}.zip`);
   assert.equal(result.parts, 38);
   assert.deepEqual(result.skills, ['apple', 'design-spacing-rhythm', 'icons-pro-max']);
-  assert.match(fs.readFileSync(path.join(result.dist, SUMS_FILE), 'utf8'), /^[0-9a-f]{64} {2}design-pro-max-v0\.0\.0\.zip\n$/);
-  const prefix = `${NAME}-v0.0.0/`;
+  assert.equal(fs.readFileSync(path.join(result.dist, SUMS_FILE), 'utf8').replace(/^[0-9a-f]{64} {2}/, ''), `${NAME}-v${version}.zip\n`);
+  const prefix = `${NAME}-v${version}/`;
   const entries = readZip(fs.readFileSync(path.join(result.dist, result.zip)));
   assert.ok(entries.every((entry) => entry.name.startsWith(prefix)));
   const files = entries.filter((entry) => !entry.directory).map((entry) => entry.name.slice(prefix.length));
@@ -267,16 +268,16 @@ test('check names top-level items that are neither payload nor repo-only, and pl
   for (const item of ['.claude-plugin', '.codex-plugin', 'web-card.json']) assert.ok(!names.some((name) => name.split('/')[1] === item), item);
 });
 
-test('the package is private before 0.2.0 and a public scoped package from then on, and a tag drops the banner', (t) => {
-  assert.ok(compareVersions('0.10.0', '0.9.9') > 0 && compareVersions('0.2.0', '0.2.0') === 0 && compareVersions('0.1.9', '0.2.0') < 0);
-  assert.deepEqual(packageProblems({ name: NAME, private: true }, '0.1.0'), []);
-  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.1.0').join(''), /must name the private package design-pro-max before 0\.2\.0/);
-  assert.match(packageProblems({ name: NAME, private: true }, '0.2.0').join(''), /must name a public package @<scope>\/design-pro-max from 0\.2\.0 on/);
-  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.2.0').join(''), /public package/);
-  assert.deepEqual(packageProblems({ name: `@example/${NAME}` }, '0.2.0'), []);
+test('the package is private before 0.1.0 and a public scoped package from then on, and a tag drops the banner', (t) => {
+  assert.ok(compareVersions('0.10.0', '0.9.9') > 0 && compareVersions('0.1.0', '0.1.0') === 0 && compareVersions('0.0.9', '0.1.0') < 0);
+  assert.deepEqual(packageProblems({ name: NAME, private: true }, '0.0.9'), []);
+  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.0.9').join(''), /must name the private package design-pro-max before 0\.1\.0/);
+  assert.match(packageProblems({ name: NAME, private: true }, '0.1.0').join(''), /must name a public package @<scope>\/design-pro-max from 0\.1\.0 on/);
+  assert.match(packageProblems({ name: `@example/${NAME}`, private: true }, '0.1.0').join(''), /public package/);
+  assert.deepEqual(packageProblems({ name: `@example/${NAME}` }, '0.1.0'), []);
   const changelog = '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n- First release.\n';
   const root = releaseFixture(t, (base) => {
-    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
     write(base, 'CHANGELOG.md', changelog);
     write(base, 'README.md', `# design-pro-max\n\n> ${PRE_RELEASE_BANNER} Nothing has been released yet.\n`);
   });
@@ -291,7 +292,7 @@ test('pack refuses an archive with a symlink', { skip: !canCreate('symlink') && 
 
 test('pack needs a clean tree, a current skills.json and HEAD at the tag', (t) => {
   const root = releaseFixture(t, (base) => {
-    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
     write(base, 'CHANGELOG.md', '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n');
   });
   const git = gitIn(root, t);
@@ -310,7 +311,7 @@ test('pack needs a clean tree, a current skills.json and HEAD at the tag', (t) =
 test('check ties a tag to package.json and a dated CHANGELOG entry', (t) => {
   const changelog = '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n\n## [0.0.1] - 2026-10-01\n\n- Old.\n';
   const root = releaseFixture(t, (base) => {
-    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
     write(base, 'CHANGELOG.md', changelog);
   });
   assert.deepEqual(checkRelease(root, 'v0.1.0').problems, []);
@@ -415,7 +416,7 @@ test('push-tag tags only origin/main with ready inputs, pushes the tag by name a
     t.after(() => (before === undefined ? delete process.env[key] : (process.env[key] = before)));
   }
   const root = releaseFixture(t, (base) => {
-    write(base, 'package.json', `${JSON.stringify({ name: NAME, version: '0.1.0', private: true }, null, 2)}\n`);
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
     write(base, 'CHANGELOG.md', '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-16\n\n- First release.\n');
   });
   const remote = tempDir('design-pro-max-remote-');

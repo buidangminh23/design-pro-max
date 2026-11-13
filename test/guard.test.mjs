@@ -213,6 +213,9 @@ test('privateTerms keeps real account and host names and skips generic and proje
   const vocabulary = projectVocabulary([{ id: 'swift-concurrency' }, { id: 'app-store-connect/asc-cli-usage' }], ['apple']);
   assert.deepEqual(privateTerms({ env: {}, username: 'swift', hostname: 'design.local', vocabulary }), []);
   assert.deepEqual(privateTerms({ env: {}, username: 'connect', hostname: 'jdoe-mbp.lan', vocabulary }), ['jdoe-mbp']);
+  const scoped = projectVocabulary([], ['apple'], '@jdoe-dev/design-pro-max');
+  assert.deepEqual(privateTerms({ env: {}, username: 'jdoe-dev', hostname: 'atelier.lan', vocabulary: scoped }), ['atelier']);
+  assert.deepEqual(privateTerms({ env: {}, username: 'jdoe-dev', hostname: 'atelier.lan', vocabulary: projectVocabulary([], ['apple'], 'jdoe-dev/x') }), ['jdoe-dev', 'atelier']);
   assert.deepEqual(riskyCounts('plain text'), {});
 });
 

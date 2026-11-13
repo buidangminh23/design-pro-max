@@ -10,11 +10,13 @@ import { isBundledMedia } from './bundles.mjs';
 /**
  * Reviewed media files by repository path, with the SHA-256 of the reviewed bytes. skills/apple/assets/apple.svg is
  * the Apple logo that the owner chose as the apple skill's icon; README.md and skills/apple/NOTICE.md explain it.
+ * designs/brand/logo.png is the project logo the owner supplied for the README header.
  * The designs/renders/devices files are the owner's device render: two frame images, a preview and the renders;
  * designs/renders/devices/NOTICE.md explains them, and none of them ships in a release.
  */
 export const REVIEWED_MEDIA = new Map([
   ['skills/apple/assets/apple.svg', '70941d8953cda19267f7be707c8b39c2293d76de8d2bcd484211bb925983ed0b'],
+  ['designs/brand/logo.png', '855978c69a66300237b9b419f5a7870b0c5b5f87bc45d7ac0588a54906947ab4'],
   ['designs/renders/devices/assets/display.png', '6b7b3627c31a5f0496dad98659f374a4497db3b8298f01168deff27fbf243877'],
   ['designs/renders/devices/assets/macbook.png', '7aa30328703416f0a8054b105bb30c84ea176e9d4877b6a7822486f36356eb9e'],
   ['designs/renders/devices/preview.jpg', 'f065ef566af1363c12c730e799fa1712acdb3072c03d3a0f99a5bdc4ce0d4544'],

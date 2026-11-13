@@ -1,20 +1,23 @@
 <div align="center">
 
-<img src="skills/apple/assets/apple.svg" alt="Apple logo, the icon of the apple skill" width="112" height="112">
-
-# design-pro-max
+<h1><img src="designs/brand/logo.png" alt="design-pro-max" width="360"></h1>
 
 ### Design Skills for AI Coding Agents
 
 *One skill per design. A router for Apple-platform work with its own HIG and scroll-scene guides, plus spacing rhythm and an exact-icon catalog, bundled.*
 
 <p align="center">
+  <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://img.shields.io/npm/v/@minhspark/design-pro-max?logo=npm&amp;color=CB3837" height="20" alt="npm" /></a>
+  <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/npm-downloads.svg" height="20" alt="npm downloads" /></a>
+  <a href="https://www.npmcharts.com/compare/%40minhspark%2Fdesign-pro-max?minimal=true"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/npm-downloads-month.svg" height="20" alt="npm downloads / 30d" /></a>
+  <br />
+  <a href="https://github.com/buidangminh23/design-pro-max/network/dependents"><img src="https://img.shields.io/librariesio/dependent-repos/npm/@minhspark/design-pro-max?label=Used%20by&amp;logo=github&amp;color=0969da" height="20" alt="Used by repositories (Libraries.io)" /></a>
   <a href="https://skills.sh/buidangminh23/design-pro-max"><img src="https://skills.sh/b/buidangminh23/design-pro-max?label=skills.sh" height="20" alt="skills.sh installs" /></a>
   <a href="https://github.com/buidangminh23/design-pro-max/graphs/traffic"><img src="https://raw.githubusercontent.com/buidangminh23/design-pro-max/badges/github-views.svg" height="20" alt="GitHub views / 14d" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/buidangminh23/design-pro-max" height="20" alt="license" /></a>
 </p>
 
-[CI](https://github.com/buidangminh23/design-pro-max/actions/workflows/ci.yml) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+[Latest release](https://github.com/buidangminh23/design-pro-max/releases/latest) · [npm package](https://www.npmjs.com/package/@minhspark/design-pro-max) · [CI](https://github.com/buidangminh23/design-pro-max/actions/workflows/ci.yml) · [Changelog](CHANGELOG.md)
 
 </div>
 
@@ -25,8 +28,6 @@ Three skills, one per design:
 - **icons-pro-max**: an icon catalog with the exact brand logos, UI icons and render rules, bundled from [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max).
 
 The two bundled skills are copied byte for byte from the latest release of their own repositories and kept in step by a daily job; see [Bundled skills](#bundled-skills).
-
-> **Status: pre-release.** Nothing has been released yet; `main` already installs as described below.
 
 ## Install
 
@@ -42,6 +43,8 @@ The bundled skills install the same way, one `--skill` per skill:
 npx skills add buidangminh23/design-pro-max --skill design-spacing-rhythm -g
 npx skills add buidangminh23/design-pro-max --skill icons-pro-max -g
 ```
+
+From v0.1 the same files are on npm as `@minhspark/design-pro-max`. `npm install @minhspark/design-pro-max` puts them under `node_modules/@minhspark/design-pro-max/skills/`; copy the skill folders you want, with `apple`'s hidden `.vendor/` folder, into a skill root.
 
 From v0.1 each release also ships `design-pro-max-vX.Y.Z.zip` with `SHA256SUMS.txt`. The ZIP holds `skills/apple` with its hidden `.vendor/` folder, which must be copied along with the rest, and the bundled skills next to it.
 
@@ -238,7 +241,7 @@ Node 22 or later; no dependencies.
 | `node scripts/bundle-sync.mjs check` | Offline: each bundled folder holds exactly the files `vendor/bundles.json` records, with their sizes, hashes and executable bits, plus its `LICENSE` |
 | `node scripts/bundle-sync.mjs update [--only <name>] [--report <file>]` | Network. Reads each repository's latest release from `/releases/latest`, moves the bundles whose tag changed and syncs them; the report lists what moved |
 | `node scripts/check-history.mjs` | Fails when any commit reachable from HEAD adds an image, font, media file or archive, recognised by extension or by its first bytes, other than a reviewed file with its reviewed bytes (`REVIEWED_MEDIA` in `scripts/lib/media.mjs`; today only `skills/apple/assets/apple.svg`) or a bundled image that `vendor/bundles.json` at the same commit records with those bytes, or any file in a vendored part's `assets/` or `agents/` folder. It needs the full history, so it fails in a shallow clone |
-| `node scripts/release.mjs check [vX.Y.Z]` | Validates the release inputs: the payload exists, `skills.json` is current, `.gitattributes` marks exactly the repo-only paths `export-ignore`, every top-level item is either payload or repo-only, and `package.json` names the private package `design-pro-max` before 0.2.0 and a public `@<scope>/design-pro-max` package from 0.2.0 on. With a tag, the tag must match the `package.json` version, `[Unreleased]` must be empty, the newest CHANGELOG entry must be that version, dated, with notes, and the README must have dropped the pre-release banner |
+| `node scripts/release.mjs check [vX.Y.Z]` | Validates the release inputs: the payload exists, `skills.json` is current, `.gitattributes` marks exactly the repo-only paths `export-ignore`, every top-level item is either payload or repo-only, and `package.json` names the private package `design-pro-max` before 0.1.0 and a public `@<scope>/design-pro-max` package from 0.1.0 on. With a tag, the tag must match the `package.json` version, `[Unreleased]` must be empty, the newest CHANGELOG entry must be that version, dated, with notes, and the README must have dropped the pre-release banner |
 | `node scripts/release.mjs notes vX.Y.Z` | Prints the CHANGELOG notes of that version |
 | `node scripts/release.mjs pack [vX.Y.Z]` | Builds `dist/design-pro-max-vX.Y.Z.zip` from a clean HEAD (the tag's commit when a tag is given) with git archive under `TZ=UTC`, so the bytes do not depend on the packer's time zone, plus `dist/SHA256SUMS.txt` naming it, then verifies both. The ZIP holds one `design-pro-max-vX.Y.Z/` folder with `skills/` (the hidden `.vendor/` folders included), `skills.json`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `CHANGELOG.md`; everything else is `export-ignore` |
 | `node scripts/release.mjs verify <dir>` | Checks release assets, such as a downloaded release, against the installers' contract: `SHA256SUMS.txt` names exactly one ZIP, without "plugin" in its name, and its hash matches; the ZIP holds one `SKILL.md` outside dot-folders per skill in `skills.json`, every vendored file with the hash in its `UPSTREAM.json`, one MIT `LICENSE` per part and exactly the parts of `vendor/sources.json`, no entry name over 150 characters, and no symlinks, `__pycache__` folders, compiled Python, `metadata.json` files or media other than reviewed files. It also compares the ZIP with the tracked files of the tag `vX.Y.Z` (or of HEAD before the tag exists): every tracked payload file with its exact bytes and executable bit, and nothing else, so a nested `.gitattributes`, `.git/info/attributes`, `export-subst` or a line-ending filter cannot drop or rewrite a file |
