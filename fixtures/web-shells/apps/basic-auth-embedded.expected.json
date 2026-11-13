@@ -1,0 +1,7 @@
+{
+  "description": "The two Basic Auth challenges planted in basic-auth-embedded.mjs: scripts/verify.mjs requires an error for each, matched by its where field, and no other error rule of probe-webkit.",
+  "defects": [
+    { "defect": "an iframe whose document answers 401 with a Basic challenge", "rule": "WS-AUTH-01", "checker": "probe-webkit", "match": "iframe /admin/" },
+    { "defect": "a fetch that answers 401 with a Basic challenge", "rule": "WS-AUTH-01", "checker": "probe-webkit", "match": "fetch /api/stats" }
+  ]
+}
