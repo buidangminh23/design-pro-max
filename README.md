@@ -57,6 +57,9 @@ skills/
       assets/lib/            scene progress, seek queue and scrub loader, with their CSS contract
       assets/reference/      three reference pages: JavaScript engine, CSS engine, scrub video
       scripts/               probe-scene.mjs (browser checks), encode-scrub.mjs (scrub encoder)
+    hig/                     own part: Apple's Human Interface Guidelines for native app interfaces
+      PART.md                how to read, build to and review against the guidelines
+      references/            own-words digest of every guideline page by section, with generated evidence
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -85,6 +88,7 @@ evidence/ledger.json         own-words claims with their label, source and sourc
 evidence/ip-hashes.json      salted hashes of the private identifiers, private terms and Apple text corpus
 designs/apple.json           the apple skill's design record: marks, never-ship list, phrase gates, newest released OS
 fixtures/                    pass and fail cases for every error rule, with pages; media is built at run time
+evals/                       routing and part evals, the harness that runs them on Claude Code and Codex, and RESULTS.md
 .github/workflows/           CI, release, the weekly vendor sync and the own-part verify run
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
 CONTRIBUTING.md              issues first, MIT-only sources, how a part is added
@@ -100,13 +104,16 @@ The same constraint shapes the rest of the tree: each skill's own `skills/<name>
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Own parts (1)
+### Own parts (2)
 
-Written for this project and released under its MIT licence. Each has a `PART.md` guide, error rules in `rules.json` that its checkers enforce, and a pass and a fail fixture for every error rule.
+Written for this project and released under its MIT licence. Each has a `PART.md` guide; a part with checkers has error rules in `rules.json` that they enforce, and a pass and a fail fixture for every error rule.
 
 | Part | Covers | Prerequisites |
 |---|---|---|
 | `launch-scroll` | Pinned scroll scenes and scroll-scrubbed video or frame sequences on web pages: when not to pin, the engine, geometry, gates for reduced motion, short viewports and blocked autoplay, scrub encoding and the start frame. 8 error rules and 9 warnings | Node 22 or later; ffmpeg and ffprobe for media checks and encoding; Playwright with Chromium in the user's project for browser checks |
+| `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
+
+Known limit, measured in `evals/RESULTS.md`: asked for a scroll-scrub film in AV1 or HEVC only, Codex reads the part's rule and still delivers those codecs alone, recommending H.264 only in its advice; Claude Code adds the H.264 source. Check the delivered `<source>` list with `skills/apple/shared/check-media.mjs` before shipping.
 
 The checkers print one JSON line per finding and a summary that states what they prove and what they do not. They exit 0 when every check passes, 1 on an error, 2 when an argument or a tool is missing, and 3 when a sandbox blocks the browser or ffmpeg. They load Playwright from the project passed with `--project`, never install anything, and never fetch third-party pages.
 
@@ -222,7 +229,7 @@ Node 22 or later; no dependencies.
 | `node scripts/release.mjs notes vX.Y.Z` | Prints the CHANGELOG notes of that version |
 | `node scripts/release.mjs pack [vX.Y.Z]` | Builds `dist/design-pro-max-vX.Y.Z.zip` from a clean HEAD (the tag's commit when a tag is given) with git archive under `TZ=UTC`, so the bytes do not depend on the packer's time zone, plus `dist/SHA256SUMS.txt` naming it, then verifies both. The ZIP holds one `design-pro-max-vX.Y.Z/` folder with `skills/` (the hidden `.vendor/` folders included), `skills.json`, `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `CHANGELOG.md`; everything else is `export-ignore` |
 | `node scripts/release.mjs verify <dir>` | Checks release assets, such as a downloaded release, against the installers' contract: `SHA256SUMS.txt` names exactly one ZIP, without "plugin" in its name, and its hash matches; the ZIP holds one `SKILL.md` outside dot-folders per skill in `skills.json`, every vendored file with the hash in its `UPSTREAM.json`, one MIT `LICENSE` per part and exactly the parts of `vendor/sources.json`, no entry name over 150 characters, and no symlinks, `__pycache__` folders, compiled Python, `metadata.json` files or media other than reviewed files. It also compares the ZIP with the tracked files of the tag `vX.Y.Z` (or of HEAD before the tag exists): every tracked payload file with its exact bytes and executable bit, and nothing else, so a nested `.gitattributes`, `.git/info/attributes`, `export-subst` or a line-ending filter cannot drop or rewrite a file |
-| `node scripts/release.mjs stats` | Prints the card stats computed from the committed files: guides (own and vendored parts), active guides, error rules with at least one non-inferred ledger entry, must-fail fixtures, eval cases in `evals/<suite>/cases.json` and dated ledger claims. `check` fails when `web-card.json` shows other values |
+| `node scripts/release.mjs stats` | Prints the card stats computed from the committed files: guides (own and vendored parts), active guides, error rules with at least one non-inferred ledger entry, must-fail fixtures, eval cases in `evals/<suite>/cases.json` and `evals/<design>/<part>/evals.json` and dated ledger claims. `check` fails when `web-card.json` shows other values |
 | `node scripts/release.mjs bump X.Y.Z` | Writes the version into `package.json` and the plugin manifests that exist, and the computed stats into `web-card.json` |
 | `node scripts/release.mjs push-tag vX.Y.Z` | Creates the annotated tag on HEAD once HEAD is `origin/main`, the tree is clean and `check vX.Y.Z` passes; pushes the tag by name, retries up to three times, and succeeds only when `git ls-remote` lists the tag at HEAD |
 | `node scripts/badges.mjs <dir>` | Network. Writes the README badges into `<dir>`: `github-views.svg` from the GitHub traffic API, which needs `ANALYTICS_TOKEN` with Administration read on the repository, and the npm download badges once `package.json` names a public package. `BADGE_SOURCES` limits the sources, for example `views`. A source that has no data yet is skipped and leaves the published badge in place; a rejected request fails the run |
@@ -258,7 +265,7 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 
 <!-- gen:trademarks -->
 
-Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari, Siri, Swift, SwiftUI, Xcode, TestFlight, App Store, AirPlay, Apple Pay, Apple Pencil, Apple TV, Apple Vision Pro, CarPlay, CareKit, Digital Crown, Dynamic Island, Face ID, FaceTime, HealthKit, HomeKit, iCloud, iMessage, Live Photos, Mac Catalyst, ResearchKit, SharePlay, Spotlight, Touch ID, SF Symbols, Apple Wallet, Live Activities, Handoff, Multi-Touch, Finder, Mission Control and Apple Music are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
 
 <!-- /gen:trademarks -->
 

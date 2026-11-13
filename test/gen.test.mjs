@@ -82,8 +82,9 @@ test('trademarkLine credits the marks, the logo and Cisco when iOS is named', ()
 
 test('README.md and NOTICE.md carry the generated trademark line', () => {
   const { trademarks, marks } = generate(ROOT);
-  assert.deepEqual(marks, ['Apple', 'iOS', 'macOS', 'Safari', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store']);
-  assert.ok(trademarks.startsWith('Apple, the Apple logo, iOS, macOS, Safari, Swift, SwiftUI, Xcode, TestFlight and App Store are trademarks of Apple Inc.'));
+  assert.deepEqual(marks, ['Apple', 'iOS', 'iPadOS', 'macOS', 'watchOS', 'tvOS', 'visionOS', 'iPhone', 'iPad', 'Mac', 'Apple Watch', 'Safari', 'Siri', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store', 'AirPlay', 'Apple Pay', 'Apple Pencil', 'Apple TV', 'Apple Vision Pro', 'CarPlay', 'CareKit', 'Digital Crown', 'Dynamic Island', 'Face ID', 'FaceTime', 'HealthKit', 'HomeKit', 'iCloud', 'iMessage', 'Live Photos', 'Mac Catalyst', 'ResearchKit', 'SharePlay', 'Spotlight', 'Touch ID', 'SF Symbols', 'Apple Wallet', 'Live Activities', 'Handoff', 'Multi-Touch', 'Finder', 'Mission Control', 'Apple Music']);
+  assert.ok(trademarks.startsWith('Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari,'));
+  assert.ok(trademarks.includes('Finder, Mission Control and Apple Music are trademarks of Apple Inc.'));
   assert.ok(trademarks.endsWith(CISCO_SENTENCE));
   assert.ok(read(ROOT, README_FILE).includes(trademarks));
   assert.ok(read(ROOT, NOTICE_FILE).includes(trademarks));
@@ -118,7 +119,7 @@ test('gen --check names stale files and gen rewrites them', (t) => {
   const pinned = fs.readFileSync(readme, 'utf8').match(/`(?!0{12}`)[0-9a-f]{12}`/)?.[0];
   assert.ok(pinned, 'README.md pins at least one source commit');
   fs.writeFileSync(readme, fs.readFileSync(readme, 'utf8').replace(pinned, '`000000000000`'));
-  fs.writeFileSync(path.join(root, 'CHANGELOG.md'), `${fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8')}\nNow on iPhone too.\n`);
+  fs.writeFileSync(path.join(root, 'CHANGELOG.md'), `${fs.readFileSync(path.join(root, 'CHANGELOG.md'), 'utf8')}\nNow with AirDrop too.\n`);
   fs.rmSync(path.join(root, SKILLS_FILE));
   const check = runScript(GEN, ['--check', '--root', root]);
   assert.equal(check.status, 1);
@@ -129,7 +130,7 @@ test('gen --check names stale files and gen rewrites them', (t) => {
   assert.equal(write.status, 0, write.stderr);
   assert.match(write.stdout, /Wrote README\.md\./);
   assert.ok(read(root, README_FILE).includes(pinned));
-  assert.match(read(root, NOTICE_FILE), /iOS, macOS, iPhone, Safari, Swift/);
+  assert.match(read(root, NOTICE_FILE), /Handoff, AirDrop, Multi-Touch/);
   const again = runScript(GEN, ['--check', '--root', root]);
   assert.equal(again.status, 0, again.stderr);
 });

@@ -4,18 +4,20 @@ Pinned web scenes driven by scroll: a sticky stage that changes while the reader
 
 ## 1. Read the scene before building
 
-Ask, and write the answers down as a beat table (progress window, what changes, which element):
+Ask, and write the answers down as a beat table (progress window, what changes, which element). Show the table to the user in your reply, before or with the build:
 
-1. What changes on screen while the reader scrolls through this section? If nothing changes, or the change is one reveal that plays once, **do not pin**: use a normal section with a one-time reveal (see `../shared/motion-classes.md`) and stop here.
+1. What changes on screen while the reader scrolls through this section? Read it from the section's actual content. If nothing changes, or the change is one reveal that plays once, **do not pin, even when the user asked for a pin**: tell them why before writing anything, offer a normal section with at most a one-time reveal that respects reduced motion (see `../shared/motion-classes.md`), and build that instead. Build the pin only if they still want it after hearing this. Never invent scroll beats (quotes cycling, progress bars, counters) to give a still section something to pin for.
 2. Is the change continuous and tied to position (a device turning, a film advancing, a diagram assembling)? Then pin.
 3. How tall is the stage's content, and how tall is the page's sticky chrome (a fixed nav)? Both decide the short-viewport gate [LS-GATE-02]. Take them from this page, never from another site's measurements.
 4. How much travel does the story need? Aim for 70-300vh [LS-WARN-TRAVEL]; more asks the reader to scroll through too little change.
-5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`).
+5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`). The sources always include H.264, listed first, even when the user asks for AV1 or HEVC only: write the H.264 source into the markup and the commands you deliver, not only into your advice, and say why [LS-VID-02]. The start image is frame 0 of the film, in the markup with its `src` set from the start (never set by script after the video plays): the static layout shows the still, and once the scene pins the start image covers the film area until the video has presented a frame [LS-VID-05].
+6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). If a sequence stays, decode a bounded window of frames, never the whole set.
+7. Fixing an existing scene? Check its code against section 6 as well as the reported symptom, and replace every item it ships from there, such as `preload="auto"`.
 
 ## 2. Choose the engine
 
 - **CSS scroll timeline** (`assets/reference/scene-css.html`): no script; pins only inside `@supports (animation-timeline: view())` with motion allowed, over a finished static layout [LS-WARN-SUPPORTS]. Firefox stable gets the static page (TQ-14). Best when the stage has a fixed height and no film.
-- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`): the default when gates need script, the stage height depends on content, or a film scrubs. It writes one clamped value to `--scene-progress` and children read it.
+- **One JS progress value** (`assets/lib/scene-progress.js`, `assets/reference/scene-js.html`; with a film, `assets/reference/scrub-video.html`): the default when gates need script, the stage height depends on content, or a film scrubs. It writes one clamped value to `--scene-progress` and children read it.
 - **GSAP ScrollTrigger**: only for labelled timelines with many overlapping tweens or callbacks. It is free for sites and apps but not open source (TQ-1), and GSAP with ScrollTrigger adds about 44.9 KB gzipped (TQ-23). For its API, use the `gsap-scrolltrigger` skill if it is installed.
 
 Whatever the engine, the stage animates `transform` and `opacity` only, and the static layout is the end state.
@@ -23,6 +25,8 @@ Whatever the engine, the stage animates `transform` and `opacity` only, and the 
 ## 3. Hard rules
 
 Each has a check that was seen failing on a broken fixture; `scripts/probe-scene.mjs` or `../shared/check-media.mjs` reports it.
+
+These rules hold even when the request asks for the opposite (a single codec, no fallback, no gate): they protect the readers whose browsers or settings would otherwise get a blank or broken scene, which the user cannot waive for them. Deliver the compliant version in the code and commands themselves, not only in your advice, and explain in one or two sentences what it adds and why.
 
 - [LS-GATE-01] Under reduced motion, or when a muted `play()` probe is rejected (blocked autoplay, iOS Low Power Mode), the scene stays in normal flow at its end state and requests no film.
 - [LS-GATE-02] The scene does not pin when the viewport is shorter than the stage's content height plus the sticky offset.
@@ -52,8 +56,8 @@ Read the reference the task needs, in full:
 
 1. List every path you will write before writing any, and stop if one exists that you did not create. The library files start with a `launch-scroll ... (design-pro-max)` header; an older header means an earlier release, so ask once whether to upgrade them.
 2. Copy `assets/lib/scene.css`, `assets/lib/scene-progress.js`, and for a film `assets/lib/seek-queue.js` and `assets/lib/scrub-loader.js` into the project. They have no dependencies.
-3. Mark up the scene: `[data-scene]` (the tall box), `[data-scene-sticky]` (its child), `[data-scene-stage]` (the content whose height the gate measures). Set `--scene-travel` and, under a fixed nav, `--scene-sticky-top`. For a film add `[data-scene-film]` holding the still, the start image and `<video data-scrub>` with `<source data-src>` children, H.264 first.
-4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output).
+3. Mark up the scene: `[data-scene]` (the tall box), `[data-scene-sticky]` (its child), `[data-scene-stage]` (the content whose height the gate measures). Set `--scene-travel` and, under a fixed nav, `--scene-sticky-top`. For a film add `[data-scene-film]` holding the still, the start image and `<video data-scrub>` with `<source data-src>` children, H.264 first. Ship every piece of the stage's content visible in the markup: no `hidden`, `display: none` or zero opacity that only script removes; script may only add the pinned state.
+4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output). The start image is always frame 0 of that encode: when the master film is not in the project, point the markup at the encoder's `startframe.jpg` and say it still has to be generated; never draw or substitute an illustration.
 5. Mount: `createScene(element)` for a plain scene, `mountScrubScene(element)` for a film.
 6. Verify (section 7).
 
@@ -61,7 +65,7 @@ Read the reference the task needs, in full:
 
 - A pinned scene without a finished static layout, or content that is hidden until script runs.
 - `currentTime` written from a raw scroll handler, or `fastSeek()`.
-- An HEVC, VP9 or AV1 film without an H.264 source, or a start image that is a separately composed still.
+- An HEVC, VP9 or AV1 film without an H.264 source, even when the user asks for AV1 or HEVC only: keep the H.264 source, say why, and never offer to drop it. Or a start image that is a separately composed still.
 - `preload="auto"` as the loading plan (SC-15): load the film in a scroll-ahead window instead.
 - Smoothing as a fixed fraction per frame (AM-10).
 - Thresholds, type sizes, breakpoints, class names or media copied from another site; measured values elsewhere are context, never defaults.
@@ -69,7 +73,7 @@ Read the reference the task needs, in full:
 
 ## 7. Verify
 
-Run the probe against the page, from the project folder that holds Playwright (it never installs anything; exit 2 means a missing tool, with the install command):
+Run the probe against the page, from the project folder that holds Playwright. This folder has no `package.json` and needs no install: the scripts use Node's standard library and load Playwright from `--project` (exit 2 means a missing tool, with the install command):
 
 ```
 node <absolute path to this folder>/scripts/probe-scene.mjs --url http://localhost:5173/ --project .

@@ -1,0 +1,4 @@
+body { margin: 0; font-family: system-ui, sans-serif; }
+section { padding: 96px 24px; }
+.quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+blockquote { margin: 0; padding: 24px; border-radius: 16px; background: #f4f4f6; }
