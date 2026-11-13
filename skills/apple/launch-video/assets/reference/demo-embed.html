@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- launch-video reference: lazy demo clips below the fold (design-pro-max).
+     Media comes from scripts/encode.mjs: loop.mp4 and loop.webm with loop.start.jpg (frame 0), and the one-shot
+     clip.mp4 with clip.start.jpg. Nothing but the lazy start images loads until a clip comes near; a clip plays while
+     at least half visible; the loop has a labelled pause button; reduced motion and Save-Data show the start images
+     until the reader presses Play. Sources are listed best codec first and H.264 last. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo clips</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #1d232b; background: #f7f8fa; }
+  .intro { min-height: 200vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  .gap { height: 60vh; }
+  .outro { min-height: 100vh; }
+  [data-demo] { width: min(100% - 48px, 400px); margin: 0 auto; display: grid; gap: 12px; }
+  [data-demo-frame] { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #e3e7ec; }
+  [data-demo-frame] > img, [data-demo-frame] > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  [data-demo-frame] > video { opacity: 0; }
+  [data-demo][data-demo-ready] [data-demo-frame] > video { opacity: 1; }
+  [data-demo-toggle] { justify-self: start; min-height: 44px; padding: 0 16px; border: 1px solid #c4c9d1; border-radius: 22px; background: #fff; color: inherit; font: inherit; }
+  [data-demo-toggle]:focus-visible { outline: 2px solid #1f5fd6; outline-offset: 3px; }
+  figcaption { color: #5d6672; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. Each clip loads when it comes near and plays while you can see it.</p></section>
+
+<figure data-demo>
+  <div data-demo-frame>
+    <img data-demo-start src="loop.start.jpg" width="640" height="360" alt="" loading="lazy" decoding="async">
+    <video muted playsinline loop preload="none" aria-hidden="true" width="640" height="360">
+      <source data-src="loop.webm" type='video/webm; codecs="vp09.00.30.08"'>
+      <source data-src="loop.mp4" type='video/mp4; codecs="avc1.64001f"'>
+    </video>
+  </div>
+  <button type="button" data-demo-toggle>Pause</button>
+  <figcaption>Describe what the looping clip shows, for every reader.</figcaption>
+</figure>
+
+<div class="gap"></div>
+
+<figure data-demo>
+  <div data-demo-frame>
+    <img data-demo-start src="clip.start.jpg" width="640" height="360" alt="" loading="lazy" decoding="async">
+    <video muted playsinline preload="none" aria-hidden="true" width="640" height="360">
+      <source data-src="clip.mp4" type='video/mp4; codecs="avc1.64001f"'>
+    </video>
+  </div>
+  <figcaption>A short one-shot clip: it plays once and needs no pause button.</figcaption>
+</figure>
+
+<section class="outro"></section>
+
+<script type="module">
+  import { mountDemos } from '../lib/demo-embed.js';
+  mountDemos(document);
+</script>
+</body>
+</html>
