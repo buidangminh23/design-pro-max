@@ -87,7 +87,7 @@ export function materialize(name = null) {
 }
 
 export function removeTree(root) {
-  fs.rmSync(root, { recursive: true, force: true });
+  fs.rmSync(root, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 }
 
 export function canCreate(kind) {
@@ -151,7 +151,7 @@ export function runScript(script, args = [], { env = process.env, timeout = 60_0
  */
 export function isolatedGitEnv(home, extra = {}) {
   const config = path.join(home, 'gitconfig');
-  if (!fs.existsSync(config)) fs.writeFileSync(config, '');
+  if (!fs.existsSync(config)) fs.writeFileSync(config, '[maintenance]\n\tauto = false\n[gc]\n\tauto = 0\n');
   const env = { ...process.env, GIT_CONFIG_GLOBAL: config, GIT_CONFIG_NOSYSTEM: '1', GIT_TERMINAL_PROMPT: '0', ...extra };
   for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_CONFIG_PARAMETERS']) delete env[key];
   return env;

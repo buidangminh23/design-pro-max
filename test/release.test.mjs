@@ -110,6 +110,21 @@ test('the repository is ready to pack', () => {
   assert.deepEqual(checkRelease(ROOT).problems, []);
 });
 
+test('fixture commits keep automatic maintenance from racing with teardown', (t) => {
+  const home = tempDir('design-pro-max-home-');
+  const root = materialize();
+  t.after(() => removeTree(root));
+  t.after(() => removeTree(home));
+  const env = isolatedGitEnv(home);
+  const git = (...args) => execFileSync('git', ['-C', root, ...args], { env, encoding: 'utf8' }).trim();
+  assert.equal(git('config', '--bool', 'maintenance.auto'), 'false');
+  assert.equal(git('config', '--int', 'gc.auto'), '0');
+  commitTree(root);
+  assert.match(git('rev-parse', 'HEAD'), /^[a-f0-9]{40}$/);
+  removeTree(root);
+  assert.equal(fs.existsSync(root), false);
+});
+
 test('pack builds one ZIP with the payload, every hidden part and a checksum file', (t) => {
   const root = copyCheckout({ commit: true });
   t.after(() => removeTree(root));
