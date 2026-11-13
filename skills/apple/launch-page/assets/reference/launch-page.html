@@ -1,7 +1,8 @@
 <!doctype html>
 <!-- launch-page reference: a launch page on the restrained token set (design-pro-max). Every visual is drawn in CSS.
      Content is visible without script and under reduced motion; reveals run once; the gallery and the marquee move
-     on their own only with motion allowed and always carry a labelled pause control. Copy is placeholder text. -->
+     on their own only under html[data-motion="ok"], which gate.js sets, and carry a labelled pause control whenever
+     they move. Every text pair holds in the light and the dark scheme. Copy is placeholder text. -->
 <html lang="en" data-launch-mode="restrained">
 <head>
 <meta charset="utf-8">
@@ -108,7 +109,7 @@
 
   .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--tile-gap); }
   .tile { display: grid; align-content: start; gap: var(--stack); padding: var(--tile-inset); border-radius: var(--radius-tile); background: var(--color-bg); }
-  .tile--feature { background: linear-gradient(160deg, var(--color-accent-fill), var(--color-ink)); color: var(--color-on-accent); }
+  .tile--feature { background: linear-gradient(160deg, var(--color-accent-fill), #15171a); color: var(--color-on-accent); }
   .tile--feature .muted { color: var(--color-on-accent); }
   .tile--feature .button--quiet { color: var(--color-on-accent); }
   .tile-art { aspect-ratio: 4 / 3; border-radius: var(--radius-card); background: var(--color-surface); position: relative; overflow: hidden; }
@@ -124,20 +125,19 @@
   .dot::before { content: ""; position: absolute; inset: 18px 8px; border-radius: var(--radius-pill); background: var(--color-line); }
   .dot::after { content: ""; position: absolute; inset: 18px 8px; border-radius: var(--radius-pill); background: var(--color-accent); transform-origin: left; transform: scaleX(0); }
   .dot[aria-current="true"]::after { transform: scaleX(1); }
-  html[data-motion="ok"] [data-gallery][data-playing="true"] .dot[aria-current="true"]::after { animation: dot-fill var(--slide-duration) linear both; }
+  html[data-motion="ok"] [data-gallery] .dot[aria-current="true"]::after { animation: dot-fill var(--slide-duration) linear both; animation-play-state: paused; }
+  html[data-motion="ok"] [data-gallery][data-running="true"] .dot[aria-current="true"]::after { animation-play-state: running; }
   @keyframes dot-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
   .marquee { overflow: hidden; }
-  .marquee-track { display: flex; gap: var(--space-6); width: max-content; list-style: none; padding: 0; animation: marquee var(--duration-marquee) linear infinite; }
+  .marquee-track { display: flex; flex-wrap: wrap; gap: var(--space-6); list-style: none; padding: 0; }
+  .marquee-track [data-marquee-dup], .marquee [data-marquee-toggle] { display: none; }
+  html[data-motion="ok"] .marquee-track { flex-wrap: nowrap; width: max-content; animation: marquee var(--duration-marquee) linear infinite; }
+  html[data-motion="ok"] .marquee-track [data-marquee-dup] { display: block; }
+  html[data-motion="ok"] .marquee [data-marquee-toggle] { display: inline-flex; }
   .marquee[data-paused] .marquee-track { animation-play-state: paused; }
   .marquee-track li { color: var(--color-muted); white-space: nowrap; }
   @keyframes marquee { to { translate: -50% 0; } }
-  @media (prefers-reduced-motion: reduce) {
-    .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
-    .marquee-track [data-marquee-dup] { display: none; }
-  }
-  html.reduced-motion .marquee-track { animation: none; flex-wrap: wrap; width: auto; }
-  html.reduced-motion .marquee-track [data-marquee-dup] { display: none; }
 
   .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--tile-gap); }
   .plan { display: grid; gap: var(--stack); padding: var(--tile-inset); border: 1px solid var(--color-line); border-radius: var(--radius-tile); align-content: start; }
