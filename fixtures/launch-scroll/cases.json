@@ -158,6 +158,16 @@
       "server": "range",
       "media": { "sequence": "sequence" },
       "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "warn-seq-image-array",
+      "rule": "LS-WARN-SEQ",
+      "expect": "warn",
+      "checker": "probe-scene",
+      "page": "pages/warn-seq-image-array.html",
+      "server": "range",
+      "media": { "sequence": "sequence" },
+      "args": ["--viewport", "1280x800"]
     }
   ]
 }

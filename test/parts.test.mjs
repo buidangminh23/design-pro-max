@@ -99,7 +99,7 @@ test('every fixture case names an existing page, a known checker and known media
       assert.ok(['probe-scene', 'check-media', 'check-embed', 'render-frames', 'check-page', 'lint-css'].includes(entry.checker), entry.id);
       if (entry.poster) assert.ok(recipes.includes(entry.poster), `${entry.id}: ${entry.poster}`);
       if (entry.expected) assert.ok(fs.existsSync(path.join(ROOT, 'fixtures', part, entry.expected)), `${entry.id}: ${entry.expected}`);
-      assert.ok(['pass', 'fail'].includes(entry.expect), entry.id);
+      assert.ok(['pass', 'fail', 'warn'].includes(entry.expect), entry.id);
       if (entry.page) {
         const page = entry.page.startsWith('reference/') ? path.join(ROOT, SKILL_DIR, part, 'assets', entry.page) : path.join(ROOT, 'fixtures', part, entry.page);
         assert.ok(fs.existsSync(page), `${entry.id}: ${entry.page}`);
@@ -121,6 +121,9 @@ test('the harness judges fail and pass runs red-first', async () => {
   assert.equal(evaluateRun({ rule: 'LS-VID-04', expect: 'pass' }, green).ok, true);
   assert.equal(evaluateRun({ rule: ['LS-VID-04', 'LS-VID-05'], expect: 'pass' }, green).ok, false, 'an unchecked rule is not green');
   assert.equal(evaluateRun({ rule: 'LS-VID-04', expect: 'fail' }, { code: 2, stdout: '' }).ok, false);
+  const warned = { code: 0, stdout: [line('LS-WARN-SEQ', 'warn'), summary].join('\n') };
+  assert.equal(evaluateRun({ rule: 'LS-WARN-SEQ', expect: 'warn' }, warned).ok, true);
+  assert.equal(evaluateRun({ rule: 'LS-WARN-SEQ', expect: 'warn' }, green).ok, false, 'a warn fixture needs a warning');
 });
 
 const box = (type, ...parts) => {

@@ -130,7 +130,7 @@
       "values": "1.95-5.3 times the bytes of GOP-6 video, by content; frames x width x height x 4 bytes decoded; a window of (2 x radius + 1) decoded frames",
       "evidence": ["SC-11", "SC-12", "TQ-N0"],
       "check": "launch-scroll/scripts/probe-scene.mjs",
-      "fixtures": { "pass": ["scrub-sequence"], "fail": [] },
+      "fixtures": { "pass": ["scrub-sequence"], "fail": ["warn-seq-image-array"] },
       "implementedBy": ["launch-scroll/assets/lib/frame-window.js", "launch-scroll/scripts/make-sequence.mjs", "launch-scroll/scripts/bench-scrub.mjs", "launch-scroll/assets/reference/scrub-sequence.html"]
     },
     {
