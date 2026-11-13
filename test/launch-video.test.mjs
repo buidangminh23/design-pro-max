@@ -181,3 +181,12 @@ test('the launch-video scripts run from a copy outside the repository and exit 2
   assert.equal(media.status, 2);
   assert.match(media.stderr, /need --profile demo/);
 });
+
+test('the alpha pair warning reads the source order, not only the codecs present', async () => {
+  const { checkDemoSet } = await shared('check-media.mjs');
+  const hevc = info({ file: 'clip.alpha.mov' }, { codec: 'hevc' });
+  const alphaWebm = info({ file: 'clip.alpha.webm', mp4: null }, { codec: 'vp9', alpha: true });
+  const run = await collect();
+  checkDemoSet([alphaWebm, hevc, info()], run.report);
+  assert.deepEqual(levels(run.report, 'LV-WARN-ALPHA'), ['warn'], 'HEVC listed after VP9 alpha');
+});

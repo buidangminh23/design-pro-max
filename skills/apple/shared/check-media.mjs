@@ -201,8 +201,10 @@ export function checkDemoSet(infos, report, { poster = null, slot = null, loop =
   const baseline = infos.find(isBaselineH264);
   const listed = infos.map((info) => `${name(info)} (${info.video?.codec ?? 'none'})`).join(', ');
   report.check('LV-ENC-01', Boolean(baseline), `${where}: H.264 source`, baseline ? name(baseline) : listed, 'an H.264 High, yuv420p, moov-first file in every set');
-  if (infos.some((info) => info.video?.codec === 'vp9' && info.video.alpha)) {
-    report.check('LV-WARN-ALPHA', infos.some((info) => info.video?.codec === 'hevc'), `${where}: alpha`, listed, 'VP9 with alpha turns opaque in WebKit: pair it with HEVC with alpha, listed before it', 'warn');
+  const vp9Alpha = infos.findIndex((info) => info.video?.codec === 'vp9' && info.video.alpha);
+  if (vp9Alpha >= 0) {
+    const hevc = infos.findIndex((info) => info.video?.codec === 'hevc');
+    report.check('LV-WARN-ALPHA', hevc >= 0 && hevc < vp9Alpha, `${where}: alpha`, listed, 'VP9 with alpha turns opaque in WebKit: pair it with HEVC with alpha, listed before it', 'warn');
   }
   if (slot) {
     const budget = slotBudget(slot);
