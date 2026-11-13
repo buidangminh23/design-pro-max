@@ -4,13 +4,15 @@ Pinned web scenes driven by scroll: a sticky stage that changes while the reader
 
 ## 1. Read the scene before building
 
-Ask, and write the answers down as a beat table (progress window, what changes, which element):
+Ask, and write the answers down as a beat table (progress window, what changes, which element). Show the table to the user in your reply, before or with the build:
 
-1. What changes on screen while the reader scrolls through this section? If nothing changes, or the change is one reveal that plays once, **do not pin**: use a normal section with a one-time reveal (see `../shared/motion-classes.md`) and stop here.
+1. What changes on screen while the reader scrolls through this section? Read it from the section's actual content. If nothing changes, or the change is one reveal that plays once, **do not pin, even when the user asked for a pin**: tell them why before writing anything, offer a normal section with at most a one-time reveal that respects reduced motion (see `../shared/motion-classes.md`), and build that instead. Build the pin only if they still want it after hearing this. Never invent scroll beats (quotes cycling, progress bars, counters) to give a still section something to pin for.
 2. Is the change continuous and tied to position (a device turning, a film advancing, a diagram assembling)? Then pin.
 3. How tall is the stage's content, and how tall is the page's sticky chrome (a fixed nav)? Both decide the short-viewport gate [LS-GATE-02]. Take them from this page, never from another site's measurements.
 4. How much travel does the story need? Aim for 70-300vh [LS-WARN-TRAVEL]; more asks the reader to scroll through too little change.
 5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`).
+6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). If a sequence stays, decode a bounded window of frames, never the whole set.
+7. Fixing an existing scene? Check its code against section 6 as well as the reported symptom, and replace every item it ships from there, such as `preload="auto"`.
 
 ## 2. Choose the engine
 
@@ -52,8 +54,8 @@ Read the reference the task needs, in full:
 
 1. List every path you will write before writing any, and stop if one exists that you did not create. The library files start with a `launch-scroll ... (design-pro-max)` header; an older header means an earlier release, so ask once whether to upgrade them.
 2. Copy `assets/lib/scene.css`, `assets/lib/scene-progress.js`, and for a film `assets/lib/seek-queue.js` and `assets/lib/scrub-loader.js` into the project. They have no dependencies.
-3. Mark up the scene: `[data-scene]` (the tall box), `[data-scene-sticky]` (its child), `[data-scene-stage]` (the content whose height the gate measures). Set `--scene-travel` and, under a fixed nav, `--scene-sticky-top`. For a film add `[data-scene-film]` holding the still, the start image and `<video data-scrub>` with `<source data-src>` children, H.264 first.
-4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output).
+3. Mark up the scene: `[data-scene]` (the tall box), `[data-scene-sticky]` (its child), `[data-scene-stage]` (the content whose height the gate measures). Set `--scene-travel` and, under a fixed nav, `--scene-sticky-top`. For a film add `[data-scene-film]` holding the still, the start image and `<video data-scrub>` with `<source data-src>` children, H.264 first. Ship every piece of the stage's content visible in the markup: no `hidden`, `display: none` or zero opacity that only script removes; script may only add the pinned state.
+4. For a film, encode it with `scripts/encode-scrub.mjs` (it writes the film, the start image, the still and a manifest, then checks its own output). The start image is always frame 0 of that encode: when the master film is not in the project, point the markup at the encoder's `startframe.jpg` and say it still has to be generated; never draw or substitute an illustration.
 5. Mount: `createScene(element)` for a plain scene, `mountScrubScene(element)` for a film.
 6. Verify (section 7).
 
@@ -61,7 +63,7 @@ Read the reference the task needs, in full:
 
 - A pinned scene without a finished static layout, or content that is hidden until script runs.
 - `currentTime` written from a raw scroll handler, or `fastSeek()`.
-- An HEVC, VP9 or AV1 film without an H.264 source, or a start image that is a separately composed still.
+- An HEVC, VP9 or AV1 film without an H.264 source, even when the user asks for AV1 or HEVC only: keep the H.264 source, say why, and never offer to drop it. Or a start image that is a separately composed still.
 - `preload="auto"` as the loading plan (SC-15): load the film in a scroll-ahead window instead.
 - Smoothing as a fixed fraction per frame (AM-10).
 - Thresholds, type sizes, breakpoints, class names or media copied from another site; measured values elsewhere are context, never defaults.

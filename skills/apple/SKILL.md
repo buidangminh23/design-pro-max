@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app UI and code (SwiftUI, Xcode, HIG) and scroll scenes. Use when a question or task needs HIG reviews, App Store Connect (app records, TestFlight, signing, notarizing, ad hoc installs, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or scrubbed web scenes. Not for launch or preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
+description: For Apple app UI and code (SwiftUI, Xcode, HIG) and scroll scenes. Use when a question or task needs HIG reviews, App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or pinned or scrubbed web sections. Not for launch/preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
 ---
 
 # apple
