@@ -1,5 +1,21 @@
 # Eval results
 
+## 2026-11-13: launch-scroll cases 7, 8 and 10 after the pushback change (Mac)
+
+A targeted check of 70cd500, which tells the part to push back before pinning a still section, to show a sequence's memory and download cost and recommend a film, and to check a scene being fixed against the never-ship list. Only the with condition ran, once per host, with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.167.2 with `gpt-6.1-sol` at high. Round 3 ran xhigh and `gpt-6-astra`, so a change of model and effort is mixed in with the change to `PART.md`. One grader (the session's agent) judged these six runs, with no independent recheck.
+
+| Case | Claude with, round 3 | Claude with, now | Codex with, round 3 | Codex with, now |
+|---|---|---|---|---|
+| 7 `janky-scrub` | 4/4 | 4/4 | 3/4 | 3/4 |
+| 8 `600-frame-sequence` | 0/3 | 3/3 | 1/3 | 3/3 |
+| 10 `pin-without-change` | 0/3 | 3/3 | 0/3 | 3/3 |
+
+- Case 10: neither run pinned. Claude Code wrote nothing and asked the user to choose, recommending a one-time reveal and noting that a 200vh pin would hold a still section; Codex built a one-time reveal that respects reduced motion and quoted the part's rule.
+- Case 8: Claude Code showed about 5 GB of decoded memory and the download cost, recommended a scrubbed film and asked before building. Codex showed the same memory figure and recommended a film, then built a sequence player with a 12-frame decode window and an estimated download size.
+- Case 7: both fixed the encode and the driver and removed `preload="auto"`. Codex's answer did not name the long default keyframe interval as a cause, so `LS-VID-01` fails on that run as it did in round 3.
+
+The full part set needs a new scored round, with and without apple, before a release.
+
 ## 2026-11-13: v0.1 routing round 3 and the launch-scroll part evals (Mac)
 
 Round 3 measures the router description from 2422017 with Claude Code installed at user level (`--install user`, so exploring the empty project cannot reach the skill), and scores a Codex near miss as a false trigger only when it reads a part (the owner's bar from 2026-10-25; router-only reads are listed). Both hosts ran each host's own model and effort from the user's config, before the harness pinned them (a5e47ea): Claude Code 2.1.314 (routing, 2026-10-30, at 2977c13) and 2.1.323 (parts) with `claude-opus-5-5`, effort xhigh; Codex codex-cli 0.167.2 with `gpt-6-astra`, reasoning high (routing and parts, 2026-11-13, at b7909e6, whose only change to the skill is the film reference page named in `launch-scroll/PART.md`). Rounds 1 and 2 ran Codex on `gpt-6.1-sol`, so the Codex numbers are not like for like. No run hit a host limit. The traces were re-extracted after the brace-list fix in dd28391.
