@@ -36,12 +36,13 @@ The caption says in words what the clip shows, for readers who never play it; th
 ## What the component does
 
 1. Nothing loads at first except the lazy start image. It sets `preload="none"`, removes any `autoplay` attribute and keeps sources in `data-src` [LV-EMBED-01].
-2. When a clip comes within the load margin, 600px by default on both axes so carousels work too, its sources get their `src` (ON-11).
+2. When a clip comes within the load margin of the viewport, 600px by default, its sources get their `src` (ON-11). A margin does not reach through a scrolling carousel's clipped edge; the component also passes it as the observer's `scrollMargin`, which extends it there where the browser supports that option, and elsewhere a clip in a carousel loads once it scrolls into the carousel's box.
 3. It plays a clip while at least half of it is visible and pauses it otherwise; only the most visible clip plays (`maxActive: 1`).
 4. Every `play()` checks reduced motion, Save-Data and the reader's own pause at that moment, including the call that follows loading [LV-EMBED-02].
 5. The video is shown over the start image only after its first presented frame, so there is never a blank box.
-6. Any loop, and any one-shot longer than 5 s, gets a labelled Pause button if the markup has none [LV-EMBED-02]. Its label switches between Pause and Play, and the reader's choice sticks.
+6. Any loop, and any one-shot longer than 5 s, gets a labelled Pause button if the markup has none [LV-EMBED-02]. Its label switches between Pause and Play (an icon-only button keeps its icon and switches its `aria-label`), and the reader's choice sticks. A one-shot that has ended stays on its last frame; scrolling or returning to the tab does not restart it, only the Play button does.
 7. Under reduced motion or Save-Data, nothing loads or plays; the button reads Play and starts the clip on request.
+8. A `[data-demo]` without a `<video>` (a still) is left alone.
 
 Options: `mountDemos(root, { loadMargin, playRatio, maxActive, pauseAfterSeconds, labels })`; it returns a function that stops the observers.
 

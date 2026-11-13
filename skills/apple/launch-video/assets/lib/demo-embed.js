@@ -3,14 +3,16 @@
 // Lazy, accessible demo clips. Order of work for each [data-demo]:
 //   1. Nothing loads at first: the <video> has preload="none", no autoplay attribute and its sources in data-src; the
 //      start image (an <img loading="lazy">, frame 0 of the clip) is what the reader sees.
-//   2. When the clip comes within the load margin (600px by default, both axes, so carousels work), the sources get
-//      their src and the clip loads.
+//   2. When the clip comes within the load margin (600px by default) of the viewport, the sources get their src and
+//      the clip loads. Inside a scrolling carousel the margin also reaches past the carousel's edge where the browser
+//      supports the observer's scrollMargin option; elsewhere a clip there loads once it enters the carousel's box.
 //   3. It plays while at least half of it is visible and pauses otherwise; with maxActive 1 only the most visible
 //      clip plays. Every play() call checks reduced motion and the reader's own pause at that moment, including the
 //      one that follows loading.
 //   4. The video is revealed over the start image only after it has presented a frame.
 //   5. A clip that moves for more than 5 s (any loop, or a longer one-shot) gets a labelled pause button if the
-//      markup has none; the reader's choice sticks.
+//      markup has none; the reader's choice sticks, and a one-shot that has ended stays on its last frame until the
+//      reader presses Play. An icon-only button keeps its icon: its aria-label switches instead of its text.
 //   6. Under reduced motion, or with Save-Data on, nothing loads or plays until the reader presses Play.
 // Markup:
 //   <figure data-demo>
@@ -77,21 +79,34 @@ function ensureToggle(root, labels) {
   return button;
 }
 
+export function setLabel(button, text) {
+  if (button.hasAttribute('aria-label')) return button.setAttribute('aria-label', text);
+  if (!button.children.length) {
+    button.textContent = text;
+    return;
+  }
+  const node = [...button.childNodes].find((child) => child.nodeType === 3 && child.data.trim());
+  if (node) node.data = text;
+  else button.setAttribute('aria-label', text);
+}
+
 /** Mounts every [data-demo] under root and returns a function that stops them all. */
 export function mountDemos(root = document, options = {}) {
   const settings = { ...DEFAULTS, ...options, labels: { ...DEFAULTS.labels, ...options.labels } };
-  const demos = [...root.querySelectorAll('[data-demo]')].map((element, id) => ({ id, element, video: element.querySelector('video'), ratio: 0, held: false, chosen: false, toggle: null }));
+  const demos = [...root.querySelectorAll('[data-demo]')]
+    .map((element) => ({ element, video: element.querySelector('video') }))
+    .filter((demo) => demo.video)
+    .map((demo, id) => ({ ...demo, id, ratio: 0, held: false, chosen: false, finished: false, toggle: null }));
   const motion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
   const blocked = () => prefersReducedMotion() || saveData();
 
   const label = (demo) => {
     if (!demo.toggle) return;
-    const playing = !demo.video.paused;
-    demo.toggle.textContent = playing ? settings.labels.pause : settings.labels.play;
+    setLabel(demo.toggle, demo.video.paused ? settings.labels.play : settings.labels.pause);
   };
 
   const play = (demo) => {
-    if (demo.held || (blocked() && !demo.chosen)) return;
+    if (demo.held || demo.finished || (blocked() && !demo.chosen)) return;
     attachSources(demo.video);
     const started = demo.video.play();
     started?.catch?.(() => label(demo));
@@ -111,6 +126,7 @@ export function mountDemos(root = document, options = {}) {
     demo.toggle.addEventListener('click', () => {
       if (demo.video.paused) {
         demo.held = false;
+        demo.finished = false;
         demo.chosen = true;
         attachSources(demo.video);
         demo.video.play()?.catch?.(() => label(demo));
@@ -129,7 +145,7 @@ export function mountDemos(root = document, options = {}) {
       const demo = demos.find((candidate) => candidate.element === entry.target);
       if (demo && !blocked()) attachSources(demo.video);
     }
-  }, { rootMargin: settings.loadMargin });
+  }, { rootMargin: settings.loadMargin, scrollMargin: settings.loadMargin });
 
   const seen = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -141,7 +157,6 @@ export function mountDemos(root = document, options = {}) {
 
   const cleanups = [];
   for (const demo of demos) {
-    if (!demo.video) continue;
     demo.video.muted = true;
     demo.video.playsInline = true;
     demo.video.removeAttribute('autoplay');
@@ -153,13 +168,19 @@ export function mountDemos(root = document, options = {}) {
       update();
     };
     const onState = () => label(demo);
+    const onEnded = () => {
+      demo.finished = true;
+      label(demo);
+    };
     demo.video.addEventListener('loadedmetadata', onMeta);
     demo.video.addEventListener('play', onState);
     demo.video.addEventListener('pause', onState);
+    demo.video.addEventListener('ended', onEnded);
     cleanups.push(() => {
       demo.video.removeEventListener('loadedmetadata', onMeta);
       demo.video.removeEventListener('play', onState);
       demo.video.removeEventListener('pause', onState);
+      demo.video.removeEventListener('ended', onEnded);
     });
     near.observe(demo.element);
     seen.observe(demo.element);
