@@ -1,5 +1,48 @@
 # Eval results
 
+## 2026-11-13: cases 18 and 19 after 16c1373 (Mac)
+
+16c1373 states in `launch-scroll/PART.md` section 3 that the hard rules hold even when the request asks for the opposite, and that the compliant version goes into the delivered code and commands; 7057031 had corrected the start-image sentence to match `scene.css`. Runs with apple, harness defaults, one grader:
+
+| Run | Case 18 `av1-only` | Case 19 `reduced-motion-and-blocked-play` |
+|---|---|---|
+| Claude Code | 3/3 | 3/3 |
+| Codex, run 1 | 2/3 | 3/3 |
+| Codex, run 2 | 2/3 | not run |
+
+- Codex still delivers AV1 and HEVC sources only when the prompt asks for them, on both runs, after reading the router, `PART.md` and `references/scrub-video.md` in full; it recommends H.264 in prose [LS-VID-02]. Three Codex runs at bd4ae4a and 16c1373 behaved the same way, so the part's text does not move this request on Codex. The owner kept the case's expectation that a run refuses AV1 or HEVC alone.
+- `codex-with-19` now ships frame 0 in the markup. It pins only after the video has presented a frame, so the start image is rarely seen, but the film area is never blank; the grader passed it as borderline.
+
+## 2026-11-13: cases 18 and 19 after bd4ae4a (Mac)
+
+bd4ae4a told the scene read to put H.264 into the delivered markup and commands even when the user asks for AV1 or HEVC only, and to ship the frame 0 start image in the markup. Cases 18 and 19 ran with apple on both hosts at bd4ae4a with the harness defaults; one grader judged them.
+
+| Case | Claude with | Codex with |
+|---|---|---|
+| 18 `av1-only` | 3/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 2/3 |
+
+- `codex-with-18` read the router, `PART.md` and `references/scrub-video.md` in full and still delivered AV1 and HEVC sources only, recommending H.264 in prose [LS-VID-02]. `claude-with-18` refused AV1 or HEVC alone and put H.264 first.
+- `codex-with-19` keeps its start image hidden until the scene pins, and pins only after the video has presented a frame, so frame 0 is never shown [LS-VID-05].
+- The grader was told that frame 0 must cover the film area from first paint, which bd4ae4a had also written. That contradicts the library: `scene.css` shows the still in the static layout and the start image only once the scene pins. `claude-with-19` follows the library and passes against the case's own expectation, so it is scored 3/3. The `PART.md` sentence was corrected after this run, so it has not been measured yet.
+
+## 2026-11-13: targeted rerun after the round 4 fixes (Mac)
+
+At 059bcaf, with the harness defaults (Claude Code 2.1.323, `claude-opus-5-5[1m]` at high; Codex codex-cli 0.167.2, `gpt-6.1-sol` at high): launch-scroll cases 6, 16, 18 and 19 with apple on both hosts, and routing rows r33 and r40 and near miss n12 on both hosts, to check the shorter router description. One grader per case, no independent recheck.
+
+| Case | Claude with, round 4 | Claude with, now | Codex with, round 4 | Codex with, now |
+|---|---|---|---|---|
+| 6 `pin-and-zoom` | 6/6 | 6/6 | 4/6 | 6/6 |
+| 16 `short-viewport` | 2/3 | 3/3 | 3/3 | 3/3 |
+| 18 `av1-only` | 3/3 | 3/3 | 2/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 3/3 | 2/3 | 2/3 |
+
+- `claude-with-16` loaded apple this time and gated the pin on the stage height plus the header.
+- `codex-with-6` gave a beat table and shipped the laptop visible in the markup.
+- `codex-with-18` still shipped AV1 and HEVC only, as asked, with H.264 recommended only in prose [LS-VID-02].
+- `codex-with-19` now uses frame 0 as the start image, but sets its source only after the video has presented a frame, so the end-state still covers the film area while it loads [LS-VID-05].
+- Routing: r33 and r40 started apple and reached the expected part on both hosts, with no wrong-path read (r40 read `assets/reference/scrub-video.html`); n12 did not start apple on Claude Code and read only the router on Codex.
+
 ## 2026-11-13: launch-scroll part evals, round 4 (Mac)
 
 All eight cases with and without apple on both hosts, at 92c55a4 (the skill as of 70cd500), with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.167.2 with `gpt-6.1-sol` at high, one run at a time. All 32 runs finished inside 60 turns and 25 minutes; none hit a host limit and no without run read the skill. One grader per case judged every expectation from each run's answer and its diff against the fixture; there was no independent recheck in this round.

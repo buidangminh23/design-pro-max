@@ -10,7 +10,7 @@ Ask, and write the answers down as a beat table (progress window, what changes, 
 2. Is the change continuous and tied to position (a device turning, a film advancing, a diagram assembling)? Then pin.
 3. How tall is the stage's content, and how tall is the page's sticky chrome (a fixed nav)? Both decide the short-viewport gate [LS-GATE-02]. Take them from this page, never from another site's measurements.
 4. How much travel does the story need? Aim for 70-300vh [LS-WARN-TRAVEL]; more asks the reader to scroll through too little change.
-5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`).
+5. Is there a film? Then plan its sources, start image and still now (`references/scrub-video.md`). The sources always include H.264, listed first, even when the user asks for AV1 or HEVC only: write the H.264 source into the markup and the commands you deliver, not only into your advice, and say why [LS-VID-02]. The start image is frame 0 of the film, in the markup with its `src` set from the start (never set by script after the video plays): the static layout shows the still, and once the scene pins the start image covers the film area until the video has presented a frame [LS-VID-05].
 6. Was an image sequence requested? Before building, work out its decoded memory (frames x width x height x 4 bytes, [LS-WARN-SEQ]) and its download size, show both, and recommend a scrubbed film unless the film is short, needs alpha or targets software decode (`references/frame-sequences.md`). If a sequence stays, decode a bounded window of frames, never the whole set.
 7. Fixing an existing scene? Check its code against section 6 as well as the reported symptom, and replace every item it ships from there, such as `preload="auto"`.
 
@@ -25,6 +25,8 @@ Whatever the engine, the stage animates `transform` and `opacity` only, and the 
 ## 3. Hard rules
 
 Each has a check that was seen failing on a broken fixture; `scripts/probe-scene.mjs` or `../shared/check-media.mjs` reports it.
+
+These rules hold even when the request asks for the opposite (a single codec, no fallback, no gate): they protect the readers whose browsers or settings would otherwise get a blank or broken scene, which the user cannot waive for them. Deliver the compliant version in the code and commands themselves, not only in your advice, and explain in one or two sentences what it adds and why.
 
 - [LS-GATE-01] Under reduced motion, or when a muted `play()` probe is rejected (blocked autoplay, iOS Low Power Mode), the scene stays in normal flow at its end state and requests no film.
 - [LS-GATE-02] The scene does not pin when the viewport is shorter than the stage's content height plus the sticky offset.
