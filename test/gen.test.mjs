@@ -82,7 +82,7 @@ test('trademarkLine credits the marks, the logo and Cisco when iOS is named', ()
 
 test('README.md and NOTICE.md carry the generated trademark line', () => {
   const { trademarks, marks } = generate(ROOT);
-  assert.deepEqual(marks, ['Apple', 'iOS', 'iPadOS', 'macOS', 'watchOS', 'tvOS', 'visionOS', 'iPhone', 'iPad', 'Mac', 'Apple Watch', 'Safari', 'Siri', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store', 'AirPlay', 'Apple Pay', 'Apple Pencil', 'Apple TV', 'Apple Vision Pro', 'CarPlay', 'CareKit', 'Digital Crown', 'Dynamic Island', 'Face ID', 'FaceTime', 'HealthKit', 'HomeKit', 'iCloud', 'iMessage', 'Live Photos', 'Mac Catalyst', 'ResearchKit', 'SharePlay', 'Spotlight', 'Touch ID', 'SF Symbols', 'Apple Wallet', 'Live Activities', 'Handoff', 'Multi-Touch', 'Finder', 'Mission Control', 'Apple Music']);
+  assert.deepEqual(marks, ['Apple', 'iOS', 'iPadOS', 'macOS', 'watchOS', 'tvOS', 'visionOS', 'iPhone', 'iPad', 'Mac', 'Apple Watch', 'Safari', 'Siri', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store', 'AirPlay', 'Apple Pay', 'Apple Pencil', 'Apple TV', 'Apple Vision Pro', 'CarPlay', 'CareKit', 'Digital Crown', 'Dynamic Island', 'Face ID', 'FaceTime', 'HealthKit', 'HomeKit', 'iCloud', 'iMessage', 'Live Photos', 'Mac Catalyst', 'ResearchKit', 'SharePlay', 'Spotlight', 'Touch ID', 'Retina', 'SF Symbols', 'Apple Wallet', 'Live Activities', 'Handoff', 'Multi-Touch', 'Finder', 'Mission Control', 'Apple Music']);
   assert.ok(trademarks.startsWith('Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari,'));
   assert.ok(trademarks.includes('Finder, Mission Control and Apple Music are trademarks of Apple Inc.'));
   assert.ok(trademarks.endsWith(CISCO_SENTENCE));
