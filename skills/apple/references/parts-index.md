@@ -463,3 +463,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 0 error, 0 warn; evidence in `hig/references/evidence.md`
 - Checkers: 
+
+### `launch-page`
+
+- Guide: `launch-page/PART.md`
+- Status: active
+- Rules: 7 error, 9 warn; evidence in `launch-page/references/evidence.md`
+- Checkers: `launch-page/scripts/check-page.mjs`
