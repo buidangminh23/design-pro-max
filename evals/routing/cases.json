@@ -509,6 +509,26 @@
       }
     },
     {
+      "id": "r56",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Staff open our internal orders site from an icon they added to their iPads' Home Screen. In Safari the site asks for a user name and password, but from the Home Screen icon it opens to a blank white page. The site sits behind HTTP Basic Auth on nginx. What should we change so it works from the icon?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
+      "id": "r57",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Our Playwright login test passes in the Chromium project but fails in the WebKit project: right after signing in, the next page sends us back to /login. The test server runs on http://localhost:3000 and the session cookie is HttpOnly and Secure. Why only WebKit, and how should we change the test setup?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
       "id": "r50",
       "kind": "row",
       "row": "macOS menu bar apps and WidgetKit widgets",
