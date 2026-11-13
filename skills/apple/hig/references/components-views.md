@@ -35,7 +35,7 @@ Source: [Charts](https://developer.apple.com/design/human-interface-guidelines/c
 Governs how to build data charts: marks, axes, labels, color and accessibility. Read it before generating any graph, plot or sparkline.
 
 - Pick the mark by the question: bars to compare categories or show parts of a whole, lines for change over time and trend, points for relationships, outliers and clusters.
-- Use bars for time series only when each value is a total for its period, such as steps per day.
+- Bars suit change over time especially well when each value is a sum for its period, such as steps per day.
 - Combine mark types when it adds clarity, for example points on top of a line to highlight single readings.
 - Use a fixed axis range when the minimum and maximum have fixed meaning (a battery runs from empty to full); use a dynamic range when values vary widely and marks should fill the plot area.
 - Start a bar chart's value axis at zero so bar heights compare honestly; do not force zero when it hides meaningful differences, such as resting versus active heart rate.
@@ -414,7 +414,7 @@ Covers feedback that work is ongoing: determinate bars and circles, indeterminat
 - Report progress accurately and smooth the pace; racing to near completion and then crawling looks broken or deceptive.
 - Keep the indicator visibly moving, since a still one reads as a stall. If the process really stalls, explain the problem and what people can do.
 - Convert an indeterminate bar to determinate once the duration becomes known.
-- Never swap a spinner for a bar, or a bar for a spinner, mid-task, because shapes and sizes differ and disrupt the layout.
+- Do not move from the circular spinner to the bar style during a task, since the shapes and sizes differ and the layout jumps.
 - Add a short, accurate description when it helps; skip vague words like loading or authenticating.
 - Use one consistent location for progress across platforms and screens.
 - Offer Cancel when stopping is harmless. If stopping loses work, such as a partial download, also offer Pause, and warn with an alert that lets people confirm cancelling or resume.

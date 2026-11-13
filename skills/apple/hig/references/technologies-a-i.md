@@ -43,7 +43,7 @@ Covers apps that send video or audio to Apple TV, HomePod or AirPlay-capable TVs
 - Make any mention of AirPlay less prominent than your own app name and identity.
 - Text: write AirPlay as one word with a capital A and a capital P. Use all caps only when the whole layout is all caps.
 - Text: use AirPlay as a noun ("Use AirPlay to listen on your speaker"), never as a verb ("AirPlay to your speaker").
-- Text: phrase support with words like works with, use, supports or compatible, for example "AirPlay-enabled speaker" or "[App] has AirPlay". The form "Apple AirPlay" is allowed.
+- Text: say support with wording such as "compatible with", "use" or "now supports", for example "AirPlay-enabled speaker" or "You can use AirPlay with [App Name]"; avoid "[App Name] has AirPlay" and the verb form "You can AirPlay with [App Name]". "Compatible with Apple AirPlay" is fine.
 - Text: mention AirPlay when it adds clarity or in technical specs, for example "now supports AirPlay".
 - Platforms: no extra rules for iOS, iPadOS, macOS, tvOS or visionOS; the feature does not exist on watchOS.
 
@@ -87,7 +87,7 @@ An App Clip is a small, instantly available slice of an app or game that finishe
 - Showcasing: do not spoil the experience with install prompts. For on-the-go clips, ask whether the card and banner are enough. For demo clips, let people finish the demo first.
 - Showcasing: when a task ends or a natural pause arrives, show `SKOverlay` so people can start the full-app download from inside the clip.
 - Showcasing: recommend the app politely. No repeated asks, no interruptions mid-task, no push notifications for it, and say plainly what extra features the app has.
-- Notifications: a clip can schedule and receive them for 8 hours after launch. (HG-173)
+- Notifications: a clip can schedule and receive them for 8 hours after launch. (HG-174)
 - Notifications: request longer-lasting permission only when the clip's job spans more than a day, for example a rental return reminder.
 - Notifications: send nothing purely promotional, send only in response to an explicit user action, and skip them entirely if the task ends inside the clip.
 - Notifications: keep each one tied to the task, for example a scheduled food delivery.
@@ -95,9 +95,9 @@ An App Clip is a small, instantly available slice of an app or game that finishe
 - Businesses: handle people using the clip for several businesses or locations. Offer a way to switch among recent ones and verify the person's location at launch.
 - Card image: make it say what the clip offers. Prefer photos or graphics, or a photo of the place, over a screenshot of the interface.
 - Card image: avoid text in it, since text cannot be localized and is hard to read.
-- Card image: use a PNG or JPEG without transparency at 1800x1200 px. (HG-174)
-- Card copy: a title is required and may be at most 30 characters. (HG-175)
-- Card copy: a subtitle is required and may be at most 56 characters. (HG-176)
+- Card image: use a PNG or JPEG without transparency at 1800x1200 px. (HG-175)
+- Card copy: a title is required and may be at most 30 characters. (HG-176)
+- Card copy: a subtitle is required and may be at most 56 characters. (HG-177)
 - Card button verb: View for media or informational and educational content, Play for games, Open for everything else.
 - Codes: an App Clip Code is the best way to get discovered. Use only the artwork generated in App Store Connect or by the App Clip Code Generator tool; never draw your own or alter one.
 - Codes: do not apply filters, recolor, or add glows, shadows, gradients or reflections. When scaling, keep the aspect ratio and scale every attribute, such as stroke widths.
@@ -106,15 +106,15 @@ An App Clip is a small, instantly available slice of an app or game that finishe
 - Codes: use the NFC-integrated variant (iPhone icon in the center) wherever people can reach the code: tabletops, registers, storefront windows, signage, gift cards or coupons.
 - Codes: use the scan-only variant (camera icon in the center) for posters, printed ads, unreachable signage and digital uses such as email, displays or social posts.
 - Codes: leave out the App Clip logo on disposable paper or plastic items and on gambling or drinking items (playing cards, poker chips, coasters), or when the clear-space rule cannot be met.
-- Codes: mount them on a flat or cylindrical surface only. On a cylinder, keep the code's width no more than one-sixth of the circumference. (HG-177)
+- Codes: mount them on a flat or cylindrical surface only. On a cylinder, keep the code's width no more than one-sixth of the circumference. (HG-178)
 - Codes: keep them flat. Avoid fold-prone materials like paper, plastic or fabric; attach a rigid card to flexible objects, and make sure stickers stay stuck to flat surfaces.
 - Codes: place them where lighting is good and scanning does not need a wide angle.
 - Codes: keep them unobstructed (no text, logos or images on top), never animated, never dimmed, and upright (no rotation of the code or its center glyph).
-- Codes: printed codes must be at least 3/4 inch (1.9 cm) across. (HG-178)
-- Codes: digital codes must be at least 256x256 px, as PNG or SVG. (HG-179)
-- Codes: the embedded NFC tag must be at least 35 mm across or equivalent. (HG-180)
-- Codes: with a tag at the minimum size, the printed code needs a diameter of 1.37 inches (3.48 cm) or more. (HG-181)
-- Codes: keep the distance-to-code-size ratio at most 20:1, and aim for 10:1 where possible. (HG-182)
+- Codes: printed codes must be at least 3/4 inch (1.9 cm) across. (HG-179)
+- Codes: digital codes must be at least 256x256 px, as PNG or SVG. (HG-180)
+- Codes: the embedded NFC tag must be at least 35 mm across or equivalent. (HG-181)
+- Codes: with a tag at the minimum size, the printed code needs a diameter of 1.37 inches (3.48 cm) or more. (HG-182)
+- Codes: keep the distance-to-code-size ratio at most 20:1, and aim for 10:1 where possible. (HG-183)
 - Codes: next to a QR code or other scannable item, make the App Clip Code at least as large as that item.
 - Codes: leave clear space around the code equal to the gap between the center glyph and the circle, and more when it sits beside other machine-readable codes.
 - Codes: add a plain call to action, especially without the logo. Scan-only: "Scan to [what the clip does]" or a longer form that names the iPhone or iPad camera as the scanner and then states what the clip does. NFC: "Scan to [what it does]", or tell people to hold their iPhone close to the named object to open a clip that does the described thing.
@@ -122,9 +122,9 @@ An App Clip is a small, instantly available slice of an app or game that finishe
 - Printing: test printed codes from several angles before handing them out.
 - Printing: use high-quality matte, non-textured materials. Avoid gloss, reflective or holographic finishes and thin laminates; use matte laminate if you must laminate, and UV-resistant material outdoors.
 - Printing: for professional runs prefer flexographic printing; for desktop printing prefer inkjet.
-- Printing: rasterize the SVG at no less than 600 ppi and print at no less than 300 dpi. (HG-183)
+- Printing: rasterize the SVG at no less than 600 ppi and print at no less than 300 dpi. (HG-184)
 - Printing: calibrate the printer and avoid misaligned color channels, wrong gamma, artifacts or distorted (non-circular) codes. On receipt printers, print the code as close to the paper's maximum bounds as possible.
-- Printing: convert the sRGB SVG to CMYK with relative colorimetric (media-relative) intent, using the Generic CMYK profile for CMYK printers and the GRACoL 2013 profile for CMYKOV printers, with a CIELab Delta E tolerance of 2.5. (HG-184)
+- Printing: convert the sRGB SVG to CMYK with relative colorimetric (media-relative) intent, using the Generic CMYK profile for CMYK printers and the GRACoL 2013 profile for CMYKOV printers, with a CIELab Delta E tolerance of 2.5. (HG-185)
 - Printing: on grayscale-only printers, generate grayscale codes only.
 - Printing: for NFC-integrated codes choose Type 5 NFC tags.
 - Printing: for big batches, run a small pilot first, print on templates that show the encoded URL and SVG filename for checking, and keep a file mapping each SVG to its invocation URL, with careful versioning.
@@ -207,12 +207,12 @@ Apple Pay pays for physical goods, services and donations in apps and browsers t
 - Payment sheet: if you are an intermediary, name both: "Pay [End Merchant (via Your Business)]".
 - Payment sheet: when the total may change after authorization (ride fare, tip), where regulations allow explain it and mark a subtotal "Amount Pending"; preauthorized amounts must match what the sheet shows.
 - Payment sheet: let the sheet show progress, with no extra spinners or progress indicators.
-- Website icon: provide an icon for payment authorization and Handoff (and Wallet for subscriptions) at 60x60 pt, which is 120x120 px at @2x. (HG-185)
-- Website icon: the same icon at @3x is 180x180 px. (HG-186)
+- Website icon: provide an icon for payment authorization and Handoff (and Wallet for subscriptions) at 60x60 pt, which is 120x120 px at @2x. (HG-186)
+- Website icon: the same icon at @3x is 180x180 px. (HG-187)
 - Validation: check input when the sheet appears, when fields change and after authentication. Until the person authorizes, you can see just the card type and a masked shipping address, so check whatever is available early and show errors on failure.
 - Validation: do not force business rules; ignore irrelevant data and infer missing data (accept Zip+4 when five digits are needed; accept phone numbers with or without dashes or country code).
 - Validation: send the proper status code and custom error (`PKPaymentError`) so the sheet highlights the right field.
-- Validation: name the field and the expectation ("Zip code doesn't match city", "Shipping not available for this state"), not "Address is invalid". Use noun phrases, sentence-style capitalization, no ending punctuation, and keep to 128 characters or fewer to avoid truncation. (HG-187)
+- Validation: name the field and the expectation ("Zip code doesn't match city", "Shipping not available for this state"), not "Address is invalid". Use noun phrases, sentence-style capitalization, no ending punctuation, and keep to 128 characters or fewer to avoid truncation. (HG-188)
 - Processing: on cancellation or timeout that dismisses the sheet, cancel any in-progress payment; people may restart with the button.
 - Subscriptions: explain billing frequency and terms before the sheet, and add line items for frequency, discounts and upfront fees. If nothing is charged at authorization, say when billing starts.
 - Subscriptions: for trials, show the trial amount (including $0), the regular amount and the date billing begins. Make the total line show what is charged now.
@@ -226,12 +226,12 @@ Apple Pay pays for physical goods, services and donations in apps and browsers t
 - Button size: size the Apple Pay button at least as large as any other payment button, and place it where no scrolling is needed to see it.
 - Button size: beside Add to Cart, place it to the right in a side-by-side layout and above in a stacked one.
 - Button size: match the corner radius to your other buttons (square corners to capsule shape are possible).
-- Button size: minimum width for the plain Apple Pay button is 100 pt. (HG-188)
-- Button size: minimum height is 30 pt. (HG-189)
-- Button size: typed buttons such as Book with Apple Pay need a minimum width of 140 pt. (HG-190)
-- Button size: minimum margin around any button is 1/10 of the button's height. (HG-191)
+- Button size: minimum width for the plain Apple Pay button is 100 pt. (HG-189)
+- Button size: minimum height is 30 pt. (HG-190)
+- Button size: typed buttons such as Book with Apple Pay need a minimum width of 140 pt. (HG-191)
+- Button size: minimum margin around any button is 1/10 of the button's height. (HG-192)
 - Mark: use Apple's artwork, changing only height, which must be equal to or larger than other payment marks. Do not alter width, radius or aspect ratio, add a trademark symbol or content, remove the border, add effects, or flip, rotate or animate it.
-- Mark: keep clear space of at least 1/10 of its height, and do not share its border with another graphic or button. (HG-192)
+- Mark: keep clear space of at least 1/10 of its height, and do not share its border with another graphic or button. (HG-193)
 - Wording: write Apple Pay as two words with capital A and P, never plural or possessive, following the Apple Trademark List; all caps only in an all-caps style.
 - Wording: never use the Apple logo in place of the name. In the United States add ® on the first appearance in body text, but not on a selection option at checkout.
 - Wording: use your own fonts and sizes, not Apple's, and never translate Apple Pay.
@@ -246,7 +246,7 @@ Covers camera-based AR built on ARKit: capability checks, placing and manipulati
 - Offer AR only on devices that can run it. If AR is the app's whole purpose, restrict availability to ARKit-capable devices. If AR is optional, quietly leave the feature out on unsupported devices instead of showing an error.
 - Give the camera view as much of the screen as possible. Do not clutter it with controls and information that weaken immersion.
 - Build convincing objects: detailed 3D assets with lifelike textures, correct scale, placement on detected surfaces, matching environment lighting and camera grain, soft top-down shadows on real surfaces, and visuals that follow camera movement.
-- Update the scene 60 times per second, so objects do not jump or flicker. (HG-193)
+- Update the scene 60 times per second, so objects do not jump or flicker. (HG-194)
 - For reflective virtual surfaces, remember reflections are approximations from the camera feed. Prefer small or coarse reflective areas so the approximation is less noticeable.
 - Use audio and haptics to confirm contact between a virtual object and a surface or another object, and consider background music to envelop people.
 - Minimize text placed in the environment; show only what the experience needs.
@@ -276,8 +276,8 @@ Covers camera-based AR built on ARKit: capability checks, placing and manipulati
 - Multiuser: let people occlude virtual objects when your app places objects behind people in the camera feed.
 - Multiuser: let new people join an ongoing session through implicit map merging, unless everyone must be present before it starts.
 - Real-world triggers: supply 2D reference images or 3D reference objects so detection can make virtual content appear.
-- Real-world triggers: when a detected image first disappears, wait up to one second before fading out or removing attached virtual objects, to prevent flicker. (HG-194)
-- Real-world triggers: keep active reference images to 100 or fewer; switch the active set by context, such as museum area, if you need more. (HG-195)
+- Real-world triggers: when a detected image first disappears, wait up to one second before fading out or removing attached virtual objects, to prevent flicker. (HG-195)
+- Real-world triggers: keep active reference images to 100 or fewer; switch the active set by context, such as museum area, if you need more. (HG-196)
 - Real-world triggers: limit images that need an accurate tracked position, using tracked images when the image may move or the attached content is small relative to it.
 - Wording: use friendly terms, not "ARKit", "world detection", "tracking" or "plane". Good examples: tell people a surface could not be found and suggest moving sideways or repositioning the phone; ask them to tap a spot to place the named object; suggest more light and walking around; suggest moving the phone more slowly.
 - Wording: in 3D contexts prefer 3D hints, such as a rotation indicator around an object, over text overlays, and use text overlays only if people do not respond to contextual hints.
@@ -287,16 +287,16 @@ Covers camera-based AR built on ARKit: capability checks, placing and manipulati
 - Interruptions: consider hiding placed objects during relocalization and redisplaying them at the new positions, to avoid flicker.
 - Interruptions: when the app mixes AR and non-AR tasks, embed the non-AR task inside the AR view, such as changing upholstery without leaving AR.
 - Interruptions: give a reset button or another way to cancel relocalization, which otherwise can continue forever.
-- Interruptions: when the front camera loses the face for roughly half a second or longer, show a visual indicator, with only minimal text if any. (HG-196)
+- Interruptions: when the front camera loses the face for roughly half a second or longer, show a visual indicator, with only minimal text if any. (HG-197)
 - Problems: let people reset the experience, and do not make them wait for conditions to improve.
 - Problems: suggest fixes in plain language: pair each failure with a hint: too few features, suggest more light and walking around; too much motion, suggest a slower phone; slow surface detection, suggest moving, adding light and aiming at a textured surface.
 - AR glyph: use it only to start an ARKit-based experience. Change only its size and color, never use it for other purposes or for experiences not built on ARKit.
-- AR glyph: keep clear space of at least 10% of the glyph's height, with nothing overlapping it. (HG-197)
+- AR glyph: keep clear space of at least 10% of the glyph's height, with nothing overlapping it. (HG-198)
 - AR badges: use the badge only to mark products or objects viewable in AR through ARKit. Do not alter the badge or its color, and download the official collapsed and expanded artwork from Apple.
 - AR badges: prefer the full badge, and use the glyph-only badge in spaces too small for it. Both work at default size.
 - AR badges: use badging only when some items can be viewed in AR and others cannot.
 - AR badges: place the badge in the same corner of each item's photo, large enough to see but not hiding important detail.
-- AR badges: keep clear space of at least 10% of the badge's height. (HG-198)
+- AR badges: keep clear space of at least 10% of the badge's height. (HG-199)
 - visionOS: ARKit on visionOS can detect surfaces, use hand and finger positions for custom gestures, and bring nearby physical objects into immersive experiences.
 
 ## CareKit
@@ -354,7 +354,7 @@ CarPlay shows apps from a connected iPhone on the car display, built from system
 - Audio: show the Now Playing screen once audio is ready, without waiting for descriptive metadata. Keep loading that in the background.
 - Audio: resume after a temporary interruption (such as a phone call) if audio was playing when it began. Do not resume after a permanent one, such as a Siri-started playlist.
 - Audio: you may adjust relative mix levels, but never the overall output volume; people control that.
-- Layout: the system scales icons and UI across display sizes such as 800x480, 960x540, 1280x720 and 1920x720 px (aspect ratios 5:3, 16:9, 16:9, 8:3), so elements appear at roughly the same size. (HG-199)
+- Layout: the system scales icons and UI across display sizes such as 800x480, 960x540, 1280x720 and 1920x720 px (aspect ratios 5:3, 16:9, 16:9, 8:3), so elements appear at roughly the same size. (HG-200)
 - Layout: present valuable information in an uncluttered layout that can be read at a glance from the driver's seat, without extra detail or ornament.
 - Layout: keep a consistent look, with similar-looking elements for similar functions.
 - Layout: make the main content prominent and tappable: bigger items look more important and are easier to hit, and the top half of the screen is where the key content and controls go.
@@ -366,8 +366,8 @@ CarPlay shows apps from a connected iPhone on the car display, built from system
 - Images: provide @2x and @3x artwork for everything in CarPlay; the system picks and scales the right one for landscape or portrait displays.
 - Icons: reuse your iPhone app icon instead of designing a second one.
 - Icons: do not use black as the icon background. Lighten it or add a border so it does not melt into the display.
-- Icons: create the CarPlay app icon at 120x120 px for @2x. (HG-200)
-- Icons: create the CarPlay app icon at 180x180 px for @3x. (HG-201)
+- Icons: create the CarPlay app icon at 120x120 px for @2x. (HG-201)
+- Icons: create the CarPlay app icon at 180x180 px for @3x. (HG-202)
 - Errors: handle errors gracefully and surface them only when unavoidable.
 - Errors: show any error in CarPlay itself, and never tell people to pick up the iPhone to read or fix it.
 - Audio and video CarPlay apps also run on Apple HomeView with no changes.
@@ -393,34 +393,34 @@ Game Center is Apple's social gaming layer, used through GameKit, covering the a
 - Achievements: use progressive achievements so the system shows progress and encouraging messages.
 - Achievement images: make rich, high-quality art, and never reuse one image for several achievements. A missing image becomes a placeholder.
 - Achievement images: the system applies a circular mask, so keep content centered.
-- Achievement images: use PNG, TIF or JPG in sRGB or P3, at 72 DPI or higher (minimum). (HG-202)
-- Achievement images (iOS, iPadOS, macOS, visionOS): image size 512x512 pt (1024x1024 px @2x). (HG-203)
-- Achievement images (iOS, iPadOS, macOS, visionOS): mask diameter 512 pt (1024 px @2x). (HG-204)
-- Achievement images (tvOS): image size 320x320 pt (640x640 px @2x). (HG-205)
-- Achievement images (tvOS): mask diameter 200 pt (400 px @2x). (HG-206)
+- Achievement images: use PNG, TIF or JPG in sRGB or P3, at 72 DPI or higher (minimum). (HG-203)
+- Achievement images (iOS, iPadOS, macOS, visionOS): image size 512x512 pt (1024x1024 px @2x). (HG-204)
+- Achievement images (iOS, iPadOS, macOS, visionOS): mask diameter 512 pt (1024 px @2x). (HG-205)
+- Achievement images (tvOS): image size 320x320 pt (640x640 px @2x). (HG-206)
+- Achievement images (tvOS): mask diameter 200 pt (400 px @2x). (HG-207)
 - Leaderboards: pick classic (best all-time score, never ends, such as top rhythm-game score or longest endless run) or recurring (resets on an interval you set, such as daily puzzles, seasonal events, or weekly boards per battle mode).
 - Leaderboards: group many boards into leaderboard sets by theme or play style, such as difficulty modes, activity types, or genres.
 - Leaderboards: give each board its own image that reflects the gameplay being ranked. Use a single image on iOS, iPadOS and macOS, and a set of animating layered images on tvOS (focus effect; Apple Design Resources has a tvOS template).
-- Leaderboard images (iOS, iPadOS, macOS): JPEG, JPG or PNG in sRGB or P3, image size 512x512 pt (1024x1024 px @2x). (HG-207)
-- Leaderboard images (iOS, iPadOS, macOS): the cropped area is 512x312 pt (1024x624 px @2x). (HG-208)
-- Leaderboard images (tvOS): PNG, TIF or JPG, image size 659x371 pt (1318x742 px @2x). (HG-209)
-- Leaderboard images (tvOS): focused size 618x348 pt (1236x696 px @2x). (HG-210)
-- Leaderboard images (tvOS): unfocused size 548x309 pt (1096x618 px @2x). (HG-211)
+- Leaderboard images (iOS, iPadOS, macOS): JPEG, JPG or PNG in sRGB or P3, image size 512x512 pt (1024x1024 px @2x). (HG-208)
+- Leaderboard images (iOS, iPadOS, macOS): the cropped area is 512x312 pt (1024x624 px @2x). (HG-209)
+- Leaderboard images (tvOS): PNG, TIF or JPG, image size 659x371 pt (1318x742 px @2x). (HG-210)
+- Leaderboard images (tvOS): focused size 618x348 pt (1236x696 px @2x). (HG-211)
+- Leaderboard images (tvOS): unfocused size 548x309 pt (1096x618 px @2x). (HG-212)
 - Mind cropping: the system crops art for boards inside a set (iOS, iPadOS, macOS), and tvOS focus can crop layer edges. Keep key content comfortably inside.
-- Challenges: they are timed contests built on leaderboards. Use them for short, skill-based activities with a clear measure, playable alone, taking 1-5 minutes. (HG-212)
+- Challenges: they are timed contests built on leaderboards. Use them for short, skill-based activities with a clear measure, playable alone, taking 1-5 minutes. (HG-213)
 - Challenges: do not track overall progress or personal bests, which favor regular players. Track the most recent score of each attempt so everyone is on equal footing.
 - Challenges: deep-link straight into the mode or level that hosts the challenge. When a first-time player needs a tutorial, run it first, show a notice that the challenge follows automatically, and then start the challenge.
 - Challenge artwork: keep key visuals away from the zone where the title and description overlay the image. If the image contains text, deliver localized variants via App Store Connect or Xcode.
-- Challenge artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x). (HG-213)
-- Challenge artwork: cropped area 1465x767 pt (2930x1534 px @2x). (HG-214)
+- Challenge artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x). (HG-214)
+- Challenge artwork: cropped area 1465x767 pt (2930x1534 px @2x). (HG-215)
 - Multiplayer: support both real-time and turn-based sessions. Entry points are party codes, the Game Overlay, the dashboard and the Games app.
-- Party codes: generated codes are alphanumeric and typically eight characters long, like "2MP4-9CMF". (HG-215)
+- Party codes: generated codes are alphanumeric and typically eight characters long, like "2MP4-9CMF". (HG-216)
 - Party codes: let players join late, leave early and come back; show the current code in the game; accept a manually entered code.
 - Offer multiplayer through in-game UI. The default interface lets players invite nearby or recent players, friends and contacts; you can also build it in custom UI.
-- Activity artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x). (HG-216)
-- Activity artwork: cropped area 1465x767 pt (2930x1534 px @2x). (HG-217)
+- Activity artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x). (HG-217)
+- Activity artwork: cropped area 1465x767 pt (2930x1534 px @2x). (HG-218)
 - tvOS: add an optional simple, recognizable image at the top of the dashboard, such as the game logo or word mark, but not the app icon.
-- tvOS: dashboard image size is 600x180 pt (1200x360 px @2x), PNG, TIF or JPG, in sRGB or P3, 72 DPI or higher. (HG-218)
+- tvOS: dashboard image size is 600x180 pt (1200x360 px @2x), PNG, TIF or JPG, in sRGB or P3, 72 DPI or higher. (HG-219)
 - watchOS: GameKit APIs work, but there is no system Game Center UI to call. Game Center content for watch games appears on the paired iPhone.
 - iOS, iPadOS, macOS, visionOS: no extra considerations.
 
@@ -480,7 +480,7 @@ HealthKit is the shared store for health and fitness data. This page covers perm
 - Apple Health icon: show the name Apple Health near the icon, and make the icon no smaller than other app icons beside it.
 - Apple Health icon: use it only to show compatibility, never as a button.
 - Apple Health icon: do not mask it into other corner radii or a circle, and add no borders, overlays, gradients, shadows or effects.
-- Apple Health icon: keep clear space of at least 1/10 of its height, and do not composite it onto another graphic. (HG-219)
+- Apple Health icon: keep clear space of at least 1/10 of its height, and do not composite it onto another graphic. (HG-220)
 - Apple Health icon: never use it inside text or in place of Health, Apple Health or HealthKit.
 - Apple Health icon: do not show Health app images or screenshots, which are copyrighted. Use an Activity ring element for ring progress.
 - Wording: call the app Apple Health or the Apple Health app, written as two words with capital A and H (all caps only where the whole interface style is all caps).
@@ -572,16 +572,16 @@ iMessage apps and sticker packs live inside Messages conversations and in effect
 - Make stickers expressive, inclusive and versatile: legible on many backgrounds, rotated and scaled; transparency helps them blend with text, photos and other stickers.
 - Give every sticker a localized alternative description for VoiceOver.
 - Icons: supply a square-cornered icon per extension; the system rounds the corners. It appears in Messages, the App Store, notifications, Settings and the Messages app drawer.
-- Icons (Messages, notifications) at @2x: 148x110 px. (HG-220)
-- Icons (Messages, notifications) at @2x: 143x100 px. (HG-221)
-- Icons (Messages, notifications) at @2x: 120x90 px, and at @3x: 180x135 px. (HG-222)
-- Icons (Messages, notifications) at @2x: 64x48 px, and at @3x: 96x72 px. (HG-223)
-- Icons (Messages, notifications) at @2x: 54x40 px, and at @3x: 81x60 px. (HG-224)
-- Icons (Settings): 58x58 px at @2x and 87x87 px at @3x. (HG-225)
-- Icons (App Store): 1024x1024 px at both scales. (HG-226)
+- Icons (Messages, notifications) at @2x: 148x110 px. (HG-221)
+- Icons (Messages, notifications) at @2x: 143x100 px. (HG-222)
+- Icons (Messages, notifications) at @2x: 120x90 px, and at @3x: 180x135 px. (HG-223)
+- Icons (Messages, notifications) at @2x: 64x48 px, and at @3x: 96x72 px. (HG-224)
+- Icons (Messages, notifications) at @2x: 54x40 px, and at @3x: 81x60 px. (HG-225)
+- Icons (Settings): 58x58 px at @2x and 87x87 px at @3x. (HG-226)
+- Icons (App Store): 1024x1024 px at both scales. (HG-227)
 - Stickers: pick one size (small, regular or large) and use it for the whole pack; do not mix sizes.
-- Stickers: prepare images at @3x, and the system downscales for @2x and @1x. Small is 300x300 px. (HG-227)
-- Stickers: regular is 408x408 px at @3x. (HG-228)
-- Stickers: large is 618x618 px at @3x. (HG-229)
-- Stickers: each file must be 500 KB or smaller. (HG-230)
+- Stickers: prepare images at @3x, and the system downscales for @2x and @1x. Small is 300x300 px. (HG-228)
+- Stickers: regular is 408x408 px at @3x. (HG-229)
+- Stickers: large is 618x618 px at @3x. (HG-230)
+- Stickers: each file must be 500 KB or smaller. (HG-231)
 - Stickers: PNG has 8-bit transparency and no animation; APNG has 8-bit transparency and animation; GIF has single-color transparency and animation; JPEG has neither.

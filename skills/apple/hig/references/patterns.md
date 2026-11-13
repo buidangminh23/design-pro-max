@@ -312,7 +312,7 @@ Covers behaving well when people switch between apps or run apps side by side. A
 - Use notifications sparingly: notify on completion of important or time-sensitive tasks, not routine or secondary ones.
 - iPadOS: Adapt gracefully to any window size, because apps are not told which multitasking configuration people chose and can be windowed, resized, tiled or full screen, with several windows per app.
 - iPadOS: Expect videos and FaceTime calls to float over other content as Picture in Picture, whether apps are full screen or windowed.
-- macOS: Multitasking is the default. Use the standard window states so layered windows read correctly.
+- macOS: Running several apps at once is the normal case, and the system itself draws layered windows with shadows and state effects that tell windows apart.
 - visionOS: Do not change the appearance of a window's edges, since the system masks a window people look away from. Closing a window sends the app to the background but leaves it running.
 - visionOS: Do not pause a window's video when people look away from it; playback should continue while they use another window.
 - visionOS: Expect audio to duck when people look at another app, unless yours is the Now Playing app. Closing the Now Playing window pauses playback.
@@ -439,7 +439,7 @@ Covers embedding video playback, aspect-ratio modes, TV app integration and plat
 - tvOS, visionOS: The built-in player has transport controls (subtitles, audio language, add to library, favorite) and content tabs such as Info, Episodes and Chapters. In visionOS the controls appear as an ornament.
 - Always show video at its original aspect ratio. Padding baked into the frame stops the system scaling correctly, makes the video look smaller and breaks edge-to-edge contexts such as Picture in Picture on iPad.
 - Supply extra information (image, title, description) where it adds value on iOS, iPadOS, tvOS and visionOS (`externalMetadata`), without covering playback.
-- Support expected input: on any attached keyboard, Space toggles play and pause on every platform here, and the Siri Remote uses its familiar gestures.
+- Support the input people expect: Space on a connected keyboard plays or pauses video on Apple TV, iPad, iPhone, Mac and Vision Pro, and the Siri Remote keeps its familiar swipe and press behavior on Apple TV.
 - tvOS: For playback options or content details, add a transport control (for actions like favoriting) or a custom content tab (supplementary information or recommendations). Keep actions to a step or two and content brief.
 - Do not let audio from different sources mix when viewers switch modes, for instance a game that ignores secondary audio while Picture in Picture video is unmuted (`silenceSecondaryAudioHintNotification`).
 - TV app: When playback starts from the TV app, it fades to black without your launch screen. Show your own black screen immediately before playing or resuming.

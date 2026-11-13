@@ -1836,6 +1836,19 @@
       "sourceSha": "f7a9676e62a38edae95e0124cb9aefb2696dd8ae77deee14f71b298257672360"
     },
     "HG-110": {
+      "claim": "In visionOS, circular buttons come in five heights from mini to extra large; other shapes come in fewer sizes.",
+      "value": "28 pt; 32 pt; 44 pt; 52 pt; 64 pt",
+      "label": "documented",
+      "date": "2026-11-13",
+      "source": "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "method": "Read the Human Interface Guidelines page.",
+      "confidence": "high",
+      "remeasure": "Read the page again; Apple revises the guidelines.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "12ebc93b4f302a4a05aeec6d63f2b458138e03af9b8dc6245d18c2d2572373ff"
+    },
+    "HG-111": {
       "claim": "The About menu item uses a short app name of at most 16 characters.",
       "value": "16 characters or fewer",
       "label": "documented",
@@ -1846,9 +1859,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "cbf063a76123409567c5e7134cc8b60b16c5240a75a6dfd02a15b7bab75c5279"
+      "sourceSha": "8a46558dbaef308f72a637079eaa8ba09e059b02d1c90076701fcc4da54b2d09"
     },
-    "HG-111": {
+    "HG-112": {
       "claim": "The macOS menu bar is 24 pt tall.",
       "value": "24 pt",
       "label": "documented",
@@ -1859,9 +1872,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "82e84c445a04f2e167c05f08cc893e17762b98a27fdc66c110a9762cf7bb986d"
+      "sourceSha": "d2fed02844425952fdf6c700caaee265ad4cc46ec2865735edf7da74f10f5e98"
     },
-    "HG-112": {
+    "HG-113": {
       "claim": "A toolbar title should stay under 15 characters.",
       "value": "under 15 characters",
       "label": "documented",
@@ -1872,9 +1885,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b8418d28078344b7246d39df170afa9948241a199a47262c28741bddd10e9f2a"
+      "sourceSha": "1a24aced9d14c3928ce2c4344d616d3f6c5b353401ac4969b2aac7b834cb99eb"
     },
-    "HG-113": {
+    "HG-114": {
       "claim": "A visionOS alert accessory view has a maximum height of 154 pt and a 16 pt corner radius.",
       "value": "154 pt; 16 pt",
       "label": "documented",
@@ -1885,9 +1898,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "a604c7bd645bd626fde2dd9a7b5a492bce496164af14c6ab6d637d8a21c0181b"
+      "sourceSha": "d5500fad72133030ab0ce69796ad9a8dd42aa73dc5f3040ea039dfdae18c1b8e"
     },
-    "HG-114": {
+    "HG-115": {
       "claim": "The default visionOS window measures 1280x720 pt.",
       "value": "1280x720 pt",
       "label": "documented",
@@ -1898,9 +1911,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "063c35f1c2db42d35630085ddb388dd708d40e751d9a9f182a8762f4cea1913d"
+      "sourceSha": "984f03817a83d1fdbcb1fad62500f3470b2cdb3d6cc83674d570dde7a36a765f"
     },
-    "HG-115": {
+    "HG-116": {
       "claim": "visionOS opens the first window about two meters from the wearer, with an apparent width of about three meters.",
       "value": "about two meters; about three meters",
       "label": "documented",
@@ -1911,9 +1924,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "e02dbed856bb80742daa682957fadebbe0d8cdf9b4a3d6e6e4d09fddbe28501c"
+      "sourceSha": "145655cca0cdbcf3ad74caa947565bd771f98d3220d54025f79d0c594206491e"
     },
-    "HG-116": {
+    "HG-117": {
       "claim": "The default minute list has 60 values (0 to 59); any interval dividing evenly into 60, such as 15 minutes, can be used.",
       "value": "60 values; 15-minute interval",
       "label": "documented",
@@ -1924,9 +1937,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0fb753b957630220338696dacff8b5aa433bf2c8459a2a08ff1f24163380dc68"
+      "sourceSha": "ea2a7a3fb0214ab9d887b3b05ff3977c86f50a2affffe9cc5540b96b5f2b52a6"
     },
-    "HG-117": {
+    "HG-118": {
       "claim": "Countdown timer mode goes up to a maximum of 23 hours and 59 minutes.",
       "value": "23 hours 59 minutes",
       "label": "documented",
@@ -1937,9 +1950,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "43249a75500cae86cc3e95be14a08bedd07430f9311d9b047b2744b721d92c67"
+      "sourceSha": "7d8e3773d1a1a93f8ce0413f1d80f333bee255eb77044d23e1441b09e691e0fb"
     },
-    "HG-118": {
+    "HG-119": {
       "claim": "An opacity slider typically spans 0 to 100 percent.",
       "value": "0 to 100 percent",
       "label": "documented",
@@ -1950,9 +1963,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3de79b398c515583ff7344f2c4cebcd8c7c2d13cb3bc8d65827c13b14897ef70"
+      "sourceSha": "f3b75ed4d08fb901064a61e61d32f41831ea7fb21b125ff9cd288fc9c45fb869"
     },
-    "HG-119": {
+    "HG-120": {
       "claim": "A rotation circular slider spans 0 to 360 degrees; four spins equal 1440 degrees.",
       "value": "0 to 360 degrees; 1440 degrees",
       "label": "documented",
@@ -1963,9 +1976,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b40887f88db8b285be4cb30097bbc541a668a7067db835d5fb76757bda6fde73"
+      "sourceSha": "f05cdc22e8e7fe5049cf8158d972063622f313e756eb164049c9f84050039c78"
     },
-    "HG-120": {
+    "HG-121": {
       "claim": "An app can include at most ten App Shortcuts.",
       "value": "10",
       "label": "documented",
@@ -1976,9 +1989,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "99d7d8ef4cd8a0a96a96de391175b14dfa2478264439919d953f1de9c3378807"
+      "sourceSha": "fc33b883b5e6856f80cba4cae276b65890fbf20f112b60fe9fe6e4ef6759754b"
     },
-    "HG-121": {
+    "HG-122": {
       "claim": "Complication line widths should generally be two points or more.",
       "value": "2 pt",
       "label": "documented",
@@ -1989,9 +2002,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "8df23cbb002ee13b2a379b615f83336ada36fe7f41151c73cf2952b3d5ad3534"
+      "sourceSha": "aacf9cd81f3945525c32b191d3088d214605ef3bbe67c6508bb9f24632914688"
     },
-    "HG-122": {
+    "HG-123": {
       "claim": "Curved bezel text can span nearly half a circle before it truncates.",
       "value": "180 degrees",
       "label": "documented",
@@ -2002,9 +2015,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "6620642a1ffbda877dd3664075be06b30feb2818d1a64de996fcc25bc284a282"
+      "sourceSha": "863719e2d053c5ae821163abf6103073a37df3973d12b86a1d0f1fc7ad124ce3"
     },
-    "HG-123": {
+    "HG-124": {
       "claim": "Regular circular complication image runs from 42x42 pt on 40mm to 50x50 pt on 45mm/49mm.",
       "value": "42x42 pt to 50x50 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2015,9 +2028,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "673e29048111a33a5c4964591396714dc18dc36aada33fd29cc93fc61394d89e"
+      "sourceSha": "948e61ddc9d725fabfc46577db76d1b3e63a9dc5aab99e836f57bcdd44eba942"
     },
-    "HG-124": {
+    "HG-125": {
       "claim": "Default regular circular text size ranges from 12 pt on 40mm to 14.5 pt on 45mm/49mm.",
       "value": "12 pt to 14.5 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2028,9 +2041,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "83e9b2d9fb148fc23e94b37398343b72742a026f0e9a630f352ffde477600959"
+      "sourceSha": "e288e0293a7448784100777d604703d95896069cb8d9bd4ea076a9502331c577"
     },
-    "HG-125": {
+    "HG-126": {
       "claim": "Extra-large circular image runs from 120x120 pt on 40mm to 143x143 pt on 45mm/49mm.",
       "value": "120x120 pt to 143x143 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2041,9 +2054,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ed1ceb8b185f6e89153e297cf7fcfa34a3e533af5335648a22c4159fbc1f753c"
+      "sourceSha": "b98d7b011cdf6eaf459c1c190ce43a693eaddb6aaa2e27a00056af1a49802e68"
     },
-    "HG-126": {
+    "HG-127": {
       "claim": "Extra-large circular default text is 34.5 pt on 40mm up to 41 pt on 45mm/49mm.",
       "value": "34.5 pt to 41 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2054,9 +2067,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "e73dfe270551ad241a169dbf676e9de3334b43add122f4b77beb1a144647ccd1"
+      "sourceSha": "d2b9f7a186aff81f71454a1b2ad943b61e054be39257111d57d0807a8a36a1bf"
     },
-    "HG-127": {
+    "HG-128": {
       "claim": "Corner circular image runs from 32x32 pt on 40mm to 38x38 pt on 45mm/49mm.",
       "value": "32x32 pt to 38x38 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2067,9 +2080,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "d1a5c31214066f9371ca8d9396388a2da1f5becedee7abc1c9ae5d4b672176bf"
+      "sourceSha": "f7be461f99dec8c1fdab0334bc5e20c0673c33c805c5839819e740327ec34b08"
     },
-    "HG-128": {
+    "HG-129": {
       "claim": "Default corner text size ranges from 10 pt on 40mm to 12 pt on 45mm/49mm.",
       "value": "10 pt to 12 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2080,9 +2093,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "feb8ed54790ed0aa1c22bb96e902a9063f8ad426588e74958ab556013f4ca1db"
+      "sourceSha": "4bd7e46952e7c673af494143a613b0ddea39d1e1106bf4b70f86c370e78ad5da"
     },
-    "HG-129": {
+    "HG-130": {
       "claim": "The Heart Rate rectangular complication graphs values over a day.",
       "value": "24 hours",
       "label": "documented",
@@ -2093,9 +2106,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "fac5932186c385c139d515b690e5142a1d531827d55cb82b66157ba4cc68d797"
+      "sourceSha": "760035440f39558b2a24f2284a74f826c0d6e6111bcbd1fe20f47eb5ca771738"
     },
-    "HG-130": {
+    "HG-131": {
       "claim": "Rectangular large image with title runs from 150x47 pt on 40mm to 178.5x56 pt on 45mm/49mm.",
       "value": "150x47 pt to 178.5x56 pt; 40mm; 45mm; 49mm; 162x69 pt; 193x82 pt",
       "label": "documented",
@@ -2106,9 +2119,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ae03762ed8cae8a4354b3377803c78b195d9bc468375d5af926cd561d552bb7f"
+      "sourceSha": "296feab93dd3bf8587a0e915809380f51aae647e4f348481b2384ba0bae1c998"
     },
-    "HG-131": {
+    "HG-132": {
       "claim": "Default rectangular text size ranges from 16.5 pt on 40mm to 19.5 pt on 45mm/49mm.",
       "value": "16.5 pt to 19.5 pt; 40mm; 45mm; 49mm",
       "label": "documented",
@@ -2119,9 +2132,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dbaea703b723dec273cbd2848ad8c4935eab73409b2f0b1412c718771d8594ac"
+      "sourceSha": "29c20658e4691a9406423de8d513d2e91e1371b29d30a0d29328dff16ad6ad31"
     },
-    "HG-132": {
+    "HG-133": {
       "claim": "Circular small ring image runs from 20x20 pt on 38mm to 26x26 pt on 45mm/49mm.",
       "value": "20x20 pt to 26x26 pt; 38mm; 45mm; 49mm",
       "label": "documented",
@@ -2132,9 +2145,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "7440b89e8f30b1223afcb5be299a0c0c75b8c945104f07330185338d3e167cd8"
+      "sourceSha": "8786ccc253deb2129d9ae2642b40a6ee0bd6945b3b2992a0fe8984948bf442ba"
     },
-    "HG-133": {
+    "HG-134": {
       "claim": "Live Activities suit short to medium tasks not exceeding eight hours.",
       "value": "8 hours",
       "label": "documented",
@@ -2145,9 +2158,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "08c5793bc0ddb4190a51631cd428b9c4221906dbaf52f5bca7ca615d9a4fad21"
+      "sourceSha": "c14d89230b21da300918ed48d2a18c2a6ca1d4930076ea9bf95e55a20057f783"
     },
-    "HG-134": {
+    "HG-135": {
       "claim": "Limited-width compact and minimal views must fit a circle 28 pt across.",
       "value": "28 pt",
       "label": "documented",
@@ -2158,9 +2171,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dcabbf4b93fa8caeb0e7f328004a94b01c302af7dbfd29e55cdec43e40261862"
+      "sourceSha": "98b018c1b8eca7f1d9a1e17c0521a3e913e31d96a5e045b655aec6f4bb2817e4"
     },
-    "HG-135": {
+    "HG-136": {
       "claim": "Live Activity animations last at most two seconds.",
       "value": "2 s",
       "label": "documented",
@@ -2171,9 +2184,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "632135cc8e7ce920054c4ededab10692c82d3eb3fd40419b0e59bbd77b0a0733"
+      "sourceSha": "99fab022e31a3f7d2cbf53e8b2792333cfebbb896786274083d3feb81945cc43"
     },
-    "HG-136": {
+    "HG-137": {
       "claim": "Ended Live Activities stay on Lock Screen, Mac menu bar and watchOS Smart Stack for up to four hours.",
       "value": "4 hours",
       "label": "documented",
@@ -2184,9 +2197,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0c4c0f322461b8210399dc38d503a25b628692eb0dc0fcc15d380d3c0ba83feb"
+      "sourceSha": "2fdc49ed301e78da5c4d1e85dfa2ba5e4a342fa7ddb9db00745362f4da1cdc93"
     },
-    "HG-137": {
+    "HG-138": {
       "claim": "A custom dismissal time of 15 to 30 minutes suits most Live Activities.",
       "value": "15 to 30 minutes",
       "label": "documented",
@@ -2197,9 +2210,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "893996ed98813da0f55ed3d7dee7b0332df8cf274a531cbb5959b84ead5e512a"
+      "sourceSha": "4a295f75b717f7b51b07939af134d8b159ec116ff62551847ac09524fc91e887"
     },
-    "HG-138": {
+    "HG-139": {
       "claim": "The standard Live Activity Lock Screen layout margin is 14 points.",
       "value": "14 points",
       "label": "documented",
@@ -2210,9 +2223,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c2774663694ca13eb824244c654a5045b5ab5d5b737aa4bec50600c2d0ba4013"
+      "sourceSha": "4ea507954ed540c4e33c02325e42539497193e685d9f63b88402ab4248aad765"
     },
-    "HG-139": {
+    "HG-140": {
       "claim": "StandBy scales the Lock Screen presentation by two times when tapped.",
       "value": "2x",
       "label": "documented",
@@ -2223,9 +2236,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "de21bc33dc7af2a9f818e8a95ac10fd45bc4cb3436ba8b51fc6b8f3a2498016b"
+      "sourceSha": "7bd1294b8e94b5115f2a62addd1a42fc850c5cc4a6b20a2d56c7ae6cb2720170"
     },
-    "HG-140": {
+    "HG-141": {
       "claim": "On a 430x932 pt iPhone the expanded and Lock Screen presentations are 408 pt wide and 84 to 160 pt tall.",
       "value": "408x84–160 pt; 62.33x36.67 pt; 36.67–45 pt; 36.67 pt",
       "label": "documented",
@@ -2236,9 +2249,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "e52b5374da8fe964f74161cc3cfb9317534037ba7c757fb8ca18cb91626fc01b"
+      "sourceSha": "dc0a3197044f8d8c8d77da150128f8e135c482ff53b834ad9c90948e38473332"
     },
-    "HG-141": {
+    "HG-142": {
       "claim": "CarPlay Live Activity verification sizes include 240x78, 240x100 and 170x78 pt.",
       "value": "240x78, 240x100, 170x78 pt",
       "label": "documented",
@@ -2249,9 +2262,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "cbeacda802c1cf1a5bbad64980afe06ea98e5d3c7890ac1e8e1c17f6cc8bfcc2"
+      "sourceSha": "0ed15288f0fca639115ad2a7ba1ae1d544d413a08afb8ede30f5eb8ae966b79c"
     },
-    "HG-142": {
+    "HG-143": {
       "claim": "Smart Stack Live Activity size ranges from 152x69.5 pt on 40mm to 198x81.5 pt on 49mm Ultra 3, 4.",
       "value": "152x69.5 pt to 198x81.5 pt; 425–500 pt; 84–160 pt; 40mm; 49mm",
       "label": "documented",
@@ -2262,9 +2275,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "7eba4e7ced04e8120f635dac34862f0415f74c1b74ce0830f1dcec50485fbc50"
+      "sourceSha": "b3245233149446c966008f36c1ab6396995bb88d1fb9a07cbdbc84861738bdc9"
     },
-    "HG-143": {
+    "HG-144": {
       "claim": "A notification detail view contains up to four action buttons.",
       "value": "4 buttons",
       "label": "documented",
@@ -2275,9 +2288,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "74e614526cb2622cf1c73d279e0d5efc36fd28fa5d6299b6b6494ca462ae80dc"
+      "sourceSha": "fafc284bf3a0d7ca87f251f2b250b2776a6e0eae0a76009eae9d9304581fe2f9"
     },
-    "HG-144": {
+    "HG-145": {
       "claim": "White at 18 percent opacity matches the background of system long-look notifications.",
       "value": "18%",
       "label": "documented",
@@ -2288,9 +2301,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "31bcbf8c87e2ea94e894711977bfa9b2c33f90dac5e5433a7cb46f9918aa98fe"
+      "sourceSha": "7f940ca86514e94cbe892e9375b88ca975df3f19bc4f5ce2458c30db25a0f2b7"
     },
-    "HG-145": {
+    "HG-146": {
       "claim": "A long look can show up to four custom action buttons.",
       "value": "4 buttons",
       "label": "documented",
@@ -2301,9 +2314,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dc35c42481244cc0658fb04f99d6b6899451f9eda8cf6121e598278b55f2594c"
+      "sourceSha": "fbb9cd560500dfa60b5e5a3162a10f69db24172ee3eb830bb9fb614d378552a7"
     },
-    "HG-146": {
+    "HG-147": {
       "claim": "Double tap triggers the first nondestructive action; example parking options were 5 minutes, 15 minutes or one hour.",
       "value": "5 minutes, 15 minutes, 1 hour",
       "label": "documented",
@@ -2314,9 +2327,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "5543811cf047894410325fb8a1bfd503f4c32f020ecc965d8152a9bca2d6b6c9"
+      "sourceSha": "c9bc8fe1a310c8988167d3b2f72ab47003ff2b53eed40df0d70e06a1f4f6dcfb"
     },
-    "HG-147": {
+    "HG-148": {
       "claim": "A snippet custom view should be no taller than 400 points.",
       "value": "400 points",
       "label": "documented",
@@ -2327,9 +2340,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ec0b34f0e1539a7ebee7e5f1b8c17bbbdd308076cfb6b9ec5f79a8590fe710bc"
+      "sourceSha": "04b39891d49b461452f7a149873a16abbaa76282edc33033a2f663cece32bf62"
     },
-    "HG-148": {
+    "HG-149": {
       "claim": "Static Top Shelf fallback image size is 2320x720 pt, or 4640x1440 px at 2x.",
       "value": "2320x720 pt; 1920 pixels; 4640x1440 px",
       "label": "documented",
@@ -2340,9 +2353,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "db4565ca142d324b62bc3090b5b646ec5b7438bd197dabee4873584ec7d1a2ed"
+      "sourceSha": "f535faa9af439dab65bdaa8775af69f55ad4e88484b19fad5a2810a33f1144ee"
     },
-    "HG-149": {
+    "HG-150": {
       "claim": "Poster (2:3) sectioned-row image actual size is 404x608 pt.",
       "value": "404x608 pt; 380x570 pt; 333x570 pt",
       "label": "documented",
@@ -2353,9 +2366,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "81a2f83d367fbe29c0afb57ef5af43490eb2999f2bd5885ed44c93b18a779323"
+      "sourceSha": "c2203785f5d321361622457200ea22234ea9654464d3026e6ee13a8e029aea22"
     },
-    "HG-150": {
+    "HG-151": {
       "claim": "Square sectioned-row image actual size is 608x608 pt.",
       "value": "608x608 pt; 570x570 pt; 500x500 pt",
       "label": "documented",
@@ -2366,9 +2379,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "cc8f765aca957b7be1d0ecac9e345032887e9d0f6b3cb85eaf4a2aa6d7ce556a"
+      "sourceSha": "e0a8d8de6f5944efccbfe920c04f2676f7dbfd6bb6b4df5055fd292c52eb1cf2"
     },
-    "HG-151": {
+    "HG-152": {
       "claim": "16:9 sectioned-row image actual size is 908x512 pt.",
       "value": "908x512 pt; 852x479 pt; 782x440 pt",
       "label": "documented",
@@ -2379,9 +2392,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "756dd62a0d27c4497b4f5404d6a883d374fe8ce8b7e4f87a91b45d6aa8f0853e"
+      "sourceSha": "16a1bdd4d0532f5660ef6499501c80fcf1666c2c98516d0a947461e7124cffae"
     },
-    "HG-152": {
+    "HG-153": {
       "claim": "A 16:9 image next to a poster or square scales to 500 pixels high.",
       "value": "500 pixels",
       "label": "documented",
@@ -2392,9 +2405,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "d1a42b86a7039867b8e46475ae07d392446218df80d60ab92b36e1b522935ba8"
+      "sourceSha": "9c2ee87fb1827ce9a3da6275e2a6932095907e1a4b0f27cb3382b3922fd99ad2"
     },
-    "HG-153": {
+    "HG-154": {
       "claim": "Scrolling inset banners should use three to eight images.",
       "value": "3 to 8 images",
       "label": "documented",
@@ -2405,9 +2418,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1c11adb496e41bb04ed052f0591272bf13a61a28631ebe1783530ba6ab3209fb"
+      "sourceSha": "5f28a85a4d9217d1f338069bec0f9c9297f056ed0f60d58d6a6edbd63bdd7439"
     },
-    "HG-154": {
+    "HG-155": {
       "claim": "Scrolling inset banner image actual size is 1940x692 pt.",
       "value": "1940x692 pt; 1740x620 pt; 1740x560 pt",
       "label": "documented",
@@ -2418,9 +2431,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "89037a5171c099cb4055885b64f0cee915fe2928f18ef2f97ca28a47e2d10ffb"
+      "sourceSha": "c2233cbbbdb54d28ac0d1389ff90b4c8e309431fbbaa5361c457b4c8a5eaa774"
     },
-    "HG-155": {
+    "HG-156": {
       "claim": "Widget update animations can last up to two seconds.",
       "value": "2 seconds",
       "label": "documented",
@@ -2431,9 +2444,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "18ef3b5479893bee50df65642d0d56092511e0fab0c0a470ae3f016febf85ba2"
+      "sourceSha": "7c474662eda1e423f0c18cdcace9a87237ab520e5a58892c82c8740efe86903b"
     },
-    "HG-156": {
+    "HG-157": {
       "claim": "Standard widget margin is 16 points for most widgets.",
       "value": "16 points",
       "label": "documented",
@@ -2444,9 +2457,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "f7fa4e0124e8ec51af5509613398bf68a6885700e7f77f094b5faf8399594393"
+      "sourceSha": "86517fa369b4687212f1e27d321ca35e0b6e81c245d21c353b6c8176e1da075a"
     },
-    "HG-157": {
+    "HG-158": {
       "claim": "Tighter widget margins of 11 points can suit content groupings.",
       "value": "11 points",
       "label": "documented",
@@ -2457,9 +2470,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "64b7a8edd5ec80027f6f5119740191fb5304e5008182d55f33fb7683cdcf33c0"
+      "sourceSha": "06df4eb18fcb915c472b4ba747768eb4e4ef231e459a3d7329a3bdcbe4d5b52c"
     },
-    "HG-158": {
+    "HG-159": {
       "claim": "Widget text should generally be 11 points or larger.",
       "value": "11 points",
       "label": "documented",
@@ -2470,9 +2483,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b72432e6ffd53c11b85e4f95a39c065390aebf12fee579a67db7dfab9e25f170"
+      "sourceSha": "f160fa7521c05f8f254044ebfa75d12141212b16bdcdcca38f0f478fecab0067"
     },
-    "HG-159": {
+    "HG-160": {
       "claim": "Widgets support Dynamic Type sizes from Large up to AX5 in iOS, iPadOS and visionOS.",
       "value": "Large to AX5",
       "label": "documented",
@@ -2483,9 +2496,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "01d4974b309d8ae025a34829789074439164723010c6872bd4f3a369b38c5b52"
+      "sourceSha": "d16246e0aec5dd5375e38449d0e77c38a4125c53a0e4cc3320de362d7f688401"
     },
-    "HG-160": {
+    "HG-161": {
       "claim": "The Apple HomeView Modular face can hold up to four widgets.",
       "value": "4 widgets",
       "label": "documented",
@@ -2496,9 +2509,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "61cca288fb4982e91908b1b32aea51284addeb53406a0ce12c8f0835ecb0dc1b"
+      "sourceSha": "96478c8a8127d4b049a16bca41449d6e1699bdbcb40d2e9d8dff24977dc2377c"
     },
-    "HG-161": {
+    "HG-162": {
       "claim": "Users can scale a visionOS widget from 75 to 125 percent.",
       "value": "75 to 125 percent",
       "label": "documented",
@@ -2509,9 +2522,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "70832c0490d5394a333dfbe81a2eaab7de51638925a6a59bebed519a66e0720d"
+      "sourceSha": "23e82c32fdded62abc35fe924c0351b9076195bb0354cba642c414ab66933708"
     },
-    "HG-162": {
+    "HG-163": {
       "claim": "On a 430x932 pt iPhone the small widget is 170x170 pt and the large is 364x382 pt.",
       "value": "170x170 pt and 364x382 pt; 430x932 pt; 76x76 pt; 172x76 pt; 257x26 pt",
       "label": "documented",
@@ -2522,9 +2535,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "23771749d2c463a6f1bf6b0567462e59ed71373767c2ff1fc9cd844111d0c088"
+      "sourceSha": "ab5497ed694637ec9f7d62f6978d721247d98090e7bc1d462dda56355cb95973"
     },
-    "HG-163": {
+    "HG-164": {
       "claim": "On a 768x1024 pt iPad the canvas small widget is 141x141 pt and the device small is 120x120 pt.",
       "value": "141x141 pt and 120x120 pt",
       "label": "documented",
@@ -2535,9 +2548,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "f4fe27fe1d53e42b731aafef84d3e6ebaebbbf820139746957498e6522ca64c9"
+      "sourceSha": "fb2cda29cbaff95d2badf9aea702a167adbbb0373f59508c0d8b53ff7062ce36"
     },
-    "HG-164": {
+    "HG-165": {
       "claim": "visionOS small widget is 158x158 pt, and Smart Stack widgets run from 152x69.5 pt to 198x81.5 pt.",
       "value": "158x158 pt; 152x69.5 pt to 198x81.5 pt; 450x338 pt; 40mm; 49mm",
       "label": "documented",
@@ -2548,9 +2561,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "db1e41a94236d32017d22cdd0736b20d18cd5fe37cd1b08be74384f5a0a7f87c"
+      "sourceSha": "ee9b87071148f3c9b48cf759bb0251519adbee5e982f4f48ad5d91aaa575e885"
     },
-    "HG-165": {
+    "HG-166": {
       "claim": "Action button labels should be as short as possible, at most three words.",
       "value": "three words",
       "label": "documented",
@@ -2561,9 +2574,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "20c98d126f06974a8d9ac143d9ad3b503fedc7c82454e1a01b63fa5d4ca60563"
+      "sourceSha": "352d621322644b4355d61c8cf3ca3fc753a15d97d02fc4affd14673903f4ef80"
     },
-    "HG-166": {
+    "HG-167": {
       "claim": "Content read or used for long should sit at least this far from the viewer.",
       "value": "one meter",
       "label": "documented",
@@ -2574,9 +2587,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3903356fa77a204190b5b8a7016396370ba2df80e2f999d9c3e96e4591a17821"
+      "sourceSha": "f958001c00a22e08b2826868fac0b1f739f9504c23e37bd283ac902a89bc7b38"
     },
-    "HG-167": {
+    "HG-168": {
       "claim": "Interactive items need a margin around their bounds to be easy to look at.",
       "value": "16 points; 60 points",
       "label": "documented",
@@ -2587,9 +2600,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c59621d793d3aa9aac23b892ffc65da41f6bd70b916424cf57e964bd6d816e8f"
+      "sourceSha": "408f4cbedd08cda53bc813e9c5179d3ab5f6246a27130163668884f28f618a90"
     },
-    "HG-168": {
+    "HG-169": {
       "claim": "Alternatively, item centers should be kept apart by a minimum distance.",
       "value": "60 points; 16 points",
       "label": "documented",
@@ -2600,9 +2613,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "6cec988c95388f94974cabc9aefc16e3711de9e5f383c62f6d917a0574d1d814"
+      "sourceSha": "f65fd856a2ab049def1bfaa9eaa63f3d4a46203824817e9f8972f41adaa8fdcf"
     },
-    "HG-169": {
+    "HG-170": {
       "claim": "Frequently used virtual game controls need a minimum touch size.",
       "value": "44x44 pt; 28x28 pt",
       "label": "documented",
@@ -2613,9 +2626,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "5fe0b1765b66572d6efcb55cc61a56746b523e549857f68616a55368af4198ea"
+      "sourceSha": "41b97189f11b1652ff9404e1939fb1b28b6ee15f82232f4dc506db36a56d7416"
     },
-    "HG-170": {
+    "HG-171": {
       "claim": "Less important virtual controls such as menus need a smaller minimum size.",
       "value": "28x28 pt; 44x44 pt",
       "label": "documented",
@@ -2626,9 +2639,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b64965ead0b6c3056a8d978aff4d096f159e37ee8d40724aebc1e38fa11a4f96"
+      "sourceSha": "69ccf73633ed9f8bf2fd78243d2c61594c6901542f5709fe8044722e26e0736a"
     },
-    "HG-171": {
+    "HG-172": {
       "claim": "Elements with a bezel work well with this much hit-region padding for pointer use.",
       "value": "12 points; 24 points",
       "label": "documented",
@@ -2639,9 +2652,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "4d8ea4f1b73f5216c9e2370c37a4b3c2cd1d1bbfa2540c08cf0d3bd255721977"
+      "sourceSha": "92f5c29ee09f2b3f5501ddb7d814b0e312d26f62a09541549429f7534b58b9ec"
     },
-    "HG-172": {
+    "HG-173": {
       "claim": "Elements without a bezel work well with this much padding around visible edges.",
       "value": "24 points; 12 points",
       "label": "documented",
@@ -2652,9 +2665,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "57063a6827d8dce135e35bc60e5b386afdecd1329cebcc2eb03ac593ec9d8213"
+      "sourceSha": "bc3086941228afa68e82e3e84dcace2dee641cfb580e64a7a72e8f2d6610bc62"
     },
-    "HG-173": {
+    "HG-174": {
       "claim": "Notifications: a clip can schedule and receive them for 8 hours after launch.",
       "value": "8 hours",
       "label": "documented",
@@ -2665,9 +2678,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "daeebd82d75bf3691c0f9f4b588f3afd1d107e531303a053e9ba5a30a17a2f67"
+      "sourceSha": "8994043fdbecd9d480f23d940eb1eaed322c77b10fc862fbb803cf34d947c99b"
     },
-    "HG-174": {
+    "HG-175": {
       "claim": "Card image: use a PNG or JPEG without transparency at 1800x1200 px.",
       "value": "1800x1200 px",
       "label": "documented",
@@ -2678,9 +2691,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "f6f4175e06d0aaf81b8ca90bd153e9ff0516580b1b85218fcf1e0f5e01a0049c"
+      "sourceSha": "e1721e712ccf63c20f77ff2c8f66d5b3435278bdec62a9e253439b3178fe2dfc"
     },
-    "HG-175": {
+    "HG-176": {
       "claim": "Card copy: a title is required and may be at most 30 characters.",
       "value": "30 characters",
       "label": "documented",
@@ -2691,9 +2704,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "6a6c3ca2a4c2c6c01fafeee2f4ad1e12bf3eae734098831237feb1b87c6d7c0f"
+      "sourceSha": "0fb9f4b68be85cfa1ecd01327b0b5cf590cd1279770e5d91b6d9d7b28fae8dfd"
     },
-    "HG-176": {
+    "HG-177": {
       "claim": "Card copy: a subtitle is required and may be at most 56 characters.",
       "value": "56 characters",
       "label": "documented",
@@ -2704,9 +2717,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1ef83053fbf0524b8588d66acb295cf16b48b4319d24a5f37df3f64b28725d36"
+      "sourceSha": "43b2099ebb51c4e3540b2d487b93769538573b4fbd01f9c2a67621d4ba608802"
     },
-    "HG-177": {
+    "HG-178": {
       "claim": "Codes: mount them on a flat or cylindrical surface only. On a cylinder, keep the code's width no more than one-sixth of the circumference.",
       "value": "one-sixth of the circumference",
       "label": "documented",
@@ -2717,9 +2730,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "9c311feda68c3eecc634ad4077963fb5b155ceca4793aa8a1f53cd59c8303432"
+      "sourceSha": "92999a5d1497e0cceb2b2dadfe5aac661f319807cc379df863fb58db90651949"
     },
-    "HG-178": {
+    "HG-179": {
       "claim": "Codes: printed codes must be at least 3/4 inch (1.9 cm) across.",
       "value": "3/4 inch (1.9 cm)",
       "label": "documented",
@@ -2730,9 +2743,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1f23d4517bc980a289a774566245388b7572a43a7b11352bbab48ef6bd58c074"
+      "sourceSha": "01e286b2a5378980ee76026aa990452a2bc53b114ab9048100ccef624048afa6"
     },
-    "HG-179": {
+    "HG-180": {
       "claim": "Codes: digital codes must be at least 256x256 px, as PNG or SVG.",
       "value": "256x256 px",
       "label": "documented",
@@ -2743,9 +2756,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "93e779df46af7b08793725a44ee40e307d1a1125c9bdfe63aa8052a97788eb5f"
+      "sourceSha": "dd679032ec4f9bd704c1ecb022978c7551e28a23667c4b5f3213436a7439d809"
     },
-    "HG-180": {
+    "HG-181": {
       "claim": "Codes: the embedded NFC tag must be at least 35 mm across or equivalent.",
       "value": "35 mm",
       "label": "documented",
@@ -2756,9 +2769,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "902fc8a5d72dd9003f69eb51c6d015ef8c62f10cc9ff24b9657921d180d2a216"
+      "sourceSha": "788b519d07270fe1a2c8c5c4c8de5ef3d0920caf0abd63c59a65a3ce87c7ef9d"
     },
-    "HG-181": {
+    "HG-182": {
       "claim": "Codes: with a tag at the minimum size, the printed code needs a diameter of 1.37 inches (3.48 cm) or more.",
       "value": "1.37 inches (3.48 cm)",
       "label": "documented",
@@ -2769,9 +2782,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "9aeb820dc6e6fb4852c34842e929bead892c25338109b74d85c7472aada682bb"
+      "sourceSha": "432c547371b0c39f131938f39040640c52423b1b63ea99c8f2c54db5994de14c"
     },
-    "HG-182": {
+    "HG-183": {
       "claim": "Codes: keep the distance-to-code-size ratio at most 20:1, and aim for 10:1 where possible.",
       "value": "20:1",
       "label": "documented",
@@ -2782,9 +2795,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b0f8b2bb0f111f7c06b8303a033e312c7e15f0acac4f7fdcfd1383316abfe023"
+      "sourceSha": "9650da9cc1a34ab6ee34c42deaf9bb3e2c5479ab4afb6548ad330565d131ad99"
     },
-    "HG-183": {
+    "HG-184": {
       "claim": "Printing: rasterize the SVG at no less than 600 ppi and print at no less than 300 dpi.",
       "value": "600 ppi and 300 dpi",
       "label": "documented",
@@ -2795,9 +2808,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dbed7433931674cdcf12258f9ce1923fb5888c0300d6729fb13ea431a6fe548a"
+      "sourceSha": "a319e8f4cf1de676ea81fd5b58eb6c9b0122833897e74c0f51e8ec04d0754e96"
     },
-    "HG-184": {
+    "HG-185": {
       "claim": "Printing: convert the sRGB SVG to CMYK with relative colorimetric (media-relative) intent, using the Generic CMYK profile for CMYK printers and the GRACoL 2013 profile for CMYKOV printers, with a CIELab Delta E tolerance of 2.5.",
       "value": "Delta E 2.5",
       "label": "documented",
@@ -2808,9 +2821,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3a5abacee8aa3aaaafa5d493c66a4e2bd04d727e4763ce70122c5b6e7d084c74"
+      "sourceSha": "a7d6cd6bd9f6c0a2bc4238384779c3f327de2f83cba5c2f7e7896940fe0dc626"
     },
-    "HG-185": {
+    "HG-186": {
       "claim": "Website icon: provide an icon for payment authorization and Handoff (and Wallet for subscriptions) at 60x60 pt, which is 120x120 px at @2x.",
       "value": "60x60 pt; 120x120 px",
       "label": "documented",
@@ -2821,9 +2834,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0e26abb7a3f1fa0a3e9067a68c4f07529fe89874e01e73a90d3907430749c065"
+      "sourceSha": "a072fc1b6b2fb871205da2d0f596455d86bab88b5f8398fdb20a47f4aae193de"
     },
-    "HG-186": {
+    "HG-187": {
       "claim": "Website icon: the same icon at @3x is 180x180 px.",
       "value": "180x180 px",
       "label": "documented",
@@ -2834,9 +2847,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1cc53e948598a3243b13fa3aed3f5ed08af2b8102603019bcc26cb4ecd7ebb12"
+      "sourceSha": "4cdf2a8dc46ccf9b07b31d22e694f7fecaf7c8c1d5b2fa39fe17033247fb0df4"
     },
-    "HG-187": {
+    "HG-188": {
       "claim": "Validation: name the field and the expectation (\"Zip code doesn't match city\", \"Shipping not available for this state\"), not \"Address is invalid\". Use noun phrases, sentence-style capitalization, no ending punctuation, and keep to 128 characters or fewer to avoid truncation.",
       "value": "128 characters",
       "label": "documented",
@@ -2847,9 +2860,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c06535f91c6338c6b888eac6a9cf5cd2da94dce77d2121ccb3677d12bc0f1097"
+      "sourceSha": "bc09829fd9fb21a3a8ba9a600200967f2489b6624b6a9c2ca557d20ef34a687e"
     },
-    "HG-188": {
+    "HG-189": {
       "claim": "Button size: minimum width for the plain Apple Pay button is 100 pt.",
       "value": "100 pt",
       "label": "documented",
@@ -2860,9 +2873,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0473d3e7771ba671e77d69abe9a3a135ab7e860ce97a28a71e67951fd01cb8ab"
+      "sourceSha": "9efbee906d7e5126fbf1cce91789e9b91a83cd1a927b9066c6f4f87e726a8743"
     },
-    "HG-189": {
+    "HG-190": {
       "claim": "Button size: minimum height is 30 pt.",
       "value": "30 pt",
       "label": "documented",
@@ -2873,9 +2886,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1807514fe35105c87614d68ee20e1aa7f96e6d4fce959b0ca06e1531565a11e7"
+      "sourceSha": "1731e707e0db5d6ae6cbc809cf97631f4aa7820a46525a27ffa736ee0b266160"
     },
-    "HG-190": {
+    "HG-191": {
       "claim": "Button size: typed buttons such as Book with Apple Pay need a minimum width of 140 pt.",
       "value": "140 pt",
       "label": "documented",
@@ -2886,9 +2899,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "badd34dfe785a02a839c2dd8f01b505002a606df18bd64c29d13f4e5b0cd74ae"
+      "sourceSha": "f1888ba58eaf6d797be225fa3b13f058bc44e436f38939f655b1ac0ebce8761e"
     },
-    "HG-191": {
+    "HG-192": {
       "claim": "Button size: minimum margin around any button is 1/10 of the button's height.",
       "value": "1/10 of the button's height",
       "label": "documented",
@@ -2899,9 +2912,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dafb56d2ffc04099b8f748df9c7fbef5470073c5cf17c5254625249c0bb82529"
+      "sourceSha": "7908a4288f0157b2d264fb3f956690188268b490fe1dafc514e8d9e96b80eaff"
     },
-    "HG-192": {
+    "HG-193": {
       "claim": "Mark: keep clear space of at least 1/10 of its height, and do not share its border with another graphic or button.",
       "value": "1/10 of its height",
       "label": "documented",
@@ -2912,9 +2925,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "dc18b26623b55007f40fdacefb903042ba461d81d005d264d550a83ce33c6044"
+      "sourceSha": "3da99bfc40183ec5b579047e99625a9043b903622168ada8e9ba83f8fe5a7a66"
     },
-    "HG-193": {
+    "HG-194": {
       "claim": "Update the scene 60 times per second, so objects do not jump or flicker.",
       "value": "60 times per second",
       "label": "documented",
@@ -2925,9 +2938,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0571400499d7419d3eccb65a5746125d868443470a39aaacdef7b6763768d148"
+      "sourceSha": "5c092b9222dc67fe193f71cac45efbbacc5aa3c60d58880a66bbe58d07b1f47b"
     },
-    "HG-194": {
+    "HG-195": {
       "claim": "Real-world triggers: when a detected image first disappears, wait up to one second before fading out or removing attached virtual objects, to prevent flicker.",
       "value": "one second",
       "label": "documented",
@@ -2938,9 +2951,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "86b706873b45dfd48685d4989652b59a63200acfc57bbc193386a36cc585e400"
+      "sourceSha": "00a4ad52f64ad97c481c962636e1d882ad3da5f19b7834bdad70c56bc1aaccd5"
     },
-    "HG-195": {
+    "HG-196": {
       "claim": "Real-world triggers: keep active reference images to 100 or fewer; switch the active set by context, such as museum area, if you need more.",
       "value": "100 or fewer",
       "label": "documented",
@@ -2951,9 +2964,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ed08fca0537fb1ce190eb4dd1ec1ea2565b0772acfa6fd35c6cc8f998a0f8222"
+      "sourceSha": "8e6d67934b88a8f3a600cabe73b5e6ccba5073b8dac6603672aedb1af241aa47"
     },
-    "HG-196": {
+    "HG-197": {
       "claim": "Interruptions: when the front camera loses the face for roughly half a second or longer, show a visual indicator, with only minimal text if any.",
       "value": "half a second",
       "label": "documented",
@@ -2964,9 +2977,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "5436ff8bca1c9ad84e5df15936c547de9964f640f6d5a296843ba653125c9e5e"
+      "sourceSha": "aa990fe30ff65fe0f569336c23ccc55a057556dc6b03eedae8bc8044bc440c52"
     },
-    "HG-197": {
+    "HG-198": {
       "claim": "AR glyph: keep clear space of at least 10% of the glyph's height, with nothing overlapping it.",
       "value": "10% of the glyph's height",
       "label": "documented",
@@ -2977,9 +2990,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "356b42ea3f69c62c7a5dccb91b828c0a1a8f8904f8fbf50d3e13ea62dc01f9ca"
+      "sourceSha": "34cc3983587567a42139809bdaaf33c7fb6bc893dafc13825717094436a9f690"
     },
-    "HG-198": {
+    "HG-199": {
       "claim": "AR badges: keep clear space of at least 10% of the badge's height.",
       "value": "10% of the badge's height",
       "label": "documented",
@@ -2990,9 +3003,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b6b3449b2ba64fa474105ff2412cf0253118f50a9ba358365b8877bdc635896d"
+      "sourceSha": "8505da6f610277eea66a2d24c00261e1c640ce778f228878e36a1af6d9e6ac8e"
     },
-    "HG-199": {
+    "HG-200": {
       "claim": "Layout: the system scales icons and UI across display sizes such as 800x480, 960x540, 1280x720 and 1920x720 px (aspect ratios 5:3, 16:9, 16:9, 8:3), so elements appear at roughly the same size.",
       "value": "800x480, 960x540, 1280x720 and 1920x720 px",
       "label": "documented",
@@ -3003,9 +3016,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3a819db076bcdb9200504c1035137e7d9cd3be9e5f83e744b6864fe7769af5f0"
+      "sourceSha": "a05c9fc53a07a2057f78c9bac2d878e004518cc226b0a2653aeafa400bd35da8"
     },
-    "HG-200": {
+    "HG-201": {
       "claim": "Icons: create the CarPlay app icon at 120x120 px for @2x.",
       "value": "120x120 px",
       "label": "documented",
@@ -3016,9 +3029,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c35dee9cd7d25cc2b7369fe5b14e6858525a9b828fa2f579d6fa197a2f03cbf9"
+      "sourceSha": "b9c845c7e041439cb633e977ab379cd5743b11256db546ba9ff78057ffc446eb"
     },
-    "HG-201": {
+    "HG-202": {
       "claim": "Icons: create the CarPlay app icon at 180x180 px for @3x.",
       "value": "180x180 px",
       "label": "documented",
@@ -3029,9 +3042,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b3d0854e9f95cd903c71fa2ef77ca18b7643173bc5d1ef9c0038ba0269d63dd6"
+      "sourceSha": "fe3a11af2d8a9bb1f0f6461529b0f186579ecc9305c188220226aefd0b2a0ff0"
     },
-    "HG-202": {
+    "HG-203": {
       "claim": "Achievement images: use PNG, TIF or JPG in sRGB or P3, at 72 DPI or higher (minimum).",
       "value": "72 DPI",
       "label": "documented",
@@ -3042,9 +3055,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c7c5208e897bd454a6ab2833a1015f427978aababf946287ffa01763efce2caa"
+      "sourceSha": "7ccadf1a823d9fc17ea9f8b0c26d88524bf3e3041ab8d575a7727c19c5ae96d6"
     },
-    "HG-203": {
+    "HG-204": {
       "claim": "Achievement images (iOS, iPadOS, macOS, visionOS): image size 512x512 pt (1024x1024 px @2x).",
       "value": "512x512 pt; 1024x1024 px",
       "label": "documented",
@@ -3055,9 +3068,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "7beedec1caaa24ba564e863d491e756edb5c9eb7784bc5128147a9edac20342c"
+      "sourceSha": "fb670054809b3063a15fc4dfa236392bba6065cdf6f736d8dea33a902a8027c4"
     },
-    "HG-204": {
+    "HG-205": {
       "claim": "Achievement images (iOS, iPadOS, macOS, visionOS): mask diameter 512 pt (1024 px @2x).",
       "value": "512 pt; 1024 px",
       "label": "documented",
@@ -3068,9 +3081,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0d5dab50f7a65604433c9135e9bdac5b9e724b8cf01368d37284d8aea5b5c58e"
+      "sourceSha": "0106b6309145522e25daa525e50da43ccd53620852625d94f6e39ce6989ea69b"
     },
-    "HG-205": {
+    "HG-206": {
       "claim": "Achievement images (tvOS): image size 320x320 pt (640x640 px @2x).",
       "value": "320x320 pt; 640x640 px",
       "label": "documented",
@@ -3081,9 +3094,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "53809a2fa0288b1422f14d6e020dab87805ecae7e26cb1c9a2195b25f8070a78"
+      "sourceSha": "f2a850c913aad7c21ec101b7b157e7a64e166915efa5e64dde584ce654475a4f"
     },
-    "HG-206": {
+    "HG-207": {
       "claim": "Achievement images (tvOS): mask diameter 200 pt (400 px @2x).",
       "value": "200 pt; 400 px",
       "label": "documented",
@@ -3094,9 +3107,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c80e4b3eb4eba738a6f461d490cfca6e09b3ab5659176d2231c250fd8eff2a6d"
+      "sourceSha": "260aa5d8a404aa8c6217a09266ecbef7d029b5b925de96be2a038cd51ba199c4"
     },
-    "HG-207": {
+    "HG-208": {
       "claim": "Leaderboard images (iOS, iPadOS, macOS): JPEG, JPG or PNG in sRGB or P3, image size 512x512 pt (1024x1024 px @2x).",
       "value": "512x512 pt; 1024x1024 px",
       "label": "documented",
@@ -3107,9 +3120,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "0618b94ff3775eb9bf32b195bcea9fda0be8f3c2dfaeed900fb0b5b2164f7e70"
+      "sourceSha": "6eb23308d027edfcb051df5b70379ff6f9ed4fe8498aac4aab7bf7289fb3d3cd"
     },
-    "HG-208": {
+    "HG-209": {
       "claim": "Leaderboard images (iOS, iPadOS, macOS): the cropped area is 512x312 pt (1024x624 px @2x).",
       "value": "512x312 pt; 1024x624 px",
       "label": "documented",
@@ -3120,9 +3133,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ca69e7d9bed6e8dc271eff60f1435d7ef38cff6986271fbde809919bf9d15b41"
+      "sourceSha": "a855bf494b9f159881fc3fbe96004073c6a5b8e2346db926878abecc0b8e6c6f"
     },
-    "HG-209": {
+    "HG-210": {
       "claim": "Leaderboard images (tvOS): PNG, TIF or JPG, image size 659x371 pt (1318x742 px @2x).",
       "value": "659x371 pt; 1318x742 px",
       "label": "documented",
@@ -3133,9 +3146,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "73c5d4ba7aa99205bbed313dd738f52ca192c00be1856d57a55529b867e87e09"
+      "sourceSha": "c49d10516bf3dfdca3f3a744acf28424b850337595c1ff3280215274f65d4972"
     },
-    "HG-210": {
+    "HG-211": {
       "claim": "Leaderboard images (tvOS): focused size 618x348 pt (1236x696 px @2x).",
       "value": "618x348 pt; 1236x696 px",
       "label": "documented",
@@ -3146,9 +3159,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "fa67b93c610f0e503af6a7d0a32c20a0fa2382fec88550917635d39193435066"
+      "sourceSha": "a03ee2be09840e6f6cccd0289b30a2331af66e8b2e7a6f95b13fe84adb9a4e3f"
     },
-    "HG-211": {
+    "HG-212": {
       "claim": "Leaderboard images (tvOS): unfocused size 548x309 pt (1096x618 px @2x).",
       "value": "548x309 pt; 1096x618 px",
       "label": "documented",
@@ -3159,9 +3172,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1b6f94154862c7478556c203741d28d3479198d6689ad6a9c3017428f2301df6"
+      "sourceSha": "69890d24ae5e71c8d66e2aaec1914f17521dd3ba0d5e3e2624a0124949865b45"
     },
-    "HG-212": {
+    "HG-213": {
       "claim": "Challenges: they are timed contests built on leaderboards. Use them for short, skill-based activities with a clear measure, playable alone, taking 1-5 minutes.",
       "value": "1-5 minutes",
       "label": "documented",
@@ -3172,9 +3185,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "422086cb26d7291b99935733fc35ed69c284475cf51d280518054f6551033f47"
+      "sourceSha": "afd9291fab9db016003aaf5dd8441f2bb0b4422e816d2fbe74d7724a63e1847e"
     },
-    "HG-213": {
+    "HG-214": {
       "claim": "Challenge artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x).",
       "value": "1920x1080 pt; 3840x2160 px",
       "label": "documented",
@@ -3185,9 +3198,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "4e0cda4c664f8329897ee1eab0313e97174cb5af55c4bd2d1c65a156b5aa348e"
+      "sourceSha": "ff24a78437de94b73e44870a1471da4bc141a9c85bc956b49ef9b3b0eb5eb617"
     },
-    "HG-214": {
+    "HG-215": {
       "claim": "Challenge artwork: cropped area 1465x767 pt (2930x1534 px @2x).",
       "value": "1465x767 pt; 2930x1534 px",
       "label": "documented",
@@ -3198,9 +3211,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c3368b645f23803dc7ba36e150eaf5ae8f66511e0bac5a8e3bd4e3acd820a6d3"
+      "sourceSha": "7c1833aa9aaa7647dc61fc5dbeca970d01a7c8138e3c57cd49ff65023a7bb1f5"
     },
-    "HG-215": {
+    "HG-216": {
       "claim": "Party codes: generated codes are alphanumeric and typically eight characters long, like \"2MP4-9CMF\".",
       "value": "eight characters",
       "label": "documented",
@@ -3211,9 +3224,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "65de36ae56a541a565f9594d3d7ad6059be5a1553175dcc5343e43247c096edd"
+      "sourceSha": "6619c45dd897cea4211f2b9df7b44086c2c60c0c02de5b744fde4c51e77c708f"
     },
-    "HG-216": {
+    "HG-217": {
       "claim": "Activity artwork: JPEG, JPG or PNG in sRGB or P3, at least 72 DPI, image size 1920x1080 pt (3840x2160 px @2x).",
       "value": "1920x1080 pt; 3840x2160 px",
       "label": "documented",
@@ -3224,9 +3237,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "4ac138138fe9828aea9072d86e57cbcc04519262c88e7186176c98652acd8315"
+      "sourceSha": "2e61a71069f1b1b22e42bf464edc332478e529a48db7985b9579b4da25a0ad34"
     },
-    "HG-217": {
+    "HG-218": {
       "claim": "Activity artwork: cropped area 1465x767 pt (2930x1534 px @2x).",
       "value": "1465x767 pt; 2930x1534 px",
       "label": "documented",
@@ -3237,9 +3250,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "2368c063f4c1d372c9b112ab41900ac0f6b480753579d351413f8e6da6432591"
+      "sourceSha": "9339b946409c33fc4b32e2f96879cc52ca0e16fa101c9567753712e961d61328"
     },
-    "HG-218": {
+    "HG-219": {
       "claim": "tvOS: dashboard image size is 600x180 pt (1200x360 px @2x), PNG, TIF or JPG, in sRGB or P3, 72 DPI or higher.",
       "value": "600x180 pt; 1200x360 px",
       "label": "documented",
@@ -3250,9 +3263,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "76f37cdcf1d94eab67c2a481644e4eafc547348f1a7d0d3470d73be0ca19cc1f"
+      "sourceSha": "5c78b0182efe3bf5de0b1b83fb4c24409fdba5e22ec3778cac8f951a83859a3c"
     },
-    "HG-219": {
+    "HG-220": {
       "claim": "Apple Health icon: keep clear space of at least 1/10 of its height, and do not composite it onto another graphic.",
       "value": "1/10 of its height",
       "label": "documented",
@@ -3263,9 +3276,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "49ed95930a613d8550f71d493871dacf6b000a460b1fc2c7bc6868d4b7c40cef"
+      "sourceSha": "6b570e6b4963ad13cfc226c77e76c59216c162995241d7d25e87721166e86577"
     },
-    "HG-220": {
+    "HG-221": {
       "claim": "Icons (Messages, notifications) at @2x: 148x110 px.",
       "value": "148x110 px",
       "label": "documented",
@@ -3276,9 +3289,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "67182fce8a3410e1337b842ead8549cb715f9139402094abf95abc8aab15ec7f"
+      "sourceSha": "166b5e6764e37ba58c746f0f2a95677b3dfdf24e941ae4fcc9653b85e2e1c6be"
     },
-    "HG-221": {
+    "HG-222": {
       "claim": "Icons (Messages, notifications) at @2x: 143x100 px.",
       "value": "143x100 px",
       "label": "documented",
@@ -3289,9 +3302,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "ba5847970709eac68743c679571d850e32616dd66f7d84875617edf6688ba1e4"
+      "sourceSha": "be496bfabb8a61c72415d65ccaddbc78618c6ceb268e1439040d9d82709d0500"
     },
-    "HG-222": {
+    "HG-223": {
       "claim": "Icons (Messages, notifications) at @2x: 120x90 px, and at @3x: 180x135 px.",
       "value": "120x90 px; 180x135 px",
       "label": "documented",
@@ -3302,9 +3315,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "eef5e54c5dbf3fc85cefb9a892d780ff835a107c88df2178b96e7d5b74bdd6c0"
+      "sourceSha": "b8eeb236ba22be363e3d5060c251da1bb6cd0cf077f94450d8e327714ab165ea"
     },
-    "HG-223": {
+    "HG-224": {
       "claim": "Icons (Messages, notifications) at @2x: 64x48 px, and at @3x: 96x72 px.",
       "value": "64x48 px; 96x72 px",
       "label": "documented",
@@ -3315,9 +3328,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "556ab528bdd2e56e5e89e3bb5804d5a55d58884304fee0dd585aa83e6365f6a3"
+      "sourceSha": "b6ac64343646ab3c47bab61e720e521a9c1c296a8d5af54997647b67b003d5f8"
     },
-    "HG-224": {
+    "HG-225": {
       "claim": "Icons (Messages, notifications) at @2x: 54x40 px, and at @3x: 81x60 px.",
       "value": "54x40 px; 81x60 px",
       "label": "documented",
@@ -3328,9 +3341,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "97291bc686996d0535eee0a6e424f1760f5f6870d4f61d50959ba264fe1fff73"
+      "sourceSha": "c8ed9c6ab2269f0aa2a005b266d0cb17b060951c9f94d0589d05b8028156c909"
     },
-    "HG-225": {
+    "HG-226": {
       "claim": "Icons (Settings): 58x58 px at @2x and 87x87 px at @3x.",
       "value": "58x58 px; 87x87 px",
       "label": "documented",
@@ -3341,9 +3354,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "e3609af1668d2f96a34e710101797756e5c0d484d0548e172595f23e473ca78a"
+      "sourceSha": "1ab2689cd29296664412200747218e8c4933acad7673d45a8cac18004a9ada52"
     },
-    "HG-226": {
+    "HG-227": {
       "claim": "Icons (App Store): 1024x1024 px at both scales.",
       "value": "1024x1024 px",
       "label": "documented",
@@ -3354,9 +3367,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "83561fe68f84453d414a159b29a2318428d423d744e548b5fa69af8d4b4c1647"
+      "sourceSha": "24349620da9ff00b1f927e0dccb405810f1ba8fa020458cd3c1815357dd78b60"
     },
-    "HG-227": {
+    "HG-228": {
       "claim": "Stickers: prepare images at @3x, and the system downscales for @2x and @1x. Small is 300x300 px.",
       "value": "300x300 px",
       "label": "documented",
@@ -3367,9 +3380,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "5ac53c298b8178abf1f6eef01bca056fa4d294106e1530feee4d9ed1d667ec30"
+      "sourceSha": "936f17a8f6472603d3a3dab7fc7703b6f490b6d44ae3115594cbbadacc11cb6b"
     },
-    "HG-228": {
+    "HG-229": {
       "claim": "Stickers: regular is 408x408 px at @3x.",
       "value": "408x408 px",
       "label": "documented",
@@ -3380,9 +3393,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "140a3f846bb6f2551af996e07455e9e7937694f96a0cc091c7210049315894b9"
+      "sourceSha": "9e781cd248e138214c580de92613f5cb12500550be6a2045fdb2b1e09b534468"
     },
-    "HG-229": {
+    "HG-230": {
       "claim": "Stickers: large is 618x618 px at @3x.",
       "value": "618x618 px",
       "label": "documented",
@@ -3393,9 +3406,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "86eb725b26f4aca9301c023868b6ce8f1aad1343950e6ac29c7e76b6e4e65a66"
+      "sourceSha": "c697f80741fb34e2f30dec413273cd473ac3961b7ed02af005c17c1aee26b421"
     },
-    "HG-230": {
+    "HG-231": {
       "claim": "Stickers: each file must be 500 KB or smaller.",
       "value": "500 KB",
       "label": "documented",
@@ -3406,9 +3419,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b91366cf7672f224deb649339419ac554b776db1eb53728684c746cbf3fc3374"
+      "sourceSha": "8d6fa7ab72b6b9665f89bb23c4772bb11c31d9f34926003bd5f8820f666b4561"
     },
-    "HG-231": {
+    "HG-232": {
       "claim": "The iPad idiom scales Mac Catalyst views and text down to 77%.",
       "value": "77%; 17pt; 13pt",
       "label": "documented",
@@ -3419,9 +3432,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "c582a25d2e016c7d52ed4d231ba7f28adf18fc9ba6ba52983304c12d2d4593e9"
+      "sourceSha": "ecef62d754701b472abe06faa5b17ae157e496a9681f790c033e663f37793566"
     },
-    "HG-232": {
+    "HG-233": {
       "claim": "The Mac idiom renders views and text at 100% of their size.",
       "value": "100%",
       "label": "documented",
@@ -3432,9 +3445,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "8fe95fb4b18d800635e7602a6ebfd9e55a3955e4b08f43fc0cca023269fb1a5b"
+      "sourceSha": "7b885c2580bd7612b5c87aec184569cb4f8d7b6500e1d964842bd861bd51ae45"
     },
-    "HG-233": {
+    "HG-234": {
       "claim": "Padding for the Apple logo and legal link on a map: sides versus above and below.",
       "value": "7 points at the sides and 10 points above and below",
       "label": "documented",
@@ -3445,9 +3458,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "75f1261a4508f65acb8ba3475103ba3fcc431def354d511c77e4b562126b460b"
+      "sourceSha": "228b37a7bd5518b74478f5f2022ac5427f455365fccc97a04699001f7d56631b"
     },
-    "HG-234": {
+    "HG-235": {
       "claim": "Position of the logo and link above a pull-up card's lowest resting position.",
       "value": "10 points",
       "label": "documented",
@@ -3458,9 +3471,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "e40983c16548178a50a13a135c1a390f8fbce2d900dac19ca7431d35cd74eda7"
+      "sourceSha": "c734d3af5c1c0c1455b70f4ca8d9e516a1ca10c510f5ce1e1e88de490a1167f6"
     },
-    "HG-235": {
+    "HG-236": {
       "claim": "Maps smaller than this hide the Apple logo and legal link.",
       "value": "200x100 pixels",
       "label": "documented",
@@ -3471,9 +3484,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "56f36763a8572a43f4e2e3c262bdc92447426fcf411a429901e75c68e1efeaa6"
+      "sourceSha": "8ad24d697ac9149f8746fd8dc6d4e4cec01b34557638aaadb0a93aae4a0dd097"
     },
-    "HG-236": {
+    "HG-237": {
       "claim": "Annotation glyph strings should stay short for readability.",
       "value": "two or three characters",
       "label": "documented",
@@ -3484,9 +3497,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "b58478ae00b6d6edcb176a042e05aa66729cc365415f7d36dada8440806a6314"
+      "sourceSha": "0f8fbddd36b978ffc8e21d6b24872beb68dfb12837c56abe7843f1a1f48b783c"
     },
-    "HG-237": {
+    "HG-238": {
       "claim": "Custom spatial template seats should be spaced at least this far apart.",
       "value": "a meter",
       "label": "documented",
@@ -3497,9 +3510,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "d08981097e9739db8eb3f31bffb2964ac26d33e9fd37ec3fc4a076517d2fc3c2"
+      "sourceSha": "26b4f075d89a9a3124e8851e0a82b35f682d5a6fad0fbfc33df9523870ffe7b8"
     },
-    "HG-238": {
+    "HG-239": {
       "claim": "Minimum size and margin of the Sign in with Apple button.",
       "value": "140pt, 30pt, one tenth of the button height",
       "label": "documented",
@@ -3510,9 +3523,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "66ddefcb9a6d64dd3f2c892502da3956f21bf62b4480b24a16874994810f40a7"
+      "sourceSha": "03e5b87d8d7ed23edfe05b62713358a0c564f478c49fdac7136955e355a1f0e9"
     },
-    "HG-239": {
+    "HG-240": {
       "claim": "PNG logo files fit only buttons of this height, the recommended iOS height.",
       "value": "44 points",
       "label": "documented",
@@ -3523,9 +3536,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "1fd25c4170b4f78e548735f84f5492e8e85588c873a0aeeb543cffaf4b911b4b"
+      "sourceSha": "140ba37001f0808175909ba0cde4e6584032e1a2bcf4014dd1cc2efed5627982"
     },
-    "HG-240": {
+    "HG-241": {
       "claim": "Title font size is about this share of button height; button height about this share of font size.",
       "value": "43%, 233%",
       "label": "documented",
@@ -3536,9 +3549,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "f6426bc25ce79bd1529c71ae5a13538db45eafe144542a0447ab3d4b30c6d92f"
+      "sourceSha": "95f7ab9f5bf8371bf5188b1c65d310248c1f10eafbb95fa87e28e1c02d88b10d"
     },
-    "HG-241": {
+    "HG-242": {
       "claim": "Minimum margin between title and right edge of a custom button.",
       "value": "8% of the button width",
       "label": "documented",
@@ -3549,9 +3562,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "97242e6a4e5cc8bd86f85b4357c516f4a6395250e0bd12a9795c7b141587f22e"
+      "sourceSha": "ffd6f29ebfdd635ccdd78040a0a0d35a2dc74f1d4686e4b9b8fc211da51ded1d"
     },
-    "HG-242": {
+    "HG-243": {
       "claim": "Logo-only buttons use PNG only at this size.",
       "value": "44x44 points",
       "label": "documented",
@@ -3562,9 +3575,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "6782f4e1e2481d4d66467f3d5fe37f97c69415d3b02ff7870549bf5cb65bc13a"
+      "sourceSha": "49f160b6bfe9af8b7af8a436c482da1e9260c7d49a6ea5ddf545a20590272f8f"
     },
-    "HG-243": {
+    "HG-244": {
       "claim": "Logo image width range and height.",
       "value": "50 to 160 points wide, 50 points tall",
       "label": "documented",
@@ -3575,9 +3588,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "29c03184aec01598e11656b8e602801b4a6750240dd509ab67223c48f0d41a00"
+      "sourceSha": "2166cc688dca029d4b9209af1ae99f47ce7915d0ce681334719dbf06277a0dba"
     },
-    "HG-244": {
+    "HG-245": {
       "claim": "Primary logo width range and height.",
       "value": "30 to 126 points wide, 30 points tall",
       "label": "documented",
@@ -3588,9 +3601,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "35db59496df3f1afbba20ff43c84d8c4565936c0330dae32a9188bccaf497b45"
+      "sourceSha": "c4c48ef0c9e382d15d69dbb4af954dde029f0a1df1ed04d1bc03f4eba6bdfed3"
     },
-    "HG-245": {
+    "HG-246": {
       "claim": "Secondary logo width range and height.",
       "value": "12 to 135 points wide, 12 points tall",
       "label": "documented",
@@ -3601,9 +3614,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3c06f962e44b4cd34f0c25b786e1e4e9a491a9c14bde366a3db5d2c171aec4ef"
+      "sourceSha": "bb3ef09e7294f997e79b9e1e78d9840a1601bec5d3573771721d95fe26ae6c42"
     },
-    "HG-246": {
+    "HG-247": {
       "claim": "Pass icon dimensions.",
       "value": "38 by 38 points",
       "label": "documented",
@@ -3614,9 +3627,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "98959b851020a2a26ee08ee7963ce7dc5c35733132c8154e3fda8505fb717d7f"
+      "sourceSha": "1a52df6d3346229d205e420c65463a90eb83718491586b37d1563a6ca21bbd38"
     },
-    "HG-247": {
+    "HG-248": {
       "claim": "Strip image dimensions.",
       "value": "375 by 144 points",
       "label": "documented",
@@ -3627,9 +3640,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "96c542c25b43fc65a93c1fa26aa496f625dabfdaaa1de3f7d98d71459c6823d9"
+      "sourceSha": "a34eb736d563c1cbfacdefb7d3fd1cd5fac1f32ccfb4c93979da9be6100db90c"
     },
-    "HG-248": {
+    "HG-249": {
       "claim": "Thumbnail width range and height.",
       "value": "60 to 90 points wide, 90 points tall",
       "label": "documented",
@@ -3640,9 +3653,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "59f2226a8ecc287579e6f939e2499f919c767aba8105ba533c0fc9c0c317147b"
+      "sourceSha": "42d548166774258366ddd40b475daaaa5474c2412707b942f45c91be0483fe12"
     },
-    "HG-249": {
+    "HG-250": {
       "claim": "Background image dimensions for non-poster event tickets.",
       "value": "343 by 503 points",
       "label": "documented",
@@ -3653,9 +3666,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "728a40f5a5e4bb31fdb069754a6df7797832eaccfd76668033e70d562bba33a9"
+      "sourceSha": "a8ecfa37442601e805d8073d4d2f705dc34726457889ebf3537da652bcc88802"
     },
-    "HG-250": {
+    "HG-251": {
       "claim": "Poster pass background dimensions.",
       "value": "358 by 448 points",
       "label": "documented",
@@ -3666,9 +3679,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "fd5d5845e318d5caeb0312e33ca78d3f304e2bc784e10c3d7dff90c7f5c0761b"
+      "sourceSha": "f4eb1385f194f17d020bf23e15204f5c2feadc09c9cab696eff7238da26e64ce"
     },
-    "HG-251": {
+    "HG-252": {
       "claim": "Footer image dimensions for airline boarding passes.",
       "value": "268 by 15 points",
       "label": "documented",
@@ -3679,9 +3692,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "d7d4b8425e61356258c87b5cdfe0ac2e4071515f829124a86483db750156cd26"
+      "sourceSha": "6f6aea1332d476c9f5f972645adbfaca8ebb2cd26463dd69948a992b11dcb076"
     },
-    "HG-252": {
+    "HG-253": {
       "claim": "Order logo image size.",
       "value": "300x300 pixels",
       "label": "documented",
@@ -3692,9 +3705,9 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "6fdb874a3ff4dfef37d3ef8d9c212e34feafc0d8b712bf35d6b9ea234fa8dd19"
+      "sourceSha": "7a24023f19a01259078208fe9d3ad4f6a583cf206f6cfe0ede66f7426e218639"
     },
-    "HG-253": {
+    "HG-254": {
       "claim": "Order product image size.",
       "value": "300x300 pixels",
       "label": "documented",
@@ -3705,7 +3718,7 @@
       "remeasure": "Read the page again; Apple revises the guidelines.",
       "status": "current",
       "correction": null,
-      "sourceSha": "3534f82ccbcbbab10a87014c8320ac027df7532d192b463c8d6c48f39b11768a"
+      "sourceSha": "a0cfff4ed7976db4ea122ea0cfa74fd742a857386f69931d14cf099660e7a7df"
     }
   }
 }

@@ -27,11 +27,11 @@ Covers the hardware button that people map to a quick function on supported iPho
 - Offer a small set of the app's most-used actions for the button, such as starting a timer in a cooking app.
 - Skip an action that merely opens the app. The system already provides that, and icons, widgets and complications cover it.
 - Write each action label so it starts with a verb, uses present tense, uses title-style capitalization and omits articles and prepositions.
-- Keep each action label to three words or fewer, for example "Start Race" rather than "Start the Race". (HG-165)
+- Keep each action label to three words or fewer, for example "Start Race" rather than "Start the Race". (HG-166)
 - Let the system teach people how to assign and use the button. Do not add your own text that repeats the Settings guidance.
 - iOS: Let an action finish without pulling people out of their current context, using Live Activities or custom snippets. A timer action, for instance, asks for a duration and starts a countdown Live Activity instead of launching the Clock app.
 - watchOS: The first press can start a workout, begin a dive or drop a waypoint. Design later presses to flow logically from the first one, since people often press without looking.
-- watchOS: Offer at most one simple secondary function, such as marking a segment or moving to the next phase of a multi-part workout. Several secondary functions raise cognitive load.
+- watchOS: Consider adding one simple secondary function for workout or dive actions, such as marking a segment or moving to the next phase. Think hard before adding more than one, since extra functions raise cognitive load and make the app seem harder to use.
 - watchOS: Use follow-up presses to add capability, not to end the main task. Put a stop control in the app's own interface.
 - watchOS: Pause the current function when the Action button and side button are pressed together. The exception is a diving app, where pausing could endanger the diver by hiding depth or elapsed time.
 - Not supported on iPadOS, macOS, tvOS or visionOS.
@@ -116,10 +116,10 @@ Covers gaze-based targeting, where looking at an element highlights it before a 
 - Hover effects (gaze) and focus effects (keyboard or controller) are separate systems.
 - Always provide more than one way to interact, and support accessibility features.
 - Keep objects people need within their field of view and avoid requiring quick eye jumps over wide areas or several depth levels.
-- Place content at a comfortable distance, at least a meter away for anything read or used for long: one meter (HG-166)
+- Place content at a comfortable distance, at least a meter away for anything read or used for long: one meter (HG-167)
 - Prefer standard UI components, which give consistent gaze feedback. Custom visual cues are harder to learn.
 - Reduce clutter and motion, particularly in peripheral vision. New content appearing near a gazed button pulls the eyes away from it.
-- Space interactive items so eyes can rest on one: at least 16 points of margin around each item or centers at least 60 points apart. (HG-167) (HG-168)
+- Space interactive items so eyes can rest on one: at least 16 points of margin around each item or centers at least 60 points apart. (HG-168) (HG-169)
 - Do not fill the field of view with a repeating pattern or texture, which can make elements seem to sit at different depths. Use it in a smaller area.
 - Use subtle cues to draw gaze to the likely next target, such as central placement, gentle motion, contrast, or color or scale variation. Avoid flashy or harsh cues.
 - Give interactive items rounded shapes, because gaze gravitates to corners and rounder shapes are easier to target.
@@ -162,7 +162,7 @@ Covers touch controls, physical controllers and keyboard bindings for games. Rea
 - Support each platform's default input (touch, remote, mouse and keyboard, gestures) as well as controllers, since not everyone owns a controller.
 - iOS, iPadOS: Add virtual controls only where they help, typically games with many actions or needing movement. Prefer direct touch on game objects or in-game gestures, such as tapping an object instead of a select button.
 - iOS, iPadOS: Put buttons where they are easy to reach and clear of the Home indicator and Dynamic Island. Frequent buttons go near the thumb, outside the regions used for movement and camera. Secondary controls like menus go at the top.
-- iOS, iPadOS: Make frequently used controls at least 44x44 pt and less important ones, like menus, at least 28x28 pt. (HG-169) (HG-170)
+- iOS, iPadOS: Make frequently used controls at least 44x44 pt and less important ones, like menus, at least 28x28 pt. (HG-170) (HG-171)
 - iOS, iPadOS: Give every virtual control a visible press state (such as a glow that shows under a finger) plus sound and haptics.
 - iOS, iPadOS: Use symbols that depict the action, such as a weapon for attack. Avoid abstract shapes or controller labels like A, X or R1 as artwork.
 - iOS, iPadOS: Show or hide controls with context, for example hiding movement controls until the screen is touched.
@@ -282,14 +282,14 @@ Covers mouse and trackpad behavior, pointer effects on iPad, touch support for h
 - iPadOS: Pointer shape is an arrow by default, becomes an I-beam over text, and can be customized. Content effects change the element under it: highlight, lift and hover.
 - iPadOS: Use highlight (a Liquid Glass shape) for grouped controls in a Liquid Glass container, lift (scale up with shadow and highlight) for standalone Liquid Glass controls or small opaque elements, and hover (custom scale, tint, shadow) for large elements.
 - iPadOS: Prefer system pointer appearances for standard buttons and text areas, and system effects for custom elements that act like standard ones, so they do not seem broken.
-- iPadOS: Pad interactive elements for comfortable hit regions: about 12 points around elements with a bezel and about 24 points around those without. (HG-171) (HG-172)
+- iPadOS: Pad interactive elements for comfortable hit regions: about 12 points around elements with a bezel and about 24 points around those without. (HG-172) (HG-173)
 - iPadOS: Make hit regions for adjacent custom bar buttons contiguous so the highlight does not flicker out between them.
 - iPadOS: Use pointer effects consistently, such as the same pointer in every drawing area. Skip decorative effects with no practical value.
 - iPadOS: Keep custom pointer shapes simple and instantly understandable.
 - iPadOS: Add helpful annotations, like X and Y values over a graph or dimensions of a resizable image, but no instructional text.
 - iPadOS: Pointer accessories are small secondary indicators (such as resize arrows, `UIPointerAccessory`). Use clear, simple images, and use the accessory transition to signal state changes, like a plus symbol turning into a slashed circle when adding becomes unavailable.
 - iPadOS: With custom hover effects, scale only elements with space around them (not table rows). With little space, use tint without scale and shadow. Do not use shadow without scale.
-- macOS: Support customizable standard behaviors: primary click selects or activates; secondary click shows context menus; scrolling, smart zoom, swipe between pages and full-screen apps, Mission Control, lookup/data detectors, Force Click, pinch zoom, rotate, Notification Center, App Exposé, Apps and Show Desktop work through system gestures.
+- macOS: the first seven behaviors (primary and secondary click, scrolling, smart zoom, both swipes, Mission Control) work with a mouse or a trackpad; lookup and data detectors, tap to click, Force Click, pinch zoom, rotate, Notification Center, App Exposé, Apps and Show Desktop are trackpad-only, so offer a non-gesture route to anything they trigger.
 - macOS: Use standard pointer styles to communicate state: arrow, I-beam, pointing hand for links, open or closed hand for dragging content, crosshair for precise selection, resize cursors for dividers and window edges, and drag copy, drag link, disappearing item and not-allowed pointers during drag and drop.
 - macOS touch: Decide which hover-revealed controls need touch support. Only essential ones. Skip static info like tooltips and controls reachable another way, such as carousel buttons when swiping works. Do not leave hidden controls always visible just for touch.
 - macOS touch: Reveal a hidden control when its area is tapped, show only controls relevant to the content, and hide it after use or a few seconds.

@@ -45,9 +45,9 @@ Governs a Mac app built from an iPad app with Mac Catalyst. Use it when deciding
 
 - Before starting, check that the iPad app already handles drag and drop, keyboard navigation and shortcuts, window resizing (Split View, Slide Over, Picture in Picture) and multiple scenes. Those carry over to the Mac.
 - Reject the port if the core experience depends on gyroscope, accelerometer, rear camera, HealthKit, ARKit, or on marking, handwriting or navigation as the main function.
-- The default is the iPad idiom, which shrinks views and text to 77% on the Mac, so 17pt text shows at 13pt. (HG-231)
+- The default is the iPad idiom, which shrinks views and text to 77% on the Mac, so 17pt text shows at 13pt. (HG-232)
 - Consider the Mac idiom once the app feels at home: text and art render in more detail, and graphics-heavy apps can run faster and use less power.
-- With the Mac idiom, audit the whole layout. Views and text render at 100% of their size, so fixed font, view and layout sizes cause rework. (HG-232)
+- With the Mac idiom, audit the whole layout. Views and text render at 100% of their size, so fixed font, view and layout sizes cause rework. (HG-233)
 - Use a separate asset catalog for the Mac app when you adopt the Mac idiom.
 - Prefer text styles over fixed font sizes, and check that images look right at full resolution.
 - Limit appearance customizations to those that exist on both iPadOS and macOS controls.
@@ -138,12 +138,12 @@ Governs maps in apps and on web pages: interaction, styling, custom content, pla
 - Give a selected area or item a distinct outline and color change.
 - Cluster overlapping points of interest under one pin and expand the cluster as people zoom in.
 - Keep the Apple mark and the legal link in view. Brief cover by your UI is acceptable, constant cover is not.
-- Pad the logo and link 7 points at the sides and 10 points above and below, away from map edges and custom controls. (HG-233)
+- Pad the logo and link 7 points at the sides and 10 points above and below, away from map edges and custom controls. (HG-234)
 - Keep the logo and link fixed to the map, not moving with your interface.
-- If your interface moves relative to the map, position them from its lowest resting point, for example 10 points over the resting position of a pull-up card at its lowest. (HG-234)
-- The logo and link do not appear on maps smaller than 200x100 pixels. (HG-235)
+- If your interface moves relative to the map, position them from its lowest resting point, for example 10 points over the resting position of a pull-up card at its lowest. (HG-235)
+- The logo and link do not appear on maps smaller than 200x100 pixels. (HG-236)
 - Style annotations to match your app. The default marker is red with a white pin; change the tint or the glyph, such as a logo or a string.
-- Keep a string glyph to two or three characters so it stays readable. (HG-236)
+- Keep a string glyph to two or three characters so it stays readable. (HG-237)
 - To show custom info on top of standard features, make map features independently selectable and configure their appearance and details.
 - Use overlays for areas tied to your content. "Above roads" sits over roads but under buildings and trees, so the map beneath stays understandable. "Above labels" hides roads and labels below it, good for abstracting or concealing parts of the map.
 - Make custom controls contrast with the map using a thin stroke, a light shadow, or blend modes on the map area.
@@ -246,9 +246,10 @@ Covers shared real-time activities across devices, plus extra visionOS guidance 
 - Custom templates: people in the same room cannot be moved by a template, so add visual cues like position markers when positions matter.
 - Choose the seat orientation your content needs; seats face the content center by default.
 - Define the maximum number of seats up front, which is five spatial Personas on Apple Vision Pro, and leave a seat where it is when its occupant goes. Add spectator seats if participants are limited.
-- Place seats at least a meter apart; a Persona that gets too close to another is replaced with a contact photo: a meter (HG-237)
+- Place seats at least a meter apart; a Persona that gets too close to another is replaced with a contact photo: a meter (HG-238)
 - Define the seating order so partial groups look balanced, rather than filling left to right.
 - Keep roles independent of seats so everyone, including seatless participants, can have any role. Reserve a specific seat only for a role that needs it, like a game host.
+- Design activities to work across Apple platforms. People may join from other devices, settings and communication methods, so build adaptable experiences that let everyone take part.
 
 ## ShazamKit
 
@@ -286,18 +287,18 @@ Governs when to offer Sign in with Apple, what data to request, and how to prese
 - White with outline suits white or light backgrounds; avoid it on dark or saturated backgrounds. Available on iOS, macOS and web.
 - Black suits white or light backgrounds with good contrast, never black or dark ones. The watchOS button uses dark gray rather than pure black.
 - Match the corner radius to your other buttons: rounded by default, with square or capsule options on iOS, macOS and web.
-- Keep a minimum width of 140pt, a minimum height of 30pt, and a margin of one tenth of the button height. (HG-238)
+- Keep a minimum width of 140pt, a minimum height of 30pt, and a margin of one tenth of the button height. (HG-239)
 - Custom buttons are allowed for iOS, macOS and web but App Review evaluates them. They must still be instantly recognizable as Sign in with Apple.
 - Use only logo artwork downloaded from Apple's design resources. Never draw your own Apple logo, use the logo alone as a button, crop it, or add vertical padding. Match the logo file height to the button height.
 - Do not change the allowed titles (the three "... with Apple" phrases: Sign in, Sign up, Continue), the general shape (rectangular with text; circular or rectangular for logo-only), or the colors: logo and title both black or both white.
 - You may change the title font, weight and size, uppercase the title, adjust a black or white background with subtle texture or gradient, use your corner radius, and add a bezel stroke or shadow.
-- For a logo-and-text button, use SVG or PDF at any height. Use PNG only for buttons 44 points tall, the recommended iOS height. (HG-239)
-- Prefer the system font for the title. Title size is about 43% of button height, so the height is about 233% of the font size, rounded to a whole number. (HG-240)
+- For a logo-and-text button, use SVG or PDF at any height. Use PNG only for buttons 44 points tall, the recommended iOS height. (HG-240)
+- Prefer the system font for the title. Title size is about 43% of button height, so the height is about 233% of the font size, rounded to a whole number. (HG-241)
 - Keep the capitalization style (first word and Apple capitalized) unless the interface is all uppercase.
 - Vertically center the title, then place the logo at full button height so everything lines up.
 - Inset the logo if you need to align it with other authentication logos.
-- Keep the title at least 8% of the button width from the right edge. (HG-241)
-- For logo-only buttons, use SVG or PDF at any size or PNG only at 44x44 points. Keep a 1:1 aspect ratio and add no horizontal padding. (HG-242)
+- Keep the title at least 8% of the button width from the right edge. (HG-242)
+- For logo-only buttons, use SVG or PDF at any size or PNG only at 44x44 points. Keep a 1:1 aspect ratio and add no horizontal padding. (HG-243)
 - Use a mask to change the logo-only shape, for example to a circle; never crop the artwork to reduce its padding. Keep a margin of at least one tenth of the button height.
 
 ## Siri
@@ -407,20 +408,20 @@ Covers passes, pass design and images, order tracking and identity verification.
 - Use device-neutral language, for example not "Slide to view".
 - Styles: boarding pass (semantic tags for airlines, pass fields for other transit); coupon; event ticket (poster style supports full art; non-poster uses fields, background image, thumbnail); store card (loyalty, discount, points, gift cards, often with balance); poster generic pass (full background image, flexible); generic pass for other uses.
 - Pass images are PNG in @2x and @3x. Use them only for visuals, not text or barcodes (use Pass Designer or APIs for barcodes). Keep files small, and provide a pass icon, which may be your app icon.
-- Logo (`logo.png`) in the top leading corner: width 50 to 160 points, height 50 points. Avoid inner drop shadows. (HG-243)
-- Primary logo (`primaryLogo.png`) for airline boarding passes plus poster event and poster generic styles: width 30 to 126 points, height 30 points. (HG-244)
-- Secondary logo (`secondaryLogo.png`), bottom trailing corner of poster event tickets: width 12 to 135 points, height 12 points. (HG-245)
-- Icon (`icon.png`) is square, 38 by 38 points; the system rounds corners. (HG-246)
-- Strip image (`strip.png`) for coupons and store cards: 375 by 144 points. Keep areas behind text uncluttered, put key visuals toward the bottom or trailing edge, and embed no text. (HG-247)
-- Thumbnail (`thumbnail.png`) for event tickets and generic passes: width 60 to 90 points, height 90 points; rounded artwork on transparent PNG. (HG-248)
-- Background (`background.png`) for non-poster event tickets: 343 by 503 points. (HG-249)
-- Poster background (`artwork.png`): 358 by 448 points. Keep content in the safe area, as a material strip covers the bottom edge, and allow for a barcode. (HG-250)
-- Footer (`footer.png`), airline boarding passes only: 268 by 15 points. (HG-251)
+- Logo (`logo.png`) in the top leading corner: width 50 to 160 points, height 50 points. Avoid inner drop shadows. (HG-244)
+- Primary logo (`primaryLogo.png`) for airline boarding passes plus poster event and poster generic styles: width 30 to 126 points, height 30 points. (HG-245)
+- Secondary logo (`secondaryLogo.png`), bottom trailing corner of poster event tickets: width 12 to 135 points, height 12 points. (HG-246)
+- Icon (`icon.png`) is square, 38 by 38 points; the system rounds corners. (HG-247)
+- Strip image (`strip.png`) for coupons and store cards: 375 by 144 points. Keep areas behind text uncluttered, put key visuals toward the bottom or trailing edge, and embed no text. (HG-248)
+- Thumbnail (`thumbnail.png`) for event tickets and generic passes: width 60 to 90 points, height 90 points; rounded artwork on transparent PNG. (HG-249)
+- Background (`background.png`) for non-poster event tickets: 343 by 503 points. (HG-250)
+- Poster background (`artwork.png`): 358 by 448 points. Keep content in the safe area, as a material strip covers the bottom edge, and allow for a barcode. (HG-251)
+- Footer (`footer.png`), airline boarding passes only: 268 by 15 points. (HG-252)
 - Order tracking: let Wallet show orders and update them as status changes. Supply as many properties from the Orders schema as match your process.
 - Make adding an order easy, for example automatically after an Apple Pay purchase (`PKPaymentOrderDetails`, `ApplePayPaymentOrderDetails`) or with the Track with Apple Wallet button (`AddOrderToWalletButton`) on confirmation, status and tracking pages and in email.
 - Show order data immediately after purchase, with a status such as "Check back later for full order details" if details are not ready. Then provide fulfillment info as soon as it is available and keep the status updated.
-- Logo image: 300x300 pixels PNG or JPEG with a nontransparent background. (HG-252)
-- Product images: distinct, straightforward, 300x300 pixels PNG or JPEG with a solid background; avoid lifestyle or busy backgrounds. (HG-253)
+- Logo image: 300x300 pixels PNG or JPEG with a nontransparent background. (HG-253)
+- Product images: distinct, straightforward, 300x300 pixels PNG or JPEG with a solid background; avoid lifestyle or busy backgrounds. (HG-254)
 - Keep text brief, clear and localized, and make the price match what the customer confirmed.
 - Link to an order management area with a universal link, describe each item with `LineItem`, and optionally attach a PDF receipt.
 - Provide a prioritized list of your apps so the system links the best installed one, and avoid duplicate notifications when your app is installed.

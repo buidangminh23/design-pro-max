@@ -95,6 +95,7 @@ A button triggers an instant action. Its function comes from style, content (sym
 - watchOS: put corner buttons in a toolbar, and use toolbar buttons only for navigation to related areas or contextual actions.
 - watchOS: prefer full-width buttons for primary actions. When two buttons share a row, give them equal height and use images or short titles.
 - watchOS: keep one- and two-line text buttons in a vertical stack at the same height.
+- visionOS: circular buttons come in all five heights (28 pt mini, 32 pt small, 44 pt regular, 52 pt large and 64 pt extra large); text-only capsules and rounded rectangles come only in small, regular and large, and capsules with an icon and text only in regular and large. (HG-110)
 
 ## Context menus
 
@@ -254,7 +255,7 @@ The top-of-screen strip with an app's top-level menus. Below are the rules and t
 - Use standard icons for common actions, and keep the standard shortcuts for standard items (Copy, Cut, Paste, Save, Print). Add custom shortcuts only when needed.
 - Prefer short one-word menu titles, in title-style capitalization if more than one word.
 - App menu: bold app name. Items in order: About, Settings..., optional app-level items, Services (macOS), Hide app, Hide Others, Show All (macOS), Quit.
-- About comes first, alone in its group after a separator. Use a short app name of 16 characters or fewer, no version number, and reuse that same name for Hide and Quit. (HG-110)
+- About comes first, alone in its group after a separator. Use a short app name of 16 characters or fewer, no version number, and reuse that same name for Hide and Quit. (HG-111)
 - Use Settings only for app-wide settings. Put document-specific settings in File. Pressing Option turns Quit into Quit and Keep Windows.
 - File menu: omit or rename it if the app has no files. Items run New, Open (with ellipsis if it asks for a file), Open Recent (names, not paths, newest first, with Clear Menu), Close, Close Tab, Close File, Save, Save All, Duplicate, Rename..., Move To..., Export As..., Revert To, Page Setup..., Print....
 - File: Close becomes Close Tab in tabbed windows, and Option changes Close to Close All. Consider a Close Window item for tabbed windows.
@@ -281,7 +282,7 @@ The top-of-screen strip with an app's top-level menus. Below are the rules and t
 - iPadOS: Settings opens the app's page in iPadOS Settings. Link in-app preferences from a separate item beneath it in the same group, along with other app-wide options.
 - iPadOS: for tab navigation, consider listing each tab in the View menu with key bindings. Group items into submenus more often than on Mac, because rows are taller.
 - macOS: the Apple menu cannot be changed. When space is tight the system shrinks title spacing, truncates titles and hides extras. Full-screen mode hides the bar until the pointer reaches the top.
-- macOS menu bar extra: use a symbol or interface icon in black and clear, so the system can recolor it. The bar height is 24 pt. (HG-111)
+- macOS menu bar extra: use a symbol or interface icon in black and clear, so the system can recolor it. The bar height is 24 pt. (HG-112)
 - macOS menu bar extra: open a menu, not a popover, unless the content is too complex. Let people choose whether it appears, perhaps offering it during setup, and never depend on its presence.
 - Offer the same function elsewhere as well, such as a Dock menu.
 
@@ -300,7 +301,7 @@ A horizontal bar on the top or bottom edge holding a view title, navigation cont
 - Use standard components, whose corner radii are concentric with the bar. A custom component needs a concentric radius too.
 - Consider hiding toolbars temporarily for a distraction-free mode, only in suitable contexts, with a dependable way to bring them back.
 - Give each window a useful title that tells windows apart, or leave it empty when redundant (Notes, one window). Never use the app name as the title.
-- Keep titles to a word or short phrase, under 15 characters, to leave room for controls. (HG-112)
+- Keep titles to a word or short phrase, under 15 characters, to leave room for controls. (HG-113)
 - Use the standard Back and Close buttons with their standard symbols, never text labels reading "Back" or "Close". A custom version must look and behave identically, used consistently.
 - Offer actions that support the main tasks, most likely first, or the highest-level objects first when that fits better.
 - Make each item's meaning obvious. Prefer simple recognizable symbols over text, except for actions like Edit that symbols convey poorly.
@@ -358,7 +359,7 @@ A modal for critical, immediate information: problems, data-loss warnings, confi
 - Add informative text only if useful: short, full sentences, sentence-style capitalization.
 - Do not explain what buttons do. If you must, say "choose" and use the exact button title without quotes.
 - Include a text field only when input is required, for instance a secure field for a password.
-- Titles: one or two words, verbs tied to the text ("View All", "Reply", "Ignore"), sentence-style capitalization, no ending punctuation.
+- Button titles: one or two words, preferably verbs tied to the alert text ("View All", "Reply", "Ignore"), sentence-style capitalization, no ending punctuation.
 - Use "OK" only in purely informational alerts, never "Yes" or "No". Prefer specific titles such as Erase, Convert, Clear or Delete. Always title a canceling button "Cancel".
 - Place the likeliest button trailing in a horizontal row, or first in a vertical stack; the default button always takes that spot. Cancel is leading or at the bottom.
 - Apply the destructive style only when the destructive action was not what the user deliberately chose. For example, Empty Trash after choosing Empty Trash is not styled destructive.
@@ -368,7 +369,7 @@ A modal for critical, immediate information: problems, data-loss warnings, confi
 - macOS: the app icon appears by default and can be replaced. Use repeat-suppression, an accessory view (`accessoryView`) and a help button as needed.
 - macOS: use the caution symbol (`exclamationmark.triangle`) sparingly, for real risk of unexpected data loss, not for save or empty-trash style overwrites.
 - visionOS: in the Shared Space the alert floats slightly in front of the window and stays anchored if the window moves. In a Full Space it is centered in the field of view.
-- visionOS: cap an accessory view at 154 pt tall and give it 16 pt rounded corners. (HG-113)
+- visionOS: cap an accessory view at 154 pt tall and give it 16 pt rounded corners. (HG-114)
 
 ## Page controls
 
@@ -407,7 +408,7 @@ A floating supplementary window with controls or info about the active window or
 - Do not list panels in the Window menu's document list. Show/hide commands are fine.
 - Normally leave out the minimize button.
 - In menus, name panels by title without the word "panel" ("Show Fonts"). In help, use the title, or the title plus "window" when clearer.
-- HUD panels are darker and translucent. Prefer standard panels. Use a HUD only in media apps, when a standard panel would hide essential content, and when you need few controls (most system controls do not match HUD styling, except the disclosure triangle) (`hudWindow`).
+- Use a HUD only in media-oriented apps, when a standard panel would hide essential content, and when it needs no controls other than a disclosure triangle, since other system controls clash with HUD styling (`hudWindow`).
 - Keep one panel style across modes; if the HUD appears in full screen, keep it outside full screen.
 - Use color sparingly in a HUD: small amounts of high-contrast color.
 - Keep HUDs small so they do not hide or compete with the content they adjust.
@@ -510,8 +511,8 @@ Windows hold an app's views and set its visual boundaries. A primary window carr
 - visionOS: windows use dynamic scale, with a close button, a window bar and resize handles, plus optional Share button, tab bar, toolbar and ornaments (`DefaultWindowStyle`).
 - visionOS: prefer a window for familiar interfaces and tasks, saving immersive modes for meaningful content. Use a volume for bounded 3D content such as a game board.
 - visionOS: keep the glass background. Removing it hurts legibility and unity, and an opaque background feels heavy and hides surroundings.
-- visionOS: the default window size is 1280x720 pt. Pick an initial size with little empty space. (HG-114)
-- visionOS: the system opens the first window about two meters ahead, appearing about three meters wide. (HG-115)
+- visionOS: the default window size is 1280x720 pt. Pick an initial size with little empty space. (HG-115)
+- visionOS: the system opens the first window about two meters ahead, appearing about three meters wide. (HG-116)
 - visionOS: choose an initial shape that fits the content (wide for Keynote, tall for Safari, tall for a tower game). Set minimum and maximum sizes so layouts neither overlap nor become unusable.
 - visionOS: keep 3D content in a window shallow, since content that extends far from the surface is clipped. Use a volume for deeper content.
 - visionOS volumes: use them for rich 3D content viewable from any angle (`VolumetricWindowStyle`). Their close button and window bar turn to face the viewer.
@@ -569,9 +570,9 @@ Scrollable lists of distinct values, single or multipart. Date pickers add calen
 - Use a picker for medium-to-long lists. For short lists use a pull-down button, and for very large sets use a list or table, which can adjust in height and carry an index.
 - Order values predictably (for example an alphabetical country list) so hidden values can be guessed.
 - Show the picker in context, below or near the field being edited, usually at the bottom of the window or in a popover. Do not switch views for it.
-- In date pickers, consider coarser minute steps. The default minute list has 60 values (0 to 59). Any interval that divides evenly into 60 works, such as 15 minutes. (HG-116)
+- In date pickers, consider coarser minute steps. The default minute list has 60 values (0 to 59). Any interval that divides evenly into 60 works, such as 15 minutes. (HG-117)
 - iOS, iPadOS date picker styles: compact (a button showing the value in the accent color that opens a modal editor), inline (a calendar, or a wheel button for time only), wheels (scrolling wheels with keyboard entry), automatic (system choice).
-- iOS, iPadOS modes: date, time, date and time, and countdown timer. Countdown goes up to 23 hours 59 minutes and is unavailable in the inline and compact styles. (HG-117)
+- iOS, iPadOS modes: date, time, date and time, and countdown timer. Countdown goes up to 23 hours 59 minutes and is unavailable in the inline and compact styles. (HG-118)
 - iOS, iPadOS: use the compact style when space is tight. People can make several edits and confirm by tapping outside the modal.
 - macOS (`NSDatePicker`): choose textual style for limited space and exact entry, or graphical style for calendar browsing, date ranges, or a clock-face look.
 - tvOS: pickers are available through SwiftUI `Picker`.
@@ -611,8 +612,8 @@ A horizontal track with a thumb between a minimum and maximum. The track fills w
 - iOS, iPadOS: never use a slider for audio volume. Use the volume view, which includes output-device switching.
 - macOS: sliders may have tick marks. A linear slider has a narrow lozenge thumb, and a circular slider has a small round thumb with dot ticks around the circumference.
 - macOS: consider live feedback while dragging, like the Dock size slider scaling icons.
-- macOS: use a horizontal slider for a fixed range such as opacity from 0 to 100 percent. (HG-118)
-- macOS: use a circular slider for repeating or unbounded values, such as rotation from 0 to 360 degrees, or four spins equaling 1440 degrees. (HG-119)
+- macOS: use a horizontal slider for a fixed range such as opacity from 0 to 100 percent. (HG-119)
+- macOS: use a circular slider for repeating or unbounded values, such as rotation from 0 to 360 degrees, or four spins equaling 1440 degrees. (HG-120)
 - macOS: consider an intro label in sentence-style capitalization ending with a colon.
 - macOS: add tick marks for clarity and optionally label them (numbers or words). Labeling just the minimum and maximum is often enough, but nonlinear scales benefit from periodic labels. Add a tooltip showing the thumb value on hover.
 - visionOS: prefer horizontal sliders, since side-to-side gestures are easier.

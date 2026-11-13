@@ -105,9 +105,9 @@ Explains the spatial platform: unlimited space, adjustable immersion, passthroug
 
 - visionOS: use space, Spatial Audio, immersion, passthrough, and eye and hand input rather than porting a flat design.
 - visionOS: choose the lowest level of immersion that suits each moment. An experience can be windowed, fully immersive, or in between; do not make everything fully immersive.
-- visionOS: launch in the Shared Space, where other apps run side by side, and offer a Full Space only when the app should be alone.
+- visionOS: an app opens in the Shared Space by default, alongside other apps. People can move it into a Full Space, where it is the only app running.
 - visionOS: use standard windows with familiar controls for contained, UI-focused tasks. Windows are movable, and system scaling keeps them legible at any distance.
-- visionOS: support the Digital Crown for adjusting how much passthrough people see.
+- visionOS: people use the Digital Crown to set how much passthrough they see. The system handles it, so the app needs no extra work for it.
 - visionOS: support indirect gestures (look, then tap) as the default, and direct touch as an option.
 - visionOS: keep content inside the field of view, placed relative to the head. Never require turning the head or changing position to reach it.
 - visionOS: avoid motion that is overwhelming, jarring, too fast, or lacks a stationary reference frame.

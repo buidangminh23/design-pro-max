@@ -226,7 +226,7 @@ Covers interface icons (glyphs) used for actions and modes, as opposed to app ic
 - macOS document icons: combine a background fill, a center image and a label as you like; the system composites them onto the folded-corner page shape. Without one, macOS composites your app icon and the extension.
 - Use simple shapes and a small palette; document icons can render as small as 16x16 px, so they must stay recognizable at every size. (HG-39)
 - Reduce complexity at small sizes, for example fewer, thicker grid lines at intermediate sizes and none at the smallest.
-- Keep important content out of the top-right corner of the background fill, where the folded corner covers it.
+- The folded corner hides the upper-right area of the background fill, so put nothing important there.
 - Background fill sizes: 512, 256, 128, 32 and 16 px squares at 1x, with 2x versions twice that. (HG-40)
 - A center image is half the document icon canvas (for example 16x16 px for a 32x32 px icon), offered at 256, 128, 32 and 16 px at 1x and double at 2x. (HG-41)
 - Leave about a 10% margin on the center image canvas and fill roughly 80%, so a 256x256 px canvas holds art in about 205x205 px. (HG-42)
