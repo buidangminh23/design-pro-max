@@ -1,0 +1,126 @@
+/* launch-page theme.tailwind.css (design-pro-max). Generated from tokens.json: the token sets as Tailwind v4 @theme
+ * variables. Import it after tailwindcss. Responsive rungs are separate names (text-hero sm:text-hero-sm ...); the
+ * expressive mode and reduced motion override the same variables outside @theme. */
+@theme {
+  --font-sans: system-ui, "Segoe UI", Roboto, "Noto Sans", "Inter", sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, "Noto Sans Mono", monospace;
+  --breakpoint-sm: 640px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --spacing: 4px;
+  --text-caption: 13px;
+  --text-caption--line-height: 20px;
+  --text-caption--letter-spacing: 0.008em;
+  --text-caption--font-weight: 400;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body--letter-spacing: 0em;
+  --text-body--font-weight: 400;
+  --text-lede: 20px;
+  --text-lede--line-height: 32px;
+  --text-lede--letter-spacing: -0.004em;
+  --text-lede--font-weight: 400;
+  --text-title: 25px;
+  --text-title--line-height: 28px;
+  --text-title--letter-spacing: -0.008em;
+  --text-title--font-weight: 600;
+  --text-heading: 31px;
+  --text-heading--line-height: 36px;
+  --text-heading--letter-spacing: -0.012em;
+  --text-heading--font-weight: 600;
+  --text-heading-lg: 39px;
+  --text-heading-lg--line-height: 44px;
+  --text-heading-lg--letter-spacing: -0.016em;
+  --text-heading-lg--font-weight: 600;
+  --text-display: 39px;
+  --text-display--line-height: 44px;
+  --text-display--letter-spacing: -0.016em;
+  --text-display--font-weight: 600;
+  --text-display-sm: 49px;
+  --text-display-sm--line-height: 56px;
+  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-sm--font-weight: 600;
+  --text-hero: 39px;
+  --text-hero--line-height: 44px;
+  --text-hero--letter-spacing: -0.016em;
+  --text-hero--font-weight: 600;
+  --text-hero-sm: 49px;
+  --text-hero-sm--line-height: 56px;
+  --text-hero-sm--letter-spacing: -0.02em;
+  --text-hero-sm--font-weight: 600;
+  --text-hero-lg: 61px;
+  --text-hero-lg--line-height: 68px;
+  --text-hero-lg--letter-spacing: -0.022em;
+  --text-hero-lg--font-weight: 600;
+  --text-hero-xl: 76px;
+  --text-hero-xl--line-height: 84px;
+  --text-hero-xl--letter-spacing: -0.024em;
+  --text-hero-xl--font-weight: 600;
+  --color-bg: #ffffff;
+  --color-surface: #f6f5f2;
+  --color-ink: #15171a;
+  --color-muted: #575d65;
+  --color-line: #d9d8d3;
+  --color-accent: #0b6670;
+  --color-accent-fill: #0b6670;
+  --color-on-accent: #ffffff;
+  --color-focus: #0b6670;
+  --color-bg-dark: #0f1113;
+  --color-surface-dark: #1b1e21;
+  --color-ink-dark: #f3f4f5;
+  --color-muted-dark: #a5abb3;
+  --color-line-dark: #33373c;
+  --color-accent-dark: #5ccfd9;
+  --color-accent-fill-dark: #0b6670;
+  --color-on-accent-dark: #ffffff;
+  --color-focus-dark: #5ccfd9;
+  --color-section-amber: #8a4b0f;
+  --color-section-amber-dark: #f0a868;
+  --color-section-violet: #6b4bb0;
+  --color-section-violet-dark: #b8a2f0;
+  --color-section-rose: #a33a5c;
+  --color-section-rose-dark: #f29bb8;
+  --radius-control: 8px;
+  --radius-card: 16px;
+  --radius-tile: 24px;
+  --radius-pill: 9999px;
+  --container-content: 1200px;
+  --container-measure: 65ch;
+  --ease-out-launch: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-reveal: reveal 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 40s linear infinite;
+
+  @keyframes reveal {
+    from { opacity: 0; translate: 0 16px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+
+  @keyframes marquee {
+    to { translate: -50% 0; }
+  }
+}
+
+[data-launch-mode="expressive"] {
+  --text-lede: clamp(1.25rem, 1.1404rem + 0.4494vw, 1.5rem);
+  --text-lede--line-height: round(up, calc(var(--text-lede) * 1.5), 4px);
+  --text-lede--letter-spacing: -0.006em;
+  --text-heading: clamp(2rem, 1.1236rem + 3.5955vw, 4rem);
+  --text-heading--line-height: round(up, calc(var(--text-heading) * 1.1), 4px);
+  --text-heading--letter-spacing: -0.024em;
+  --text-hero: clamp(2.75rem, 1.3258rem + 5.8427vw, 6rem);
+  --text-hero--line-height: round(up, calc(var(--text-hero) * 1.1), 4px);
+  --text-hero--letter-spacing: -0.028em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --animate-reveal: none;
+    --animate-marquee: none;
+  }
+}
+
+:root.reduced-motion {
+  --animate-reveal: none;
+  --animate-marquee: none;
+}
