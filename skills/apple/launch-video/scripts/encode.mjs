@@ -14,7 +14,8 @@
  * background colour. It always writes the start image <name>.start.jpg (or .png with --start png, for fine detail),
  * frame 0 of <name>.mp4 through the colour conversion browsers use (with alpha also <name>.start-alpha.png), and
  * <name>.encode.json with its settings and version. It lists every path first and stops when one exists that it did
- * not write. Source order for the markup: alpha.mov, alpha.webm, av1.webm, webm, then mp4 last.
+ * not write; a file counts as its own only when <name>.encode.json lists it. Source order for the markup: alpha.mov,
+ * alpha.webm, av1.webm, webm, then mp4 last.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -143,12 +144,17 @@ function ffmpeg(args, command) {
   if (result.status !== 0) throw ffmpegFailure(result.stderr, command);
 }
 
-function ownedByUs(outputs) {
+function readManifest(file) {
   try {
-    return JSON.parse(fs.readFileSync(outputs.manifest, 'utf8')).generator === GENERATOR;
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function foreignFiles(existing, manifest, manifestFile) {
+  const ours = manifest?.generator === GENERATOR ? new Set([...(manifest.files ?? []), path.basename(manifestFile)]) : new Set();
+  return existing.filter((file) => !ours.has(path.basename(file)));
 }
 
 function writeManifest(options, outputs, master, complete) {
@@ -179,8 +185,9 @@ async function main() {
   const outputs = plan(options);
   process.stderr.write(`encode ${VERSION} will write:\n${Object.values(outputs).map((file) => `  ${file}`).join('\n')}\n`);
   const existing = Object.values(outputs).filter((file) => fs.existsSync(file));
-  if (existing.length && !options.force && !ownedByUs(outputs)) {
-    throw new UsageError(`Stopped: ${existing.join(', ')} already exist and were not written by encode.mjs.`, 'Choose another --out or --name, or pass --force to replace them.');
+  const foreign = foreignFiles(existing, readManifest(outputs.manifest), outputs.manifest);
+  if (foreign.length && !options.force) {
+    throw new UsageError(`Stopped: ${foreign.join(', ')} already exist and were not written by encode.mjs.`, 'Choose another --out or --name, or pass --force to replace them.');
   }
   fs.mkdirSync(path.resolve(options.out), { recursive: true });
   writeManifest(options, outputs, master, false);

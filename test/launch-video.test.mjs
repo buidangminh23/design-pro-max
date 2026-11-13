@@ -190,3 +190,12 @@ test('the alpha pair warning reads the source order, not only the codecs present
   checkDemoSet([alphaWebm, hevc, info()], run.report);
   assert.deepEqual(levels(run.report, 'LV-WARN-ALPHA'), ['warn'], 'HEVC listed after VP9 alpha');
 });
+
+test('encode replaces only the files its manifest lists', async () => {
+  const { foreignFiles, GENERATOR } = await part('scripts', 'encode.mjs');
+  const manifest = { generator: GENERATOR, files: ['clip.mp4', 'clip.start.jpg', 'clip.encode.json'] };
+  const existing = ['/out/clip.mp4', '/out/clip.webm', '/out/clip.encode.json'];
+  assert.deepEqual(foreignFiles(existing, manifest, '/out/clip.encode.json'), ['/out/clip.webm']);
+  assert.deepEqual(foreignFiles(existing, null, '/out/clip.encode.json'), existing);
+  assert.deepEqual(foreignFiles(existing, { generator: 'other', files: ['clip.webm'] }, '/out/clip.encode.json'), existing);
+});
