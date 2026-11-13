@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- Fail fixture for LV-RENDER-01: an image inside the frame that never paints (its file is missing), so a capture
+     would show an empty box. The renderer must stop and name the element and the frame. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame with a missing image</title>
+<style>
+  body { margin: 0; height: 100vh; display: grid; place-items: center; background: #f4f6f9; font-family: system-ui, sans-serif; }
+  .card { display: flex; gap: 12px; align-items: center; padding: 16px; border-radius: 12px; background: #fff; animation: rise 1s ease-out infinite; }
+  .card img { width: 48px; height: 48px; }
+  @keyframes rise { from { transform: translateY(8px); } to { transform: none; } }
+</style>
+</head>
+<body>
+<div class="card"><img id="avatar" src="missing-avatar.png" alt="" width="48" height="48"><span>Profile</span></div>
+</body>
+</html>

@@ -92,11 +92,12 @@ test('no own file in the skill names a research folder or a private path', () =>
 });
 
 test('every fixture case names an existing page, a known checker and known media', async () => {
-  const { buildFixtureMedia } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'lib', 'fixture-media.mjs')).href);
-  const recipes = buildFixtureMedia.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, ''));
+  const { buildFixtureMedia, buildLaunchVideoMedia } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'lib', 'fixture-media.mjs')).href);
+  const recipes = [buildFixtureMedia, buildLaunchVideoMedia].flatMap((build) => build.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, '')));
   for (const part of OWN_PARTS) {
     for (const entry of loadCases(ROOT, part)) {
-      assert.ok(['probe-scene', 'check-media'].includes(entry.checker), entry.id);
+      assert.ok(['probe-scene', 'check-media', 'check-embed', 'render-frames'].includes(entry.checker), entry.id);
+      if (entry.poster) assert.ok(recipes.includes(entry.poster), `${entry.id}: ${entry.poster}`);
       assert.ok(['pass', 'fail'].includes(entry.expect), entry.id);
       if (entry.page) {
         const page = entry.page.startsWith('reference/') ? path.join(ROOT, SKILL_DIR, part, 'assets', entry.page) : path.join(ROOT, 'fixtures', part, entry.page);

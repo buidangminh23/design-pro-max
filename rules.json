@@ -187,6 +187,160 @@
       "check": "shared/check-media.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": ["launch-scroll/scripts/encode-scrub.mjs"]
+    },
+    {
+      "id": "LV-ENC-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "Every demo clip ships an H.264 High file in yuv420p with limited range (never yuvj420p or 4:4:4) and the moov box before mdat, and every other file of the set is 4:2:0 in limited range.",
+      "values": "H.264 High; yuv420p, limited range; moov first",
+      "evidence": ["AM-19", "PV-1", "PV-22"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["enc-encoded"], "fail": ["enc-01-yuvj420p", "enc-01-444", "enc-01-moov-at-end"] },
+      "implementedBy": ["launch-video/scripts/encode.mjs"]
+    },
+    {
+      "id": "LV-ENC-02",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "A muted or decorative clip carries no audio stream.",
+      "values": "no audio stream; measured waste 32.5-43.7 % of the file",
+      "evidence": ["PV-2"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["enc-encoded"], "fail": ["enc-02-aac-in-muted-clip"] },
+      "implementedBy": ["launch-video/scripts/encode.mjs"]
+    },
+    {
+      "id": "LV-ENC-03",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "Every file carries the three colour tags, written with setparams and read back: bt709 primaries and matrix, and a bt709 or iec61966-2-1 transfer.",
+      "values": "bt709 primaries and matrix; transfer bt709 or iec61966-2-1",
+      "evidence": ["PV-22", "SC-23"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["enc-encoded"], "fail": ["enc-03-untagged"] },
+      "implementedBy": ["launch-video/scripts/encode.mjs"]
+    },
+    {
+      "id": "LV-POSTER-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "The start image of a clip is its frame 0, with an SSIM of at least 0.99 against that frame as a browser shows it.",
+      "values": "SSIM at least 0.99 against frame 0",
+      "evidence": ["PV-4"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["poster-01-frame-zero"], "fail": ["poster-01-wrong-frame"] },
+      "implementedBy": ["launch-video/scripts/encode.mjs", "launch-video/assets/lib/demo-embed.js"]
+    },
+    {
+      "id": "LV-EMBED-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "A clip below the fold has no autoplay attribute, preload=\"none\" and no source until it comes near, so 0 video bytes load before the reader scrolls; it gets its source once near.",
+      "values": "no autoplay attribute; preload none; no source until near; 0 video bytes before scroll",
+      "evidence": ["EC-5", "PV-13", "ON-14"],
+      "check": "launch-video/scripts/check-embed.mjs",
+      "fixtures": { "pass": ["demo-embed"], "fail": ["embed-01-autoplay"] },
+      "implementedBy": ["launch-video/assets/lib/demo-embed.js", "launch-video/assets/reference/demo-embed.html"]
+    },
+    {
+      "id": "LV-EMBED-02",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "A clip that moves on its own for more than 5 s (any loop, or a longer one-shot) has a visible, labelled control that pauses it, and under reduced motion no clip plays by itself, also after it has loaded.",
+      "values": "a labelled pause control above 5 s; nothing autoplays under reduced motion, also after load",
+      "evidence": ["PV-21", "AM-23", "ON-11"],
+      "check": "launch-video/scripts/check-embed.mjs",
+      "fixtures": { "pass": ["demo-embed"], "fail": ["embed-02-no-pause", "embed-02-plays-after-load"] },
+      "implementedBy": ["launch-video/assets/lib/demo-embed.js", "launch-video/assets/reference/demo-embed.html"]
+    },
+    {
+      "id": "LV-RENDER-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "A rendered master has duration x fps frames at twice the slot's CSS pixels, with every image painted in every frame, and never comes from the built-in page recording (VP8 at 25 fps in CSS pixels).",
+      "values": "duration x fps frames; 2x the slot; every image painted; not VP8 at 25 fps",
+      "evidence": ["PV-11"],
+      "check": "launch-video/scripts/render-frames.mjs",
+      "fixtures": { "pass": ["render-ui-mock"], "fail": ["render-01-recorded", "render-01-broken-image"] },
+      "implementedBy": ["launch-video/scripts/render-frames.mjs", "launch-video/assets/reference/ui-mock.html"]
+    },
+    {
+      "id": "LV-WARN-DIRECTION",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "Direct a demo as short beats with readable holds: transitions of 300-500 ms, holds of at least 1 s (1.5 s for a result), typing at 8-12 characters per second, one cursor move of 0.3-0.8 s per target, no cut or zoom, loops of 4-8 s.",
+      "values": "transitions 300-500 ms; holds at least 1 s, 1.5 s for a result; typing 8-12 characters per second; cursor moves 0.3-0.8 s; loops 4-8 s",
+      "evidence": ["PV-20", "PV-N0"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/assets/reference/ui-mock.html"]
+    },
+    {
+      "id": "LV-WARN-BUDGET",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "Keep each file inside its slot's budget: a tile 120 KB, a 5 s tile 250 KB at 1x or 600 KB at 2x, a card 400 KB, a device screen 700 KB, a hero under 2 s 300 KB at 1x or 1 MB at 2x.",
+      "values": "tile 120 KB; 5 s tile 250 KB at 1x, 600 KB at 2x; card 400 KB; device screen 700 KB; hero under 2 s 300 KB at 1x, 1 MB at 2x",
+      "evidence": ["PV-N1"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/encode.mjs"]
+    },
+    {
+      "id": "LV-WARN-DENSITY",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "Deliver 1.3-2.0 video pixels per CSS pixel of the slot.",
+      "values": "1.3-2.0 video px per CSS px",
+      "evidence": ["PV-14"],
+      "check": "launch-video/scripts/check-embed.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/render-frames.mjs"]
+    },
+    {
+      "id": "LV-WARN-FPS",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "Render and encode UI demos at 30 fps; 60 fps costs about 34 % more bytes and suits only fast motion graphics.",
+      "values": "30 fps; 60 fps about 34 % more bytes",
+      "evidence": ["PV-10"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/render-frames.mjs", "launch-video/scripts/encode.mjs"]
+    },
+    {
+      "id": "LV-WARN-AV1",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "When an AV1 file ships, list it first (it is about 55 % of the H.264 bytes at equal quality) and always end the sources with H.264, since WebKit plays AV1 only with a hardware decoder.",
+      "values": "AV1 about 55 % of the H.264 bytes; H.264 last",
+      "evidence": ["PV-9", "PV-24"],
+      "check": "launch-video/scripts/check-embed.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/assets/reference/demo-embed.html"]
+    },
+    {
+      "id": "LV-WARN-SEAM",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "A loop's seam, its last frame against frame 0, scores an SSIM at least the clip's median for consecutive frames (about 0.995); measured seams of 0.714-0.971 were visible.",
+      "values": "seam SSIM at least the consecutive-frame median (about 0.995)",
+      "evidence": ["PV-3"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/assets/reference/ui-mock.html"]
+    },
+    {
+      "id": "LV-WARN-ALPHA",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "A transparent clip ships HEVC with alpha before VP9 with alpha, then H.264 flattened over the page colour: VP9 alpha turns opaque in WebKit, and HEVC alpha encodes only through VideoToolbox, outside the agent sandbox.",
+      "values": "HEVC with alpha first; VP9 with alpha second; H.264 flattened last",
+      "evidence": ["TQ-20", "TQ-31"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/encode.mjs"]
     }
   ]
 }

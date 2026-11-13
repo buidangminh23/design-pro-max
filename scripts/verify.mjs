@@ -16,9 +16,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
-import { buildFixtureMedia } from './lib/fixture-media.mjs';
+import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll'];
+export const PARTS = ['launch-scroll', 'launch-video'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -69,7 +69,21 @@ function buildSite(entry, skill, media, folder) {
 function runCase(entry, skill, media, scratch) {
   let args;
   if (entry.checker === 'check-media') {
-    args = [path.join(skill, 'shared', 'check-media.mjs'), ...entry.files.map((recipe) => media[recipe])];
+    const demo = [...(entry.profile ? ['--profile', entry.profile] : []), ...(entry.poster ? ['--poster', media[entry.poster]] : [])];
+    args = [path.join(skill, 'shared', 'check-media.mjs'), ...demo, ...(entry.args ?? []), ...entry.files.map((recipe) => media[recipe])];
+  } else if (entry.checker === 'check-embed') {
+    const site = path.join(scratch, 'sites', entry.id);
+    buildSite(entry, skill, media, site);
+    args = [path.join(skill, entry.part, 'scripts', 'check-embed.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server ?? 'range', '--project', ROOT, ...(entry.args ?? [])];
+  } else if (entry.checker === 'render-frames') {
+    const script = path.join(skill, entry.part, 'scripts', 'render-frames.mjs');
+    if (entry.files) {
+      args = [script, '--check', media[entry.files[0]], ...(entry.args ?? [])];
+    } else {
+      const site = path.join(scratch, 'sites', entry.id);
+      buildSite(entry, skill, media, site);
+      args = [script, '--serve', site, '--page', entry.page, '--out', path.join(scratch, 'frames', entry.id), '--project', ROOT, ...(entry.args ?? [])];
+    }
   } else if (entry.checker === 'probe-scene') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
@@ -100,7 +114,11 @@ async function main(argv) {
     process.stderr.write(`no case matches ${only}\n`);
     return 2;
   }
-  const media = buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs') });
+  const needed = new Set(cases.map((entry) => entry.part));
+  const media = {
+    ...(needed.has('launch-scroll') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs') }) : {}),
+    ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs') }) : {}),
+  };
   const results = [];
   for (const entry of cases) {
     const run = runCase(entry, skill, media, scratch);

@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- Fail fixture for LV-EMBED-01: a clip below the fold with the autoplay attribute, preload="auto", a src from the
+     start and an eager poster, so its bytes load before the reader scrolls. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eager clip</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  figure { width: 400px; margin: 0 auto 100vh; }
+  video { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<figure>
+  <video autoplay muted loop playsinline preload="auto" src="loop.mp4" poster="loop.start.jpg" width="640" height="360"></video>
+  <button type="button" onclick="this.previousElementSibling.pause()">Pause</button>
+</figure>
+</body>
+</html>

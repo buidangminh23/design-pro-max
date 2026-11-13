@@ -366,7 +366,7 @@ test('the release commands report usage errors and results', (t) => {
 function statsRoot(t) {
   const root = tempDir('design-pro-max-stats-');
   t.after(() => removeTree(root));
-  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'fixtures/launch-video/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
   write(root, 'package.json', `${JSON.stringify({ name: NAME, version: '0.0.0', private: true }, null, 2)}\n`);
   write(root, '.claude-plugin/plugin.json', `${JSON.stringify({ name: NAME, version: '0.0.0' }, null, 2)}\n`);
   write(root, '.claude-plugin/marketplace.json', `${JSON.stringify({ name: NAME, plugins: [{ name: NAME, version: '0.0.0', source: './' }] }, null, 2)}\n`);

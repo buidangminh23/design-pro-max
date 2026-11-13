@@ -1,0 +1,109 @@
+/* launch-video device-frames.css (design-pro-max). Generic frames drawn in CSS for a rebuilt UI, live or rendered.
+   They imitate no real product: a browser window, a laptop and a phone as plain rounded shapes. Never swap them for
+   product photos or a vendor's device images. Sizes follow the frame's font-size, so one value scales a frame.
+
+   <div class="device-frame device-frame--browser">
+     <div class="device-frame__bar"><span></span><span></span><span></span><div class="device-frame__address">example.com</div></div>
+     <div class="device-frame__screen">...</div>
+   </div> */
+
+.device-frame {
+  --frame-body: #1f2328;
+  --frame-edge: #3a4048;
+  --frame-screen: #ffffff;
+  --frame-bar: #eef0f3;
+  --frame-dot: #c4c9d1;
+  --frame-text: #59616b;
+  --frame-ratio: 16 / 10;
+  --frame-radius: 0.75em;
+  position: relative;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.device-frame *,
+.device-frame *::before,
+.device-frame *::after {
+  box-sizing: border-box;
+}
+
+.device-frame__screen {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--frame-ratio);
+  background: var(--frame-screen);
+}
+
+.device-frame--browser {
+  border-radius: var(--frame-radius);
+  overflow: hidden;
+  background: var(--frame-screen);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08), 0 1.5em 3em -1em rgb(0 0 0 / 0.25);
+}
+
+.device-frame__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.375em;
+  height: 2.25em;
+  padding: 0 0.75em;
+  background: var(--frame-bar);
+  border-bottom: 1px solid rgb(0 0 0 / 0.06);
+}
+
+.device-frame__bar > span {
+  width: 0.625em;
+  height: 0.625em;
+  border-radius: 50%;
+  background: var(--frame-dot);
+}
+
+.device-frame__address {
+  flex: 1;
+  max-width: 60%;
+  margin: 0 auto;
+  padding: 0.25em 0.75em;
+  border-radius: 0.5em;
+  background: var(--frame-screen);
+  color: var(--frame-text);
+  font: 0.75em/1.25 system-ui, sans-serif;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.device-frame--laptop {
+  padding: 0.75em 0.75em 0;
+  border-radius: var(--frame-radius) var(--frame-radius) 0 0;
+  background: var(--frame-body);
+  box-shadow: inset 0 0 0 1px var(--frame-edge);
+}
+
+.device-frame--laptop .device-frame__screen {
+  border-radius: 0.25em 0.25em 0 0;
+}
+
+.device-frame--laptop::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: -1.25em;
+  height: 1.25em;
+  border-radius: 0 0 1em 1em;
+  background: linear-gradient(var(--frame-edge), var(--frame-body));
+}
+
+.device-frame--phone {
+  --frame-ratio: 9 / 19.5;
+  --frame-radius: 2.5em;
+  padding: 0.625em;
+  border-radius: var(--frame-radius);
+  background: var(--frame-body);
+  box-shadow: inset 0 0 0 1px var(--frame-edge), 0 1.5em 3em -1em rgb(0 0 0 / 0.3);
+}
+
+.device-frame--phone .device-frame__screen {
+  border-radius: calc(var(--frame-radius) - 0.625em);
+}
