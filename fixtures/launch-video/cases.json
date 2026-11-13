@@ -104,6 +104,60 @@
       "media": { "loop.mp4": "lv-loop" }
     },
     {
+      "id": "embed-01-poster",
+      "rule": "LV-EMBED-01",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-01-poster.html",
+      "server": "range",
+      "media": { "clip.mp4": "lv-clip", "clip.start.jpg": "lv-clip-start" }
+    },
+    {
+      "id": "embed-01-ignores-scrub-film",
+      "rule": "LV-EMBED-01",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-scrub-film.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "clip.mp4": "lv-clip", "clip.start.jpg": "lv-clip-start" }
+    },
+    {
+      "id": "embed-02-dead-pause",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-dead-pause.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-02-unfocusable",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-unfocusable.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-02-share-first",
+      "rule": "LV-EMBED-02",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-02-share-first.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "loop.start.jpg": "lv-loop-start" }
+    },
+    {
+      "id": "embed-02-native-controls",
+      "rule": "LV-EMBED-02",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-02-native-controls.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
       "id": "render-ui-mock",
       "rule": "LV-RENDER-01",
       "expect": "pass",
@@ -125,6 +179,22 @@
       "expect": "fail",
       "checker": "render-frames",
       "page": "pages/render-01-broken-image.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "render-01-image-never-loads",
+      "rule": "LV-RENDER-01",
+      "expect": "fail",
+      "checker": "render-frames",
+      "page": "pages/render-01-image-never-loads.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "1"]
+    },
+    {
+      "id": "render-01-clock-in-step",
+      "rule": "LV-RENDER-01",
+      "expect": "pass",
+      "checker": "render-frames",
+      "page": "pages/render-01-clock-in-step.html",
       "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
     }
   ]

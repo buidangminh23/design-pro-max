@@ -1,0 +1,42 @@
+<!doctype html>
+<!-- Pass fixture for LV-EMBED-01: a launch-scroll scene whose scrub film below the fold carries preload="auto" and a
+     src, followed by a correct lazy demo clip. Scrub films follow launch-scroll's rules, so the demo-clip checks must
+     judge the demo clip only and leave the scrub film alone. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scrub film and a demo clip</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  [data-scene] { height: 200vh; }
+  [data-scene-sticky] { position: sticky; top: 0; height: 100vh; display: grid; place-items: center; }
+  [data-scene] video { width: 400px; height: auto; }
+  [data-demo] { width: 400px; margin: 0 auto 100vh; }
+  [data-demo-frame] { position: relative; aspect-ratio: 16 / 9; }
+  [data-demo-frame] > img, [data-demo-frame] > video { position: absolute; inset: 0; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<section data-scene>
+  <div data-scene-sticky>
+    <video data-scrub muted playsinline aria-hidden="true" preload="auto" src="loop.mp4" width="640" height="360"></video>
+  </div>
+</section>
+<figure data-demo>
+  <div data-demo-frame>
+    <img data-demo-start src="clip.start.jpg" width="640" height="360" alt="" loading="lazy" decoding="async">
+    <video muted playsinline preload="none" aria-hidden="true" width="640" height="360">
+      <source data-src="clip.mp4" type='video/mp4; codecs="avc1.64001f"'>
+    </video>
+  </div>
+  <figcaption>A short one-shot after the scene.</figcaption>
+</figure>
+<script type="module">
+  import { mountDemos } from '../lib/demo-embed.js';
+  mountDemos(document);
+</script>
+</body>
+</html>

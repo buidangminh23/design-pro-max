@@ -34,9 +34,10 @@ start   end     what moves                              what the viewer reads
 1.4 s   2.0 s   three results rise in, 0.1 s apart      that the search found files
 2.0 s   2.6 s   the pointer moves to the second result  which one matters
 2.6 s   2.8 s   a press, then the row highlights        the choice
-2.8 s   4.6 s   a confirmation stays on screen          the result
-4.6 s   5.0 s   everything fades back                   (nothing new)
-5.0 s   6.0 s   the empty field, as at the start        (the loop closes)
+2.8 s   3.2 s   a confirmation rises in                 the result
+3.2 s   4.8 s   the confirmation holds for 1.6 s        the result
+4.8 s   5.2 s   everything fades back                   (nothing new)
+5.2 s   6.0 s   the empty field, as at the start        (the loop closes)
 ```
 
 ## Loops, one-shots and the seam

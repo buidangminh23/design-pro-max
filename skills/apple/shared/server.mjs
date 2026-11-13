@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { isMain } from './report.mjs';
+import { rethrowSandbox } from './sandbox.mjs';
 
 export const MODES = ['range', '200'];
 
@@ -94,7 +95,13 @@ export function startServer({ root, mode = 'range', port = 0, host = '127.0.0.1'
     }, body);
   });
   return new Promise((resolve, reject) => {
-    server.once('error', reject);
+    server.once('error', (error) => {
+      try {
+        rethrowSandbox(error);
+      } catch (thrown) {
+        reject(thrown);
+      }
+    });
     server.listen(port, host, () => {
       const address = server.address();
       resolve({

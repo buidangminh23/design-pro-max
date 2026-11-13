@@ -54,7 +54,7 @@ Copy `assets/lib/demo-embed.js` and follow `assets/reference/demo-embed.html` an
 
 - Markup ships `muted playsinline preload="none"`, no `autoplay` attribute, sources in `data-src`, best codec first and H.264 last [LV-WARN-AV1], and a lazy `<img>` start image instead of the `poster` attribute, which loads eagerly (PV-13).
 - The component gives a clip its sources when it comes within the load margin, plays it while at least half is visible, pauses it otherwise, runs one clip at a time, and reveals the video only after its first presented frame.
-- A clip that moves on its own for over 5 s, which includes every loop, gets a labelled pause button [LV-EMBED-02]. Under reduced motion or Save-Data nothing loads or plays until the reader presses Play.
+- A clip that moves on its own for over 5 s, which includes every loop, gets a labelled pause button that a keyboard reaches and presses [LV-EMBED-02]. Under reduced motion or Save-Data nothing loads or plays until the reader presses Play.
 
 ## 7. Hard rules
 
@@ -64,8 +64,8 @@ Each has a check that was seen failing on a broken fixture. These rules hold eve
 - [LV-ENC-02] A muted or decorative clip has no audio stream.
 - [LV-ENC-03] Every file carries bt709 primaries and matrix and a bt709 or sRGB transfer tag.
 - [LV-POSTER-01] The start image is frame 0 of the clip.
-- [LV-EMBED-01] A clip below the fold has no `autoplay` attribute, `preload="none"`, and no source or video bytes until it comes near.
-- [LV-EMBED-02] Motion over 5 s has a labelled pause control, and under reduced motion nothing plays, also after loading.
+- [LV-EMBED-01] A clip below the fold has no `autoplay` attribute, `preload="none"`, no `poster` attribute, and no source or video bytes until it comes near.
+- [LV-EMBED-02] Motion over 5 s has native controls or a labelled pause control that works from the keyboard, and under reduced motion nothing plays, also after loading.
 - [LV-RENDER-01] A master has duration x fps frames at twice the slot's CSS pixels, every image painted, never the built-in recording.
 
 Warnings (guidance, not failures): direction bands [LV-WARN-DIRECTION]; slot budgets [LV-WARN-BUDGET]; delivered density [LV-WARN-DENSITY]; frame rate [LV-WARN-FPS]; AV1 first and H.264 last [LV-WARN-AV1]; loop seam [LV-WARN-SEAM]; the alpha pair [LV-WARN-ALPHA].
