@@ -456,3 +456,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 8 error, 9 warn; evidence in `launch-scroll/references/evidence.md`
 - Checkers: `launch-scroll/scripts/probe-scene.mjs`, `shared/check-media.mjs`
+
+### `hig`
+
+- Guide: `hig/PART.md`
+- Status: active
+- Rules: 0 error, 0 warn; evidence in `hig/references/evidence.md`
+- Checkers: 

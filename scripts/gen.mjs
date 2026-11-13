@@ -47,7 +47,7 @@ export const PARTS_INDEX_FILE = `${SKILL_DIR}/references/parts-index.md`;
 export const README_FILE = 'README.md';
 export const NOTICE_FILE = `${SKILL_DIR}/NOTICE.md`;
 export const LOGO_FILE = `${SKILL_DIR}/assets/apple.svg`;
-export const APPLE_MARKS = ['Apple', 'iOS', 'iPadOS', 'macOS', 'watchOS', 'tvOS', 'visionOS', 'iPhone', 'iPad', 'Mac', 'Apple Watch', 'Safari', 'Siri', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store'];
+export const APPLE_MARKS = ['Apple', 'iOS', 'iPadOS', 'macOS', 'watchOS', 'tvOS', 'visionOS', 'iPhone', 'iPad', 'Mac', 'Apple Watch', 'Safari', 'Siri', 'Swift', 'SwiftUI', 'Xcode', 'TestFlight', 'App Store', 'AirPlay', 'AirPods', 'Apple Pay', 'Apple Pencil', 'Apple TV', 'Apple Vision Pro', 'CarPlay', 'CareKit', 'Digital Crown', 'Dynamic Island', 'Face ID', 'FaceTime', 'HealthKit', 'HomeKit', 'iCloud', 'iMessage', 'Live Photos', 'Mac Catalyst', 'ResearchKit', 'SharePlay', 'Spotlight', 'Touch ID', 'Retina', 'SF Symbols', 'Apple Wallet', 'Live Activities', 'Handoff', 'AirDrop', 'Multi-Touch', 'Finder', 'Mission Control', 'Apple Arcade', 'Apple Music'];
 export const CISCO_SENTENCE = 'IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.';
 
 const OWN_TEXT_FILES = [README_FILE, 'CHANGELOG.md', SKILLS_FILE];
