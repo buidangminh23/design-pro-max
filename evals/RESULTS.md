@@ -1,5 +1,18 @@
 # Eval results
 
+## 2026-11-13: cases 18 and 19 after bd4ae4a (Mac)
+
+bd4ae4a told the scene read to put H.264 into the delivered markup and commands even when the user asks for AV1 or HEVC only, and to ship the frame 0 start image in the markup. Cases 18 and 19 ran with apple on both hosts at bd4ae4a with the harness defaults; one grader judged them.
+
+| Case | Claude with | Codex with |
+|---|---|---|
+| 18 `av1-only` | 3/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 2/3 |
+
+- `codex-with-18` read the router, `PART.md` and `references/scrub-video.md` in full and still delivered AV1 and HEVC sources only, recommending H.264 in prose [LS-VID-02]. `claude-with-18` refused AV1 or HEVC alone and put H.264 first.
+- `codex-with-19` keeps its start image hidden until the scene pins, and pins only after the video has presented a frame, so frame 0 is never shown [LS-VID-05].
+- The grader was told that frame 0 must cover the film area from first paint, which bd4ae4a had also written. That contradicts the library: `scene.css` shows the still in the static layout and the start image only once the scene pins. `claude-with-19` follows the library and passes against the case's own expectation, so it is scored 3/3. The `PART.md` sentence was corrected after this run, so it has not been measured yet.
+
 ## 2026-11-13: targeted rerun after the round 4 fixes (Mac)
 
 At 059bcaf, with the harness defaults (Claude Code 2.1.323, `claude-opus-5-5[1m]` at high; Codex codex-cli 0.167.2, `gpt-6.1-sol` at high): launch-scroll cases 6, 16, 18 and 19 with apple on both hosts, and routing rows r33 and r40 and near miss n12 on both hosts, to check the shorter router description. One grader per case, no independent recheck.
