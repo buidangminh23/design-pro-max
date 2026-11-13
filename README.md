@@ -4,7 +4,7 @@
 
 ### Design Skills for AI Coding Agents
 
-*One skill per design. A router for Apple-platform work with its own HIG and scroll-scene guides, plus spacing rhythm and an exact-icon catalog, bundled.*
+*One skill per design. A router for Apple-platform work with its own HIG, launch-page, demo-clip and scroll-scene guides, plus spacing rhythm and an exact-icon catalog, bundled.*
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://img.shields.io/npm/v/@minhspark/design-pro-max?logo=npm&amp;color=CB3837" height="20" alt="npm" /></a>
@@ -70,9 +70,23 @@ skills/
     launch-scroll/           own part: pinned and scroll-scrubbed scenes on web pages
       PART.md                the guide the router sends to
       references/            engines and geometry, scrub video, frame sequences, gates, generated evidence
-      assets/lib/            scene progress, seek queue and scrub loader, with their CSS contract
-      assets/reference/      three reference pages: JavaScript engine, CSS engine, scrub video
-      scripts/               probe-scene.mjs (browser checks), encode-scrub.mjs (scrub encoder)
+      assets/lib/            scene progress, seek queue, scrub loader and frame window, with their CSS contract
+      assets/reference/      four reference pages: JavaScript engine, CSS engine, scrub video, image sequence
+      scripts/               probe-scene.mjs (browser checks), encode-scrub.mjs (scrub encoder),
+                             make-sequence.mjs (image sequences), bench-scrub.mjs (advisory film-vs-sequence sweep)
+    launch-page/             own part: launch and landing pages, built or reviewed
+      PART.md                the guide the router sends to
+      references/            type and colour, layout and components, motion and the hero intro, generated evidence
+      assets/                tokens.json and the tokens.css and theme.tailwind.css generated from it
+      assets/lib/            intro gate, one-shot reveals, gallery and marquee with pause controls
+      assets/reference/      two CSS-drawn reference pages: a launch page and a hero intro hand-off
+      scripts/               check-page.mjs (browser checks), lint-css.mjs (static check)
+    launch-video/            own part: demo clips rendered from code, encoded and embedded
+      PART.md                the guide the router sends to
+      references/            paths and licences, direction, rendering, encode recipes, the embed component, generated evidence
+      assets/lib/            demo-embed.js, the lazy clip loader with its pause control
+      assets/reference/      an original UI mock, a demo embed page and generic CSS device frames
+      scripts/               render-frames.mjs (frame-stepped render), encode.mjs (encode profiles), check-embed.mjs
     hig/                     own part: Apple's Human Interface Guidelines for native app interfaces
       PART.md                how to read, build to and review against the guidelines
       references/            own-words digest of every guideline page by section, with generated evidence
@@ -97,13 +111,15 @@ scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and as
 scripts/release.mjs          checks, packs and verifies the release ZIP; bumps versions and card stats; pushes the tag
 scripts/ci-local.mjs         runs the CI steps and the verify run locally when Actions cannot run
 scripts/lint-ip.mjs          IP and privacy lint over the project's own files
+scripts/lint-tokens.mjs      fails a launch-page token set that copies measured reference values
 scripts/verify.mjs           runs every own-part fixture through the checkers, red first
 scripts/import-findings.mjs  checks the evidence ledger's source hashes against a research folder
 rules.json                   the own parts' rules: level, evidence, check, fixtures and the checker that implements each
 evidence/ledger.json         own-words claims with their label, source and source hash
 evidence/ip-hashes.json      salted hashes of the private identifiers, private terms and Apple text corpus
+evidence/token-hashes.json   salted hashes of the measured reference values lint-tokens compares against
 designs/apple.json           the apple skill's design record: marks, never-ship list, phrase gates, newest released OS
-fixtures/                    pass and fail cases for every error rule, with pages; media is built at run time
+fixtures/                    pass and fail cases for every error rule, with pages and a planted-defect launch page; media is built at run time
 evals/                       routing and part evals, the harness that runs them on Claude Code and Codex, and RESULTS.md
 .github/workflows/           CI, release, the weekly vendor sync and the own-part verify run
 THIRD_PARTY_NOTICES.md       generated credits with every licence text
@@ -120,13 +136,15 @@ The same constraint shapes the rest of the tree: each skill's own `skills/<name>
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Own parts (2)
+### Own parts (4)
 
 Written for this project and released under its MIT licence. Each has a `PART.md` guide; a part with checkers has error rules in `rules.json` that they enforce, and a pass and a fail fixture for every error rule.
 
 | Part | Covers | Prerequisites |
 |---|---|---|
 | `launch-scroll` | Pinned scroll scenes and scroll-scrubbed video or frame sequences on web pages: when not to pin, the engine, geometry, gates for reduced motion, short viewports and blocked autoplay, scrub encoding and the start frame. 8 error rules and 9 warnings | Node 22 or later; ffmpeg and ffprobe for media checks and encoding; Playwright with Chromium in the user's project for browser checks |
+| `launch-page` | Launch and landing pages (hero, feature tiles, galleries and marquees, pricing, FAQ), built on the part's own restrained or expressive token sets and the user's brand, or reviewed read-only: no SF fonts on the web, text in normal flow without JavaScript or motion, sizes from one token set, contrast on the real background, pause controls for self-moving content, a hero intro that always ends and reveals that stay. 7 error rules and 9 warnings | Node 22 or later; Playwright with Chromium in the user's project for browser checks |
+| `launch-video` | Demo clips rendered from code, never screen recordings: whether a still or a live replica is enough, an HTML and CSS rebuild of the UI rendered frame by frame at 2x, H.264, VP9, AV1 and transparent encodes with a frame-0 start image, and a lazy embed that starts late, plays one clip at a time and can be paused. 7 error rules and 7 warnings | Node 22 or later; ffmpeg and ffprobe; Playwright with Chromium in the user's project; macOS outside an agent sandbox for HEVC with alpha |
 | `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
 
 Known limit, measured in `evals/RESULTS.md`: asked for a scroll-scrub film in AV1 or HEVC only, Codex reads the part's rule and still delivers those codecs alone, recommending H.264 only in its advice; Claude Code adds the H.264 source. Check the delivered `<source>` list with `skills/apple/shared/check-media.mjs` before shipping.
@@ -235,7 +253,7 @@ Node 22 or later; no dependencies.
 | `node scripts/vendor-sync.mjs classify --from <dir> [--json \| --markdown]` | Offline. Compares a staged update with the tree: `safe` only when no file that ships in a moved part changes, so the pins move past upstream commits that touched nothing in the parts; any added, removed or edited file, executable bit, licence or skill name makes it `needs-review`, because agents read and run these files with the user's permissions and no pattern can prove new text safe. Each reason names the file, and the added lines of each changed text file are listed with what they bring: links by host and path, commands, injection phrases, words that mix scripts and fenced code. `--markdown` prints the pull request body |
 | `node scripts/vendor-sync.mjs confirm --from <dir>` | Network. Proves a staged update came from upstream: each moved source's staged commit must be on its default branch and descend from the pin, and every moved part must match a fresh copy made at that commit, record for record |
 | `node scripts/vendor-sync.mjs apply --from <dir>` | Copies a staged update into the tree after refusing symlinks, special files, paths outside the moved parts and any manifest change other than commits; executable bits come from each part's `UPSTREAM.json` |
-| `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, the README credits table, the trademark line in this README and in `skills/apple/NOTICE.md`, and the licences of the third-party drawings the skill ships (`MEDIA_NOTICES` in `scripts/lib/media.mjs`) in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
+| `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, each own part's `references/evidence.md`, launch-page's `tokens.css` and `theme.tailwind.css` from its `tokens.json`, the README credits table, the trademark line in this README and in `skills/apple/NOTICE.md`, and the licences of the third-party drawings the skill ships (`MEDIA_NOTICES` in `scripts/lib/media.mjs`) in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
 | `node scripts/bundle-sync.mjs sync [--only <name>]` | Network. Fetches each bundle's pinned commit, proves its release tag points at it, copies its skill folder byte for byte into `skills/<name>/` with the repository's licence as `LICENSE`, and records every file in `vendor/bundles.json` |
 | `node scripts/bundle-sync.mjs check` | Offline: each bundled folder holds exactly the files `vendor/bundles.json` records, with their sizes, hashes and executable bits, plus its `LICENSE` |
@@ -250,7 +268,8 @@ Node 22 or later; no dependencies.
 | `node scripts/release.mjs push-tag vX.Y.Z` | Creates the annotated tag on HEAD once HEAD is `origin/main`, the tree is clean and `check vX.Y.Z` passes; pushes the tag by name, retries up to three times, and succeeds only when `git ls-remote` lists the tag at HEAD |
 | `node scripts/badges.mjs <dir>` | Network. Writes the README badges into `<dir>`: `github-views.svg` from the GitHub traffic API, which needs `ANALYTICS_TOKEN` with Administration read on the repository, and the npm download badges once `package.json` names a public package. `BADGE_SOURCES` limits the sources, for example `views`. A source that has no data yet is skipped and leaves the published badge in place; a rejected request fails the run |
 | `node scripts/ci-local.mjs [--skip-verify] [--json]` | Runs every step of CI's test job in order, read from `ci.yml`, then `scripts/verify.mjs` when ffmpeg, ffprobe and Playwright are installed, and lists what the run did not cover: the OS and Node matrix, L2 media, the GitHub-side release and sync steps, and verify when it could not run. For use when GitHub Actions is unavailable |
-| `node scripts/verify.mjs [--only <case>] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium` |
+| `node scripts/verify.mjs [--only <case or rule>[,<more>]] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. A case with an expected file, such as the planted-defect launch page, must also report exactly the error rules that file lists for its checker. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium` |
+| `node scripts/lint-tokens.mjs [<file.css> ...] [--json]` | Fails a token set that matches 3 or more of the measured reference values within 1 px or 0.001 em; by default it lints the shipped `tokens.css` and `theme.tailwind.css`, each mode and `:lang()` set on its own. The measured values are committed only as salted hashes in `evidence/token-hashes.json`. Runs inside `npm test` |
 | `node scripts/import-findings.mjs --check <research folder>` | Recomputes each ledger entry's source hash from the private research folder it was written from and fails on any difference; `--write` records new hashes. The research folder never enters the repository |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories, the evidence ledger and rules, the citation lint, the own-part checkers' pure code and a red-first check of the harness |
 
