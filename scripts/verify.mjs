@@ -62,7 +62,8 @@ function buildSite(entry, skill, media, folder) {
   const pageFolder = path.dirname(path.join(folder, entry.page));
   for (const [name, recipe] of Object.entries(entry.media ?? {})) {
     if (!media[recipe]) throw new Error(`${entry.id}: unknown media recipe ${recipe}`);
-    fs.copyFileSync(media[recipe], path.join(pageFolder, name));
+    if (fs.statSync(media[recipe]).isDirectory()) copyTree(media[recipe], path.join(pageFolder, name));
+    else fs.copyFileSync(media[recipe], path.join(pageFolder, name));
   }
 }
 
@@ -100,7 +101,7 @@ async function main(argv) {
     process.stderr.write(`no case matches ${only}\n`);
     return 2;
   }
-  const media = buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs') });
+  const media = buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs'), makeSequence: path.join(skill, 'launch-scroll', 'scripts', 'make-sequence.mjs') });
   const results = [];
   for (const entry of cases) {
     const run = runCase(entry, skill, media, scratch);

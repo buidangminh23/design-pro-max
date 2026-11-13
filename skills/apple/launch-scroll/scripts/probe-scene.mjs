@@ -14,7 +14,10 @@
  * progress stays in [0, 1] and never runs backwards on a forward sweep; LS-VID-03 no currentTime write while seeking
  * and no fastSeek(); LS-VID-04 the film is seekable (a Blob URL, MediaSource or 206 Range responses); LS-VID-05 the
  * start image is frame 0 and the video stays hidden until it has presented a frame. LS-VID-01 and LS-VID-02 run on
- * the film files through the shared check-media. Output follows the shared checker contract.
+ * the film files through the shared check-media. An image sequence (a canvas[data-sequence] whose data-src names a
+ * make-sequence manifest) gets the same gates, with its manifest and frames counted as scrub media, and the warning
+ * LS-WARN-SEQ: the page keeps a bounded window of decoded frames (live ImageBitmaps), never the whole set.
+ * Output follows the shared checker contract.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -31,7 +34,7 @@ const VIDEO_URL = /\.(?:mp4|m4v|mov|webm)(?:[?#]|$)/i;
 const TOLERANCE = { px: 2, progress: 0.002 };
 
 export const INSTRUMENT = String.raw`(() => {
-  const log = { seekingWrites: 0, firstWrite: null, fastSeekCalls: 0, earlyVisible: [], playRejected: false };
+  const log = { seekingWrites: 0, firstWrite: null, fastSeekCalls: 0, earlyVisible: [], playRejected: false, bitmaps: { created: 0, live: 0, peak: 0, width: 0, height: 0 } };
   Object.defineProperty(window, '__lsProbe', { value: log, enumerable: false });
   const media = HTMLMediaElement.prototype;
   const time = Object.getOwnPropertyDescriptor(media, 'currentTime');
@@ -53,6 +56,29 @@ export const INSTRUMENT = String.raw`(() => {
     media.play = function play() {
       log.playRejected = true;
       return Promise.reject(new DOMException('play() rejected by the probe', 'NotAllowedError'));
+    };
+  }
+  if (typeof window.createImageBitmap === 'function' && typeof ImageBitmap !== 'undefined') {
+    const nativeCreate = window.createImageBitmap;
+    const nativeClose = ImageBitmap.prototype.close;
+    const open = new WeakSet();
+    window.createImageBitmap = function createImageBitmap(...args) {
+      return nativeCreate.apply(this, args).then((bitmap) => {
+        open.add(bitmap);
+        log.bitmaps.created += 1;
+        log.bitmaps.live += 1;
+        log.bitmaps.peak = Math.max(log.bitmaps.peak, log.bitmaps.live);
+        log.bitmaps.width = Math.max(log.bitmaps.width, bitmap.width);
+        log.bitmaps.height = Math.max(log.bitmaps.height, bitmap.height);
+        return bitmap;
+      });
+    };
+    ImageBitmap.prototype.close = function close() {
+      if (open.has(this)) {
+        open.delete(this);
+        log.bitmaps.live -= 1;
+      }
+      return nativeClose.call(this);
     };
   }
   const presented = new WeakSet();
@@ -146,6 +172,7 @@ function readScene(page, selector, index) {
     const sources = video ? [...video.querySelectorAll('source')].map((source) => source.dataset.src || source.getAttribute('src')).filter(Boolean) : [];
     if (video && !sources.length && (video.getAttribute('src') || video.dataset.src)) sources.push(video.dataset.src || video.getAttribute('src'));
     const start = scene.querySelector('[data-scene-startframe]');
+    const canvas = scene.querySelector('canvas[data-sequence]');
     return {
       pinned: stickies.length > 0,
       state: scene.dataset.sceneState ?? null,
@@ -174,6 +201,11 @@ function readScene(page, selector, index) {
         height: video.videoHeight,
       } : null,
       startframe: start ? new URL(start.currentSrc || start.getAttribute('src'), location.href).href : video?.poster || null,
+      sequence: canvas && canvas.dataset.src ? {
+        manifest: new URL(canvas.dataset.src, location.href).href,
+        state: scene.dataset.scrubState ?? null,
+        frame: scene.dataset.sequenceFrame === undefined ? null : Number(scene.dataset.sequenceFrame),
+      } : null,
     };
   }, { sel: selector, at: index });
 }
@@ -184,8 +216,10 @@ async function newPage(browser, viewport, { reducedMotion = 'no-preference', rej
   await context.addInitScript(INSTRUMENT);
   const page = await context.newPage();
   const media = [];
+  const requests = [];
   const responses = new Map();
   page.on('request', (request) => {
+    requests.push(request.url());
     if (request.resourceType() === 'media' || VIDEO_URL.test(request.url())) media.push(request.url());
   });
   page.on('response', (response) => {
@@ -195,7 +229,7 @@ async function newPage(browser, viewport, { reducedMotion = 'no-preference', rej
     list.push(response.status());
     responses.set(response.url(), list);
   });
-  return { context, page, media, responses };
+  return { context, page, media, requests, responses };
 }
 
 async function sweep(page, selector, index, scene, steps = LIMITS.sweepSteps) {
@@ -237,8 +271,46 @@ async function waitForFilm(page, selector, index) {
   await page.waitForFunction(({ sel, at }) => {
     const scene = document.querySelectorAll(sel)[at];
     const video = scene?.querySelector('video[data-scrub]') ?? scene?.querySelector('video');
+    if (!video && scene?.querySelector('canvas[data-sequence]')) return ['ready', 'failed'].includes(scene.dataset.scrubState);
     return !video || video.readyState >= 2 || scene?.dataset.scrubState === 'failed';
   }, { sel: selector, at: index }, { timeout: LIMITS.loadMs }).catch(() => {});
+}
+
+export async function readManifest(context, url) {
+  try {
+    const response = await context.request.get(url);
+    return response.ok() ? await response.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+export function sequenceUrls(manifestUrl, manifest) {
+  const template = typeof manifest?.frames === 'string' ? manifest.frames : '';
+  const folder = new URL(template.includes('/') ? template.slice(0, template.lastIndexOf('/') + 1) : './', manifestUrl).href;
+  return (url) => url === manifestUrl || (template.includes('/') && url.startsWith(folder));
+}
+
+export function frameWindowVerdict(bitmaps, count) {
+  const bounded = count > 0 && bitmaps.peak < count;
+  const megabytes = Math.round((bitmaps.peak * bitmaps.width * bitmaps.height * 4) / 1048576);
+  return {
+    ok: bounded || count <= 1,
+    measured: `${bitmaps.peak} decoded frame(s) at most of ${count}, about ${megabytes} MB at ${bitmaps.width}x${bitmaps.height}`,
+  };
+}
+
+async function checkSequence(report, where, run, scene) {
+  const manifest = await readManifest(run.context, scene.sequence.manifest);
+  const count = Number(manifest?.count) || 0;
+  report.check('LS-WARN-SEQ', scene.sequence.state === 'ready', `${where}: sequence`, `state ${scene.sequence.state ?? 'none'}, frame ${scene.sequence.frame ?? 'none'}`, 'frames drawn once the scene pins', 'warn');
+  const log = await run.page.evaluate(() => window.__lsProbe.bitmaps);
+  if (!log.created) {
+    report.warn('LS-WARN-SEQ', `${where}: decoded frames`, 'no createImageBitmap call seen', 'a bounded window of decoded frames (ImageBitmap, closed when it leaves)');
+    return;
+  }
+  const verdict = frameWindowVerdict(log, count);
+  report.check('LS-WARN-SEQ', verdict.ok, `${where}: decoded frames`, verdict.measured, 'a bounded window of decoded frames, never the whole set', 'warn');
 }
 
 async function fastSweep(page, scene) {
@@ -321,13 +393,15 @@ async function checkStatic(report, rule, where, browser, url, viewport, selector
     await settle(run.page, selector);
     const first = await readScene(run.page, selector, index);
     if (!first) return;
+    const isSequence = first.sequence ? sequenceUrls(first.sequence.manifest, await readManifest(run.context, first.sequence.manifest)) : () => false;
     const pageHeight = await run.page.evaluate(() => document.documentElement.scrollHeight);
     for (let y = 0; y <= pageHeight; y += Math.max(200, viewport.height / 2)) await scrollTo(run.page, y);
     await run.page.waitForTimeout(500);
     const scene = await readScene(run.page, selector, index);
     report.check(rule, !scene.pinned, `${where}: layout`, scene.pinned ? `still pinned (state ${scene.state ?? 'none'})` : 'normal flow', 'normal flow, no sticky stage');
     if (scene.exposed !== null) report.check(rule, scene.exposed >= 0.99, `${where}: end state`, `--scene-progress ${scene.exposed}`, 'end state (progress 1)');
-    report.check(rule, run.media.length === 0, `${where}: film requests`, run.media.length ? run.media.map((entry) => path.basename(new URL(entry).pathname)).join(', ') : 'none', 'no film requested');
+    const requested = [...new Set([...run.media, ...run.requests.filter(isSequence)])];
+    report.check(rule, requested.length === 0, `${where}: film requests`, requested.length ? requested.slice(0, 5).map((entry) => path.basename(new URL(entry).pathname)).join(', ') + (requested.length > 5 ? ` and ${requested.length - 5} more` : '') : 'none', 'no film or sequence frames requested');
   } finally {
     await run.context.close();
   }
@@ -381,6 +455,16 @@ export async function probe(options, report) {
             checkGeometry(report, where, scene, samples);
             await checkShortViewport(report, where, browser, url, viewport, options.scene, index, scene);
           }
+          if (scene.sequence) {
+            if (scene.pinned) {
+              await scrollTo(run.page, scene.top);
+              await waitForFilm(run.page, options.scene, index);
+              await fastSweep(run.page, await readScene(run.page, options.scene, index));
+              await checkSequence(report, where, run, await readScene(run.page, options.scene, index));
+            } else {
+              report.skip('LS-WARN-SEQ', where, 'the scene does not pin, so nothing scrubs');
+            }
+          }
           if (scene.video) {
             if (scene.pinned) {
               await scrollTo(run.page, scene.top);
@@ -392,7 +476,7 @@ export async function probe(options, report) {
             }
           }
           await checkStatic(report, 'LS-GATE-01', `${where}, reduced motion`, browser, url, viewport, options.scene, index, { reducedMotion: 'reduce' });
-          if (scene.video) await checkStatic(report, 'LS-GATE-01', `${where}, rejected play()`, browser, url, viewport, options.scene, index, { rejectPlay: true });
+          if (scene.video || scene.sequence) await checkStatic(report, 'LS-GATE-01', `${where}, rejected play()`, browser, url, viewport, options.scene, index, { rejectPlay: true });
         }
       } finally {
         await run.context.close();

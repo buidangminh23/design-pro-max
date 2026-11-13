@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Fail fixture for LS-GATE-01: the layout follows the motion and viewport gates, but the image sequence's manifest
+     and frames are fetched at load whatever the motion preference or autoplay result. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-GATE-01 sequence fail</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 16px/1.5 system-ui, sans-serif; }
+  .spacer { height: 80vh; }
+  .stage { width: min(100% - 32px, 720px); height: 480px; display: grid; place-items: center; }
+</style>
+</head>
+<body>
+<div class="spacer"></div>
+<section data-scene>
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <div data-scene-film>
+        <img data-scene-startframe src="sequence/startframe.jpg" width="640" height="360" alt="">
+        <canvas data-sequence data-src="sequence/sequence.json" aria-hidden="true"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="spacer"></div>
+<script type="module">
+  import { createScene } from '../lib/scene-progress.js';
+  import { createFrameWindow, frameAt, loadManifest } from '../lib/frame-window.js';
+  const element = document.querySelector('[data-scene]');
+  const manifest = await loadManifest(element.querySelector('canvas').dataset.src);
+  const frames = createFrameWindow({ urls: manifest.urls });
+  frames.setCenter(0);
+  createScene(element, { onProgress: (progress) => frames.setCenter(frameAt(progress, manifest.count)) });
+</script>
+</body>
+</html>

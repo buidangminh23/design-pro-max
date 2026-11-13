@@ -1,6 +1,7 @@
 /**
  * Media for the launch-scroll fixtures, generated with ffmpeg from synthetic sources so no media file is ever
- * committed. The good film goes through the part's own encode-scrub.mjs, which the fixtures therefore exercise too.
+ * committed. The good film goes through the part's own encode-scrub.mjs and the image sequence through make-sequence.mjs,
+ * which the fixtures therefore exercise too.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,7 +22,7 @@ const ffmpeg = (...args) => run('ffmpeg', ['-hide_banner', '-nostats', '-logleve
 const H264 = ['-an', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart'];
 
 /** Builds every recipe into `folder` once and returns a map from recipe name to file. */
-export function buildFixtureMedia(folder, { encodeScrub }) {
+export function buildFixtureMedia(folder, { encodeScrub, makeSequence }) {
   fs.mkdirSync(folder, { recursive: true });
   const file = (name) => path.join(folder, name);
   const master = file('master.mkv');
@@ -38,6 +39,7 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
     'startframe-long-gop': file('startframe-long-gop.jpg'),
     'film-open-gop': file('film-open-gop.mp4'),
     'film-vp9': file('film-vp9.webm'),
+    sequence: path.join(folder, 'sequence'),
   };
   const build = (name, ...args) => {
     if (!fs.existsSync(media[name])) ffmpeg(...args, media[name]);
@@ -47,5 +49,8 @@ export function buildFixtureMedia(folder, { encodeScrub }) {
   build('startframe-long-gop', '-i', media['film-long-gop'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
   build('film-open-gop', '-i', master, '-vf', 'scale=640:-2', ...H264, '-crf', '23', '-x264-params', 'keyint=6:min-keyint=6:scenecut=0:open-gop=1');
   build('film-vp9', '-i', master, '-an', '-vf', 'scale=640:-2', '-c:v', 'libvpx-vp9', '-crf', '36', '-b:v', '0', '-g', '6', '-keyint_min', '6', '-pix_fmt', 'yuv420p', '-deadline', 'realtime', '-cpu-used', '8');
+  if (makeSequence && !fs.existsSync(path.join(media.sequence, 'sequence.json'))) {
+    run(process.execPath, [makeSequence, master, '--out', media.sequence, '--width', '640', '--format', 'jpg']);
+  }
   return media;
 }
