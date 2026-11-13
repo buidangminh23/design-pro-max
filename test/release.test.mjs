@@ -367,6 +367,10 @@ function statsRoot(t) {
   const root = tempDir('design-pro-max-stats-');
   t.after(() => removeTree(root));
   for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const part of fs.readdirSync(path.join(ROOT, 'fixtures'))) {
+    const cases = path.join(ROOT, 'fixtures', part, 'cases.json');
+    if (fs.existsSync(cases)) write(root, `fixtures/${part}/cases.json`, fs.readFileSync(cases));
+  }
   write(root, 'package.json', `${JSON.stringify({ name: NAME, version: '0.0.0', private: true }, null, 2)}\n`);
   write(root, '.claude-plugin/plugin.json', `${JSON.stringify({ name: NAME, version: '0.0.0' }, null, 2)}\n`);
   write(root, '.claude-plugin/marketplace.json', `${JSON.stringify({ name: NAME, plugins: [{ name: NAME, version: '0.0.0', source: './' }] }, null, 2)}\n`);
