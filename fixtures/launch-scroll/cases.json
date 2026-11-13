@@ -22,7 +22,7 @@
     },
     {
       "id": "scrub-sequence",
-      "rule": ["LS-GATE-01", "LS-GATE-02", "LS-GEOM-01", "LS-WARN-SEQ"],
+      "rule": ["LS-GATE-01", "LS-GATE-02", "LS-GEOM-01", "LS-VID-05", "LS-WARN-SEQ"],
       "expect": "pass",
       "checker": "probe-scene",
       "page": "reference/scrub-sequence.html",
@@ -48,6 +48,16 @@
       "page": "pages/gate-01-sequence-ignores-motion.html",
       "server": "range",
       "media": { "sequence": "sequence" },
+      "args": ["--viewport", "1280x800", "--no-media"]
+    },
+    {
+      "id": "gate-01-demo-below-scene",
+      "rule": "LS-GATE-01",
+      "expect": "pass",
+      "checker": "probe-scene",
+      "page": "pages/gate-01-demo-below-scene.html",
+      "server": "range",
+      "media": { "sequence": "sequence", "demo.mp4": "film" },
       "args": ["--viewport", "1280x800", "--no-media"]
     },
     {
@@ -128,6 +138,26 @@
       "server": "range",
       "media": { "film.mp4": "film", "film.webm": "film-webm", "startframe.jpg": "startframe-wrong", "still.jpg": "still" },
       "args": ["--viewport", "1280x800"]
+    },
+    {
+      "id": "vid-05-sequence-wrong-start",
+      "rule": "LS-VID-05",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/vid-05-sequence-wrong-start.html",
+      "server": "range",
+      "media": { "sequence": "sequence" },
+      "args": ["--viewport", "1280x800"]
+    },
+    {
+      "id": "vid-05-sequence-canvas-early",
+      "rule": "LS-VID-05",
+      "expect": "fail",
+      "checker": "probe-scene",
+      "page": "pages/vid-05-sequence-canvas-early.html",
+      "server": "range",
+      "media": { "sequence": "sequence" },
+      "args": ["--viewport", "1280x800", "--no-media"]
     }
   ]
 }

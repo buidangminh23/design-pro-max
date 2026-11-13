@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app UI and code (SwiftUI, Xcode, HIG) and launch pages. Use when a task needs HIG reviews, App Store Connect (TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist, landing pages, rendered demo clips, pinned or scrubbed web scenes. Not for launch plans, narrated or preview videos, store marketing art, GSAP, web springs (apple-design) or Swift questions (write-swift).
+description: For Apple app UI (SwiftUI, Xcode, HIG) and launch pages. Use when a question or task needs App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist, demo clips, scroll scenes. Not for narrated, preview, Remotion or template videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
 ---
 
 # apple
@@ -83,7 +83,7 @@ Routing notes:
 - SwiftData migrations: the part has one migration rule; use Apple's VersionedSchema documentation as well.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
 - Keywords in App Store metadata are limited to 100 bytes, not 100 characters.
-- A launch page with a scroll scene or demo clips: `launch-page/PART.md` for the page, plus the `launch-scroll` row for the scene or the `launch-video` row for the clips.
+- A launch page with a scroll scene or demo clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`, then the `launch-scroll` row for its scene or the `launch-video` row for its clips; a request for one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
 
 Not covered by any part:
 

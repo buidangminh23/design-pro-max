@@ -8,7 +8,8 @@
  *
  * The film is loaded into a Blob URL and driven by assets/lib/seek-queue.js; the sequence by
  * assets/lib/frame-window.js. Each sweep sets one progress step per animation frame (or per --frames-per-step frames)
- * from 0 to 1 and counts the distinct frames presented (requestVideoFrameCallback) or drawn. Output: JSON lines under
+ * from 0 to 1, one step per frame of that medium (the film's duration x --fps, the sequence's count), and counts the
+ * distinct frames presented (requestVideoFrameCallback) or drawn while the sweep runs; nothing after its last step counts. Output: JSON lines under
  * LS-WARN-SEQ, level pass for measurements and warn when the sequence shows no more frames than the film; exit 0, or
  * 2 for a missing tool or bad usage, 3 for a sandbox block. Never 1: this is advice, not a rule.
  */
@@ -37,15 +38,17 @@ const PAGE = `<!doctype html>
   import { createFrameWindow, frameAt, loadManifest, coverRect } from './lib/frame-window.js';
   const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  async function sweep(steps, framesPerStep, apply) {
+  async function sweep(steps, framesPerStep, apply, counter) {
+    counter.on = true;
     for (let step = 0; step <= steps; step += 1) {
-      apply(step / steps);
+      apply(steps ? step / steps : 1);
       for (let frame = 0; frame < framesPerStep; frame += 1) await nextFrame();
     }
+    counter.on = false;
     await wait(500);
   }
   window.bench = {
-    async film({ url, fps, steps, framesPerStep }) {
+    async film({ url, fps, framesPerStep }) {
       const video = document.getElementById('film');
       const blob = await (await fetch(url)).blob();
       video.src = URL.createObjectURL(blob);
@@ -53,17 +56,17 @@ const PAGE = `<!doctype html>
       try { await video.play(); } catch {} finally { video.pause(); }
       const count = Math.max(1, Math.round(video.duration * fps));
       const shown = new Set();
-      const watch = () => video.requestVideoFrameCallback((now, meta) => { shown.add(Math.floor(meta.mediaTime * fps + 1e-3)); watch(); });
+      const counter = { on: false };
+      const watch = () => video.requestVideoFrameCallback((now, meta) => { if (counter.on) shown.add(Math.floor(meta.mediaTime * fps + 1e-3)); watch(); });
       watch();
       const queue = createSeekQueue(video, { fps });
       queue.seekToFrame(0);
       await wait(300);
-      shown.clear();
       const started = performance.now();
-      await sweep(steps, framesPerStep, (progress) => queue.seekToFrame(frameIndex(progress, count)));
+      await sweep(count - 1, framesPerStep, (progress) => queue.seekToFrame(frameIndex(progress, count)), counter);
       return { count, shown: shown.size, ms: Math.round(performance.now() - started) };
     },
-    async sequence({ url, steps, framesPerStep, radius }) {
+    async sequence({ url, framesPerStep, radius }) {
       const canvas = document.getElementById('sequence');
       const context = canvas.getContext('2d');
       canvas.width = 640;
@@ -71,24 +74,24 @@ const PAGE = `<!doctype html>
       const manifest = await loadManifest(url);
       let target = 0;
       const shown = new Set();
+      const counter = { on: false };
       const draw = () => {
         const best = frames.nearest(frameAt(target, manifest.count));
         if (!best) return;
         const rect = coverRect(best.bitmap.width, best.bitmap.height, canvas.width, canvas.height);
         context.drawImage(best.bitmap, rect.x, rect.y, rect.width, rect.height);
-        shown.add(best.index);
+        if (counter.on) shown.add(best.index);
       };
       const frames = createFrameWindow({ urls: manifest.urls, radius, onDecoded: () => requestAnimationFrame(draw) });
       frames.setCenter(0);
       const deadline = performance.now() + 10000;
       while (frames.fetched < manifest.count && performance.now() < deadline) await wait(50);
-      shown.clear();
       const started = performance.now();
-      await sweep(steps, framesPerStep, (progress) => {
+      await sweep(manifest.count - 1, framesPerStep, (progress) => {
         target = progress;
         frames.setCenter(frameAt(progress, manifest.count));
         draw();
-      });
+      }, counter);
       return { count: manifest.count, shown: shown.size, ms: Math.round(performance.now() - started), peak: frames.live };
     },
   };
@@ -164,12 +167,11 @@ async function main() {
     const page = await context.newPage();
     await page.goto(new URL('index.html', served.url).href, { waitUntil: 'load' });
     await page.waitForFunction(() => window.benchReady === true, null, { timeout: 10000 });
-    const steps = manifest.count - 1;
-    const where = `${steps + 1} steps, ${options.framesPerStep} animation frame(s) each`;
-    const film = await page.evaluate((args) => window.bench.film(args), { url: 'film.mp4', fps: options.fps, steps, framesPerStep: options.framesPerStep });
-    report.pass('LS-WARN-SEQ', `film sweep, ${where}`, `${film.shown} of ${film.count} frames shown in ${film.ms} ms`, 'advisory: compare with the sequence');
-    const sequence = await page.evaluate((args) => window.bench.sequence(args), { url: sequenceUrl, steps, framesPerStep: options.framesPerStep, radius: options.radius });
-    report.pass('LS-WARN-SEQ', `sequence sweep, ${where}`, `${sequence.shown} of ${sequence.count} frames drawn in ${sequence.ms} ms; ${sequence.peak} decoded at the end`, 'advisory: compare with the film');
+    const where = (count) => `${count} steps, ${options.framesPerStep} animation frame(s) each`;
+    const film = await page.evaluate((args) => window.bench.film(args), { url: 'film.mp4', fps: options.fps, framesPerStep: options.framesPerStep });
+    report.pass('LS-WARN-SEQ', `film sweep, ${where(film.count)}`, `${film.shown} of ${film.count} frames shown in ${film.ms} ms`, 'advisory: compare with the sequence');
+    const sequence = await page.evaluate((args) => window.bench.sequence(args), { url: sequenceUrl, framesPerStep: options.framesPerStep, radius: options.radius });
+    report.pass('LS-WARN-SEQ', `sequence sweep, ${where(sequence.count)}`, `${sequence.shown} of ${sequence.count} frames drawn in ${sequence.ms} ms; ${sequence.peak} decoded at the end`, 'advisory: compare with the film');
     const result = verdict(film, sequence);
     const measured = `film ${Math.round(result.filmShare * 100)} %, sequence ${Math.round(result.sequenceShare * 100)} % of frames shown`;
     if (result.sequenceWins) report.pass('LS-WARN-SEQ', 'comparison', measured, 'a sequence earns its bytes only where the film drops frames');
