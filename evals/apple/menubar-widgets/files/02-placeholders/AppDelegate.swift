@@ -8,7 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        statusItem?.button?.image = NSImage(systemSymbolName: "gauge.medium", accessibilityDescription: "Usage")
+        statusItem?.button?.image = NSImage(systemSymbolName: "cloud.sun", accessibilityDescription: "Weather")
         updater.checkInBackground()
         WidgetCenter.shared.reloadAllTimelines()
     }

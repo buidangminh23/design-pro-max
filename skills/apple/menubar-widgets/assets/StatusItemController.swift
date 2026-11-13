@@ -13,7 +13,7 @@ final class StatusItemController {
 
     init() {
         guard let button = item.button else { return }
-        button.setAccessibilityLabel("Usage")
+        button.setAccessibilityLabel("Daily step goal")
         appearanceChanged(button)
         appearanceObservation = button.observe(\.effectiveAppearance, options: [.new]) { [weak self] button, _ in
             MainActor.assumeIsolated {

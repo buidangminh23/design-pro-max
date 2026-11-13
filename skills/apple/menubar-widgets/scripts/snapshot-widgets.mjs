@@ -8,9 +8,13 @@
  *
  * The sources must declare `enum SnapshotCatalog { @MainActor static func entries() -> [SnapshotEntry] }` and every
  * view the catalog uses; they are compiled as a command-line tool, so they may import SwiftUI and WidgetKit but not the
- * app's other modules. Errors: MW-SNAP-01 an entry that needs more height than its size, renders no image or whose
- * batch aborts; MW-SNAP-02 a PNG whose bytes differ from the baseline. --update writes the baseline instead of
- * comparing. Output follows the shared checker contract.
+ * app's other modules. Each entry's width and height are the family's outer size; the renderer insets the view by the
+ * entry's content margins (16 points unless the entry says otherwise) and pins locale, time zone and calendar.
+ * Errors: MW-SNAP-01 an empty catalog, two entries that write the same PNG, an entry that needs more width or height
+ * than its size, renders no image or crashes its batch (named); MW-SNAP-02 a PNG whose bytes differ from the baseline.
+ * Warnings: MW-SNAP-01 for controls that ImageRenderer may draw as placeholders; MW-SNAP-02 for an entry with no
+ * baseline PNG and a baseline PNG with no entry. --update writes the baseline instead of comparing. Output follows the
+ * shared checker contract.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -19,9 +23,10 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createReport, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
 import { currentCommand } from '../../shared/sandbox.mjs';
-import { listFiles } from './scan-swift.mjs';
+import { listFiles, stripComments } from './scan-swift.mjs';
 
-export const BOUNDARY = 'Proof boundary: offscreen ImageRenderer output of the views at the given sizes, built as a command-line tool; it does not prove the widget extension, its timeline, the placed widget on the desktop, Link or AppKit-backed controls (they draw as placeholders) or how WidgetKit tints and removes backgrounds. Look at the placed widget for those.';
+export const BOUNDARY = 'Proof boundary: offscreen ImageRenderer output of the views at the given sizes inside their content margins, built as a command-line tool on this machine and macOS version; it does not prove the widget extension, its timeline, the placed widget on the desktop, Link or AppKit-backed controls (they draw as placeholders), the container background or how WidgetKit tints and removes backgrounds. Look at the placed widget for those.';
+const PLATFORM_CONTROLS = /\b(ProgressView|Link|Toggle|Slider|Picker|TextField|SecureField|Stepper|DatePicker|ColorPicker|Gauge|Button|Menu)\s*[({]/g;
 export const RENDERER = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'assets', 'SnapshotRenderer.swift');
 export const DEFAULT_BATCH = 40;
 export const MAX_BATCH = 60;
@@ -97,28 +102,68 @@ export function judgeResult(result, scale) {
   if (result.problem) return { ok: false, measured: result.problem };
   const expected = [Math.round(result.width * scale), Math.round(result.height * scale)];
   if (result.pixels?.[0] !== expected[0] || result.pixels?.[1] !== expected[1]) return { ok: false, measured: `rendered ${result.pixels?.join('x')} px, expected ${expected.join('x')} px` };
-  return { ok: true, measured: `${result.pixels.join('x')} px; content needs ${Math.ceil(result.neededHeight)} of ${result.height} pt` };
+  const margins = result.contentMargins ?? 0;
+  return { ok: true, measured: `${result.pixels.join('x')} px; content needs ${Math.ceil(result.neededWidth ?? result.width)}x${Math.ceil(result.neededHeight)} of ${result.width}x${result.height} pt with ${margins} pt margins` };
+}
+
+export function duplicateFiles(listing) {
+  const byFile = new Map();
+  for (const entry of listing) byFile.set(entry.file, [...(byFile.get(entry.file) ?? []), entry.name]);
+  return [...byFile.entries()].filter(([, names]) => names.length > 1);
+}
+
+export function platformControls(files) {
+  return files.flatMap((file) => {
+    const text = stripComments(fs.readFileSync(file, 'utf8'));
+    return [...text.matchAll(PLATFORM_CONTROLS)].map((match) => ({ file, control: match[1], line: text.slice(0, match.index).split('\n').length }));
+  });
+}
+
+export function orphanBaselines(baseline, files) {
+  if (!fs.existsSync(baseline)) return [];
+  const wanted = new Set(files);
+  return fs.readdirSync(baseline).filter((name) => name.endsWith('.png') && !wanted.has(name)).sort();
+}
+
+function listCatalog(binary, fontArgs) {
+  const listed = run(binary, ['--list', ...fontArgs]);
+  const line = String(listed.stdout).split(/\r?\n/).find((text) => text.startsWith('['));
+  let entries = null;
+  try {
+    entries = line ? JSON.parse(line) : null;
+  } catch {}
+  if (listed.status !== 0 || !Array.isArray(entries)) throw new UsageError(`The renderer could not list the catalog: ${(listed.stderr ?? '').trim().split('\n').slice(-5).join(' ')}`);
+  return entries;
 }
 
 export function snapshot(options, report) {
   const sources = listFiles(options.sources);
   if (!sources.length) throw new UsageError('No .swift file found.');
+  for (const found of platformControls(sources)) {
+    report.warn('MW-SNAP-01', `${found.file}:${found.line}`, `${found.control} may draw as a placeholder offscreen: ImageRenderer leaves out most AppKit-backed controls`, 'draw the control with shapes and text for the snapshot, or check that part on the placed widget');
+  }
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'mw-snapshot-'));
   try {
     const binary = build(sources, scratch);
     const fontArgs = options.fonts ? ['--fonts', path.resolve(options.fonts)] : [];
-    const counted = run(binary, ['--count', ...fontArgs]);
-    const count = Number.parseInt(counted.stdout, 10);
-    if (counted.status !== 0 || !Number.isInteger(count)) throw new UsageError(`The renderer could not list the catalog: ${(counted.stderr ?? '').trim().split('\n').slice(-5).join(' ')}`);
+    const listing = listCatalog(binary, fontArgs);
+    if (!listing.length) {
+      report.error('MW-SNAP-01', 'SnapshotCatalog', 'the catalog has no entries, so nothing was rendered or compared', 'one entry per family, colour scheme and state the widget ships');
+      return report;
+    }
+    const duplicates = duplicateFiles(listing);
+    for (const [file, names] of duplicates) report.error('MW-SNAP-01', names.join(', '), `these entries all write ${file}, so one overwrites the other`, 'give every entry a name that stays unique once reduced to letters, digits, dashes, underscores and dots');
+    if (duplicates.length) return report;
     const out = path.resolve(options.out);
     fs.mkdirSync(out, { recursive: true });
     const rendered = [];
-    for (const [from, to] of batches(count, options.batch)) {
+    for (const [from, to] of batches(listing.length, options.batch)) {
       const result = run(binary, ['--out', out, '--from', String(from), '--to', String(to), '--scale', String(options.scale), ...fontArgs]);
       const lines = parseResults(result.stdout);
       rendered.push(...lines);
       if (result.status !== 0 || lines.length !== to - from) {
-        report.error('MW-SNAP-01', `entries ${from}-${to - 1}`, `the renderer stopped after ${lines.length} of ${to - from} entries (${result.signal ?? `exit ${result.status}`})`, `fix the entry after the last one rendered, or lower --batch below ${options.batch}`);
+        const blamed = listing[from + lines.length]?.name ?? `entry ${from + lines.length}`;
+        report.error('MW-SNAP-01', blamed, `the renderer stopped at ${blamed} after ${lines.length} of ${to - from} entries in this batch (${result.signal ?? `exit ${result.status}`})`, `fix ${blamed}, which was rendering when the process ended, or lower --batch below ${options.batch} if no entry is at fault`);
       }
     }
     for (const result of rendered) {
@@ -134,8 +179,13 @@ export function snapshot(options, report) {
         continue;
       }
       const state = compareWithBaseline(file, baselineFile);
-      if (state === 'missing') report.warn('MW-SNAP-02', result.name, 'no baseline PNG for this entry', 'run once with --update on the previous build');
+      if (state === 'missing') report.warn('MW-SNAP-02', result.name, 'no baseline PNG for this entry: a new entry, or a renamed one whose old PNG is listed as unused', 'run once with --update on the previous build');
       else report.check('MW-SNAP-02', state === 'same', result.name, state === 'same' ? 'byte-equal to the baseline' : 'bytes differ from the baseline', 'byte-equal to the previous build, or an intended change confirmed by looking at both PNGs and rerunning with --update');
+    }
+    if (options.baseline) {
+      for (const orphan of orphanBaselines(path.resolve(options.baseline), listing.map((entry) => entry.file))) {
+        report.warn('MW-SNAP-02', orphan, 'a baseline PNG that no catalog entry writes: a removed or renamed entry', 'delete it from the baseline once the entry is gone for good');
+      }
     }
     return report;
   } finally {

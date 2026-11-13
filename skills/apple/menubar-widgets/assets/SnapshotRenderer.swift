@@ -1,8 +1,13 @@
 // menubar-widgets SnapshotRenderer.swift (design-pro-max)
 // Built by scripts/snapshot-widgets.mjs together with the project's view sources and a catalog:
 //   enum SnapshotCatalog { @MainActor static func entries() -> [SnapshotEntry] }
-// Arguments: --count | --out <folder> [--from <n>] [--to <n>] [--scale <n>] [--fonts <folder>]
-// Each rendered entry prints one JSON line on stdout.
+// Arguments: --list | --out <folder> [--from <n>] [--to <n>] [--scale <n>] [--fonts <folder>]
+// --list prints the entries' names and file names as one JSON line. Each rendered entry prints one JSON line on
+// stdout, written unbuffered so a crash keeps the lines of the entries before it.
+// width and height are the family's outer size. contentMargins (16 points by default, the standard widget margin)
+// insets the view on every side, as WidgetKit's default content margins do; pass 0 for a view that draws its own
+// margins. Locale, time zone and calendar are pinned per entry so the bytes do not follow the machine's settings.
+// The container background is not drawn.
 
 import AppKit
 import CoreText
@@ -15,13 +20,31 @@ struct SnapshotEntry {
     let width: CGFloat
     let height: CGFloat
     let colorScheme: ColorScheme
+    let contentMargins: CGFloat
+    let locale: Locale
+    let timeZone: TimeZone
+    let calendar: Calendar
     let view: AnyView
 
-    init<Content: View>(_ name: String, width: CGFloat, height: CGFloat, colorScheme: ColorScheme = .light, @ViewBuilder content: () -> Content) {
+    init<Content: View>(
+        _ name: String,
+        width: CGFloat,
+        height: CGFloat,
+        colorScheme: ColorScheme = .light,
+        contentMargins: CGFloat = 16,
+        locale: Locale = Locale(identifier: "en_US"),
+        timeZone: TimeZone = .gmt,
+        calendar: Calendar = Calendar(identifier: .gregorian),
+        @ViewBuilder content: () -> Content
+    ) {
         self.name = name
         self.width = width
         self.height = height
         self.colorScheme = colorScheme
+        self.contentMargins = contentMargins
+        self.locale = locale
+        self.timeZone = timeZone
+        self.calendar = calendar
         self.view = AnyView(content())
     }
 }
@@ -30,10 +53,17 @@ struct SnapshotResult: Encodable {
     let name: String
     let width: Double
     let height: Double
+    let contentMargins: Double
+    let neededWidth: Double
     let neededHeight: Double
     let pixels: [Int]
     let file: String?
     let problem: String?
+}
+
+struct SnapshotListing: Encodable {
+    let name: String
+    let file: String
 }
 
 @MainActor
@@ -41,29 +71,36 @@ enum SnapshotRendering {
     static let overflowTolerance: CGFloat = 0.5
     static let measureLimit: CGFloat = 4
 
-    static func neededHeight(of entry: SnapshotEntry) -> CGFloat {
-        let probe = entry.view
+    static func styled(_ entry: SnapshotEntry) -> some View {
+        entry.view
+            .padding(entry.contentMargins)
             .environment(\.colorScheme, entry.colorScheme)
-            .frame(width: entry.width)
-            .fixedSize(horizontal: false, vertical: true)
-        let host = NSHostingView(rootView: probe)
-        return host.fittingSize.height
+            .environment(\.locale, entry.locale)
+            .environment(\.timeZone, entry.timeZone)
+            .environment(\.calendar, entry.calendar)
+    }
+
+    static func neededSize(of entry: SnapshotEntry) -> CGSize {
+        let probe = styled(entry).fixedSize(horizontal: false, vertical: true)
+        let controller = NSHostingController(rootView: probe)
+        return controller.sizeThatFits(in: CGSize(width: entry.width, height: entry.height * measureLimit * 4))
     }
 
     static func render(_ entry: SnapshotEntry, scale: CGFloat, folder: URL) -> SnapshotResult {
-        let needed = neededHeight(of: entry)
+        let needed = neededSize(of: entry)
         let base = { (file: String?, pixels: [Int], problem: String?) in
-            SnapshotResult(name: entry.name, width: entry.width, height: entry.height, neededHeight: needed, pixels: pixels, file: file, problem: problem)
+            SnapshotResult(name: entry.name, width: entry.width, height: entry.height, contentMargins: entry.contentMargins, neededWidth: needed.width, neededHeight: needed.height, pixels: pixels, file: file, problem: problem)
         }
-        if !needed.isFinite || needed > entry.height * measureLimit {
+        if !needed.height.isFinite || needed.height > entry.height * measureLimit {
             return base(nil, [], "the content has no bounded height at this width; cap it before rendering")
         }
-        if needed > entry.height + overflowTolerance {
-            return base(nil, [], "the content needs \(Int(needed.rounded(.up))) pt of height and the widget clips it")
+        if needed.width > entry.width + overflowTolerance {
+            return base(nil, [], "the content needs \(Int(needed.width.rounded(.up))) pt of width with \(Int(entry.contentMargins)) pt margins and the widget clips it")
         }
-        let content = entry.view
-            .environment(\.colorScheme, entry.colorScheme)
-            .frame(width: entry.width, height: entry.height)
+        if needed.height > entry.height + overflowTolerance {
+            return base(nil, [], "the content needs \(Int(needed.height.rounded(.up))) pt of height with \(Int(entry.contentMargins)) pt margins and the widget clips it")
+        }
+        let content = styled(entry).frame(width: entry.width, height: entry.height)
         let renderer = ImageRenderer(content: content)
         renderer.scale = scale
         renderer.proposedSize = ProposedViewSize(width: entry.width, height: entry.height)
@@ -93,6 +130,13 @@ enum SnapshotRendering {
             CTFontManagerRegisterFontsForURL(file as CFURL, .process, nil)
         }
     }
+
+    static func emit<Value: Encodable>(_ value: Value) {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        guard let data = try? encoder.encode(value) else { return }
+        FileHandle.standardOutput.write(data + Data("\n".utf8))
+    }
 }
 
 @main
@@ -109,12 +153,12 @@ struct SnapshotRendererMain {
             SnapshotRendering.registerFonts(in: URL(fileURLWithPath: fonts))
         }
         let entries = SnapshotCatalog.entries()
-        if arguments.contains("--count") {
-            print(entries.count)
+        if arguments.contains("--list") {
+            SnapshotRendering.emit(entries.map { SnapshotListing(name: $0.name, file: SnapshotRendering.fileName(for: $0.name)) })
             return
         }
         guard let out = value("--out") else {
-            FileHandle.standardError.write(Data("usage: --count | --out <folder> [--from n] [--to n] [--scale n] [--fonts folder]\n".utf8))
+            FileHandle.standardError.write(Data("usage: --list | --out <folder> [--from n] [--to n] [--scale n] [--fonts folder]\n".utf8))
             exit(2)
         }
         let folder = URL(fileURLWithPath: out)
@@ -122,13 +166,8 @@ struct SnapshotRendererMain {
         let from = max(0, Int(value("--from") ?? "") ?? 0)
         let to = min(entries.count, Int(value("--to") ?? "") ?? entries.count)
         let scale = CGFloat(Double(value("--scale") ?? "") ?? 2)
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.sortedKeys]
         for entry in entries[from..<max(from, to)] {
-            let result = SnapshotRendering.render(entry, scale: scale, folder: folder)
-            if let data = try? encoder.encode(result), let line = String(data: data, encoding: .utf8) {
-                print(line)
-            }
+            SnapshotRendering.emit(SnapshotRendering.render(entry, scale: scale, folder: folder))
         }
     }
 }

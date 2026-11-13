@@ -3,7 +3,7 @@ import AppKit
 @MainActor
 final class StatusItem: NSObject {
     private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-    private var used = 0.0
+    private var progress = 0.0
 
     override init() {
         super.init()
@@ -11,8 +11,8 @@ final class StatusItem: NSObject {
         refresh()
     }
 
-    func setUsage(_ value: Double) {
-        used = value
+    func setProgress(_ value: Double) {
+        progress = value
         refresh()
     }
 
@@ -25,8 +25,8 @@ final class StatusItem: NSObject {
     private func refresh() {
         guard let button = item.button else { return }
         let dark = button.effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
-        let title = NSAttributedString(string: "\(Int(used * 100))%", attributes: [
-            .foregroundColor: used > 0.8 ? NSColor.systemOrange : (dark ? NSColor.white : NSColor.black),
+        let title = NSAttributedString(string: "\(Int(progress * 100))%", attributes: [
+            .foregroundColor: progress > 0.8 ? NSColor.systemOrange : (dark ? NSColor.white : NSColor.black),
             .font: NSFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium),
         ])
         button.attributedTitle = title

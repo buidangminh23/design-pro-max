@@ -88,18 +88,23 @@ export function menubarWidgetsArgs(entry, skill, scratch, root = ROOT) {
     const folder = path.join(scratch, 'probe', entry.id);
     const app = path.join(folder, path.basename(entry.app));
     copyTree(fixture(entry.app), app);
+    for (const copy of entry.copies ?? []) copyTree(fixture(copy), path.join(folder, ...copy.split('/').slice(1)));
     const recording = (file) => {
       const target = path.join(folder, path.basename(file));
-      fs.writeFileSync(target, fs.readFileSync(fixture(file), 'utf8').replaceAll('@APP@', app));
+      fs.writeFileSync(target, fs.readFileSync(fixture(file), 'utf8').replaceAll('@APP@', app).replaceAll('@DIR@', folder));
       return target;
     };
-    return [script('probe-extension'), '--app', app, '--installed', entry.installed, '--ps', recording(entry.ps), '--lsof', recording(entry.lsof)];
+    return [script('probe-extension'), '--app', app, '--installed', entry.installed, ...(entry.tz ? ['--tz', entry.tz] : []), '--ps', recording(entry.ps), '--lsof', recording(entry.lsof)];
   }
   const folder = path.join(scratch, 'snapshots', entry.id);
   const args = [script('snapshot-widgets'), '--out', path.join(folder, 'png'), ...(entry.args ?? [])];
   if (entry.baselineSources) {
     const baseline = path.join(folder, 'baseline');
-    spawnSync(process.execPath, [script('snapshot-widgets'), '--out', path.join(folder, 'baseline-png'), '--baseline', baseline, '--update', ...sources(entry.baselineSources)], { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024, timeout: 10 * 60 * 1000 });
+    const written = spawnSync(process.execPath, [script('snapshot-widgets'), '--out', path.join(folder, 'baseline-png'), '--baseline', baseline, '--update', ...sources(entry.baselineSources)], { encoding: 'utf8', windowsHide: true, maxBuffer: 64 * 1024 * 1024, timeout: 10 * 60 * 1000 });
+    if (written.status !== 0) {
+      const output = `the baseline run exited ${written.status ?? written.signal}:\n${written.stdout ?? ''}${written.stderr ?? ''}`;
+      return ['-e', `process.stderr.write(${JSON.stringify(output)}); process.exit(4)`];
+    }
     args.push('--baseline', baseline);
   }
   return [...args, ...sources(entry.sources)];

@@ -24,8 +24,8 @@ enum SnapshotCatalog {
         [
             SnapshotEntry("small-notes", width: 170, height: 170) {
                 ReleaseNotesCard(notes: [
-                    "The account picker now lists every account you signed in with, including the ones that were added on another Mac.",
-                    "Usage numbers refresh when the widget becomes visible instead of waiting for the next scheduled timeline.",
+                    "The city picker now lists every place you saved, including the ones that were added on another Mac.",
+                    "Forecasts refresh when the widget becomes visible instead of waiting for the next scheduled timeline.",
                     "Dark mode colours follow the system setting and no longer flash when the desktop picture changes.",
                 ])
             },

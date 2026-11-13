@@ -25,10 +25,10 @@ The kind identifies the widget to the system. Placed widgets are stored against 
 
 ## Configurable widgets
 
-`StaticConfiguration` has no user options, so Edit Widget shows nothing (IL-15). For options [MW-CONFIG-01]:
+`StaticConfiguration` describes a widget with no user-configurable options, and `AppIntentConfiguration` one whose custom intent provides them ([StaticConfiguration](https://developer.apple.com/documentation/widgetkit/staticconfiguration), [AppIntentConfiguration](https://developer.apple.com/documentation/widgetkit/appintentconfiguration)), so a static widget shows nothing in Edit Widget (IL-15). For options [MW-CONFIG-01]:
 
 1. Declare a `WidgetConfigurationIntent` with one `@Parameter` per option [MW-WARN-PARAMS].
-2. Model a list of choices (accounts, projects, places) as an `AppEntity` with an `EntityQuery` that returns the entities for identifiers, the suggested entities and, optionally, a default.
+2. Model a list of choices (cities, projects, lists) as an `AppEntity` with an `EntityQuery` that returns the entities for identifiers, the suggested entities and, optionally, a default.
 3. Use `AppIntentConfiguration(kind:intent:provider:)` with an `AppIntentTimelineProvider`, whose snapshot and timeline methods receive the configured intent.
 4. Keep the kind string from the static version, so placed widgets survive the change (IL-15).
 
@@ -45,7 +45,7 @@ The kind identifies the widget to the system. Placed widgets are stored against 
 When an app replaces itself during an update, the old extension process can keep running from the removed copy, and placed widgets show placeholders until it stops (IL-14). Signs: the extension process started before the installed bundle was written, or its executable path lies outside the installed app.
 
 - Find it: `scripts/probe-extension.mjs --app <installed app>` reads `ps` and `lsof`, reports [MW-STALE-01] and prints the commands to fix it. It stops nothing itself.
-- Fix it at every launch: `assets/StaleExtensionCleanup.swift` stops extension processes whose executable is outside the installed bundle or that started before it, runs `pluginkit -a` on the installed extension and reloads every timeline. Call it early in `applicationDidFinishLaunching`. A sandboxed host app cannot list or signal other processes; there the updater, which runs outside the sandbox, does the cleanup after replacing the app.
+- Fix it at every launch: `assets/StaleExtensionCleanup.swift` stops extension processes whose executable is outside the installed bundle or that started before it, runs `pluginkit -a` on the installed extension and reloads every timeline. Call it early in `applicationDidFinishLaunching`. It finds the processes by their first argument (the executable path they were launched with, which survives the deletion of the old copy) and stops only those under this app's name whose bundle has the extension's identifier or no longer exists, so another app's extension with the same executable name and a debug copy under its own identifier keep running. It takes the install time from the change and birth times, never the modification time, which updaters keep. A sandboxed host app cannot list or signal other processes; there the updater, which runs outside the sandbox, does the cleanup after replacing the app.
 - Reloading timelines alone is not enough: it asks the running process, which is the stale one.
 
 ## Building without Xcode
@@ -53,8 +53,14 @@ When an app replaces itself during an update, the old extension process can keep
 A build made with swiftc or SwiftPM and a script must do what Xcode does for widgets:
 
 - Run the App Intents metadata extraction for the extension, and list the protocols it gathers constants for, including `EntityQuery`, `TransientEntity`, `AppIntentsPackage` and `DynamicOptionsProvider`; otherwise the extracted metadata is incomplete and options stay empty (IL-15) [MW-WARN-INTENTS].
-- Keep the extension's `Info.plist` with its extension point, and let the `WidgetBundle` marked `@main` start it in the system extension entry point, never a custom `main` (IL-18).
+- Keep the extension's `Info.plist` with its extension point, and the `WidgetBundle` marked `@main` (`assets/WidgetBundle.swift`) as its entry point, as Xcode's widget template does; do not write a custom `main` for the extension.
 
 ## Extension sandboxing and signing
 
-A widget extension runs in the App Sandbox and is signed with its own entitlements before the host app is signed; signing the app with `--deep` or with the app's entitlements must not replace the extension's (IL-18) [MW-WARN-EXTSIGN]. A notarized build needs a secure timestamp on every signature. A bare executable that carries the sandbox entitlement exits at launch without a message, so probe entitlements from inside a wrapped app bundle (IL-18). Notarization itself is the router's notarization row.
+[MW-WARN-EXTSIGN] The extension and its containing app are both code signed, the same way ([App Extension Programming Guide](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/ExtensionCreation.html)), and Xcode's macOS extension templates turn on the App Sandbox for the extension (same page). A script build should therefore:
+
+- sign the extension first, with its own entitlements including the App Sandbox, then sign the app without `--deep`, so the app's signature and entitlements do not replace the extension's;
+- add a secure timestamp (`codesign --timestamp`) to every signature of a build that will be notarized ([Notarizing macOS software](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution));
+- probe sandboxed entitlements from inside an app bundle: a bare executable that carries the App Sandbox entitlement exits at launch without any output (IL-18).
+
+Notarization itself is the router's notarization row.

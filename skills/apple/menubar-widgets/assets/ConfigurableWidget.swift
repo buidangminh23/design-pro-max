@@ -1,18 +1,19 @@
 // menubar-widgets ConfigurableWidget.swift (design-pro-max)
 // A widget whose options appear in Edit Widget: AppIntentConfiguration, a WidgetConfigurationIntent and an AppEntity
 // parameter with its query. The kind string lives in one constant that reloadTimelines(ofKind:) also uses.
+// No @main here: the widget bundle lives in WidgetBundle.swift, so this file also builds with SnapshotRenderer.swift.
 
 import AppIntents
 import SwiftUI
 import WidgetKit
 
 enum WidgetKinds {
-    static let account = "com.example.usage.account"
+    static let city = "com.example.weather.city"
 }
 
-struct AccountEntity: AppEntity {
-    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Account"
-    static let defaultQuery = AccountQuery()
+struct CityEntity: AppEntity {
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "City"
+    static let defaultQuery = CityQuery()
 
     let id: String
     let name: String
@@ -22,75 +23,75 @@ struct AccountEntity: AppEntity {
     }
 }
 
-struct AccountQuery: EntityQuery {
-    func entities(for identifiers: [AccountEntity.ID]) async throws -> [AccountEntity] {
-        AccountStore.accounts.filter { identifiers.contains($0.id) }
+struct CityQuery: EntityQuery {
+    func entities(for identifiers: [CityEntity.ID]) async throws -> [CityEntity] {
+        CityStore.cities.filter { identifiers.contains($0.id) }
     }
 
-    func suggestedEntities() async throws -> [AccountEntity] {
-        AccountStore.accounts
+    func suggestedEntities() async throws -> [CityEntity] {
+        CityStore.cities
     }
 
-    func defaultResult() async -> AccountEntity? {
-        AccountStore.accounts.first
+    func defaultResult() async -> CityEntity? {
+        CityStore.cities.first
     }
 }
 
-enum AccountStore {
-    static let accounts = [
-        AccountEntity(id: "personal", name: "Personal"),
-        AccountEntity(id: "work", name: "Work"),
+enum CityStore {
+    static let cities = [
+        CityEntity(id: "lisbon", name: "Lisbon"),
+        CityEntity(id: "oslo", name: "Oslo"),
     ]
 
-    static func usage(for id: String) -> Double {
-        id == "work" ? 0.91 : 0.42
+    static func degrees(for id: String) -> Int {
+        id == "oslo" ? 4 : 21
     }
 }
 
-struct SelectAccountIntent: WidgetConfigurationIntent {
-    static let title: LocalizedStringResource = "Select Account"
-    static let description = IntentDescription("Choose the account this widget shows.")
+struct SelectCityIntent: WidgetConfigurationIntent {
+    static let title: LocalizedStringResource = "Select City"
+    static let description = IntentDescription("Choose the city this widget shows.")
 
-    @Parameter(title: "Account")
-    var account: AccountEntity?
+    @Parameter(title: "City")
+    var city: CityEntity?
 
     init() {}
 }
 
-struct AccountEntry: TimelineEntry {
+struct CityEntry: TimelineEntry {
     let date: Date
     let name: String
-    let used: Double
+    let degrees: Int
 }
 
-struct AccountProvider: AppIntentTimelineProvider {
-    func placeholder(in context: Context) -> AccountEntry {
-        AccountEntry(date: .now, name: "Account", used: 0.5)
+struct CityProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> CityEntry {
+        CityEntry(date: .now, name: "City", degrees: 20)
     }
 
-    func snapshot(for configuration: SelectAccountIntent, in context: Context) async -> AccountEntry {
+    func snapshot(for configuration: SelectCityIntent, in context: Context) async -> CityEntry {
         entry(for: configuration)
     }
 
-    func timeline(for configuration: SelectAccountIntent, in context: Context) async -> Timeline<AccountEntry> {
+    func timeline(for configuration: SelectCityIntent, in context: Context) async -> Timeline<CityEntry> {
         Timeline(entries: [entry(for: configuration)], policy: .after(.now.addingTimeInterval(30 * 60)))
     }
 
-    private func entry(for configuration: SelectAccountIntent) -> AccountEntry {
-        let account = configuration.account ?? AccountStore.accounts[0]
-        return AccountEntry(date: .now, name: account.name, used: AccountStore.usage(for: account.id))
+    private func entry(for configuration: SelectCityIntent) -> CityEntry {
+        let city = configuration.city ?? CityStore.cities[0]
+        return CityEntry(date: .now, name: city.name, degrees: CityStore.degrees(for: city.id))
     }
 }
 
-struct AccountWidgetView: View {
-    let entry: AccountEntry
+struct CityWidgetView: View {
+    let entry: CityEntry
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(entry.name)
                 .font(.headline)
                 .lineLimit(1)
-            Text(entry.used, format: .percent.precision(.fractionLength(0)))
+            Text("\(entry.degrees)°")
                 .font(.system(.title, design: .rounded, weight: .bold))
                 .monospacedDigit()
                 .contentTransition(.numericText())
@@ -103,27 +104,20 @@ struct AccountWidgetView: View {
     }
 }
 
-struct AccountWidget: Widget {
+struct CityWidget: Widget {
     var body: some WidgetConfiguration {
-        AppIntentConfiguration(kind: WidgetKinds.account, intent: SelectAccountIntent.self, provider: AccountProvider()) { entry in
-            AccountWidgetView(entry: entry)
+        AppIntentConfiguration(kind: WidgetKinds.city, intent: SelectCityIntent.self, provider: CityProvider()) { entry in
+            CityWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Account Usage")
-        .description("Shows how much of an account's quota is used.")
+        .configurationDisplayName("City Weather")
+        .description("Shows the temperature in a city you choose.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 
-@main
-struct UsageWidgets: WidgetBundle {
-    var body: some Widget {
-        AccountWidget()
-    }
-}
-
 enum WidgetRefresh {
-    static func accountChanged() {
-        WidgetCenter.shared.reloadTimelines(ofKind: WidgetKinds.account)
+    static func forecastChanged() {
+        WidgetCenter.shared.reloadTimelines(ofKind: WidgetKinds.city)
     }
 }

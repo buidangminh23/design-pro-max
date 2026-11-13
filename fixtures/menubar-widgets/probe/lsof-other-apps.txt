@@ -1,0 +1,6 @@
+p3001
+n/Applications/Other Forecasts.app/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget
+p3002
+n@DIR@/debug/Forecast.app/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget
+p4242
+n@APP@/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget

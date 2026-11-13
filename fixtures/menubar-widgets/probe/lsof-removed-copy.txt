@@ -1,2 +1,2 @@
 p4100
-n/private/var/folders/xy/T/update-old-copy/Usage.app/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
+n/private/var/folders/xy/T/update-old-copy/Forecast.app/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget

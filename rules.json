@@ -625,7 +625,7 @@
       "values": "redraw only when the light or dark match changes; the loop held one core at 90-97 % CPU",
       "evidence": ["IL-13"],
       "check": "menubar-widgets/scripts/scan-swift.mjs",
-      "fixtures": { "pass": ["scan-shipped-assets"], "fail": ["appear-01-kvo-redraw", "appear-02-publisher-image"] },
+      "fixtures": { "pass": ["scan-shipped-assets", "appear-08-remove-duplicates", "appear-09-project-type-guard"], "fail": ["appear-01-kvo-redraw", "appear-02-publisher-image", "appear-03-redraw-before-guard", "appear-04-compare-not-guarding", "appear-05-map-then-sink", "appear-06-receive-value-reference", "appear-07-rooted-key-path", "appear-10-tint-layer-display"] },
       "implementedBy": ["menubar-widgets/assets/StatusItemController.swift"]
     },
     {
@@ -636,7 +636,7 @@
       "values": "AppIntentConfiguration with a WidgetConfigurationIntent; kind string unchanged",
       "evidence": ["IL-15"],
       "check": "menubar-widgets/scripts/scan-swift.mjs",
-      "fixtures": { "pass": ["scan-shipped-assets", "config-03-static-not-requested"], "fail": ["config-01-static-with-intent", "config-02-static-when-configurable"] },
+      "fixtures": { "pass": ["scan-shipped-assets", "config-03-static-not-requested", "config-05-other-kind-requested", "config-06-qualified-intent"], "fail": ["config-01-static-with-intent", "config-02-static-when-configurable", "config-04-one-of-two-statics"] },
       "implementedBy": ["menubar-widgets/assets/ConfigurableWidget.swift"]
     },
     {
@@ -647,18 +647,18 @@
       "values": "extension processes start after the install and run the installed copy",
       "evidence": ["IL-14"],
       "check": "menubar-widgets/scripts/probe-extension.mjs",
-      "fixtures": { "pass": ["probe-fresh"], "fail": ["probe-started-before-install", "probe-removed-copy"] },
+      "fixtures": { "pass": ["probe-fresh", "probe-other-apps", "probe-installed-with-offset"], "fail": ["probe-started-before-install", "probe-removed-copy", "probe-removed-copy-no-lsof"] },
       "implementedBy": ["menubar-widgets/assets/StaleExtensionCleanup.swift"]
     },
     {
       "id": "MW-SNAP-01",
       "part": "menubar-widgets",
       "level": "error",
-      "statement": "Every widget snapshot entry fits its size at its width and renders to a PNG of that size times the scale; content that needs more height than the widget has is capped or shortened before it ships.",
-      "values": "needed height at most the entry height; PNG of width and height times the scale",
+      "statement": "Every widget snapshot entry fits its width and height inside its content margins and renders to a PNG of that size times the scale; content that needs more width or height than the widget has is capped or shortened before it ships, and every entry of a non-empty catalog writes its own PNG.",
+      "values": "needed width and height, margins included, at most the entry size; PNG of width and height times the scale; unique PNG names",
       "evidence": ["IL-16"],
       "check": "menubar-widgets/scripts/snapshot-widgets.mjs",
-      "fixtures": { "pass": ["snapshot-baseline-same"], "fail": ["snapshot-overflow"] },
+      "fixtures": { "pass": ["snapshot-baseline-same", "snapshot-shipped-widget"], "fail": ["snapshot-overflow", "snapshot-too-wide", "snapshot-content-margins", "snapshot-empty-catalog", "snapshot-duplicate-names", "snapshot-crash-blames-entry"] },
       "implementedBy": ["menubar-widgets/assets/SnapshotRenderer.swift"]
     },
     {
@@ -731,7 +731,7 @@
       "id": "MW-WARN-EXTSIGN",
       "part": "menubar-widgets",
       "level": "warn",
-      "statement": "A widget extension is sandboxed and signed with its own entitlements before the host app, whose signature must not replace them; it starts from its WidgetBundle in the system extension entry point, a notarized build carries a secure timestamp, and entitlements are probed from inside an app bundle.",
+      "statement": "A widget extension is sandboxed and signed with its own entitlements before the host app, whose signature must not replace them; it starts from its @main WidgetBundle, a notarized build carries a secure timestamp, and entitlements are probed from inside an app bundle.",
       "values": "sandboxed extension with its own entitlements; WidgetBundle entry point; secure timestamp",
       "evidence": ["IL-18"],
       "check": null,

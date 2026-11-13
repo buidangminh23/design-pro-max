@@ -3,11 +3,19 @@
  * running processes with ps and lsof, and reports any that started before the bundle was installed or run an
  * executable outside it. It never stops a process; it prints the commands to run.
  *
- *   node probe-extension.mjs --app <path to the installed .app> [--installed <date and time>] [--ps <file>] [--lsof <file>]
+ *   node probe-extension.mjs --app <path to the installed .app> [--installed <date and time>] [--ps <file> --tz <offset>] [--lsof <file>]
  *
- * --ps and --lsof read recorded output of `ps -axww -o pid=,lstart=,args=` and `lsof -a -p <pids> -d txt -Fpn` instead
- * of running them, so the probe can judge a report from another machine. Without them it runs both, on macOS only;
- * elsewhere it reports the rule as skipped. Error: MW-STALE-01. Output follows the shared checker contract.
+ * A process belongs to an extension when its ps arguments run <name>.appex/Contents/MacOS/<executable> and that
+ * extension bundle has the installed extension's identifier, or no longer exists and sat inside an app of the same
+ * name (a removed or temporary copy). Other apps' extensions and a debug copy under another identifier are ignored.
+ * The install time is the later of the change time and the birth time of the extension and its executable, since
+ * updaters keep the modification time; --installed overrides it. The executable path comes from lsof, else from the
+ * ps arguments.
+ *
+ * --ps and --lsof read recorded output of `LC_ALL=C ps -axww -o pid=,lstart=,args=` and `lsof -a -p <pids> -d txt -Fpn`
+ * instead of running them, so the probe can judge a report from another machine; --tz gives that machine's UTC offset
+ * (Z or +hh:mm), which a recording needs. Without them it runs both, on macOS only; elsewhere it reports the rule as
+ * skipped. Error: MW-STALE-01. Output follows the shared checker contract.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -15,11 +23,16 @@ import { spawnSync } from 'node:child_process';
 import { createReport, isMain, runMain, SandboxError, UsageError } from '../../shared/report.mjs';
 import { currentCommand } from '../../shared/sandbox.mjs';
 
-export const BOUNDARY = 'Proof boundary: process start times from ps (whole seconds) and executable mappings from lsof at one moment; it does not prove which process WidgetKit asks for timelines or what the placed widget draws. Look at the widget after the fix.';
+export const BOUNDARY = 'Proof boundary: process start times from ps (whole seconds) and executable mappings from lsof, or the ps arguments, at one moment; it does not prove which process WidgetKit asks for timelines or what the placed widget draws. Look at the widget after the fix.';
 const START_TOLERANCE_MS = 1000;
-const LSTART = /^\s*(\d+)\s+([A-Z][a-z]{2}\s+[A-Z][a-z]{2}\s+\d{1,2}\s+\d{1,2}:\d{2}:\d{2}\s+\d{4})\s+(.*)$/;
+const LSTART = /^\s*(\d+)\s+([A-Z][a-z]{2}\s+([A-Z][a-z]{2})\s+(\d{1,2})\s+(\d{1,2}):(\d{2}):(\d{2})\s+(\d{4}))\s+(.*)$/;
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const OFFSET = /^(?:Z|[+-]\d{2}:\d{2})$/;
+const HAS_OFFSET = /(?:Z|[+-]\d{2}:?\d{2})$/i;
+const LOCAL_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/;
 
 const quote = (value) => `'${String(value).replace(/'/g, "'\\''")}'`;
+const pad = (value) => String(value).padStart(2, '0');
 
 export function plistString(text, key) {
   const match = new RegExp(`<key>${key}</key>\\s*<string>([^<]*)</string>`).exec(text);
@@ -40,13 +53,30 @@ export function findExtensions(app) {
   return fs.readdirSync(folder).filter((name) => name.endsWith('.appex')).sort().map((name) => {
     const appex = path.join(folder, name);
     const info = path.join(appex, 'Contents', 'Info.plist');
-    const executable = fs.existsSync(info) ? plistString(readPlist(info), 'CFBundleExecutable') : null;
-    return { name, appex, executable: executable ?? name.replace(/\.appex$/, ''), binary: path.join(appex, 'Contents', 'MacOS', executable ?? name.replace(/\.appex$/, '')) };
+    const plist = fs.existsSync(info) ? readPlist(info) : '';
+    const executable = plistString(plist, 'CFBundleExecutable') ?? name.replace(/\.appex$/, '');
+    return { name, app, appex, identifier: plistString(plist, 'CFBundleIdentifier'), executable, binary: path.join(appex, 'Contents', 'MacOS', executable) };
   });
 }
 
-export function parsePs(text) {
-  return String(text).split(/\r?\n/).map((line) => LSTART.exec(line)).filter(Boolean).map((match) => ({ pid: Number(match[1]), started: new Date(match[2]), lstart: match[2].replace(/\s+/g, ' '), args: match[3] }));
+export function parsePs(text, tz = null) {
+  return String(text).split(/\r?\n/).map((line) => LSTART.exec(line)).filter(Boolean).map((match) => {
+    const [, pid, lstart, month, day, hour, minute, second, year, args] = match;
+    const iso = `${year}-${pad(MONTHS.indexOf(month) + 1)}-${pad(day)}T${pad(hour)}:${minute}:${second}`;
+    return { pid: Number(pid), started: new Date(tz ? `${iso}${tz}` : iso), lstart: lstart.replace(/\s+/g, ' '), args };
+  });
+}
+
+export function parseInstalled(value, tz = null) {
+  return new Date(tz && LOCAL_DATE_TIME.test(value) ? `${value}${tz}` : value);
+}
+
+export function installTime(extension) {
+  const times = [extension.appex, extension.binary].flatMap((file) => {
+    const stat = fs.statSync(file, { throwIfNoEntry: false });
+    return stat ? [stat.ctimeMs, stat.birthtimeMs].filter((value) => value > 0) : [];
+  });
+  return new Date(Math.max(...times));
 }
 
 export function parseLsof(text) {
@@ -62,16 +92,6 @@ export function parseLsof(text) {
   return mapped;
 }
 
-export function extensionProcesses(processes, executable) {
-  const tail = `/Contents/MacOS/${executable}`;
-  return processes.filter((process) => {
-    const index = process.args.indexOf(`.appex${tail}`);
-    if (index < 0) return false;
-    const rest = process.args.slice(index + `.appex${tail}`.length);
-    return rest === '' || rest.startsWith(' ');
-  });
-}
-
 const samePath = (a, b) => {
   const variants = (value) => {
     const resolved = path.resolve(value);
@@ -85,14 +105,46 @@ const samePath = (a, b) => {
   return [...variants(b)].some((value) => left.has(value));
 };
 
+export function launchedPath(args, executable) {
+  const tail = `.appex/Contents/MacOS/${executable}`;
+  for (let from = args.indexOf(tail); from >= 0; from = args.indexOf(tail, from + 1)) {
+    const end = from + tail.length;
+    if (end === args.length || args[end] === ' ') return args.slice(0, end);
+  }
+  return null;
+}
+
+const appName = (file) => /([^/]+\.app)\/Contents\/PlugIns\/[^/]+\.appex\/Contents\/MacOS\/[^/]+$/.exec(file)?.[1] ?? null;
+
+export function ownsProcess(extension, launched) {
+  if (!launched?.startsWith('/')) return false;
+  if (samePath(launched, extension.binary)) return true;
+  const info = path.join(path.dirname(path.dirname(path.dirname(launched))), 'Contents', 'Info.plist');
+  if (fs.existsSync(info)) return extension.identifier !== null && plistString(readPlist(info), 'CFBundleIdentifier') === extension.identifier;
+  return appName(launched) === path.basename(extension.app);
+}
+
+export function extensionProcesses(processes, extension) {
+  return processes.flatMap((process) => {
+    const launched = launchedPath(process.args, extension.executable);
+    if (!launched) return [];
+    if (!launched.startsWith('/')) return [{ ...process, launched: null }];
+    return ownsProcess(extension, launched) ? [{ ...process, launched }] : [];
+  });
+}
+
 export function judge({ extension, process, mapping, installed }) {
-  const runs = (mapping ?? []).find((file) => file.endsWith(`/Contents/MacOS/${extension.executable}`)) ?? null;
+  const mapped = (mapping ?? []).find((file) => file.endsWith(`/Contents/MacOS/${extension.executable}`)) ?? null;
+  if (!process.launched && mapped && !ownsProcess(extension, mapped)) return { foreign: true };
+  const fromArgs = process.launched;
+  const runs = mapped ?? fromArgs;
+  const source = mapped ? 'lsof' : fromArgs ? 'the ps arguments' : null;
   const early = process.started.getTime() < installed.getTime() - START_TOLERANCE_MS;
   const outside = runs !== null && !samePath(runs, extension.binary);
   const reasons = [];
-  if (early) reasons.push(`started ${process.lstart}, before the bundle was installed (${installed.toString()})`);
-  if (outside) reasons.push(`runs ${runs}, outside the installed app`);
-  return { stale: early || outside, reasons, runs };
+  if (early) reasons.push(`started ${process.lstart}, before the bundle was installed (${installed.toISOString()})`);
+  if (outside) reasons.push(`runs ${runs} (from ${source}), outside the installed app`);
+  return { stale: early || outside, reasons, runs, source };
 }
 
 export function fixCommands(extension, pids) {
@@ -115,51 +167,60 @@ function option(args, flag) {
   return args[index + 1];
 }
 
-export function probe({ app, installedAt, psText, lsofText, report }) {
+export function probe({ app, installedAt, psText, lsofText, tz = null, report }) {
   const extensions = findExtensions(app);
   if (!extensions.length) throw new UsageError(`No app extension in ${path.join(app, 'Contents', 'PlugIns')}.`);
-  const processes = parsePs(psText);
+  const processes = parsePs(psText, tz);
   const mapping = parseLsof(lsofText ?? '');
   for (const extension of extensions) {
-    const binary = fs.statSync(extension.binary, { throwIfNoEntry: false });
-    const installed = installedAt ?? (binary ? binary.mtime : fs.statSync(extension.appex).mtime);
-    const running = extensionProcesses(processes, extension.executable);
-    if (!running.length) {
+    const installed = installedAt ?? installTime(extension);
+    const judged = extensionProcesses(processes, extension).map((process) => ({ process, verdict: judge({ extension, process, mapping: mapping.get(process.pid), installed }) })).filter(({ verdict }) => !verdict.foreign);
+    if (!judged.length) {
       report.skip('MW-STALE-01', extension.name, 'no process of this extension is running; place its widget and run the probe again');
       continue;
     }
-    for (const process of running) {
-      const verdict = judge({ extension, process, mapping: mapping.get(process.pid), installed });
+    for (const { process, verdict } of judged) {
       const where = `${extension.name} pid ${process.pid}`;
       if (verdict.stale) report.error('MW-STALE-01', where, verdict.reasons.join('; '), fixCommands(extension, [process.pid]));
-      else report.pass('MW-STALE-01', where, verdict.runs ? `started ${process.lstart} and runs the installed copy` : `started ${process.lstart}, after the install; lsof gave no mapping`, 'started after the install and runs the installed copy');
+      else if (!verdict.runs) report.warn('MW-STALE-01', where, `started ${process.lstart}, after the install, but neither lsof nor the ps arguments gave its executable path`, 'an executable path inside the installed app; rerun with lsof available');
+      else report.pass('MW-STALE-01', where, `started ${process.lstart} and runs the installed copy (from ${verdict.source})`, 'started after the install and runs the installed copy');
     }
   }
 }
 
-async function main() {
-  const args = process.argv.slice(2);
+function readOptions(args) {
   const app = option(args, '--app');
-  if (!app) throw new UsageError('Usage: node probe-extension.mjs --app <path to the installed .app> [--installed <date and time>] [--ps <file>] [--lsof <file>]');
+  if (!app) throw new UsageError('Usage: node probe-extension.mjs --app <path to the installed .app> [--installed <date and time>] [--ps <file> --tz <offset>] [--lsof <file>]');
   if (!fs.existsSync(app)) throw new UsageError(`Not found: ${app}`);
-  const installedOption = option(args, '--installed');
-  const installedAt = installedOption ? new Date(installedOption) : null;
-  if (installedAt && Number.isNaN(installedAt.getTime())) throw new UsageError(`Cannot read --installed ${installedOption}.`);
   const psFile = option(args, '--ps');
   const lsofFile = option(args, '--lsof');
+  const tz = option(args, '--tz');
+  if (tz && !OFFSET.test(tz)) throw new UsageError(`--tz takes Z or +hh:mm, not ${tz}.`);
+  if (psFile && !tz) throw new UsageError("A recorded --ps needs --tz with the recording machine's UTC offset (Z or +hh:mm), since ps prints local times without one.");
+  if (tz && !psFile) throw new UsageError("--tz describes a recorded --ps; a live run uses this machine's time zone.");
+  const installedOption = option(args, '--installed');
+  if (installedOption && !HAS_OFFSET.test(installedOption) && !LOCAL_DATE_TIME.test(installedOption)) throw new UsageError(`Write --installed as YYYY-MM-DDTHH:MM:SS, with or without a UTC offset, not ${installedOption}.`);
+  const installedAt = installedOption ? parseInstalled(installedOption, tz) : null;
+  if (installedAt && Number.isNaN(installedAt.getTime())) throw new UsageError(`Cannot read --installed ${installedOption}.`);
+  return { app: path.resolve(app), psFile, lsofFile, tz, installedAt };
+}
+
+async function main() {
+  const { app, psFile, lsofFile, tz, installedAt } = readOptions(process.argv.slice(2));
   const report = createReport({ tool: 'probe-extension', boundary: BOUNDARY });
   if (!psFile && process.platform !== 'darwin') {
-    report.skip('MW-STALE-01', app, `this probe reads macOS processes and this is ${process.platform}; record ps and lsof on the Mac and pass --ps and --lsof`);
+    report.skip('MW-STALE-01', app, `this probe reads macOS processes and this is ${process.platform}; record ps and lsof on the Mac and pass --ps, --tz and --lsof`);
     return report.summary();
   }
   const psText = psFile ? fs.readFileSync(psFile, 'utf8') : runTool('ps', ['-axww', '-o', 'pid=,lstart=,args=']);
+  if (psFile && !parsePs(psText, tz).length) throw new UsageError(`No process line in ${psFile} could be read. Record it with LC_ALL=C ps -axww -o pid=,lstart=,args= so the start times are in English.`);
   if (!psFile && !parsePs(psText).length) throw new SandboxError('Blocked: ps listed no process at all, so the process table is hidden from this session.', currentCommand());
   let lsofText = lsofFile ? fs.readFileSync(lsofFile, 'utf8') : '';
   if (!lsofFile) {
-    const pids = findExtensions(app).flatMap((extension) => extensionProcesses(parsePs(psText), extension.executable)).map((item) => item.pid);
+    const pids = findExtensions(app).flatMap((extension) => extensionProcesses(parsePs(psText), extension)).map((item) => item.pid);
     if (pids.length) lsofText = runTool('lsof', ['-a', '-p', pids.join(','), '-d', 'txt', '-Fpn']);
   }
-  probe({ app: path.resolve(app), installedAt, psText, lsofText, report });
+  probe({ app, installedAt, psText, lsofText, tz, report });
   return report.summary();
 }
 

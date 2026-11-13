@@ -38,7 +38,7 @@ Each has a check that was seen failing on a broken fixture; section 7 says which
 - [MW-APPEAR-01] An observer of `effectiveAppearance` marks the view for display or swaps its image or title only after comparing the light or dark match with the last one. Redrawing on every callback can feed itself through the menu bar's snapshot of the item and keep one core busy (IL-13). Prefer a template image, which needs no observer at all.
 - [MW-CONFIG-01] A widget that should offer options uses `AppIntentConfiguration` with a `WidgetConfigurationIntent` whose parameters are `AppEntity` types with an `EntityQuery`; `StaticConfiguration` offers nothing in Edit Widget (IL-15). Keep the kind string when converting, or placed widgets disappear.
 - [MW-STALE-01] After an install or a self-update no extension process from the old copy keeps running. At launch the app stops stale extension processes, runs `pluginkit -a` on its extension and reloads all timelines (IL-14).
-- [MW-SNAP-01] Every widget entry fits its size: content that needs more height is capped, shortened or moved to a larger family, and every entry renders to a PNG offscreen (IL-16).
+- [MW-SNAP-01] Every widget entry fits its size inside the standard content margins: content that needs more width or height is capped, shortened or moved to a larger family, and every entry renders to its own PNG offscreen (IL-16).
 - [MW-SNAP-02] Each snapshot PNG matches the previous build byte for byte, or the change was looked at and accepted with a new baseline (IL-16).
 
 Warnings (guidance, not failures): one kind constant per widget, never renamed [MW-WARN-KIND]; at least one intent parameter [MW-WARN-PARAMS]; complete App Intents metadata in builds made without Xcode [MW-WARN-INTENTS]; snapshots split across processes [MW-WARN-BATCH]; test builds that never touch the installed copy [MW-WARN-TESTCOPY]; extension sandboxing and signing [MW-WARN-EXTSIGN].
@@ -54,13 +54,13 @@ Read the reference the task needs, in full:
 | Static scan, offscreen snapshots, the process probe, test builds beside the installed copy, window capture | `references/testing-and-builds.md` |
 | Every rule's evidence | `references/evidence.md` |
 
-Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/StatusItemController.swift` (a coloured status item that redraws only on a light or dark change), `assets/ConfigurableWidget.swift` (an intent-configured widget with an entity parameter, its query, a kind constant and a reload call), `assets/StaleExtensionCleanup.swift` (the launch-time cleanup after an update) and `assets/SnapshotRenderer.swift` (the offscreen renderer the snapshot script builds).
+Working examples, each type-checked with Swift 6 against the macOS SDK: `assets/StatusItemController.swift` (a coloured status item that redraws only on a light or dark change), `assets/ConfigurableWidget.swift` (an intent-configured widget with an entity parameter, its query, a kind constant and a reload call), `assets/WidgetBundle.swift` (the extension's `@main`, alone in its file), `assets/StaleExtensionCleanup.swift` (the launch-time cleanup after an update) and `assets/SnapshotRenderer.swift` (the offscreen renderer the snapshot script builds).
 
 ## 5. Build in the user's project
 
-1. List every path you will write before writing any, and stop if one exists that you did not create. Copied references start with a `menubar-widgets ... (design-pro-max)` header; rename the example identifiers (`com.example...`, `Account...`) to the project's own.
+1. List every path you will write before writing any, and stop if one exists that you did not create. Copied references start with a `menubar-widgets ... (design-pro-max)` header; rename the example identifiers (`com.example...`, `City...`) to the project's own.
 2. Status item: start from `assets/StatusItemController.swift` only when the icon needs colour; otherwise set a template image and drop the observer. For a SwiftUI app, `MenuBarExtra` with `.menu` or `.window` style replaces the controller; read the SwiftUI row of the router for the scene APIs.
-3. Widget: start from `assets/ConfigurableWidget.swift`. Put the kind in one constant and use it for every `reloadTimelines(ofKind:)` call [MW-WARN-KIND]. Reload timelines from the app when its data changes, not on a timer.
+3. Widget: start from `assets/ConfigurableWidget.swift` and `assets/WidgetBundle.swift`. Keep the `@main` widget bundle alone in its own file, apart from the views, so the views also build with the snapshot renderer, which has its own `@main`. Put the kind in one constant and use it for every `reloadTimelines(ofKind:)` call [MW-WARN-KIND]. Reload timelines from the app when its data changes, not on a timer.
 4. Self-updating apps: call `assets/StaleExtensionCleanup.swift` at launch [MW-STALE-01]; `references/widgets-and-intents.md` covers sandboxed hosts.
 5. Builds: run one Xcode or swiftc build at a time; if a build fails inside an agent sandbox on its caches, ask to run it outside the sandbox. A build without Xcode follows [MW-WARN-INTENTS] and [MW-WARN-EXTSIGN].
 6. Test as a separate debug build [MW-WARN-TESTCOPY], never by killing, replacing or re-registering the person's installed app.
@@ -82,17 +82,17 @@ These scripts need Node and, for snapshots, `swiftc` on macOS; they take no `--p
 
 ```
 node <absolute path to this folder>/scripts/scan-swift.mjs Sources
-node <absolute path to this folder>/scripts/scan-swift.mjs --configurable Sources/Widgets
+node <absolute path to this folder>/scripts/scan-swift.mjs --configurable com.example.app.widget Sources/Widgets
 node <absolute path to this folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline Snapshots/baseline Sources/WidgetViews Snapshots/Catalog.swift
 node <absolute path to this folder>/scripts/snapshot-widgets.mjs --out build/snapshots --baseline Snapshots/baseline --update Sources/WidgetViews Snapshots/Catalog.swift
 node <absolute path to this folder>/scripts/probe-extension.mjs --app "/Applications/<App>.app"
 ```
 
-`scan-swift.mjs` reports [MW-APPEAR-01], [MW-CONFIG-01] (pass `--configurable` when the widget should have options), [MW-WARN-KIND] and [MW-WARN-PARAMS]. `snapshot-widgets.mjs` reports [MW-SNAP-01] and, with a baseline, [MW-SNAP-02]; `--update` writes the baseline after you have looked at the PNGs. `probe-extension.mjs` is read-only: it reports [MW-STALE-01] and prints the commands to fix it, which the person runs or approves. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Off macOS the snapshot and live probe report their rules as skipped.
+`scan-swift.mjs` reports [MW-APPEAR-01], [MW-CONFIG-01] (pass `--configurable <kind>[,<kind>]` naming the widgets that should have options), [MW-WARN-KIND] and [MW-WARN-PARAMS]. `snapshot-widgets.mjs` reports [MW-SNAP-01] and, with a baseline, [MW-SNAP-02]; `--update` writes the baseline after you have looked at the PNGs. `probe-extension.mjs` is read-only: it reports [MW-STALE-01] and prints the commands to fix it, which the person runs or approves. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Off macOS the snapshot and live probe report their rules as skipped.
 
 ## 8. Report
 
-Give the user: the task read and the surface chosen (or why a menu or a window was enough); what was built and which references were copied; each checker's summary line with any errors fixed; and the proof boundary: the scan reads Swift text one file deep, the snapshots prove offscreen rendering of the views at their sizes, the probe proves process start times and executable paths at one moment. None of them prove the placed widget on the desktop, the menu bar on a real display, Edit Widget, VoiceOver or taste. Say which of those the user should check by hand.
+Give the user: the task read and the surface chosen (or why a menu or a window was enough); what was built and which references were copied; each checker's summary line with any errors fixed; and the proof boundary: the scan reads Swift text one file deep, the snapshots prove offscreen rendering of the views at their sizes inside the content margins on this machine and macOS version, the probe proves process start times and executable paths at one moment. None of them prove the placed widget on the desktop, the menu bar on a real display, Edit Widget, VoiceOver or taste. Say which of those the user should check by hand.
 
 ## 9. Routing
 

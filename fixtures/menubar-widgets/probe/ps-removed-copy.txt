@@ -1,2 +1,2 @@
-  101 Thu Nov 13 08:41:02 2026 /usr/libexec/someservice
-  4100 Thu Nov 13 09:00:00 2026 /private/var/folders/xy/T/update-old-copy/Usage.app/Contents/PlugIns/UsageWidget.appex/Contents/MacOS/UsageWidget
+  101 Fri Nov 13 08:41:02 2026 /usr/libexec/someservice
+  4100 Fri Nov 13 09:00:00 2026 /private/var/folders/xy/T/update-old-copy/Forecast.app/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget

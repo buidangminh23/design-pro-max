@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-APP="build/Usage.app"
-APPEX="$APP/Contents/PlugIns/UsageWidget.appex"
+APP="build/Forecast.app"
+APPEX="$APP/Contents/PlugIns/ForecastWidget.appex"
 SDK="$(xcrun --show-sdk-path --sdk macosx)"
 TARGET="arm64-apple-macos14"
 IDENTITY="${SIGN_IDENTITY:--}"
@@ -11,11 +11,11 @@ rm -rf build
 mkdir -p "$APP/Contents/MacOS" "$APPEX/Contents/MacOS"
 
 swiftc -sdk "$SDK" -target "$TARGET" -O -parse-as-library \
-  Sources/App/*.swift -o "$APP/Contents/MacOS/Usage"
+  Sources/App/*.swift -o "$APP/Contents/MacOS/Forecast"
 
 swiftc -sdk "$SDK" -target "$TARGET" -O -parse-as-library \
   -application-extension \
-  Sources/Widget/*.swift -o "$APPEX/Contents/MacOS/UsageWidget"
+  Sources/Widget/*.swift -o "$APPEX/Contents/MacOS/ForecastWidget"
 
 cp Resources/App-Info.plist "$APP/Contents/Info.plist"
 cp Resources/Widget-Info.plist "$APPEX/Contents/Info.plist"

@@ -1,37 +1,37 @@
 import SwiftUI
 import WidgetKit
 
-struct UsageSnapshot {
-    let accountName: String
-    let used: Double
-    let resetText: String
+struct ForecastSnapshot {
+    let cityName: String
+    let chanceOfRain: Double
+    let updatedText: String
     let notes: [String]
 }
 
-struct SmallUsageView: View {
-    let snapshot: UsageSnapshot
+struct SmallForecastView: View {
+    let snapshot: ForecastSnapshot
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(snapshot.accountName).font(.headline)
-            ProgressView(value: snapshot.used)
-            Text(snapshot.resetText).font(.caption).foregroundStyle(.secondary)
+            Text(snapshot.cityName).font(.headline)
+            ProgressView(value: snapshot.chanceOfRain)
+            Text(snapshot.updatedText).font(.caption).foregroundStyle(.secondary)
         }
         .padding()
     }
 }
 
-struct MediumUsageView: View {
-    let snapshot: UsageSnapshot
+struct MediumForecastView: View {
+    let snapshot: ForecastSnapshot
 
     var body: some View {
         HStack(alignment: .top) {
-            SmallUsageView(snapshot: snapshot)
+            SmallForecastView(snapshot: snapshot)
             VStack(alignment: .leading, spacing: 4) {
                 ForEach(snapshot.notes, id: \.self) { note in
                     Text(note).font(.caption)
                 }
-                Link("Open details", destination: URL(string: "usage://details")!)
+                Link("Open forecast", destination: URL(string: "weather://forecast")!)
                     .font(.caption.bold())
             }
         }
