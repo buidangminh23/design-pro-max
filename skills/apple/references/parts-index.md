@@ -477,3 +477,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 7 error, 9 warn; evidence in `launch-page/references/evidence.md`
 - Checkers: `launch-page/scripts/check-page.mjs`
+
+### `web-shells`
+
+- Guide: `web-shells/PART.md`
+- Status: active
+- Rules: 5 error, 4 warn; evidence in `web-shells/references/evidence.md`
+- Checkers: `web-shells/scripts/check-shell.mjs`, `web-shells/scripts/probe-webkit.mjs`

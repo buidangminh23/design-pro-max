@@ -10,7 +10,8 @@
  *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
- * playwright, then npx playwright install chromium-headless-shell). Exit codes: 0 every case judged right, 1 a case
+ * playwright, then npx playwright install chromium-headless-shell); the web-shells cases also need its WebKit (npx
+ * playwright install webkit) and openssl. Exit codes: 0 every case judged right, 1 a case
  * judged wrong, 2 a missing tool.
  */
 import fs from 'node:fs';
@@ -20,7 +21,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'web-shells'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -103,6 +104,12 @@ function runCase(entry, skill, media, scratch) {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
     args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
+  } else if (entry.checker === 'check-shell') {
+    const fixture = (folder) => path.join(ROOT, 'fixtures', entry.part, ...folder.split('/'));
+    args = [path.join(skill, entry.part, 'scripts', 'check-shell.mjs'), ...(entry.project ? ['--project', fixture(entry.project)] : []), ...(entry.bundle ? ['--bundle', fixture(entry.bundle)] : []), ...(entry.args ?? [])];
+  } else if (entry.checker === 'probe-webkit') {
+    const app = entry.app.startsWith('assets/') ? path.join(skill, entry.part, ...entry.app.split('/')) : path.join(ROOT, 'fixtures', entry.part, ...entry.app.split('/'));
+    args = [path.join(skill, entry.part, 'scripts', 'probe-webkit.mjs'), '--app', app, '--project', ROOT, ...(entry.args ?? [])];
   } else {
     throw new Error(`${entry.id}: unknown checker ${entry.checker}`);
   }
@@ -111,7 +118,7 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));

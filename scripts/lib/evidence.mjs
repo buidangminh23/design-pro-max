@@ -13,7 +13,7 @@ import { SKILL_DIR } from './vendor.mjs';
 
 export const LEDGER_FILE = 'evidence/ledger.json';
 export const RULES_FILE = 'rules.json';
-export const OWN_PARTS = ['launch-scroll', 'hig', 'launch-video', 'launch-page'];
+export const OWN_PARTS = ['launch-scroll', 'hig', 'launch-video', 'launch-page', 'web-shells'];
 export const LABELS = ['measured', 'documented', 'inferred', 'policy'];
 export const ENTRY_KEYS = ['claim', 'value', 'label', 'date', 'source', 'method', 'confidence', 'remeasure', 'status', 'correction', 'sourceSha'];
 export const RULE_KEYS = ['id', 'part', 'level', 'statement', 'values', 'evidence', 'check', 'fixtures', 'implementedBy'];

@@ -517,6 +517,105 @@
       "check": "launch-page/scripts/check-page.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": []
+    },
+    {
+      "id": "WS-ORIGIN-01",
+      "part": "web-shells",
+      "level": "error",
+      "statement": "Every shell config, native-project copy and built bundle loads the origin the app is meant to load: the production origin for a remote shell, the bundled web build for a bundled one; a remote shell that would open its bundled build instead fails.",
+      "values": "loaded origin equals the expected origin; no server URL when the bundled build is expected",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": ["shell-remote", "shell-tauri-remote"], "fail": ["shell-bundled-only", "shell-bundle-stale"] },
+      "implementedBy": ["web-shells/assets/config/capacitor.config.json", "web-shells/assets/config/tauri.conf.json"]
+    },
+    {
+      "id": "WS-ORIGIN-02",
+      "part": "web-shells",
+      "level": "error",
+      "statement": "A shell config that ships never points at a loopback, private-network, link-local or local-network host, or at plain http; development URLs stay in development-only settings such as devUrl or a live-reload config.",
+      "values": "a public https origin in every config that ships; no localhost, 127/8, 10/8, 172.16/12, 192.168/16, 169.254/16, .local or http",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": ["shell-remote", "shell-tauri-remote"], "fail": ["shell-localhost", "shell-tauri-lan"] },
+      "implementedBy": ["web-shells/assets/config/capacitor.config.json", "web-shells/assets/config/tauri.conf.json"]
+    },
+    {
+      "id": "WS-BUNDLE-01",
+      "part": "web-shells",
+      "level": "error",
+      "statement": "The native-project copy of the Capacitor config and the config inside the built app carry the same server URL as the project's config: after changing it, sync and rebuild before testing or shipping.",
+      "values": "server URL of the native copy and of the built bundle equals the project's",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": ["shell-remote"], "fail": ["shell-bundle-stale", "shell-native-stale"] },
+      "implementedBy": []
+    },
+    {
+      "id": "WS-AUTH-01",
+      "part": "web-shells",
+      "level": "error",
+      "statement": "No page, frame or request of an app meant for a home-screen web app, an in-app browser, a WebView shell or an iframe answers with an HTTP Basic or Digest challenge; sign-in uses a login page and a session cookie.",
+      "values": "no 401 with a Basic or Digest challenge; a login page and a session cookie",
+      "evidence": ["IL-27"],
+      "check": "web-shells/scripts/probe-webkit.mjs",
+      "fixtures": { "pass": ["probe-login-https"], "fail": ["probe-basic-auth"] },
+      "implementedBy": ["web-shells/assets/login/app.mjs"]
+    },
+    {
+      "id": "WS-COOKIE-01",
+      "part": "web-shells",
+      "level": "error",
+      "statement": "After signing in, the session cookie comes back with the next request in WebKit; an app whose session cookie is Secure is served and tested over HTTPS, never plain http, localhost included.",
+      "values": "session cookie sent with the next request; HTTPS for Secure cookies, localhost included",
+      "evidence": ["IL-27"],
+      "check": "web-shells/scripts/probe-webkit.mjs",
+      "fixtures": { "pass": ["probe-login-https"], "fail": ["probe-login-http"] },
+      "implementedBy": ["web-shells/assets/login/app.mjs"]
+    },
+    {
+      "id": "WS-WARN-THIRDPARTY",
+      "part": "web-shells",
+      "level": "warn",
+      "statement": "An app signed in inside an iframe on another site gets no cookies in Safari: open it first-party, embed it from the same site, or ask for storage access from a tap.",
+      "values": "no cookies in cross-site iframes",
+      "evidence": ["IL-27"],
+      "check": "web-shells/scripts/probe-webkit.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WS-WARN-STAGING",
+      "part": "web-shells",
+      "level": "warn",
+      "statement": "The origin a shipping shell loads carries no staging, dev, preview or test label in its host name.",
+      "values": "no staging, dev, preview or test host label in a shipping config",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WS-WARN-BUNDLED",
+      "part": "web-shells",
+      "level": "warn",
+      "statement": "A remote shell carries only an offline page, not a full web build that it would open, frozen at build time, if its server URL were ever dropped.",
+      "values": "only an offline page beside a remote server URL",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WS-WARN-PUSH",
+      "part": "web-shells",
+      "level": "warn",
+      "statement": "Web code that subscribes to Web Push inside a WKWebView shell needs a native push plugin; Web Push reaches only web apps added to the Home Screen.",
+      "values": "a native push plugin in a shell, or a home-screen web app for Web Push",
+      "evidence": ["IL-26"],
+      "check": "web-shells/scripts/check-shell.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
     }
   ]
 }

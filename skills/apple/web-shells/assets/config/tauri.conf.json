@@ -1,0 +1,18 @@
+{
+  "productName": "Example",
+  "identifier": "com.example.app",
+  "build": {
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../shell"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Example",
+        "url": "https://app.example.com",
+        "width": 1200,
+        "height": 800
+      }
+    ]
+  }
+}

@@ -74,6 +74,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Web page scenes that pin, zoom or scrub video or a canvas image sequence on scroll; sequence memory budgets; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
 | Launch and landing pages (hero, feature tiles, galleries, marquees, pricing, FAQ) or a review of one: type scale, SF fonts on the web, contrast, reveals, hero intros, pause controls | `launch-page/PART.md` | active |
 | Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
+| A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
 
 Routing notes:
@@ -91,9 +92,10 @@ Not covered by any part:
 - Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
 - WidgetKit, App Intents, Live Activities: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, AppKit status items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
+- Android-only shells, React Native and Flutter: not covered; say so.
 - Never stretch a part to fit.
 
-Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native on a phone to `mobile-native`; store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion compositions and HyperFrames templates to their own skills; GSAP APIs to the GSAP skills, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
+Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native in mobile Safari to `mobile-native` (Home Screen or shell: the `web-shells` row); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion compositions and HyperFrames templates to their own skills; GSAP APIs to the GSAP skills, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
 
 ## Parts index
 
