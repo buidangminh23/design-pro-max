@@ -109,6 +109,76 @@ test('check-page colour maths, copy counts and font patterns', async () => {
   assert.match('', APPLE_GLYPHS);
 });
 
+test('check-page stacks backgrounds and opacities once each, reads the ladder and recognises SF fonts in any spelling', async () => {
+  const { parseColor, stackColors, contrastRatio, toHex, ladderSizes, parseLadderCss, readableUrl, fontRequestProblem, SF_FONT, APPLE_GLYPHS, APPLE_FONT_HOST } = await part('scripts', 'check-page.mjs');
+  assert.deepEqual(parseColor('color(srgb 1 0.5 0)'), { r: 255, g: 127.5, b: 0, a: 1 });
+  const white = { r: 255, g: 255, b: 255, a: 1 };
+  const black = { r: 0, g: 0, b: 0, a: 1 };
+  const flat = stackColors(black, [{ bg: null, opacity: 1 }, { bg: white, opacity: 1 }]);
+  assert.equal(Number(contrastRatio(flat.text, flat.back).toFixed(2)), 21);
+  const group = stackColors(black, [{ bg: null, opacity: 0.5 }, { bg: white, opacity: 1 }]);
+  assert.equal(toHex(group.text), '#808080', 'a group opacity of 0.5 fades the text once, not twice');
+  const outer = stackColors(black, [{ bg: white, opacity: 1 }, { bg: null, opacity: 0.5 }, { bg: black, opacity: 1 }]);
+  assert.equal(toHex(outer.back), '#808080', 'the opacity of an ancestor above an opaque background still applies');
+  assert.equal(toHex(outer.text), '#000000');
+  const tokens = loadTokens(ROOT);
+  assert.deepEqual(ladderSizes(tokens, 1280), [13, 16, 20, 25, 31, 39, 49, 61, 76]);
+  assert.ok(ladderSizes(tokens, 1280, { expressive: true }).includes(96));
+  assert.ok(ladderSizes(tokens, 390, { expressive: true }).includes(44));
+  assert.ok(!ladderSizes(tokens, 1280).includes(17) && !ladderSizes(tokens, 1280).includes(23));
+  assert.deepEqual(ladderSizes({ sizes: [14, '18'] }), [14, 18]);
+  assert.deepEqual(parseLadderCss(':root { --type-a-size: 14px; --type-b-size: 1.5rem; --space-1: 8px; }'), { sizes: [14, 24] });
+  assert.equal(readableUrl('https://x.invalid/fonts?families=SF+Pro,v3|SF+Pro+Icons,v3'), 'https://x.invalid/fonts?families=SF Pro,v3|SF Pro Icons,v3');
+  assert.equal(readableUrl('%E0%A4%A'), '%E0%A4%A');
+  assert.match(fontRequestProblem('https://fonts.invalid/wss/fonts?families=SF+Pro,v3|SF+Pro+Icons,v3', 'stylesheet'), /SF font/);
+  assert.match(fontRequestProblem('https://www.apple.com/wss/fonts?families=Foo', 'stylesheet'), /apple\.com/);
+  assert.equal(fontRequestProblem('https://www.apple.com/v/hero.jpg', 'image'), null);
+  assert.equal(fontRequestProblem('https://cdn.example.com/inter.woff2', 'font'), null);
+  for (const host of ['www.apple.com', 'store.storeimages.cdn-apple.com', 'applesfont.example', 'cdn.apple-fonts.example']) assert.match(host, APPLE_FONT_HOST, host);
+  assert.doesNotMatch('pineapple.com', APPLE_FONT_HOST);
+  for (const name of ['SF UI Text', 'SF-UI-Display', 'SF NS', 'SF NS Display', 'SFUIText']) assert.match(name, SF_FONT, name);
+  for (const name of ['SF NSW', 'SFX', 'Safari Sans']) assert.doesNotMatch(name, SF_FONT, name);
+  assert.match('\u{100000}', APPLE_GLYPHS);
+  assert.match('\u{10FFFD}', APPLE_GLYPHS);
+  assert.doesNotMatch('\u{F0000}', APPLE_GLYPHS);
+});
+
+test('lint-css counts only script-set capabilities as guards and reads encoded SF families, Apple hosts and the SF Symbols plane', async () => {
+  const { lintText, guarded, appleGlyph } = await part('scripts', 'lint-css.mjs');
+  const { createReport } = await import(pathToFileURL(path.join(ROOT, SKILL_DIR, 'shared', 'report.mjs')).href);
+  assert.equal(guarded('html[data-motion="ok"] [data-reveal]:not([data-revealed])'), true);
+  assert.equal(guarded('[data-reveal]:not([data-revealed])'), false);
+  assert.equal(guarded('@media (prefers-reduced-motion: no-preference) h1'), false);
+  assert.equal(guarded('html:not(.js) h1'), false);
+  assert.equal(guarded('html:not([data-motion="ok"]) h1'), false);
+  assert.equal(guarded('html.js h1'), true);
+  const warned = (css) => {
+    const report = createReport({ tool: 't', write: () => {} });
+    lintText(css, 'a.css', report);
+    return report.findings.filter((finding) => finding.level === 'warn').map((finding) => finding.rule);
+  };
+  assert.deepEqual(warned('[data-reveal]:not([data-revealed]) { opacity: 0; }'), ['LP-BASE-01']);
+  assert.deepEqual(warned('@media (prefers-reduced-motion: no-preference) { h1 { opacity: 0; } }'), ['LP-BASE-01']);
+  assert.deepEqual(warned('html.reduced-motion h1, html:not(.reduced-motion) h1 { opacity: 0; }'), ['LP-BASE-01']);
+  assert.deepEqual(warned('html[data-motion="ok"] .track { animation: m 20s linear infinite; }'), []);
+  assert.deepEqual(warned('.track { animation: m 20s linear infinite; }'), ['LP-AMB-01']);
+  const errors = (text, file) => {
+    const report = createReport({ tool: 't', write: () => {} });
+    lintText(text, file, report);
+    return report.findings.filter((finding) => finding.level === 'error').length;
+  };
+  assert.equal(errors('<link rel="stylesheet" href="https://fonts.invalid/wss/fonts?families=SF+Pro,v3|SF+Pro+Icons,v3">', 'a.html'), 1);
+  assert.equal(errors('<link rel="stylesheet" href="https://www.apple.com/wss/fonts?families=Foo">', 'a.html'), 1);
+  assert.equal(errors('@font-face { font-family: Brand; src: url(https://www.apple.com/fonts/brand.woff2); }', 'a.css'), 1);
+  assert.equal(errors('body { font-family: "SF UI Text", system-ui; }', 'a.css'), 1);
+  assert.equal(errors('<link rel="stylesheet" href="https://fonts.invalid/css2?family=Inter">', 'a.html'), 0);
+  assert.equal(appleGlyph('.i::before { content: "\\100000"; }'), '\\100000');
+  assert.equal(appleGlyph('<span>&#x100001;</span>'), '&#x100001;');
+  assert.equal(appleGlyph('<span>&#1048576;</span>'), '&#1048576;');
+  assert.equal(appleGlyph('<span>&#1000000;</span>'), null);
+  assert.equal(appleGlyph('plain text'), null);
+});
+
 test('check-page rejects bad usage and exits 2 without Playwright from a copy outside the repository', (t) => {
   const outside = tempDir();
   t.after(() => removeTree(outside));
@@ -165,6 +235,138 @@ test('the libraries decide the intro, stagger reveals and step galleries without
   assert.deepEqual([nextIndex(2, 3), nextIndex(0, 3, -1), nextIndex(0, 0)], [0, 2, 0]);
   assert.equal(slideDuration({ dataset: { duration: '7000' } }), 7000);
   assert.equal(slideDuration({ dataset: {} }), 6000);
+});
+
+test('reveal.js reveals what is in or above the viewport at load, what the reader jumped past, and everything at the end', async () => {
+  const { shouldReveal, DEFAULTS } = await part('assets', 'lib', 'reveal.js');
+  assert.equal(DEFAULTS.threshold, 0, 'any part of a tall element in view reveals it');
+  const page = { viewportHeight: 800, scrollBottom: 1600, scrollHeight: 5000 };
+  assert.equal(shouldReveal({ top: 700 }, { ...page, atLoad: true }), true);
+  assert.equal(shouldReveal({ top: -2000 }, { ...page, atLoad: true }), true);
+  assert.equal(shouldReveal({ top: 700 }, page), false, 'mid-scroll, the observer and its bottom margin decide');
+  assert.equal(shouldReveal({ top: -10 }, page), true);
+  assert.equal(shouldReveal({ top: 780 }, { ...page, scrollBottom: 4999 }), true);
+});
+
+function fakeWindow({ reduced = false } = {}) {
+  const timers = new Map();
+  let next = 1;
+  let now = 0;
+  const query = Object.assign(new EventTarget(), { matches: reduced });
+  const document = Object.assign(new EventTarget(), { hidden: false, documentElement: { classList: { contains: () => false } } });
+  return {
+    document,
+    query,
+    performance: { now: () => now },
+    matchMedia: () => query,
+    setTimeout: (fn, ms) => {
+      timers.set(next, { fn, at: now + ms });
+      return next++;
+    },
+    clearTimeout: (id) => timers.delete(id),
+    advance(ms) {
+      now += ms;
+      for (const [id, timer] of [...timers]) if (timer.at <= now) {
+        timers.delete(id);
+        timer.fn();
+      }
+    },
+    pending: () => timers.size,
+  };
+}
+
+class FakeNode extends EventTarget {
+  constructor(parts = {}) {
+    super();
+    this.attributes = new Map();
+    this.dataset = {};
+    this.style = { setProperty: () => {} };
+    this.hidden = false;
+    this.offsetWidth = 0;
+    this.parts = parts;
+  }
+  setAttribute(name, value) { this.attributes.set(name, String(value)); }
+  getAttribute(name) { return this.attributes.has(name) ? this.attributes.get(name) : null; }
+  removeAttribute(name) { this.attributes.delete(name); }
+  querySelectorAll(selector) { return this.parts[selector] ?? []; }
+  querySelector(selector) { return (this.parts[selector] ?? [])[0] ?? null; }
+}
+
+function fakeVideo() {
+  return { paused: true, play() { this.paused = false; return Promise.resolve(); }, pause() { this.paused = true; } };
+}
+
+function fakeGallery() {
+  const videos = [fakeVideo(), fakeVideo()];
+  const slides = videos.map((video, at) => Object.assign(new FakeNode({ video: [video] }), { dataset: { duration: String(4000 + at * 1000) } }));
+  const dots = slides.map(() => new FakeNode());
+  const text = { textContent: '' };
+  const toggle = new FakeNode({ '[data-toggle-text]': [text] });
+  const element = new FakeNode({ '[data-slide]': slides, '[data-gallery-dot]': dots, '[data-gallery-toggle]': [toggle] });
+  element.setAttribute('aria-label', 'product tour');
+  return { element, slides, dots, toggle, text, videos };
+}
+
+test('gallery.js keeps the dot, the timer and slide videos in step, labels the toggle without aria-pressed and tears down', async () => {
+  const { createGallery, createMarquee, toggleLabel } = await part('assets', 'lib', 'gallery.js');
+  assert.deepEqual(toggleLabel(true, 'tour'), { label: 'Pause tour', text: 'Pause' });
+  const win = fakeWindow();
+  const { element, dots, toggle, text, videos } = fakeGallery();
+  const gallery = createGallery(element, { win });
+  assert.equal(element.dataset.playing, 'true');
+  assert.equal(element.dataset.running, 'true');
+  assert.equal(toggle.getAttribute('aria-label'), 'Pause product tour');
+  assert.equal(toggle.getAttribute('aria-pressed'), null);
+  assert.equal(text.textContent, 'Pause');
+  assert.deepEqual(videos.map((video) => video.paused), [false, true], 'only the shown slide plays');
+  win.document.hidden = true;
+  win.document.dispatchEvent(new Event('visibilitychange'));
+  assert.equal(element.dataset.running, 'false', 'a hidden tab stops the dot as well as the timer');
+  assert.equal(element.dataset.playing, 'true');
+  assert.deepEqual(videos.map((video) => video.paused), [true, true]);
+  win.advance(3000);
+  win.document.hidden = false;
+  win.document.dispatchEvent(new Event('visibilitychange'));
+  assert.equal(element.dataset.running, 'true');
+  win.advance(4000);
+  assert.equal(gallery.index, 1);
+  assert.equal(dots[1].getAttribute('aria-current'), 'true');
+  assert.deepEqual(videos.map((video) => video.paused), [true, false]);
+  toggle.dispatchEvent(new Event('click'));
+  assert.equal(element.dataset.playing, 'false');
+  assert.equal(element.dataset.running, 'false');
+  assert.equal(toggle.getAttribute('aria-label'), 'Play product tour');
+  assert.equal(toggle.getAttribute('aria-pressed'), null);
+  assert.deepEqual(videos.map((video) => video.paused), [true, true], 'pausing the gallery pauses its videos');
+  gallery.setPlaying(true);
+  const event = Object.assign(new Event('change'), { matches: true });
+  win.query.matches = true;
+  win.query.dispatchEvent(event);
+  assert.equal(gallery.playing, false, 'reduced motion turning on stops it');
+  assert.deepEqual(videos.map((video) => video.paused), [true, true]);
+  gallery.destroy();
+  toggle.dispatchEvent(new Event('click'));
+  assert.equal(gallery.playing, false, 'destroy removes the listeners');
+  assert.equal(win.pending(), 0);
+
+  const reducedWin = fakeWindow({ reduced: true });
+  const reducedGallery = fakeGallery();
+  createGallery(reducedGallery.element, { win: reducedWin });
+  assert.equal(reducedGallery.element.dataset.running, 'false');
+  assert.deepEqual(reducedGallery.videos.map((video) => video.paused), [true, true], 'no slide video plays under reduced motion');
+
+  const marqueeWin = fakeWindow();
+  const marqueeToggle = new FakeNode();
+  const marquee = new FakeNode({ '[data-marquee-toggle]': [marqueeToggle] });
+  const controller = new AbortController();
+  createMarquee(marquee, { win: marqueeWin, signal: controller.signal });
+  assert.equal('paused' in marquee.dataset, false);
+  marqueeWin.query.matches = true;
+  marqueeWin.query.dispatchEvent(Object.assign(new Event('change'), { matches: true }));
+  assert.equal(marquee.dataset.paused, '', 'the marquee pauses when reduced motion turns on mid-session');
+  controller.abort();
+  marqueeToggle.dispatchEvent(new Event('click'));
+  assert.equal(marquee.dataset.paused, '', 'an aborted signal removes the toggle listener');
 });
 
 test('the planted-defect page lists 12 defects whose rules exist or belong to a part built elsewhere', () => {
