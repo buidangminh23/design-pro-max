@@ -32,6 +32,9 @@ export function areaName(folder, code) {
 
 /** Notes ids and the heading that opens their section. */
 export const NOTES = {
+  'PV-N0': '## 7.',
+  'PV-N1': '### 5.7',
+  'PV-N2': '### 1.3',
   'SC-N0': '### R4.',
   'SC-N1': '### R1.',
   'TQ-N0': '## 6.',
