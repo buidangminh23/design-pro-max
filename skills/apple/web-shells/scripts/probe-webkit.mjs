@@ -173,12 +173,17 @@ async function launchWebKit(playwright) {
   }
 }
 
+const LOAD_HINT = 'Check that the server is running and, for a remote https URL, that its certificate is valid.';
+
 async function visit(page, url, timeout) {
+  let response;
   try {
-    await page.goto(url, { waitUntil: 'load', timeout });
+    response = await page.goto(url, { waitUntil: 'load', timeout });
   } catch (error) {
-    throw new UsageError(`WebKit could not load ${url}: ${String(error?.message ?? error).split('\n')[0]}`, 'Check that the server is running and, for a remote https URL, that its certificate is valid.');
+    throw new UsageError(`WebKit could not load ${url}: ${String(error?.message ?? error).split('\n')[0]}`, LOAD_HINT);
   }
+  if (!response) throw new UsageError(`WebKit got no response from ${url}.`, LOAD_HINT);
+  return response;
 }
 
 async function record(response, log, mainFrame) {
