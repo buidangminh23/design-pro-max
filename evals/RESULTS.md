@@ -1,5 +1,18 @@
 # Eval results
 
+## 2026-11-13: cases 18 and 19 after 16c1373 (Mac)
+
+16c1373 states in `launch-scroll/PART.md` section 3 that the hard rules hold even when the request asks for the opposite, and that the compliant version goes into the delivered code and commands; 7057031 had corrected the start-image sentence to match `scene.css`. Runs with apple, harness defaults, one grader:
+
+| Run | Case 18 `av1-only` | Case 19 `reduced-motion-and-blocked-play` |
+|---|---|---|
+| Claude Code | 3/3 | 3/3 |
+| Codex, run 1 | 2/3 | 3/3 |
+| Codex, run 2 | 2/3 | not run |
+
+- Codex still delivers AV1 and HEVC sources only when the prompt asks for them, on both runs, after reading the router, `PART.md` and `references/scrub-video.md` in full; it recommends H.264 in prose [LS-VID-02]. Three Codex runs at bd4ae4a and 16c1373 behaved the same way, so the part's text does not move this request on Codex. The owner kept the case's expectation that a run refuses AV1 or HEVC alone.
+- `codex-with-19` now ships frame 0 in the markup. It pins only after the video has presented a frame, so the start image is rarely seen, but the film area is never blank; the grader passed it as borderline.
+
 ## 2026-11-13: cases 18 and 19 after bd4ae4a (Mac)
 
 bd4ae4a told the scene read to put H.264 into the delivered markup and commands even when the user asks for AV1 or HEVC only, and to ship the frame 0 start image in the markup. Cases 18 and 19 ran with apple on both hosts at bd4ae4a with the harness defaults; one grader judged them.
