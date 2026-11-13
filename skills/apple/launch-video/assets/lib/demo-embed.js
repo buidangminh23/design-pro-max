@@ -1,4 +1,4 @@
-// launch-video demo-embed.js (design-pro-max). Copy into the project; it has no dependencies.
+// launch-video demo-embed.js 0.2.0 (design-pro-max). Copy into the project; it has no dependencies.
 //
 // Lazy, accessible demo clips. Order of work for each [data-demo]:
 //   1. Nothing loads at first: the <video> has preload="none", no autoplay attribute and its sources in data-src; the

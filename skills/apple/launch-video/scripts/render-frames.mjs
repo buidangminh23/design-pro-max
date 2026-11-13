@@ -222,6 +222,7 @@ const withTimeout = (promise, ms, message) => {
 };
 
 export async function render(options, report) {
+  if (options.out && !insideTmp(options.out)) throw new UsageError(`--out ${path.resolve(options.out)} is outside $TMPDIR (${os.tmpdir()}).`, 'Frames are captures and stay in $TMPDIR; encode.mjs writes the clips into the project.');
   const playwright = await loadPlaywright(options.project);
   const out = prepareOut(options);
   process.stderr.write(`render-frames ${VERSION} writes ${expectedFrames(options.duration, options.fps)} frames to ${out}\n`);

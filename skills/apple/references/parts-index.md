@@ -463,3 +463,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 0 error, 0 warn; evidence in `hig/references/evidence.md`
 - Checkers: 
+
+### `launch-video`
+
+- Guide: `launch-video/PART.md`
+- Status: active
+- Rules: 7 error, 7 warn; evidence in `launch-video/references/evidence.md`
+- Checkers: `shared/check-media.mjs`, `launch-video/scripts/check-embed.mjs`, `launch-video/scripts/render-frames.mjs`
