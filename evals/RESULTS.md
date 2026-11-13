@@ -1,5 +1,52 @@
 # Eval results
 
+## 2026-11-13: v0.1 routing round 3 and the launch-scroll part evals (Mac)
+
+Round 3 measures the router description from 2422017 with Claude Code installed at user level (`--install user`, so exploring the empty project cannot reach the skill), and scores a Codex near miss as a false trigger only when it reads a part (the owner's bar from 2026-10-25; router-only reads are listed). Both hosts ran each host's own model and effort from the user's config, before the harness pinned them (a5e47ea): Claude Code 2.1.314 (routing, 2026-10-30, at 2977c13) and 2.1.323 (parts) with `claude-opus-5-5`, effort xhigh; Codex codex-cli 0.167.2 with `gpt-6-astra`, reasoning high (routing and parts, 2026-11-13, at b7909e6, whose only change to the skill is the film reference page named in `launch-scroll/PART.md`). Rounds 1 and 2 ran Codex on `gpt-6.1-sol`, so the Codex numbers are not like for like. No run hit a host limit. The traces were re-extracted after the brace-list fix in dd28391.
+
+### Routing bars
+
+| Bar | Target | Claude Code | Codex |
+|---|---|---|---|
+| Recall (40 router rows) | at least 90 % | 95 % (38/40): **met** (round 2: 82.5 %) | 100 % (40/40): **met** |
+| False triggers (16 near misses) | at most 10 % | 0 % (0/16): **met** | 0 % (0/16): **met**; 10 read only the router |
+| Correct first part (triggered rows) | at least 90 % | 100 % (38/38): **met** | 100 % (40/40): **met** |
+| Full reads of guides | 100 % | 100 % (47/47): **met** | 100 % (91/91): **met** |
+| Wrong-path reads | 0 | 1: **not met** | 0: **met** |
+
+Failures:
+
+- Claude Code, recall: `claude-with-r03` (Swift 6 strict-concurrency plan) and `claude-with-r04` (XCTest to Swift Testing) answered without loading a skill.
+- Claude Code, wrong path: `claude-with-r40` read `launch-scroll/assets/reference/scene-film.html`, a guessed name. `PART.md` named the CSS and JS reference pages but not the film one; b7909e6 names `assets/reference/scrub-video.html`. A rerun of r40 on b7909e6 read that page, then looked for `launch-scroll/package.json`; dd28391 says the folder needs no install. Neither fix has had a scored run yet.
+- Codex router-only reads (not false triggers under the current bar): n01, n02, n04, n08, n10, n11, n12, n14, n15, n16.
+- Recorded prompts: Claude Code did not trigger on x01 to x03; Codex read the router on all three and no part.
+
+### launch-scroll part evals
+
+Cases 6, 7, 8, 9, 10, 16, 18 and 19, each run once per host with and without apple, one run at a time, at most 60 turns and 25 minutes. A grader per case judged every expectation from each run's final answer and its diff against the fixture; each expectation that split with from without on a host was rechecked by an independent skeptic (28 rechecks; 2 verdicts flipped, both to pass for a without run).
+
+| Case | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| 6 `pin-and-zoom` | 6/6 | 5/6 | 6/6 | 4/6 |
+| 7 `janky-scrub` | 4/4 | 4/4 | 3/4 | 3/4 |
+| 8 `600-frame-sequence` | 0/3 | 2/3 | 1/3 | 2/3 |
+| 9 `frozen-on-frame-0` | 3/3 | 2/3 | 3/3 | 3/3 |
+| 10 `pin-without-change` | 0/3 | 0/3 | 0/3 | 0/3 |
+| 16 `short-viewport` | 3/3 | 2/3 | 3/3 | 3/3 |
+| 18 `av1-only` | 3/3 | 2/3 | 3/3 | 2/3 |
+| 19 `reduced-motion-and-blocked-play` | 3/3 | 1/3 | 2/3 | 2/3 |
+| **Expectations passed** | **22/28 (78.6 %)** | **18/28 (64.3 %)** | **21/28 (75.0 %)** | **19/28 (67.9 %)** |
+
+What the part does and does not change:
+
+- With apple, Claude Code passes 4 expectations more than without and Codex 2 more. The gains are the gates and the encode: the short-viewport gate (6, 16), reduced motion and frame 0 as the start image (19), H.264 next to AV1 (18), and a stated scene read (6, Codex).
+- Case 10 fails on all four runs: asked to pin a testimonials section that does not change, every run built the pin, and `claude-with-10` invented scroll beats to justify it. `PART.md` says not to pin when nothing changes, but no run pushed back on the request.
+- Case 8 fails the pushback expectation on all four runs: no run steered the 600-frame 1080p sequence toward a scrubbed film or a shorter sequence. `claude-with-8` timed out at 25 minutes while building the sequence and returned no answer; `codex-with-8` stated the memory cost but wrote no files.
+- Case 7: both Codex runs left `preload="auto"` as the loading plan.
+- `claude-with-9` passed without loading apple.
+
+Findings to act on in a later change, which then needs a new scored round: a `PART.md` instruction to recommend against a pin when the beat table has no continuous change, and to push back on long or high-resolution image sequences with the memory and download cost before building, and to replace `preload="auto"` when fixing a film.
+
 ## 2026-10-17: v0.1 routing, round 2 (Mac)
 
 Round 2 measures the router description from #5 (3332b57), which opens its "Use when" list with App Store Connect and TestFlight through the asc CLI, names What's New and promotional text, notarizing and ad hoc installs, and adds launch and preview videos, store screenshots and GSAP APIs to its not-for clause. The prompts, the harness settings and the bars are those of round 1, below. Claude Code 2.1.302 with `claude-opus-5-5[1m]`; Codex codex-cli 0.163.0 with `gpt-6.1-sol`, reasoning high. The skill files were identical at f175fb5, where the round started, and at bf731f3, where the rerun ran.
@@ -172,17 +219,17 @@ These three prompts are kept verbatim from the plan and still refer to files tha
 | `n15` | Script and produce a 60-second narrated launch film for our app. | Help me script and produce a 60-second narrated launch film for an app. |
 | `n16` | Make the App Store app preview video for our iPhone app. | How do I make an App Store app preview video for an iPhone app? |
 
-## launch-scroll part evals: not run yet
+## Running the launch-scroll part evals
 
-Cases 6, 7, 8, 9, 10, 16, 18 and 19 of `evals/apple/launch-scroll/evals.json` have not been run. Each runs with and without apple on both hosts, one run at a time (the probe and encoder steps must not overlap on an 8 GB Mac):
+Each case runs with and without apple on both hosts, one run at a time (the probe and encoder steps must not overlap on an 8 GB Mac). `<dir>` must be outside the repository: it holds each run's full output, its final answer and the diff of the files it wrote.
 
 ```sh
 for id in 6 7 8 9 10 16 18 19; do
   for condition in with without; do
-    node evals/harness.mjs run --suite launch-scroll --host claude --condition "$condition" --out <dir> --ids "$id"
+    node evals/harness.mjs run --suite launch-scroll --host claude --condition "$condition" --install user --out <dir> --ids "$id"
     node evals/harness.mjs run --suite launch-scroll --host codex --condition "$condition" --out <dir> --ids "$id"
   done
 done
 ```
 
-`<dir>` must be outside the repository: it holds each run's full output, its final answer and the diff of the files it wrote. Grade each run's answer and diff against the case's expectations, then add both pass rates per host here. A minor or major release needs that entry, dated after the last change to `PART.md`.
+Grade each run's answer and diff against the case's expectations, then add both pass rates per host here. A minor or major release needs that entry, dated after the last change to `PART.md`.
