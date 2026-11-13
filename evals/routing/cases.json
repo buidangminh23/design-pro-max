@@ -499,6 +499,16 @@
       }
     },
     {
+      "id": "r55",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Our dashboard is a Capacitor iOS app that loads https://app.example.com. After we changed server.url and ran npx cap sync, the simulator build still opens the old staging site, and people who added the site to the Home Screen get a blank page because it sits behind Basic Auth. How do we fix both?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",
@@ -673,6 +683,16 @@
       "kind": "near-miss",
       "row": "web contrast split",
       "prompt": "Check a React web dashboard's text and icon colors against the WCAG 2.2 contrast requirements.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n25",
+      "kind": "near-miss",
+      "row": "Android shell split",
+      "prompt": "Wrap our React web app in Capacitor for Android only and make the hardware back button close our modals instead of leaving the app.",
       "expect": {
         "trigger": false,
         "instead": "no skill"

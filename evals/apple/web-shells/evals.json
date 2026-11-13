@@ -1,0 +1,136 @@
+{
+  "skill_name": "apple",
+  "part": "web-shells",
+  "description": "Part evals for web-shells in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 31,
+      "name": "stale-url-after-sync",
+      "prompt": "We changed server.url in capacitor.config.json to https://app.example.com and ran npx cap sync, but the app on the simulator still opens the old staging site. The last simulator build is under ios/build. What is wrong, and how do we fix it?",
+      "expected_output": "A diagnosis that the built app still carries the config it was built with (the staging URL inside the built App.app), shown by reading that file, with the fix: sync, rebuild in Xcode, reinstall, and check the built config again.",
+      "files": [
+        "files/31-stale-after-sync/capacitor.config.json",
+        "files/31-stale-after-sync/ios/App/App/capacitor.config.json",
+        "files/31-stale-after-sync/ios/build/Build/Products/Debug-iphonesimulator/App.app/capacitor.config.json",
+        "files/31-stale-after-sync/shell/offline.html",
+        "files/31-stale-after-sync/shell/index.html"
+      ],
+      "expectations": [
+        "[WS-BUNDLE-01] It finds that the built App.app still carries https://staging.example.com while the project and the native copy carry https://app.example.com, and says sync alone does not change an app that was already built.",
+        "[fix] The fix is to rebuild the app in Xcode (or with xcodebuild) after the sync and reinstall it on the simulator, not to edit the built bundle by hand.",
+        "[WS-ORIGIN-01] It verifies the result by reading the server URL inside the rebuilt bundle (check-shell.mjs with --bundle and --expect-origin, or an equivalent read), not only the project config.",
+        "[no-guess] It does not blame DNS, caching or the server before reading the built config."
+      ],
+      "checks": [
+        "WS-BUNDLE-01",
+        "WS-ORIGIN-01"
+      ]
+    },
+    {
+      "id": 32,
+      "name": "basic-auth-home-screen",
+      "prompt": "Our orders dashboard (server.mjs) is behind HTTP Basic Auth. On iPhone it works in Safari, but after Add to Home Screen it opens to a blank white page. Fix it.",
+      "expected_output": "An explanation that a home-screen web app cannot show the Basic Auth prompt, and a server change that replaces the 401 challenge with a login page and a session cookie (HttpOnly, Secure, SameSite=Lax) over HTTPS, protecting the pages and the API, with a way to test it.",
+      "files": [
+        "files/32-basic-auth-home-screen/server.mjs",
+        "files/32-basic-auth-home-screen/public/index.html",
+        "files/32-basic-auth-home-screen/public/app.js",
+        "files/32-basic-auth-home-screen/public/manifest.webmanifest"
+      ],
+      "expectations": [
+        "[cause] It says the blank page is the 401 response: a web app opened from the Home Screen cannot show the HTTP Basic Auth prompt.",
+        "[WS-AUTH-01] The changed server no longer answers any page or API request with a WWW-Authenticate Basic challenge.",
+        "[login] It adds a login page with a form whose fields use autocomplete username and current-password, and redirects unauthenticated requests for pages to it.",
+        "[WS-COOKIE-01] The session is a server-side session id in a cookie marked HttpOnly, Secure and SameSite=Lax, served over the existing HTTPS server.",
+        "[api] The API returns 401 without a challenge (or redirects) when there is no session, so app.js can send the user to the login page.",
+        "[verify] It tests the result in WebKit (probe-webkit.mjs or an equivalent Playwright WebKit run) or tells the user exactly how to."
+      ],
+      "checks": [
+        "WS-AUTH-01",
+        "WS-COOKIE-01"
+      ]
+    },
+    {
+      "id": 33,
+      "name": "webkit-cookie-test",
+      "prompt": "Our login end-to-end test passes in the Chromium project but fails in the WebKit project: after signing in, the next page redirects back to /login. The dev server runs on http://localhost:3000. Why, and what should we change?",
+      "expected_output": "The cause: the session cookie is Secure and the server is plain http; WebKit stores it but never sends it, even on localhost, while Chromium makes a localhost exception. The fix: run the dev and test server over HTTPS with a throwaway self-signed certificate and point the tests at it, keeping Secure on the cookie.",
+      "files": [
+        "files/33-webkit-cookie-test/playwright.config.ts",
+        "files/33-webkit-cookie-test/tests/login.spec.ts",
+        "files/33-webkit-cookie-test/server.mjs"
+      ],
+      "expectations": [
+        "[WS-COOKIE-01] It names the cause: a Secure cookie over plain http on localhost, which WebKit does not send although Chromium does.",
+        "[https] It changes the server and the Playwright config to HTTPS with a self-signed certificate made for localhost (and ignoreHTTPSErrors for it), with the key kept out of the repository.",
+        "[keep-secure] It keeps the Secure attribute rather than removing it or making it depend on the environment.",
+        "[verify] It runs the WebKit project (or the probe) after the change, or says exactly which command proves it."
+      ],
+      "checks": [
+        "WS-COOKIE-01"
+      ]
+    },
+    {
+      "id": 34,
+      "name": "shell-or-home-screen",
+      "prompt": "Should we wrap our web app in Capacitor or just make it a home-screen app? The requirements are in BRIEF.md.",
+      "expected_output": "A recommendation of a home-screen web app (a manifest with standalone display over HTTPS, Web Push from a tap) because the brief needs an icon and notifications and no native features, with the costs of a Capacitor shell for this team stated (membership, review per web change in bundled mode, Capacitor not documenting a remote server URL for production, guideline 4.2) and what would change the answer.",
+      "files": [
+        "files/34-shell-or-home-screen/BRIEF.md"
+      ],
+      "expectations": [
+        "[decision] It recommends a home-screen web app for this brief and says why a shell is not needed (an icon and notifications only, no native features, daily web changes).",
+        "[WS-WARN-PUSH] It says Web Push works for web apps added to the Home Screen and that a WKWebView shell would need native push instead.",
+        "[costs] It names the costs of a shell for this team: a paid developer membership, App Review, and either rebuilds per web change or a remote URL that Capacitor does not document for production and that guideline 4.2 may reject.",
+        "[manifest] It lists the concrete steps: a manifest with display standalone, icons, HTTPS, and asking for notification permission from a tap.",
+        "[no-scaffold] It does not scaffold a Capacitor project the user did not ask for."
+      ],
+      "checks": [
+        "WS-WARN-PUSH"
+      ]
+    },
+    {
+      "id": 35,
+      "name": "push-in-wrapper",
+      "prompt": "Push notifications don't arrive in our iOS app wrapper, but they work for people who added the site to the Home Screen. How do we fix this?",
+      "expected_output": "The cause: the wrapper runs the site in WKWebView, which has no Web Push, so pushManager.subscribe never works there. The fix: a native push plugin in the shell with the push capability and APNs, the web code choosing native push inside the shell and Web Push elsewhere, and the backend storing both kinds of subscription.",
+      "files": [
+        "files/35-push-in-wrapper/capacitor.config.json",
+        "files/35-push-in-wrapper/package.json",
+        "files/35-push-in-wrapper/src/push.js",
+        "files/35-push-in-wrapper/shell/offline.html"
+      ],
+      "expectations": [
+        "[WS-WARN-PUSH] It says WKWebView inside the wrapper has no Web Push, unlike a web app added to the Home Screen.",
+        "[native] It adds or specifies a native push plugin (such as @capacitor/push-notifications) with the push notification capability and APNs credentials.",
+        "[branch] The web code uses native push inside the shell (for example by checking Capacitor.isNativePlatform()) and keeps Web Push for home-screen users.",
+        "[backend] It says the server must store and send to both device tokens and Web Push subscriptions."
+      ],
+      "checks": [
+        "WS-WARN-PUSH"
+      ]
+    },
+    {
+      "id": 36,
+      "name": "marketing-site-instead",
+      "prompt": "Our iOS app shows the marketing site instead of the dashboard. Fix the shell config.",
+      "expected_output": "The config points server.url at https://example.com, the marketing site, while the README says the dashboard is https://app.example.com; the fix sets that one origin (or removes the server URL to use the bundled dist build, explaining the choice), then syncs, rebuilds and checks the built config.",
+      "files": [
+        "files/36-marketing-site-instead/capacitor.config.ts",
+        "files/36-marketing-site-instead/README.md",
+        "files/36-marketing-site-instead/package.json"
+      ],
+      "expectations": [
+        "[WS-ORIGIN-01] It finds that server.url names the marketing origin and changes the shipping config to load https://app.example.com, or removes server.url to load the bundled dist build, and says which it chose and why.",
+        "[WS-ORIGIN-02] It does not leave or add a localhost, LAN or staging URL in the shipping config.",
+        "[WS-BUNDLE-01] It says to run npx cap sync and rebuild the app, then confirm the server URL inside the built app (check-shell.mjs with --bundle and --expect-origin, or an equivalent read).",
+        "[production-note] If it keeps a remote server URL, it mentions that Capacitor does not document server.url for production and what the app needs to pass review."
+      ],
+      "checks": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02",
+        "WS-BUNDLE-01"
+      ]
+    }
+  ]
+}

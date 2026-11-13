@@ -1,0 +1,9 @@
+{
+  "appId": "com.example.dashboard",
+  "appName": "Dashboard",
+  "webDir": "shell",
+  "server": {
+    "url": "https://staging.example.com",
+    "errorPath": "offline.html"
+  }
+}
