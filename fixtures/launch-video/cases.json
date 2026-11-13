@@ -126,6 +126,22 @@
       "checker": "render-frames",
       "page": "pages/render-01-broken-image.html",
       "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "render-01-image-never-loads",
+      "rule": "LV-RENDER-01",
+      "expect": "fail",
+      "checker": "render-frames",
+      "page": "pages/render-01-image-never-loads.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "1"]
+    },
+    {
+      "id": "render-01-clock-in-step",
+      "rule": "LV-RENDER-01",
+      "expect": "pass",
+      "checker": "render-frames",
+      "page": "pages/render-01-clock-in-step.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
     }
   ]
 }

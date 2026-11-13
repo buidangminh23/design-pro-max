@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- Fail fixture for LV-RENDER-01: an image inside the frame whose request never completes (its host is a
+     non-routable address, so the connection hangs), so the capture would show an empty box. The renderer must give up
+     after its image timeout and report the element and the frame as a finding, not crash. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame with an image that never loads</title>
+<style>
+  body { margin: 0; height: 100vh; display: grid; place-items: center; background: #f4f6f9; font-family: system-ui, sans-serif; }
+  .card { display: flex; gap: 12px; align-items: center; padding: 16px; border-radius: 12px; background: #fff; }
+  .card img { width: 48px; height: 48px; }
+</style>
+</head>
+<body>
+<div class="card"><img id="avatar" src="http://10.255.255.1/avatar.png" alt="" width="48" height="48"><span>Profile</span></div>
+</body>
+</html>

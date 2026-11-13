@@ -8,11 +8,15 @@
  *                          [--project <folder>]
  *   node render-frames.mjs --check <frames folder | video> [--slot WxH] [--duration <s>] [--fps 30]
  *
- * How a frame is made: the page's clock is installed and paused (page.clock), every animation is paused, and for
- * frame i at time t = i / fps each animation's currentTime is set to t (animations that appear later are stepped from
- * the frame they appear in), page timers run up to t plus one animation frame, every image inside the viewport must
- * be decoded and painted, then the viewport (or --selector) is captured as frame-<i>.png. An image that cannot be
- * painted stops the render with a failure naming the element and the frame.
+ * How a frame is made: the page's clock (page.clock) is installed and paused before the page loads, so it stands
+ * still while the page loads and frame 0 is time 0 for the animations and the clock alike. Every animation is paused,
+ * and for frame i at time t = i / fps each animation's currentTime is set to t (animations that appear later are
+ * stepped from the frame they appear in), then the page clock runs to t, so timers, Date.now() and performance.now()
+ * read t, and requestAnimationFrame callbacks due by t run after the animations were set. Every image inside the
+ * viewport must be decoded and painted within 10 s, then the viewport (or --selector) is captured as frame-<i>.png. An
+ * image that is not painted stops the render with a failure naming the element and the frame. render.json is written
+ * with complete: false before the first frame and complete: true after the last, so a failed render can be rerun into
+ * the same --out.
  *
  * Rule LV-RENDER-01: a master has duration x fps frames at twice the slot's CSS pixels, every image painted, and is
  * never the built-in page recording. Frames are captures, so they stay in $TMPDIR; encode.mjs writes the clips.
@@ -29,8 +33,8 @@ import { startServer } from '../../shared/server.mjs';
 export const GENERATOR = 'design-pro-max launch-video render-frames';
 export const VERSION = '0.2.0';
 export const DPR = 2;
-export const RAF_MS = 17;
 export const IMAGE_TIMEOUT_MS = 10000;
+export const CLOCK_START = Date.parse('2026-01-01T00:00:00Z');
 export const BOUNDARY =
   'Proof boundary: headless Chromium proves frame count, pixel size, animation stepping and image decoding; it does ' +
   'not prove how the page looks in another browser, CSS background images, video inside the page, or taste.';
@@ -163,8 +167,8 @@ export function insideTmp(folder, tmp = os.tmpdir()) {
   return Boolean(relative) && !relative.startsWith('..') && !path.isAbsolute(relative);
 }
 
-function prepareOut(options) {
-  if (!options.out) return fs.mkdtempSync(path.join(os.tmpdir(), 'launch-video-frames-'));
+function checkOut(options) {
+  if (!options.out) return;
   const folder = path.resolve(options.out);
   if (!insideTmp(folder)) throw new UsageError(`--out ${folder} is outside $TMPDIR (${os.tmpdir()}).`, 'Frames are captures and stay in $TMPDIR; encode.mjs writes the clips into the project.');
   if (fs.existsSync(folder) && fs.readdirSync(folder).length && !options.force) {
@@ -176,10 +180,21 @@ function prepareOut(options) {
     }
     if (!ours) throw new UsageError(`Stopped: ${folder} is not empty and was not written by render-frames.mjs.`, 'Choose another --out or pass --force.');
   }
+}
+
+function prepareOut(options) {
+  if (!options.out) return fs.mkdtempSync(path.join(os.tmpdir(), 'launch-video-frames-'));
+  const folder = path.resolve(options.out);
   if (fs.existsSync(folder)) for (const name of fs.readdirSync(folder)) if (FRAME.test(name) || name === 'render.json') fs.rmSync(path.join(folder, name));
   fs.mkdirSync(folder, { recursive: true });
   return folder;
 }
+
+export function renderManifest(options, complete) {
+  return { generator: GENERATOR, version: VERSION, complete, page: options.serve ? options.page : options.url, selector: options.selector, slot: options.slot, dpr: DPR, fps: options.fps, duration: options.duration, frames: expectedFrames(options.duration, options.fps), alpha: options.alpha };
+}
+
+const writeManifest = (out, options, complete) => fs.writeFileSync(path.join(out, 'render.json'), `${JSON.stringify(renderManifest(options, complete), null, 2)}\n`);
 
 const STEP = ({ t }) => {
   const state = window.__lvRender ?? (window.__lvRender = { births: new Map(), last: 0 });
@@ -193,51 +208,50 @@ const STEP = ({ t }) => {
   state.last = t;
 };
 
-const PAINTED = async () => {
+const PAINTED = async (pending) => {
   const describe = (element) => `<img${element.id ? ` id="${element.id}"` : ''}${element.className ? ` class="${element.className}"` : ''} src="${(element.getAttribute('src') ?? '').slice(0, 120)}">`;
   const inView = (element) => {
     const rect = element.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth && getComputedStyle(element).visibility !== 'hidden';
   };
+  const images = [...document.images].filter(inView);
+  if (pending) return images.filter((image) => !image.complete || image.naturalWidth === 0).map((image) => `${describe(image)} ${image.complete ? 'failed to load' : `still loading after ${pending} ms`}`);
   const failed = [];
-  for (const image of document.images) {
-    if (!inView(image)) continue;
-    if (!image.complete || image.naturalWidth === 0) {
-      try {
-        await image.decode();
-      } catch {
-        failed.push(describe(image));
-        continue;
-      }
-    }
-    if (image.naturalWidth === 0) failed.push(describe(image));
+  for (const image of images) {
+    if (!image.complete || image.naturalWidth === 0) await image.decode().catch(() => {});
+    if (!image.complete || image.naturalWidth === 0) failed.push(`${describe(image)} failed to load`);
   }
   await document.fonts.ready;
   return failed;
 };
 
-const withTimeout = (promise, ms, message) => {
+const unpaintedImages = async (page) => {
   let timer;
-  return Promise.race([promise, new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(message)), ms); })]).finally(() => clearTimeout(timer));
+  const late = new Promise((resolve) => { timer = setTimeout(() => resolve(null), IMAGE_TIMEOUT_MS); });
+  const settled = await Promise.race([page.evaluate(PAINTED, 0), late]).finally(() => clearTimeout(timer));
+  return settled ?? page.evaluate(PAINTED, IMAGE_TIMEOUT_MS);
 };
 
 export async function render(options, report) {
-  if (options.out && !insideTmp(options.out)) throw new UsageError(`--out ${path.resolve(options.out)} is outside $TMPDIR (${os.tmpdir()}).`, 'Frames are captures and stay in $TMPDIR; encode.mjs writes the clips into the project.');
+  checkOut(options);
   const playwright = await loadPlaywright(options.project);
-  const out = prepareOut(options);
-  process.stderr.write(`render-frames ${VERSION} writes ${expectedFrames(options.duration, options.fps)} frames to ${out}\n`);
   const served = options.serve ? await startServer({ root: options.serve, mode: 'range' }) : null;
   const url = served ? new URL(options.page, served.url).href : options.url;
-  const browser = await launchChromium(playwright);
+  let browser;
+  let out;
   let failed = false;
   try {
+    browser = await launchChromium(playwright);
+    out = prepareOut(options);
+    process.stderr.write(`render-frames ${VERSION} writes ${expectedFrames(options.duration, options.fps)} frames to ${out}\n`);
+    writeManifest(out, options, false);
     const context = await browser.newContext({ viewport: options.viewport, deviceScaleFactor: DPR, reducedMotion: 'no-preference' });
-    await context.clock.install({ time: new Date('2026-01-01T00:00:00Z') });
+    await context.clock.install({ time: CLOCK_START });
+    await context.clock.pauseAt(CLOCK_START);
     const page = await context.newPage();
-    await page.goto(url, { waitUntil: 'load' });
-    await page.evaluate(() => document.fonts.ready);
-    const start = await page.evaluate(() => Date.now());
-    await page.clock.pauseAt(start + 100);
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+    const loaded = await page.waitForLoadState('load', { timeout: IMAGE_TIMEOUT_MS }).then(() => true, () => false);
+    if (loaded) await page.evaluate(() => document.fonts.ready);
     await page.evaluate(STEP, { t: 0 });
     const target = options.selector ? page.locator(options.selector).first() : page;
     const count = expectedFrames(options.duration, options.fps);
@@ -245,12 +259,12 @@ export async function render(options, report) {
     for (let index = 0; index < count; index += 1) {
       const t = (index * 1000) / options.fps;
       await page.evaluate(STEP, { t });
-      const due = Math.round(t) + RAF_MS;
+      const due = Math.round(t);
       if (due > advanced) {
         await page.clock.runFor(due - advanced);
         advanced = due;
       }
-      const unpainted = await withTimeout(page.evaluate(PAINTED), IMAGE_TIMEOUT_MS, `frame ${index}: images did not finish loading within ${IMAGE_TIMEOUT_MS} ms`);
+      const unpainted = await unpaintedImages(page);
       if (unpainted.length) {
         report.error('LV-RENDER-01', `frame ${index} (${(t / 1000).toFixed(3)} s)`, `not painted: ${unpainted.join(', ')}`, 'every image inside the frame decoded and painted before capture');
         failed = true;
@@ -260,12 +274,11 @@ export async function render(options, report) {
     }
     await context.close();
   } finally {
-    await browser.close();
+    await browser?.close();
     await served?.close();
   }
   if (failed) return out;
-  const manifest = { generator: GENERATOR, version: VERSION, page: options.serve ? options.page : options.url, selector: options.selector, slot: options.slot, dpr: DPR, fps: options.fps, duration: options.duration, frames: expectedFrames(options.duration, options.fps), alpha: options.alpha };
-  fs.writeFileSync(path.join(out, 'render.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+  writeManifest(out, options, true);
   report.pass('LV-RENDER-01', `${path.basename(out)}: images`, 'every image inside every frame was painted', 'every image decoded and painted before capture');
   checkMaster(out, options, report);
   process.stderr.write(`frames: ${out}\nnext: node ${path.join(path.dirname(fileURLToPath(import.meta.url)), 'encode.mjs')} ${out} --out <folder in the project>\n`);

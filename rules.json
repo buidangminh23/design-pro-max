@@ -258,11 +258,11 @@
       "id": "LV-RENDER-01",
       "part": "launch-video",
       "level": "error",
-      "statement": "A rendered master has duration x fps frames at twice the slot's CSS pixels, with every image painted in every frame, and never comes from the built-in page recording (VP8 at 25 fps in CSS pixels).",
+      "statement": "A rendered master has duration x fps frames at twice the slot's CSS pixels, with every image painted in every frame, and never comes from the built-in page recording (VP8 at 25 fps in CSS pixels). A video master is flagged as that recording by a heuristic, VP8 at 25 fps, which another VP8 file at 25 fps also matches.",
       "values": "duration x fps frames; 2x the slot; every image painted; not VP8 at 25 fps",
       "evidence": ["PV-11"],
       "check": "launch-video/scripts/render-frames.mjs",
-      "fixtures": { "pass": ["render-ui-mock"], "fail": ["render-01-recorded", "render-01-broken-image"] },
+      "fixtures": { "pass": ["render-ui-mock", "render-01-clock-in-step"], "fail": ["render-01-recorded", "render-01-broken-image", "render-01-image-never-loads"] },
       "implementedBy": ["launch-video/scripts/render-frames.mjs", "launch-video/assets/reference/ui-mock.html"]
     },
     {

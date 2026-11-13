@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Pass fixture for LV-RENDER-01: a page whose timers compare the page clock (performance.now() since the script ran)
+     with a CSS animation's currentTime. When the two drift apart by more than 60 ms, about two frames at 30 fps, the page
+     shows an image whose file is missing, so a renderer that lets the clock run ahead of the stepped animations fails
+     the image check. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clock in step with the animations</title>
+<style>
+  body { margin: 0; height: 100vh; display: grid; place-items: center; background: #f4f6f9; font-family: system-ui, sans-serif; }
+  .bar { width: 240px; height: 12px; border-radius: 6px; background: #1f5fd6; transform-origin: left; animation: grow 2s linear both; }
+  #drift { width: 48px; height: 48px; }
+  #drift[hidden] { display: none; }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<img id="drift" hidden alt="" width="48" height="48">
+<script>
+  const start = performance.now();
+  const bar = document.querySelector('.bar');
+  const drift = document.getElementById('drift');
+  const check = () => {
+    const animation = bar.getAnimations()[0];
+    const css = animation ? Number(animation.currentTime) : 0;
+    const clock = performance.now() - start;
+    if (Math.abs(clock - css) > 60 && drift.hidden) {
+      drift.src = 'clock-drift.png';
+      drift.title = `clock ${Math.round(clock)} ms, animation ${Math.round(css)} ms`;
+      drift.hidden = false;
+    }
+  };
+  setInterval(check, 5);
+</script>
+</body>
+</html>

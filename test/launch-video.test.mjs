@@ -199,3 +199,11 @@ test('encode replaces only the files its manifest lists', async () => {
   assert.deepEqual(foreignFiles(existing, null, '/out/clip.encode.json'), existing);
   assert.deepEqual(foreignFiles(existing, { generator: 'other', files: ['clip.webm'] }, '/out/clip.encode.json'), existing);
 });
+
+test('render.json marks an unfinished render', async () => {
+  const { renderManifest, GENERATOR: RENDERER } = await part('scripts', 'render-frames.mjs');
+  const options = { serve: 'site', page: 'ui-mock.html', slot: { width: 400, height: 225 }, fps: 30, duration: 2, alpha: false, selector: null };
+  assert.deepEqual([renderManifest(options, false).complete, renderManifest(options, true).complete], [false, true]);
+  assert.equal(renderManifest(options, false).generator, RENDERER);
+  assert.equal(renderManifest(options, false).frames, 60);
+});

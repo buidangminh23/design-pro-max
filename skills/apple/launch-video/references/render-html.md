@@ -21,14 +21,14 @@ How to write a mock that runs live and renders, and what `scripts/render-frames.
 
 ## What the renderer does per frame
 
-The browser opens the page at the slot's CSS size with device pixel ratio 2 and reduced motion off, installs Playwright's page clock before the page loads, waits for load and fonts, then pauses the clock and every animation. For frame `i`, at time `t = i / fps`:
+The browser opens the page at the slot's CSS size with device pixel ratio 2 and reduced motion off. Playwright's page clock is installed and paused before the page loads, so it stands still during loading; the renderer waits for load and fonts, then pauses every animation. Frame 0 is time 0 for the animations and the clock alike. For frame `i`, at time `t = i / fps`:
 
 1. Each animation's `currentTime` is set to `t`. An animation that appears later (a class added by script) is paused and stepped from the frame it appears in.
-2. The page clock runs to `t` plus one animation frame, so timers, `Date.now()`, `performance.now()` and `requestAnimationFrame` callbacks advance with the frames.
-3. Every image inside the viewport must be decoded and painted. One that cannot be (a missing file, a broken data URL) stops the render with an error naming the element and the frame [LV-RENDER-01].
+2. The page clock runs to `t`, so timers, `Date.now()` and `performance.now()` read `t` past their value at load. `requestAnimationFrame` callbacks run on the clock's own frame grid, after the animations were set for the frame, so a callback that reads an animation's `currentTime` (as the mock's typing does) sees `t`; one that reads the clock sees the last frame tick at or before `t`. At frame 0 the clock has not moved, so no callback has run since load.
+3. Every image inside the viewport must be decoded and painted before the renderer's image timeout (`IMAGE_TIMEOUT_MS` in the script). One that fails (a missing file, a broken data URL) or is still loading then stops the render with an error naming the element and the frame [LV-RENDER-01]; a page whose load event never fires is not waited for longer than that either.
 4. The viewport, or `--selector`, is captured as `frame-<i>.png`.
 
-It never uses the built-in page recording: that writes VP8 at 25 fps in CSS pixels with extra frames at both ends, while stepping gives an exact frame count at true 2x (PV-11). Frames go to `$TMPDIR` with a `render.json`, and the renderer checks them: duration x fps frames, numbered from `frame-00000.png`, each at twice the slot's CSS pixels [LV-RENDER-01].
+It never uses the built-in page recording: that writes VP8 at 25 fps in CSS pixels with extra frames at both ends, while stepping gives an exact frame count at true 2x (PV-11). `--check` on a video flags VP8 at 25 fps as the recording's signature; that is a heuristic, since another VP8 file at 25 fps matches it too. Frames go to `$TMPDIR` with a `render.json` (written with `complete: false` before the first frame, so a failed render can be rerun into the same `--out`), and the renderer checks them: duration x fps frames, numbered from `frame-00000.png`, each at twice the slot's CSS pixels [LV-RENDER-01].
 
 ## Running it
 
