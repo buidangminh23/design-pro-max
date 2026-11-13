@@ -484,3 +484,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 5 error, 6 warn; evidence in `menubar-widgets/references/evidence.md`
 - Checkers: `menubar-widgets/scripts/scan-swift.mjs`, `menubar-widgets/scripts/probe-extension.mjs`, `menubar-widgets/scripts/snapshot-widgets.mjs`
+
+### `web-shells`
+
+- Guide: `web-shells/PART.md`
+- Status: active
+- Rules: 5 error, 4 warn; evidence in `web-shells/references/evidence.md`
+- Checkers: `web-shells/scripts/check-shell.mjs`, `web-shells/scripts/probe-webkit.mjs`

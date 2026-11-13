@@ -10,8 +10,8 @@
  * JSON. A notes id <AREA>-N<k> is a section of research/<area>.md, hashed from its heading to the next heading of the
  * same or a higher level. Policies (POL-<k>) have no source file and keep a hash of their own claim. An area code that
  * AREAS does not name, such as one for a private benchmark, resolves to the one findings file in the folder that no
- * named area claims, so its name stays out of the repository. IL-<n> = research.inventory.lessons[n] of the one inputs
- * file in the research folder, hashed as that lesson object as JSON; the file name stays out of the repository too.
+ * named area claims, so its name stays out of the repository. A lesson id IL-<n> is research.inventory.lessons[n] of the one
+ * inputs file in the folder, hashed as JSON, its file name likewise kept out of the repository.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,11 +23,12 @@ export const AREAS = { AM: 'apple-motion', AD: 'apple-design', TQ: 'techniques-2
 const FINDINGS_SUFFIX = '.findings.json';
 const INPUTS_SUFFIX = '.inputs.json';
 
-/** The lesson behind IL-<n>: research.inventory.lessons[n] of the one inputs file in the research folder. */
-export function lessonHash(folder, id, index) {
+/** The SHA-256 of lesson n of the one inputs file in the folder, for the ledger id IL-<n>. */
+export function lessonHash(folder, id) {
   const inputs = fs.readdirSync(folder).filter((file) => file.endsWith(INPUTS_SUFFIX));
   if (inputs.length !== 1) return { problem: `${id}: ${inputs.length} inputs files, expected one` };
-  const lesson = JSON.parse(fs.readFileSync(path.join(folder, inputs[0]), 'utf8')).research?.inventory?.lessons?.[Number(index)];
+  const index = Number(id.slice('IL-'.length));
+  const lesson = JSON.parse(fs.readFileSync(path.join(folder, inputs[0]), 'utf8')).research?.inventory?.lessons?.[index];
   return lesson ? { sha: sha256(Buffer.from(JSON.stringify(lesson))) } : { problem: `${id}: the inputs file has no lesson ${index}` };
 }
 
@@ -70,8 +71,8 @@ function section(text, heading) {
 /** The SHA-256 of the private source behind one ledger id, or an explanation of why it has none. */
 export function sourceHash(folder, id, entry) {
   if (id.startsWith('POL-')) return { sha: sha256(Buffer.from(entry.claim)) };
+  if (id.startsWith('IL-')) return lessonHash(folder, id);
   const [area, index] = id.split('-');
-  if (area === 'IL') return lessonHash(folder, id, index);
   const { name, problem } = areaName(folder, area);
   if (problem) return { problem: `${id}: ${problem}` };
   if (index.startsWith('N')) {

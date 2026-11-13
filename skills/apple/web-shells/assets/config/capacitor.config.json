@@ -1,0 +1,9 @@
+{
+  "appId": "com.example.app",
+  "appName": "Example",
+  "webDir": "shell",
+  "server": {
+    "url": "https://app.example.com",
+    "errorPath": "offline.html"
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "description": "web-shells fixtures. check-shell cases read the project and bundle folders here as they are; probe-webkit cases serve a request handler module (a path under assets/ is the part's own, any other is under this folder) over HTTPS or plain http and drive it in WebKit, from the copy scripts/verify.mjs makes of the part. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it; a warn case must warn for its rule.",
+  "cases": [
+    {
+      "id": "shell-remote",
+      "rule": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02",
+        "WS-BUNDLE-01"
+      ],
+      "expect": "pass",
+      "checker": "check-shell",
+      "project": "projects/remote",
+      "bundle": "bundles/current",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-tauri-remote",
+      "rule": [
+        "WS-ORIGIN-01",
+        "WS-ORIGIN-02"
+      ],
+      "expect": "pass",
+      "checker": "check-shell",
+      "project": "projects/tauri-remote",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-bundle-stale",
+      "rule": [
+        "WS-BUNDLE-01",
+        "WS-ORIGIN-01"
+      ],
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/remote",
+      "bundle": "bundles/stale",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-native-stale",
+      "rule": "WS-BUNDLE-01",
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/stale-native"
+    },
+    {
+      "id": "shell-bundled-only",
+      "rule": "WS-ORIGIN-01",
+      "expect": "fail",
+      "checker": "check-shell",
+      "bundle": "bundles/bundled-only",
+      "args": [
+        "--expect-origin",
+        "https://app.example.com"
+      ]
+    },
+    {
+      "id": "shell-localhost",
+      "rule": "WS-ORIGIN-02",
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/localhost-ts"
+    },
+    {
+      "id": "shell-tauri-lan",
+      "rule": "WS-ORIGIN-02",
+      "expect": "fail",
+      "checker": "check-shell",
+      "project": "projects/tauri-lan"
+    },
+    {
+      "id": "shell-staging-bundle",
+      "rule": [
+        "WS-WARN-STAGING",
+        "WS-WARN-BUNDLED"
+      ],
+      "expect": "warn",
+      "checker": "check-shell",
+      "bundle": "bundles/stale"
+    },
+    {
+      "id": "shell-web-push",
+      "rule": "WS-WARN-PUSH",
+      "expect": "warn",
+      "checker": "check-shell",
+      "project": "projects/web-push"
+    },
+    {
+      "id": "probe-login-https",
+      "rule": [
+        "WS-AUTH-01",
+        "WS-COOKIE-01"
+      ],
+      "expect": "pass",
+      "checker": "probe-webkit",
+      "app": "assets/login/app.mjs",
+      "args": [
+        "--page",
+        "/app/",
+        "--login",
+        "/login",
+        "--field",
+        "user=demo",
+        "--field",
+        "password=demo"
+      ]
+    },
+    {
+      "id": "probe-basic-auth",
+      "rule": "WS-AUTH-01",
+      "expect": "fail",
+      "checker": "probe-webkit",
+      "app": "apps/basic-auth.mjs",
+      "args": [
+        "--page",
+        "/"
+      ]
+    },
+    {
+      "id": "probe-login-http",
+      "rule": "WS-COOKIE-01",
+      "expect": "fail",
+      "checker": "probe-webkit",
+      "app": "assets/login/app.mjs",
+      "args": [
+        "--http",
+        "--page",
+        "/app/",
+        "--login",
+        "/login",
+        "--field",
+        "user=demo",
+        "--field",
+        "password=demo"
+      ]
+    },
+    {
+      "id": "probe-cross-site",
+      "rule": "WS-WARN-THIRDPARTY",
+      "expect": "warn",
+      "checker": "probe-webkit",
+      "app": "assets/login/app.mjs",
+      "args": [
+        "--page",
+        "/app/",
+        "--login",
+        "/login",
+        "--field",
+        "user=demo",
+        "--field",
+        "password=demo",
+        "--embed-cross-site"
+      ]
+    }
+  ]
+}

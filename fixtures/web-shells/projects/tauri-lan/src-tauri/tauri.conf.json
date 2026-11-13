@@ -1,0 +1,17 @@
+{
+  "productName": "Dashboard",
+  "identifier": "com.example.dashboard",
+  "build": {
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "http://192.168.1.20:1420"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Dashboard",
+        "width": 1200,
+        "height": 800
+      }
+    ]
+  }
+}
