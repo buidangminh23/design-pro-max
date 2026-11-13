@@ -8,10 +8,13 @@
  *
  * With --install user, Claude instead finds the skill where an installer puts it, outside the project: the run gets a
  * temporary CLAUDE_CONFIG_DIR holding copies of the user's skills, links to the user's CLAUDE.md and rules, and apple
- * only in the with condition, so exploring the project cannot reach the skill. The user's model and effort are kept.
+ * only in the with condition, so exploring the project cannot reach the skill.
+ *
+ * Every run pins its model and effort, by default those in RUN_DEFAULTS, so a change to the user's own config does not
+ * change a round; --model and --effort override them, and each run's meta records what it used.
  *
  *   node evals/harness.mjs run --suite routing|launch-scroll --host claude|codex --condition with|without --out <dir>
- *        [--ids a,b] [--listing] [--install project|user]
+ *        [--ids a,b] [--listing] [--install project|user] [--model <id>] [--effort <level>]
  *                                  --listing keeps the session so the host's skill listing can be read back
  *   node evals/harness.mjs trace --out <dir>                re-extract every trace from the raw output
  *   node evals/harness.mjs score --out <dir>                score the routing traces against the bars
@@ -34,6 +37,8 @@ const SUITES = {
   'launch-scroll': { file: path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
 };
 const SKILL_ROOT = { claude: '.claude/skills/apple', codex: '.agents/skills/apple' };
+export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'high' }, codex: { model: 'gpt-6.1-sol', effort: 'high' } };
+const EFFORTS = { claude: ['low', 'medium', 'high', 'xhigh', 'max'], codex: ['minimal', 'low', 'medium', 'high', 'xhigh'] };
 const USER_CLAUDE = process.env.DPM_EVAL_CLAUDE_HOME ?? path.join(os.homedir(), '.claude');
 const SKIPPED_USER_SKILLS = new Set(['apple', 'synced']);
 const NESTED_ENV = ['CLAUDECODE', 'CLAUDE_CODE_CHILD_SESSION', 'CLAUDE_CODE_MESSAGING_SOCKET', 'CLAUDE_CODE_MESSAGING_TOKEN', 'CLAUDE_CODE_SESSION_ID', 'CLAUDE_CODE_SESSION_ATTENDED', 'CLAUDE_PID', 'CLAUDE_EFFORT', 'CLAUDE_CODE_ENTRYPOINT', 'CLAUDE_PLUGIN_DATA', 'CLAUDE_TMPDIR', 'CLAUDE_CODE_EXECPATH'];
@@ -86,14 +91,11 @@ export function makeClaudeHome(condition, userHome = USER_CLAUDE) {
   return home;
 }
 
-/** The settings a --install user run passes: hooks off, and the user's own model and effort. */
-export function userRunSettings(userHome = USER_CLAUDE) {
-  const settings = { disableAllHooks: true };
-  try {
-    const own = readJson(path.join(userHome, 'settings.json'));
-    for (const key of ['model', 'effortLevel']) if (own[key] !== undefined) settings[key] = own[key];
-  } catch {}
-  return settings;
+/** The model and effort a run pins: the options when given, else RUN_DEFAULTS for the host. */
+export function runProfile(host, options = {}) {
+  const profile = { model: options.model ?? RUN_DEFAULTS[host].model, effort: options.effort ?? RUN_DEFAULTS[host].effort };
+  if (!EFFORTS[host].includes(profile.effort)) throw new Error(`--effort for ${host} is one of ${EFFORTS[host].join(', ')}`);
+  return profile;
 }
 
 function makeProject(host, condition, testCase, suiteDir, install = 'project') {
@@ -116,13 +118,14 @@ function makeProject(host, condition, testCase, suiteDir, install = 'project') {
   return dir;
 }
 
-function hostCommand(host, prompt, suite, listing, settings = { disableAllHooks: true }) {
+export function hostCommand(host, prompt, suite, listing, profile) {
   if (host === 'claude') {
-    const args = ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'bypassPermissions', '--settings', JSON.stringify(settings), '--max-turns', String(suite.maxTurns)];
+    const settings = { disableAllHooks: true, model: profile.model, effortLevel: profile.effort };
+    const args = ['-p', prompt, '--output-format', 'stream-json', '--verbose', '--permission-mode', 'bypassPermissions', '--settings', JSON.stringify(settings), '--model', profile.model, '--effort', profile.effort, '--max-turns', String(suite.maxTurns)];
     if (!listing) args.push('--no-session-persistence');
     return ['claude', args];
   }
-  const args = ['exec', '--json', '--skip-git-repo-check'];
+  const args = ['exec', '--json', '--skip-git-repo-check', '-m', profile.model, '-c', `model_reasoning_effort="${profile.effort}"`];
   if (!listing) args.push('--ephemeral');
   args.push(prompt);
   return ['codex', args];
@@ -146,6 +149,7 @@ function runSuite(options) {
   const install = options.install ?? 'project';
   if (!['project', 'user'].includes(install)) throw new Error('--install is project or user');
   const userInstall = options.host === 'claude' && install === 'user';
+  const profile = runProfile(options.host, options);
   const doc = readJson(suite.file);
   const wanted = options.ids ? new Set(options.ids.split(',')) : null;
   const cases = suite.list(doc).filter((item) => !wanted || wanted.has(String(item.id)));
@@ -158,10 +162,10 @@ function runSuite(options) {
     const dir = makeProject(options.host, options.condition, testCase, path.dirname(suite.file), install);
     const base = sh('git', ['rev-parse', 'HEAD'], dir).trim();
     const home = userInstall ? makeClaudeHome(options.condition) : null;
-    const [cmd, args] = hostCommand(options.host, testCase.prompt, suite, options.listing, userInstall ? userRunSettings() : undefined);
+    const [cmd, args] = hostCommand(options.host, testCase.prompt, suite, options.listing, profile);
     const started = new Date().toISOString();
     const result = spawnSync(cmd, args, { cwd: dir, env: home ? { ...env, CLAUDE_CONFIG_DIR: home } : env, encoding: 'utf8', input: '', timeout: suite.timeout * 1000, killSignal: 'SIGTERM', maxBuffer: 512 * 1024 * 1024 });
-    const meta = { id, suite: options.suite, host: options.host, condition: options.condition, case: testCase.id, started, finished: new Date().toISOString(), status: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', projectDir: dir, listing: Boolean(options.listing), install: userInstall ? 'user' : 'project' };
+    const meta = { id, suite: options.suite, host: options.host, condition: options.condition, case: testCase.id, started, finished: new Date().toISOString(), status: result.status, signal: result.signal, timedOut: result.error?.code === 'ETIMEDOUT', projectDir: dir, listing: Boolean(options.listing), install: userInstall ? 'user' : 'project', model: profile.model, effort: profile.effort };
     fs.writeFileSync(path.join(out, 'raw', `${id}.jsonl`), result.stdout ?? '');
     fs.writeFileSync(path.join(out, 'raw', `${id}.err`), result.stderr ?? '');
     if (options.suite !== 'routing') fs.writeFileSync(path.join(out, 'raw', `${id}.diff`), diffOf(dir, base));
