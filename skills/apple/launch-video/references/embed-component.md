@@ -36,7 +36,7 @@ The caption says in words what the clip shows, for readers who never play it; th
 ## What the component does
 
 1. Nothing loads at first except the lazy start image. It sets `preload="none"`, removes any `autoplay` attribute and keeps sources in `data-src` [LV-EMBED-01].
-2. When a clip comes within the load margin of the viewport, 600px by default, its sources get their `src` (ON-11). A margin does not reach through a scrolling carousel's clipped edge; the component also passes it as the observer's `scrollMargin`, which extends it there where the browser supports that option, and elsewhere a clip in a carousel loads once it scrolls into the carousel's box.
+2. When a clip comes within the load margin of the viewport, 600px by default, its sources get their `src` (ON-11). A margin does not reach through a scrolling carousel's clipped edge, so where the browser supports the observer's `scrollMargin` option a second observer loads a carousel clip once the carousel is in view and the clip is within the margin of its edge; elsewhere such a clip loads once it scrolls into the carousel's box. The two margins are kept in separate observers because together they add up.
 3. It plays a clip while at least half of it is visible and pauses it otherwise; only the most visible clip plays (`maxActive: 1`).
 4. Every `play()` checks reduced motion, Save-Data and the reader's own pause at that moment, including the call that follows loading [LV-EMBED-02].
 5. The video is shown over the start image only after its first presented frame, so there is never a blank box.

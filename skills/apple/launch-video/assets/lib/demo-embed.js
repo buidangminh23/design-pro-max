@@ -4,8 +4,9 @@
 //   1. Nothing loads at first: the <video> has preload="none", no autoplay attribute and its sources in data-src; the
 //      start image (an <img loading="lazy">, frame 0 of the clip) is what the reader sees.
 //   2. When the clip comes within the load margin (600px by default) of the viewport, the sources get their src and
-//      the clip loads. Inside a scrolling carousel the margin also reaches past the carousel's edge where the browser
-//      supports the observer's scrollMargin option; elsewhere a clip there loads once it enters the carousel's box.
+//      the clip loads. A clip inside a scrolling carousel also loads once the carousel is in view and the clip is
+//      within the margin of the carousel's edge, where the browser supports the observer's scrollMargin option;
+//      elsewhere it loads once it enters the carousel's box.
 //   3. It plays while at least half of it is visible and pauses otherwise; with maxActive 1 only the most visible
 //      clip plays. Every play() call checks reduced motion and the reader's own pause at that moment, including the
 //      one that follows loading.
@@ -139,13 +140,19 @@ export function mountDemos(root = document, options = {}) {
     label(demo);
   };
 
-  const near = new IntersectionObserver((entries) => {
+  const onNear = (entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       const demo = demos.find((candidate) => candidate.element === entry.target);
       if (demo && !blocked()) attachSources(demo.video);
     }
-  }, { rootMargin: settings.loadMargin, scrollMargin: settings.loadMargin });
+  };
+  const nearPage = new IntersectionObserver(onNear, { rootMargin: settings.loadMargin });
+  const nearScroller = 'scrollMargin' in IntersectionObserver.prototype ? new IntersectionObserver(onNear, { scrollMargin: settings.loadMargin }) : null;
+  const near = {
+    observe: (element) => [nearPage, nearScroller].forEach((observer) => observer?.observe(element)),
+    disconnect: () => [nearPage, nearScroller].forEach((observer) => observer?.disconnect()),
+  };
 
   const seen = new IntersectionObserver((entries) => {
     for (const entry of entries) {
