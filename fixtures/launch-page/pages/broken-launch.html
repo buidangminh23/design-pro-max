@@ -1,8 +1,9 @@
 <!doctype html>
 <!-- Planted-defect page for the launch parts. It holds the 12 defects listed in broken-launch.expected.json, each found
      by the checker named there, and nothing else that an error rule flags. The SF font request goes to fonts.invalid,
-     a name that never resolves, so no test reaches a real font host. Served by a 200-only server. -->
-<html lang="en">
+     a name that never resolves, so no test reaches a real font host. Served by a 200-only server. data-theme="light"
+     keeps the token colours light in check-page's dark pass, so the only contrast defect is the planted one. -->
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

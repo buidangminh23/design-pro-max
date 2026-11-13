@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Fail fixture for LP-BASE-01: a page with no data-lede or data-cta markers. Until a script runs, the lede under the
+     headline and the hero button are at opacity 0, so a check of marked elements alone looks only at the heading. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-BASE-01 fail: unmarked lede and button</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+  .button { display: inline-flex; min-height: 44px; align-items: center; padding: var(--space-1-5) var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent-fill); color: var(--color-on-accent); text-decoration: none; }
+  html:not(.js) .lede, html:not(.js) .button { opacity: 0; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>A hero without markers</h1>
+  <p class="lede">This lede is the first paragraph after the headline and carries no data-lede attribute.</p>
+  <p><a class="button" href="#more">Start now</a></p>
+</header>
+<script type="module">
+  document.documentElement.classList.add('js');
+</script>
+</body>
+</html>

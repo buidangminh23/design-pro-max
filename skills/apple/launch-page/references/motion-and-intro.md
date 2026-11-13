@@ -19,7 +19,7 @@ Which motion a launch page may use, how long each kind runs, and the gates that 
 
 ## Reveals
 
-- `createReveals()` in `../assets/lib/reveal.js` marks each `[data-reveal]` element `data-revealed` the first time it enters the viewport and stops observing it: a reveal runs once and is never hidden again [LP-REVEAL-01] (AM-6) (ON-6).
+- `createReveals()` in `../assets/lib/reveal.js` marks each `[data-reveal]` element `data-revealed` the first time any part of it enters the viewport, and stops observing it: a reveal runs once and is never hidden again [LP-REVEAL-01] (AM-6) (ON-6). It also reveals what is already in or above the viewport at load, what the reader jumps past, and everything left when the page is scrolled to its end, so a block taller than the viewport or a line at the very bottom never stays hidden. `destroy()` removes its observer and listeners when a single-page app unmounts the view.
 - Items in a `[data-reveal-group]` are staggered by `--reveal-index` times `--reveal-stagger`, capped so a long list does not keep the reader waiting.
 - Reveals are narrative motion: a rise and fade of 0.7-1.1 s is in class, and the 300 ms limit for controls does not apply to them [LP-WARN-CLASS] (AM-6) (ON-6). The tokens use `800ms` (restrained) and `1000ms` (expressive) with a small rise.
 - Without `IntersectionObserver`, on print, and when reduced motion turns on mid-visit, everything is revealed at once.
@@ -38,7 +38,7 @@ The film is the user's: H.264 first, muted, no audio track, with its first frame
 ## Ambient motion
 
 - Marquees, auto-advancing galleries, slow orbits and looping decoration move on their own. Anything that does so for over 5 s gets a labelled pause control that stops it [LP-AMB-01] (PV-21). Ambient motion often runs for seconds per cycle (AM-4), so most of it needs one.
-- Under reduced motion nothing moves on its own: the marquee becomes a wrapped list, galleries stop on their first slide, orbits stand still (ON-20).
+- Under reduced motion and without script nothing moves on its own: the marquee becomes a wrapped list, galleries stop on their first slide, orbits stand still (ON-20). Put the animation itself behind `html[data-motion="ok"]`; a pause button wired by script does nothing when the script never ran.
 - Pause what is off screen or in a hidden tab, and never autoplay sound.
 
 ## Reduced motion

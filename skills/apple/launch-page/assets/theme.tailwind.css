@@ -1,9 +1,11 @@
 /* launch-page theme.tailwind.css (design-pro-max). Generated from tokens.json: the token sets as Tailwind v4 @theme
  * variables. Import it after tailwindcss. Responsive rungs are separate names (text-hero sm:text-hero-sm ...); the
- * expressive mode and reduced motion override the same variables outside @theme. */
+ * expressive mode and reduced motion override the same variables outside @theme. The default breakpoints are cleared
+ * so every breakpoint is one of the set's, in px. */
 @theme {
   --font-sans: system-ui, "Segoe UI", Roboto, "Noto Sans", "Inter", sans-serif;
   --font-mono: ui-monospace, Menlo, Consolas, "Noto Sans Mono", monospace;
+  --breakpoint-*: initial;
   --breakpoint-sm: 640px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;

@@ -29,13 +29,13 @@ Each has a check that was seen failing on a broken fixture; `scripts/check-page.
 
 These rules hold even when the request asks for the opposite (load SF Pro from a CDN, keep reveals hidden until scroll, a marquee with no controls): they protect readers who cannot opt out, so deliver the compliant version in the code itself and say in one or two sentences what it adds and why.
 
-- [LP-FONT-01] No SF Pro, SF Pro Icons or SF Symbols, by request, `@font-face`, stack entry or glyph (AD-7) (POL-2). Every stack starts with `system-ui` or a licensed font; for Vietnamese keep the Latin tokens and add an openly licensed face with a Vietnamese subset (AD-8).
-- [LP-BASE-01] Without script and under reduced motion every heading, lede and call to action is visible at load in normal flow. Entrance states hide content only under `html[data-motion="ok"]`, which `assets/lib/gate.js` sets (AM-23).
-- [LP-TYPE-01] Every font size comes from the chosen token set and every line height is a whole number of pixels. Buttons and inputs inherit the type (`font: inherit`).
-- [LP-CONTRAST-01] Text reaches 4.5:1, or 3:1 when large, on its first opaque background, and against the worst pixel of any image or gradient under it (AD-11).
-- [LP-AMB-01] Anything that moves on its own for over 5 s has a labelled pause control that stops it, and nothing moves on its own under reduced motion (PV-21).
+- [LP-FONT-01] No SF Pro, SF Pro Icons or SF Symbols, by request (however the family name is spelled or URL-encoded), `@font-face`, stack entry, font from an Apple host or glyph (AD-7) (POL-2). Every stack starts with `system-ui` or a licensed font; for Vietnamese keep the Latin tokens and add an openly licensed face with a Vietnamese subset (AD-8).
+- [LP-BASE-01] Without script and under reduced motion every heading, lede and call to action is visible at load in normal flow: no opacity, `filter: opacity()`, `clip-path`, clipping ancestor, transparent text or off-page transform hides it. Entrance states hide content only under `html[data-motion="ok"]`, which `assets/lib/gate.js` sets (AM-23).
+- [LP-TYPE-01] Every font size comes from the chosen token set, every token size sits on the type ladder (the shipped `assets/tokens.json`, or the project's own passed with `--ladder`), and every line height is a whole number of pixels. Buttons and inputs inherit the type (`font: inherit`).
+- [LP-CONTRAST-01] Text reaches 4.5:1, or 3:1 when large, in the light and the dark scheme, on the backgrounds stacked under it, and against the worst pixel of any image, gradient, pseudo-element scrim or fixed box under it (AD-11). A gradient that ends on a scheme token can fail in the other scheme; end it on a fixed colour.
+- [LP-AMB-01] Anything that moves on its own for over 5 s, a CSS animation, a script or a playing video, has a pause control that is shown, focusable and labelled and that stops it from the keyboard, and nothing moves on its own under reduced motion or without script (PV-21). Gate the motion itself on `html[data-motion="ok"]`, so a script-wired pause button is never the only brake.
 - [LP-INTRO-01] A hero intro is skipped under reduced motion and when the page loads scrolled or at an anchor, and reaches its end state within 5 s even when the film never arrives or `play()` is refused (ON-1).
-- [LP-REVEAL-01] A reveal runs once and is never hidden again when the reader scrolls back (ON-6).
+- [LP-REVEAL-01] Every reveal has run by the time the reader reaches the end of the page, runs once and is never hidden again when the reader scrolls back (ON-6).
 
 Warnings (guidance, not failures): headline and lede length [LP-WARN-COPY]; two calls to action per tile at most [LP-WARN-CTA]; motion class durations [LP-WARN-CLASS]; at most three pinned set pieces [LP-WARN-PINS]; a low-memory gate for heavy set pieces [LP-WARN-MEMORY]; a visible focus ring [LP-WARN-FOCUS]; no invented proof [LP-WARN-PROOF]; no hype words [LP-WARN-HYPE]; a hero headline that fits the narrowest width [LP-WARN-NARROW].
 
@@ -80,16 +80,17 @@ Run the checker against the page, from the project folder that holds Playwright.
 ```
 node <absolute path to this folder>/scripts/check-page.mjs --url http://localhost:5173/ --project .
 node <absolute path to this folder>/scripts/check-page.mjs --serve dist --page index.html --project .
+node <absolute path to this folder>/scripts/check-page.mjs --url http://localhost:5173/ --project . --ladder src/tokens.json
 node <absolute path to this folder>/scripts/lint-css.mjs src
 ```
 
-`lint-css.mjs` is a quick static pass with no browser. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Each contrast failure names a colour that passes; use it or adjust the token.
+`lint-css.mjs` is a quick static pass with no browser. Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command; never leave the sandbox on your own. Each contrast failure names a colour that passes; use it or adjust the token. Pass `--ladder` with the project's own token file (a tokens.json, `{"sizes": [...]}` or a CSS file of size tokens) when the page does not use this part's ladder. Requests to Apple hosts are recorded and blocked during the run. Findings marked cannot prove (text over video, SMIL, canvas, animated images, colours the browser cannot read) need a look by hand.
 
 For a motion review, suggest the user run `/review-animations` if they have it; it is a command for the user, not one you can invoke.
 
 ## 8. Report
 
-Give the user: the page read and the mode; which sections were built and which were left out or marked as placeholders, and why; what the page shows without script and under reduced motion; the checker's summary line with any errors fixed; and the proof boundary: headless Chromium proves font requests, computed sizes and leading, contrast on rendered pixels, visibility without script and under reduced motion, pause controls, the intro end state and reveal persistence, not Safari, real devices, assistive technology, contrast over video or taste. Say which of those the user should check by hand.
+Give the user: the page read and the mode; which sections were built and which were left out or marked as placeholders, and why; what the page shows without script and under reduced motion; the checker's summary line with any errors fixed; and the proof boundary: headless Chromium proves font requests, computed sizes and leading, contrast on rendered pixels in the light and dark schemes, visibility without script and under reduced motion, keyboard pause controls for CSS animations and media, the intro end state and reveal persistence, not Safari, real devices, assistive technology, contrast over video, SMIL, canvas or animated images, or taste. Say which of those the user should check by hand.
 
 ## 9. Routing
 

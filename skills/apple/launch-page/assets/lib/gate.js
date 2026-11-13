@@ -3,8 +3,11 @@
 // Motion gate and hero intro. markMotion() sets html[data-motion="ok"] only when motion is allowed (no reduced-motion
 // preference, no html.reduced-motion class), so every entrance state hides content only behind that capability: without
 // script, or under reduced motion, the page is its end state. runIntro() plays a hero intro once per session and always
-// ends it: on the film's end, an error, a rejected play(), a scroll, a key press or a timeout well under 5 s.
+// ends it: on the film's end, an error, a rejected play(), a scroll, a key press or a timeout well under 5 s. Ending it
+// pauses the film, drops its source and reloads the element, which aborts a download still in flight.
 // Pair it with the inline head snippet in assets/reference/intro-handoff.html, which decides before first paint.
+// For single-page apps that remount: markMotion(win, { signal }) and runIntro(root, { signal }) stop listening when the
+// signal aborts, and runIntro also returns destroy(), which ends the intro.
 
 export const DEFAULTS = Object.freeze({ timeoutMs: 3500, storageKey: 'launch-intro-seen', scrolledPx: 1, memoryGb: 2 });
 
@@ -30,14 +33,14 @@ export function decideIntro({ reducedMotion, scrollY = 0, hash = '', seen = fals
   return { play: true, reason: 'first-visit' };
 }
 
-export function markMotion(win = window) {
+export function markMotion(win = window, { signal } = {}) {
   const root = win.document.documentElement;
   const apply = () => {
     if (prefersReducedMotion(win)) delete root.dataset.motion;
     else root.dataset.motion = 'ok';
   };
   apply();
-  win.matchMedia?.(REDUCED).addEventListener?.('change', apply);
+  if (!signal?.aborted) win.matchMedia?.(REDUCED).addEventListener?.('change', apply, signal ? { signal } : undefined);
   return !prefersReducedMotion(win);
 }
 
@@ -78,6 +81,7 @@ export function runIntro(root, { film = root?.querySelector('video[data-intro-fi
       film.pause?.();
       film.removeAttribute('src');
       film.querySelectorAll?.('source').forEach((source) => source.removeAttribute('src'));
+      film.load?.();
     }
     writeSeen(win, settings.storageKey);
     settings.onDone?.(reason);
@@ -118,7 +122,17 @@ export function runIntro(root, { film = root?.querySelector('video[data-intro-fi
     win.addEventListener('scroll', onScroll, { passive: true });
     win.addEventListener('keydown', onKey);
   }
-  if (win.document.readyState === 'complete') win.requestAnimationFrame(start);
-  else win.addEventListener('load', () => win.requestAnimationFrame(start), { once: true });
-  return { finish, get decision() { return state.decision; } };
+  let frame = 0;
+  const onLoad = () => {
+    frame = win.requestAnimationFrame(start);
+  };
+  if (win.document.readyState === 'complete') frame = win.requestAnimationFrame(start);
+  else win.addEventListener('load', onLoad, { once: true });
+  const destroy = () => {
+    win.removeEventListener('load', onLoad);
+    if (frame) win.cancelAnimationFrame?.(frame);
+    finish('destroyed');
+  };
+  settings.signal?.addEventListener('abort', destroy, { once: true });
+  return { finish, destroy, get decision() { return state.decision; } };
 }

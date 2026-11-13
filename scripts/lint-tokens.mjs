@@ -8,10 +8,12 @@
  *   node scripts/lint-tokens.mjs --build <values.json>       hash a private values file into evidence/token-hashes.json
  *
  * A set is the declarations outside any mode selector, or those plus the declarations of one
- * [data-launch-mode="<mode>"] selector, which override by name. The measured values are committed only as salted
- * hashes of "<category>:<value>" keys; the values file is private: {"type": [[px, em], ...], "width": [px, ...],
- * "nav": [...], "radius": [...], "breakpoint": [...]}. Exit 0 when every set stays under the limit, 1 when one does
- * not, 2 for bad usage.
+ * [data-launch-mode="<mode>"] selector, which override by name. The measured values are committed as salted hashes
+ * of "<category>:<value>" keys, which keeps the list from reading as a copy-paste token sheet. The hashes do not hide
+ * the values: the salt is public and the key space is small, so anyone can recover them by trying every key. They are
+ * public measurements of public pages. The values file used to build them is not committed: {"type": [[px, em], ...],
+ * "width": [px, ...], "nav": [...], "radius": [...], "breakpoint": [...]}. Exit 0 when every set stays under the
+ * limit, 1 when one does not, 2 for bad usage.
  */
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -198,7 +200,7 @@ export function buildHashes(values, salt = crypto.randomBytes(16).toString('hex'
     }
   }
   return {
-    description: 'Salted SHA-256 hashes of measured reference-site values for scripts/lint-tokens.mjs, one per "<category>:<value>" key. The values are private context and never committed in clear.',
+    description: 'Salted SHA-256 hashes of measured reference-site values for scripts/lint-tokens.mjs, one per "<category>:<value>" key. Hashing keeps the list from reading as a copy-paste token sheet; it does not hide the values: the salt is public and the key space is small, so anyone can recover them by trying every key. They are public measurements of public pages, kept as context for the lint, never as tokens.',
     salt,
     values: [...keys].map((key) => hashKey(salt, key)).sort(),
   };

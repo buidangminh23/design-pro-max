@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Fail fixture for LP-CONTRAST-01: the card keeps a white background in both schemes but takes its text colour from
+     the ink token, which turns near white under prefers-color-scheme: dark. It passes in light and fails in dark. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-CONTRAST-01 fail: dark scheme</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .card { padding: var(--space-3); border-radius: var(--radius-card); background: #ffffff; color: var(--color-ink); }
+</style>
+</head>
+<body>
+<h1>One card, two schemes</h1>
+<div class="card"><p>The card background is fixed while its text follows the scheme.</p></div>
+</body>
+</html>

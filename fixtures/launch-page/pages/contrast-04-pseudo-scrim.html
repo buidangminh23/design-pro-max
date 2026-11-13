@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- Fail fixture for LP-CONTRAST-01: the hero's ::before scrim paints #111111 over its white background, and the text on
+     it is #222222, about 1.2:1. Read from the element backgrounds alone it looks like #222222 on white, 15.9:1. -->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-CONTRAST-01 fail: pseudo-element scrim</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  .hero { position: relative; padding: var(--space-6); background: #ffffff; }
+  .hero::before { content: ""; position: absolute; inset: 0; background: #111111; }
+  .hero h1 { position: relative; margin: 0; color: #222222; font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+</style>
+</head>
+<body>
+<section class="hero"><h1>Dark text on a dark scrim</h1></section>
+</body>
+</html>

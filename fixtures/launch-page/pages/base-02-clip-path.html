@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- Fail fixture for LP-BASE-01: until a script adds the js class, the headline is clipped away with
+     clip-path: inset(0 0 100% 0) and the call to action is faded with filter: opacity(0). Both keep opacity 1, so a
+     check that reads only opacity and display sees them as visible without script. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-BASE-01 fail: clipped and filtered</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+  a { color: var(--color-accent); }
+  html:not(.js) h1 { clip-path: inset(0 0 100% 0); }
+  html:not(.js) [data-cta] { filter: opacity(0); }
+</style>
+</head>
+<body>
+<h1>Headline behind a clip</h1>
+<p data-lede>The lede stays visible in every mode, so only the headline and the call to action disappear.</p>
+<p><a href="#more" data-cta>Get started</a></p>
+<script type="module">
+  document.documentElement.classList.add('js');
+</script>
+</body>
+</html>
