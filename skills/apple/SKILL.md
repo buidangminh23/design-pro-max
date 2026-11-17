@@ -90,7 +90,7 @@ Routing notes:
 
 Not covered by any part:
 
-- Screen recording: not covered; say so, and offer an HTML and CSS rebuild rendered to video or embedding the user's own clip, both through `launch-video/PART.md`.
+- Screen recording: not covered; read `launch-video/PART.md` section 0 and answer from it: say so, then offer its two paths.
 - Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
 - Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).

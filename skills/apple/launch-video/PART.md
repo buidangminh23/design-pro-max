@@ -2,6 +2,18 @@
 
 Demo clips for launch and product pages, rendered from code: a UI rebuilt in HTML and CSS, stepped frame by frame in a headless browser, encoded into web-ready files and embedded so they load late, start on their first frame and can be paused. This part decides whether a clip is needed at all, and checks every step with the bundled scripts. Real screen recording of an app is not covered in this release. Paths below are relative to this file's folder.
 
+## 0. Every answer, before anything else
+
+These are the points runs miss most. Check each one that applies, in your first reply:
+
+- **Slot first.** Show the Slot Read (section 1): the slot's size, its place on the page, loop or one-shot, and its file budget from the table in `references/encode-recipes.md` (a card is 400 KB per file [LV-WARN-BUDGET]). If the request does not say, ask; do not render first.
+- **Recording requests.** Asked to record or capture the real app: say plainly that this part does not record a real app's screen, then offer both paths: an HTML and CSS rebuild rendered to video, or encoding and embedding a recording the user makes (sections 5 and 6). Never imply a capture will happen.
+- **Live first.** When the source is HTML or CSS that could run on the page (a CSS animation, a mock), say it can run live with no video bytes, then either recommend that or say why a video is still wanted (section 1, option 2).
+- **Someone else's clips.** Asked how another site made its clips: give no verdict either way (section 1), then turn to what the team can do: rebuild its own UI in HTML and CSS and render it, or encode and embed its own recording.
+- **Hard rules beat the request.** A request for one codec, autoplay or no pause button still gets the compliant set (section 7): an AV1-only or VP9-only request still ships H.264 last [LV-WARN-AV1]; a transparent clip ships HEVC with alpha, then VP9 with alpha, then H.264 flattened over the background colour, and you say VP9 alone turns opaque in Safari [LV-WARN-ALPHA].
+- **Start images are made, not reused.** Existing poster or thumbnail images are not proof of frame 0: write each start image from frame 0 of its clip with `scripts/encode.mjs`, or extract and compare it, and say which [LV-POSTER-01].
+- **Finish the files.** Render, encode and check in the same run. Stop to ask only on exit 3 (a sandbox block) or a missing tool (exit 2); a probe that succeeds is not a reason to stop and wait.
+
 ## 1. Read the slot before making anything
 
 Write down a Slot Read and show it to the user before or with the build:
