@@ -42,7 +42,7 @@ const SUITES = {
   'web-shells': { file: path.join(ROOT, 'evals', 'apple', 'web-shells', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
 };
 const SKILL_ROOT = { claude: '.claude/skills/apple', codex: '.agents/skills/apple' };
-export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'high' }, codex: { model: 'gpt-6.1-sol', effort: 'high' } };
+export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'medium' }, codex: { model: 'gpt-6.2-sol', effort: 'high' } };
 const EFFORTS = { claude: ['low', 'medium', 'high', 'xhigh', 'max'], codex: ['minimal', 'low', 'medium', 'high', 'xhigh'] };
 const USER_CLAUDE = process.env.DPM_EVAL_CLAUDE_HOME ?? path.join(os.homedir(), '.claude');
 const SKIPPED_USER_SKILLS = new Set(['apple', 'synced']);

@@ -101,15 +101,15 @@ test('a user install gives Claude a config folder with the user skills, and appl
 });
 
 test('every run pins its model and effort instead of reading the user config', () => {
-  assert.deepEqual(RUN_DEFAULTS, { claude: { model: 'claude-opus-5-5[1m]', effort: 'high' }, codex: { model: 'gpt-6.1-sol', effort: 'high' } });
-  assert.deepEqual(runProfile('codex', { effort: 'xhigh' }), { model: 'gpt-6.1-sol', effort: 'xhigh' });
+  assert.deepEqual(RUN_DEFAULTS, { claude: { model: 'claude-opus-5-5[1m]', effort: 'medium' }, codex: { model: 'gpt-6.2-sol', effort: 'high' } });
+  assert.deepEqual(runProfile('codex', { effort: 'xhigh' }), { model: 'gpt-6.2-sol', effort: 'xhigh' });
   assert.throws(() => runProfile('claude', { effort: 'ultracode' }), /--effort for claude/);
   const suite = { maxTurns: 10 };
   const [claude, claudeArgs] = hostCommand('claude', 'hi', suite, false, runProfile('claude'));
   assert.equal(claude, 'claude');
-  assert.deepEqual(JSON.parse(claudeArgs[claudeArgs.indexOf('--settings') + 1]), { disableAllHooks: true, model: 'claude-opus-5-5[1m]', effortLevel: 'high' });
+  assert.deepEqual(JSON.parse(claudeArgs[claudeArgs.indexOf('--settings') + 1]), { disableAllHooks: true, model: 'claude-opus-5-5[1m]', effortLevel: 'medium' });
   assert.equal(claudeArgs[claudeArgs.indexOf('--model') + 1], 'claude-opus-5-5[1m]');
-  assert.equal(claudeArgs[claudeArgs.indexOf('--effort') + 1], 'high');
+  assert.equal(claudeArgs[claudeArgs.indexOf('--effort') + 1], 'medium');
   const [codex, codexArgs] = hostCommand('codex', 'hi', suite, false, runProfile('codex', { model: 'gpt-6-astra' }));
   assert.equal(codex, 'codex');
   assert.equal(codexArgs[codexArgs.indexOf('-m') + 1], 'gpt-6-astra');
