@@ -308,6 +308,20 @@ test('pack needs a clean tree, a current skills.json and HEAD at the tag', (t) =
   assert.throws(() => pack(root), /skills\.json does not match the skill folders; run node scripts\/gen\.mjs/);
 });
 
+test('pack on a commit after the release tag compares the archive with HEAD, not the tag', (t) => {
+  const root = releaseFixture(t, (base) => {
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
+    write(base, 'CHANGELOG.md', '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n');
+  });
+  const git = gitIn(root, t);
+  git('tag', 'v0.1.0');
+  fs.appendFileSync(path.join(root, 'README.md'), 'More.\n');
+  write(root, 'skills/apple/references/after-the-tag.md', '# Added after the tag\n');
+  git('add', '-A');
+  git('commit', '--quiet', '-m', 'after the tag');
+  assert.equal(pack(root).zip, `${NAME}-v0.1.0.zip`);
+});
+
 test('check ties a tag to package.json and a dated CHANGELOG entry', (t) => {
   const changelog = '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n\n## [0.0.1] - 2026-10-01\n\n- Old.\n';
   const root = releaseFixture(t, (base) => {
