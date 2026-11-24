@@ -1,5 +1,43 @@
 # Eval results
 
+## 2026-11-25: v0.2.1 round, router description and whats-new (Mac)
+
+The round for 0.2.1, on 529189f: the reworked router description and the new `whats-new` part. Claude Code ran a pilot of the routing rows rather than all of them, at the owner's choice, and every part run was graded by Codex instead of Claude: two blind graders per run (`gpt-6.2-sol` at high, the literal and the evidence lens of the v0.2 prompts) and one adjudicator for each expectation they disagreed on (9 of 24 runs).
+
+### Routing
+
+Codex codex-cli 0.172.0 with `gpt-6.2-sol` at high, all 80 prompts. Claude Code 2.1.331 with `claude-opus-5-5[1m]` at high and the skill installed outside the project, 15 prompts: the eight rows it missed in the v0.2 round (r01, r02, r03, r04, r10, r45, r48, r57), the new whats-new rows r58 to r60, and the near misses n10, n12, n14 and n26.
+
+| Bar | Claude Code (pilot) | Codex |
+|---|---|---|
+| Recall (≥ 90 %) | 8/11 (not comparable: the hard rows only) | 55/56 (98.2 %) |
+| False triggers (≤ 10 %) | 0/4 | **3/21 (14.3 %)** |
+| First part (≥ 90 %) | 8/8 | 53/55 (96.4 %) |
+| Full reads (100 %) | 9/9 | **130/133** |
+| Wrong-path reads (0) | 0 | 0 |
+
+- Claude Code now starts apple on six of the eight rows it answered alone in the v0.2 round (r01, r02, r04, r10, r45, r48), each reaching the expected part. It still answers r03 (Swift 6 strict concurrency) and r57 (a WebKit-only Playwright login failure) alone, and on r59 (a What's New card in a Tauri and React app) it used its 10 turns without starting a skill. Its recall over all 56 rows is not measured for this release.
+- **Codex misses two bars that it met in v0.2.** It started apple on near misses n07 (reading web-shells; the task belongs to mobile-native), n14 (a launch video template, as in v0.2) and n16 (out of scope, reading launch-video), and stopped part-way through `SKILL.md` on n06 and n11 and through `launch-video/PART.md` on n16. r57 did not start apple, r27 opened `asc-metadata-sync` instead of `asc-localize-metadata` (as in v0.2), and r60 opened web-shells instead of whats-new. Released with these as known limits, at the owner's choice.
+- A first pass of the Claude Code part runs was discarded: the script left out `--install user`, so each run loaded the full user configuration (6,299 skills, about 455k tokens before the first reply) and every run ended on autocompact thrashing without doing the task. All twelve were run again with the skill installed outside the project; only the rerun is scored.
+
+### Part evals: whats-new (cases 37 to 42)
+
+Claude Code `claude-opus-5-5[1m]` at high with the skill installed outside the project; Codex `gpt-6.2-sol` at high. Every run with apple started it and opened `whats-new` first; no run without apple read the skill.
+
+| Case | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| 37 | 3/5 | 3/5 | 4/5 | 2/5 |
+| 38 | 3/6 | 1/6 | 5/6 | 2/6 |
+| 39 | 5/6 | 1/6 | 4/6 | 1/6 |
+| 40 | 7/8 | 3/8 | 2/8 | 3/8 |
+| 41 | 4/5 | 1/5 | 3/5 | 1/5 |
+| 42 | 3/5 | 1/5 | 5/5 | 2/5 |
+| **Total** | **25/35 (71.4 %)** | **10/35 (28.6 %)** | **23/35 (65.7 %)** | **11/35 (31.4 %)** |
+
+- The part beats its no-skill baseline on both hosts by more than twice the expectations passed.
+- Codex on case 40 (reviewing a broken popup) scored below its baseline, 2/8 against 3/8, with three of the eight expectations adjudicated; Claude Code on case 37 scored the same with and without apple.
+- These scores have one grading model, Codex; no Claude grader checked them.
+
 ## 2026-11-24: v0.2 round, routing and part evals (Mac)
 
 The release round for 0.2.0. Part evals ran with apple and without it on both hosts; a run without apple neither lists nor reads the skill. Each run was graded blind, with two independent graders per run and an adjudicator for every disagreement, except the Claude Code launch-video rerun, which two graders scored separately with no adjudication (both scores are shown).
