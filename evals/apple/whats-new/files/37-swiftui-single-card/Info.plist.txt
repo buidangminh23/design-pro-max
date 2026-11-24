@@ -1,0 +1,3 @@
+CFBundleShortVersionString = 2.4.0
+CFBundleVersion = 812
+LSMinimumSystemVersion = 14.0
