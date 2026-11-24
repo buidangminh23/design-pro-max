@@ -552,7 +552,7 @@
       "id": "r60",
       "kind": "row",
       "row": "In-app What's New popups after an update",
-      "prompt": "Review the What's New modal in our web app: it shows on every launch, the arrows disappear on the last page, and the feature videos play with sound on pages you cannot see. What should we fix?",
+      "prompt": "Review the What's New modal in our web app, which ships in a Capacitor shell on iPhone: it shows on every launch, the arrows disappear on the last page, and the feature videos play with sound on pages you cannot see. What should we fix?",
       "expect": {
         "trigger": true,
         "part": "whats-new"
