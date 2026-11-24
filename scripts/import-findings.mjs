@@ -10,7 +10,8 @@
  * JSON. A notes id <AREA>-N<k> is a section of research/<area>.md, hashed from its heading to the next heading of the
  * same or a higher level. Policies (POL-<k>) have no source file and keep a hash of their own claim. An area code that
  * AREAS does not name, such as one for a private benchmark, resolves to the one findings file in the folder that no
- * named area claims, so its name stays out of the repository.
+ * named area claims, so its name stays out of the repository. A lesson id IL-<n> is research.inventory.lessons[n] of the one
+ * inputs file in the folder, hashed as JSON, its file name likewise kept out of the repository.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,6 +21,16 @@ import { ROOT, formatJson, isMainModule, sha256 } from './lib/vendor.mjs';
 export const AREAS = { AM: 'apple-motion', AD: 'apple-design', TQ: 'techniques-2026', PV: 'product-video', SC: 'scroll-cinema', EC: 'ecosystem', HG: 'apple-hig' };
 
 const FINDINGS_SUFFIX = '.findings.json';
+const INPUTS_SUFFIX = '.inputs.json';
+
+/** The SHA-256 of lesson n of the one inputs file in the folder, for the ledger id IL-<n>. */
+export function lessonHash(folder, id) {
+  const inputs = fs.readdirSync(folder).filter((file) => file.endsWith(INPUTS_SUFFIX));
+  if (inputs.length !== 1) return { problem: `${id}: ${inputs.length} inputs files, expected one` };
+  const index = Number(id.slice('IL-'.length));
+  const lesson = JSON.parse(fs.readFileSync(path.join(folder, inputs[0]), 'utf8')).research?.inventory?.lessons?.[index];
+  return lesson ? { sha: sha256(Buffer.from(JSON.stringify(lesson))) } : { problem: `${id}: the inputs file has no lesson ${index}` };
+}
 
 /** The area name behind a code: from AREAS, or the single findings file in the folder that no named area claims. */
 export function areaName(folder, code) {
@@ -32,6 +43,9 @@ export function areaName(folder, code) {
 
 /** Notes ids and the heading that opens their section. */
 export const NOTES = {
+  'PV-N0': '## 7.',
+  'PV-N1': '### 5.7',
+  'PV-N2': '### 1.3',
   'SC-N0': '### R4.',
   'SC-N1': '### R1.',
   'TQ-N0': '## 6.',
@@ -57,6 +71,7 @@ function section(text, heading) {
 /** The SHA-256 of the private source behind one ledger id, or an explanation of why it has none. */
 export function sourceHash(folder, id, entry) {
   if (id.startsWith('POL-')) return { sha: sha256(Buffer.from(entry.claim)) };
+  if (id.startsWith('IL-')) return lessonHash(folder, id);
   const [area, index] = id.split('-');
   const { name, problem } = areaName(folder, area);
   if (problem) return { problem: `${id}: ${problem}` };

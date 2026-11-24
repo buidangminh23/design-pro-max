@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- Warning fixture for LS-WARN-SEQ: the scene keeps every frame of the sequence as a loaded <img> instead of a
+     window of decoded frames. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS-WARN-SEQ every frame as an image</title>
+<link rel="stylesheet" href="../lib/scene.css">
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; color: #15171a; background: #ffffff; }
+  .intro, .outro { min-height: 90vh; display: grid; place-items: center; padding: 0 24px; text-align: center; }
+  [data-scene] { --scene-travel: 200vh; --film-ratio: 16 / 9; --film-width: 880px; }
+  .stage { width: min(100% - 48px, 880px); display: grid; gap: 24px; }
+  .stage h2 { margin: 0; font-size: 32px; line-height: 40px; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down. The sequence follows the scroll position, one image per step.</p></section>
+
+<section data-scene aria-labelledby="sequence-title">
+  <div data-scene-sticky>
+    <div class="stage" data-scene-stage>
+      <h2 id="sequence-title">The sequence follows your scroll</h2>
+      <div data-scene-film role="img" aria-label="Describe what the sequence shows, for screen readers">
+        <img data-scene-still src="sequence/still.jpg" width="1280" height="720" alt="" loading="lazy" decoding="async">
+        <img data-scene-startframe src="sequence/startframe.jpg" width="1280" height="720" alt="" decoding="async">
+        <canvas data-sequence data-src="sequence/sequence.json" aria-hidden="true"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="outro"><p>Reduced motion, a blocked muted play() or a short viewport show the still instead.</p></section>
+
+<script type="module">
+  import { createScene } from '../lib/scene-progress.js';
+  import { probeAutoplay } from '../lib/scrub-loader.js';
+  import { frameAt, frameUrl } from '../lib/frame-window.js';
+  const element = document.querySelector('[data-scene]');
+  const canvas = element.querySelector('canvas');
+  const context = canvas.getContext('2d');
+  let images = null;
+  const draw = (progress) => {
+    const image = images?.[frameAt(progress, images.length)];
+    if (!image?.complete || !image.naturalWidth) return;
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    element.dataset.scrubState = 'ready';
+  };
+  createScene(element, {
+    gate: probeAutoplay({ timeoutMs: 2000 }),
+    async onState(state) {
+      if (state !== 'pinned' || images) return;
+      images = [];
+      const base = new URL(canvas.dataset.src, location.href);
+      const manifest = await (await fetch(base)).json();
+      for (let index = 0; index < manifest.count; index += 1) {
+        const image = new Image();
+        image.src = new URL(frameUrl(manifest.frames, index), base).href;
+        images.push(image);
+      }
+    },
+    onProgress: (progress, state) => state === 'pinned' && draw(progress),
+  });
+</script>
+</body>
+</html>

@@ -10,6 +10,8 @@
  *   skills/apple/<part>/references/evidence.md
  *                                            for each own part: its rules and the ledger entries it cites, from
  *                                            rules.json and evidence/ledger.json
+ *   skills/apple/launch-page/assets/{tokens.css,theme.tailwind.css}
+ *                                            the launch-page token sets, from that folder's tokens.json
  *
  *   node scripts/gen.mjs [--check] [--root <dir>]
  *
@@ -41,6 +43,7 @@ import {
 import { MEDIA_NOTICES } from './lib/media.mjs';
 import { BUNDLED_MEDIA, loadBundles } from './lib/bundles.mjs';
 import { OWN_PARTS, RULES_FILE, buildEvidence, loadLedger, loadRules } from './lib/evidence.mjs';
+import { TAILWIND_CSS, TOKENS_CSS, TOKENS_SOURCE, buildTailwindTheme, buildTokensCss, loadTokens } from './lib/tokens.mjs';
 
 export const SKILLS_FILE = 'skills.json';
 export const PARTS_INDEX_FILE = `${SKILL_DIR}/references/parts-index.md`;
@@ -299,6 +302,11 @@ export function generate(root = ROOT) {
       ownParts.push({ id: part, rules: rules.filter((rule) => rule.part === part) });
       files.set(`${SKILL_DIR}/${part}/references/evidence.md`, buildEvidence(root, part, ledger, rules));
     }
+  }
+  if (describeEntry(root, TOKENS_SOURCE)?.kind === 'file') {
+    const tokens = loadTokens(root);
+    files.set(TOKENS_CSS, buildTokensCss(tokens));
+    files.set(TAILWIND_CSS, buildTailwindTheme(tokens));
   }
   files.set(PARTS_INDEX_FILE, buildPartsIndex(manifest, ownParts));
   const source = readText(root, README_FILE);

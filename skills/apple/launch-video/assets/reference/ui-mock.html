@@ -1,0 +1,107 @@
+<!doctype html>
+<!-- launch-video reference: one original UI mock (design-pro-max), live and renderable.
+     Live: open it and it loops a 6 s demo (a search field, typing, results, a pointer that picks one, a result held,
+     then back to the start so the loop has no seam). Under reduced motion it shows the result, still.
+     Rendered: scripts/render-frames.mjs pauses the animations and steps them frame by frame. Every moving part hangs
+     on one CSS clock (the mock-clock animation); the typed text is painted from that clock's currentTime, so the
+     live page and the rendered frames show the same thing at the same time. Sizes are in rem and the root font size
+     follows the viewport width, so any 16:9 slot renders the same composition. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI mock: search and open</title>
+<link rel="stylesheet" href="device-frames.css">
+<style>
+  :root { --loop: 6s; --ink: #1d232b; --muted: #5d6672; --accent: #1f5fd6; --accent-soft: #e6eefc; --line: #e3e7ec; }
+  html { font-size: calc(100vw / 40); }
+  body { margin: 0; height: 100vh; display: grid; place-items: center; overflow: hidden; background: linear-gradient(160deg, #f4f6f9, #e2e7ee); font-family: system-ui, sans-serif; color: var(--ink); }
+  .mock { width: 32rem; animation: mock-clock var(--loop) linear infinite; }
+  .mock .device-frame { --frame-ratio: 16 / 7.6; font-size: 1rem; }
+  .palette { position: absolute; inset: 1.25rem 2rem auto; display: grid; gap: 0.5rem; }
+  .field { display: flex; align-items: center; gap: 0.5rem; height: 2.5rem; padding: 0 0.75rem; border-radius: 0.625rem; background: #f6f7f9; box-shadow: 0 0 0 1px var(--line); animation: focus var(--loop) ease-in-out infinite; }
+  .field svg { width: 1rem; height: 1rem; flex: none; fill: none; stroke: var(--muted); stroke-width: 2; }
+  .query { font-size: 1rem; line-height: 1.5rem; animation: query var(--loop) linear infinite; }
+  .caret { width: 2px; height: 1.25rem; margin-left: -0.375rem; background: var(--accent); animation: blink 1s steps(1) infinite; }
+  .results { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+  .results li { display: grid; grid-template-columns: 1.25rem 1fr auto; align-items: center; gap: 0.625rem; height: 2.25rem; padding: 0 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; opacity: 0; }
+  .results img { width: 1rem; height: 1.25rem; }
+  .results small { color: var(--muted); font-size: 0.75rem; }
+  .results li:nth-child(1) { animation: row-1 var(--loop) ease-out infinite; }
+  .results li:nth-child(2) { animation: row-2 var(--loop) ease-out infinite, pick var(--loop) ease-out infinite; }
+  .results li:nth-child(3) { animation: row-3 var(--loop) ease-out infinite; }
+  .preview { justify-self: start; padding: 0.375rem 0.75rem; border-radius: 0.5rem; background: var(--ink); color: #fff; font-size: 0.75rem; opacity: 0; animation: preview var(--loop) ease-out infinite; }
+  .pointer { position: absolute; left: 0; top: 0; width: 1.25rem; height: 1.25rem; opacity: 0; animation: pointer var(--loop) ease-in-out infinite; }
+  .pointer path { fill: var(--ink); stroke: #fff; stroke-width: 1.5; }
+
+  @keyframes mock-clock { from { outline-color: transparent; } to { outline-color: transparent; } }
+  @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes focus {
+    0%, 5% { box-shadow: 0 0 0 1px var(--line); }
+    11.667%, 80% { box-shadow: 0 0 0 2px var(--accent); }
+    86.667%, 100% { box-shadow: 0 0 0 1px var(--line); }
+  }
+  @keyframes query { 0%, 80% { opacity: 1; } 86.667% { opacity: 0; } 86.668%, 100% { opacity: 1; } }
+  @keyframes row-1 { 0%, 23.333% { opacity: 0; transform: translateY(0.5rem); } 30%, 80% { opacity: 1; transform: none; } 86.667%, 100% { opacity: 0; transform: none; } }
+  @keyframes row-2 { 0%, 25% { opacity: 0; transform: translateY(0.5rem); } 31.667%, 80% { opacity: 1; transform: none; } 86.667%, 100% { opacity: 0; transform: none; } }
+  @keyframes row-3 { 0%, 26.667% { opacity: 0; transform: translateY(0.5rem); } 33.333%, 80% { opacity: 1; transform: none; } 86.667%, 100% { opacity: 0; transform: none; } }
+  @keyframes pick { 0%, 45% { background: transparent; } 46.667%, 80% { background: var(--accent-soft); } 86.667%, 100% { background: transparent; } }
+  @keyframes preview { 0%, 46.667% { opacity: 0; transform: translateY(0.25rem); } 53.333%, 80% { opacity: 1; transform: none; } 86.667%, 100% { opacity: 0; transform: none; } }
+  @keyframes pointer {
+    0%, 30% { opacity: 0; transform: translate(26rem, 12rem); }
+    33.333% { opacity: 1; transform: translate(26rem, 12rem); }
+    43.333% { opacity: 1; transform: translate(14rem, 7.1rem) scale(1); }
+    44.583% { transform: translate(14rem, 7.1rem) scale(0.85); }
+    45.833%, 80% { opacity: 1; transform: translate(14rem, 7.1rem) scale(1); }
+    86.667%, 100% { opacity: 0; transform: translate(14rem, 7.1rem); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mock, .mock * { animation-play-state: paused !important; animation-delay: -3.5s !important; }
+    .caret { animation: none; }
+  }
+</style>
+</head>
+<body>
+<main class="mock" data-mock aria-label="Searching files for an invoice and opening it">
+  <div class="device-frame device-frame--browser">
+    <div class="device-frame__bar"><span></span><span></span><span></span><div class="device-frame__address">files.example</div></div>
+    <div class="device-frame__screen">
+      <div class="palette">
+        <div class="field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="query" data-query></span><span class="caret"></span></div>
+        <ul class="results">
+          <li><img alt="" width="16" height="20" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M0 0h11l5 5v15H0z' fill='%23d4513f'/%3E%3C/svg%3E"><span>Invoice 0142.pdf</span><small>Finance</small></li>
+          <li><img alt="" width="16" height="20" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M0 0h11l5 5v15H0z' fill='%23d4513f'/%3E%3C/svg%3E"><span>Invoice 0143.pdf</span><small>Finance</small></li>
+          <li><img alt="" width="16" height="20" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 20'%3E%3Cpath d='M0 3h6l2 2h8v15H0z' fill='%235d6672'/%3E%3C/svg%3E"><span>Invoices 2026</span><small>Folder</small></li>
+        </ul>
+        <div class="preview">Opened Invoice 0143.pdf</div>
+      </div>
+      <svg class="pointer" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 2v14l4-3.5 2.6 5.5 2.4-1.1-2.6-5.4H15z"/></svg>
+    </div>
+  </div>
+</main>
+<script>
+  (() => {
+    const QUERY = 'invoice';
+    const TYPE_START = 0.6;
+    const CHARS_PER_SECOND = 10;
+    const CLEAR_AT = 5.2;
+    const host = document.querySelector('[data-mock]');
+    const field = host.querySelector('[data-query]');
+    const loop = parseFloat(getComputedStyle(host).getPropertyValue('--loop')) || 6;
+    const clock = () => host.getAnimations().find((animation) => animation.animationName === 'mock-clock');
+    const seconds = (animation) => {
+      const progress = animation?.effect?.getComputedTiming().progress;
+      return progress === null || progress === undefined ? 3.5 : progress * loop;
+    };
+    const paint = () => {
+      const t = seconds(clock());
+      const typed = t < TYPE_START || t >= CLEAR_AT ? 0 : Math.min(QUERY.length, Math.floor((t - TYPE_START) * CHARS_PER_SECOND));
+      if (field.textContent !== QUERY.slice(0, typed)) field.textContent = QUERY.slice(0, typed);
+      requestAnimationFrame(paint);
+    };
+    paint();
+  })();
+</script>
+</body>
+</html>

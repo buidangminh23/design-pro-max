@@ -1,0 +1,24 @@
+<!doctype html>
+<!-- Fail fixture for LP-CONTRAST-01: body text in a light grey at about 3.6:1 on white, and a caption over a light
+     gradient whose worst pixel falls under 4.5:1 even though its darkest stop would pass. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-CONTRAST-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: #ffffff; }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .grey { color: #878787; }
+  .band { margin-top: var(--space-4); padding: var(--space-3); background: linear-gradient(90deg, #0b6670, #9ad1d6); }
+  .band p { color: #ffffff; }
+</style>
+</head>
+<body>
+<h1>Grey text that looks refined</h1>
+<p class="grey">Secondary copy in a pale grey reads as calm on a bright screen and fails for many readers in daylight.</p>
+<div class="band"><p>A caption over a gradient that fades to pale on the right side of the band.</p></div>
+</body>
+</html>

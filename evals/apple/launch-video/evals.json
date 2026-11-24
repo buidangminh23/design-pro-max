@@ -1,0 +1,128 @@
+{
+  "skill_name": "apple",
+  "part": "launch-video",
+  "description": "Part evals for launch-video in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 11,
+      "name": "record-a-demo",
+      "prompt": "Record a 6-second demo of our app's search for the landing page.",
+      "expected_output": "A plain statement that recording the real app's screen is not something it does here, then two offers: rebuild the search UI in HTML and CSS and render it to video, or encode and embed a clip the user records themselves; a Slot Read or the questions it needs answered.",
+      "files": [],
+      "expectations": [
+        "[not-covered] It says it does not record the real app's screen, instead of claiming to record it or pretending a capture happened.",
+        "[two-paths] It offers both an HTML and CSS rebuild of the search UI rendered to video and encoding plus embedding a clip the user records.",
+        "[slot-read] It asks for or states the slot the clip goes in (size, place on the page, loop or one-shot) before making anything.",
+        "[LV-RENDER-01] If it renders anything, it steps frames with a paused clock and never uses the browser's built-in page recording as the master."
+      ],
+      "checks": [
+        "LV-RENDER-01"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "rebuild-and-export",
+      "prompt": "Rebuild our app's search panel in HTML and CSS from the description in SEARCH.md and export a 6-second MP4 of a search being typed, for the card on our landing page that SEARCH.md describes.",
+      "expected_output": "One HTML and CSS mock that runs live and renders, driven by one clock; a beat table; frames stepped at device pixel ratio 2 for the 640 px card (1280x720, 6 s times the frame rate it states: 180 frames at the 30 fps the part recommends); an H.264 High, yuv420p, faststart MP4 with no audio and colour tags; a start image taken from frame 0.",
+      "files": [
+        "files/12-rebuild-search/SEARCH.md"
+      ],
+      "expectations": [
+        "[one-mock] The rebuild is one HTML and CSS page that runs live in a browser and is also what gets rendered, with its motion on one timeline or clock.",
+        "[LV-WARN-DIRECTION] It writes the beats (typing at a readable speed, a hold of at least 1 s on the result) before or with the build.",
+        "[LV-RENDER-01] Frames are stepped with a paused clock at device pixel ratio 2, giving 1280x720 frames and 6 s times the frame rate it states (180 frames at 30 fps, the rate the part recommends), never the built-in page recording.",
+        "[LV-ENC-01] The MP4 is H.264 High in yuv420p with limited range and the moov box first.",
+        "[LV-ENC-02] The MP4 has no audio stream.",
+        "[LV-ENC-03] The encode writes bt709 colour tags.",
+        "[LV-POSTER-01] The start image is frame 0 of the clip, not a separately composed picture."
+      ],
+      "checks": [
+        "LV-WARN-DIRECTION",
+        "LV-RENDER-01",
+        "LV-ENC-01",
+        "LV-ENC-02",
+        "LV-ENC-03",
+        "LV-POSTER-01"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "rendered-or-recorded",
+      "prompt": "Did this product site draw its demo clips in code or record its screen? Our notes on one clip are in CLIP-NOTES.md. Give us a straight answer.",
+      "expected_output": "No verdict either way: the encoder and comment tags hint at a rendering tool and the pointer and wallpaper look like a downscaled screen capture, but neither proves how the clip was made; what each sign points to, and how the team can make its own clips either way.",
+      "files": [
+        "files/13-rendered-or-recorded/CLIP-NOTES.md"
+      ],
+      "expectations": [
+        "[no-verdict] It does not assert that the clips were rendered in code or that they were screen recordings.",
+        "[signs] It says what each sign points to: the comment tag is a hint that a tool touched the file, not proof it drew the frames; the pointer, wallpaper and sharpness look like a downscaled 2x capture, which is also not proof.",
+        "[next-step] It turns to what the team can do: rebuild their own UI in HTML and CSS and render it, or encode and embed their own recording."
+      ],
+      "checks": []
+    },
+    {
+      "id": 14,
+      "name": "twelve-demos-slow-page",
+      "prompt": "Our features page has 12 demo videos and it loads slowly, especially on phones. Fix it. The page is index.html.",
+      "expected_output": "Clips that load late: no autoplay attribute, preload=\"none\", sources given only near the viewport, lazy start images instead of the poster attribute; playback while at least half visible, one active clip at a time, labelled pause controls on the loops, nothing playing under reduced motion or Save-Data until the reader asks.",
+      "files": [
+        "files/14-twelve-demos/index.html"
+      ],
+      "expectations": [
+        "[LV-EMBED-01] The delivered markup has no autoplay attribute, uses preload=\"none\" and gives a clip its sources only when it comes near the viewport, so clips below the fold load no video bytes at first.",
+        "[poster] It replaces the eager poster attribute with a lazy start image (or equivalent), and the start image is frame 0 of each clip.",
+        "[one-active] Clips play only while mostly visible and at most one plays at a time.",
+        "[LV-EMBED-02] Each looping clip has a visible, labelled pause control, and under reduced motion no clip plays on its own, also after it loads."
+      ],
+      "checks": [
+        "LV-EMBED-01",
+        "LV-EMBED-02",
+        "LV-POSTER-01"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "transparent-css-animation",
+      "prompt": "I need a transparent video of the CSS animation in badge.html that plays in Safari and Chrome over our gradient hero.",
+      "expected_output": "First the question whether the animation can simply run live on the page; if a video is still wanted, frames rendered with a transparent background and the alpha set: HEVC with alpha first, VP9 with alpha, then H.264 flattened over the hero colour, all muted. HEVC with alpha needs VideoToolbox on macOS, which an agent sandbox may block: if the encode fails with the sandbox error it asks to run that step outside the sandbox or gives the command; where the encode succeeds it delivers the HEVC-with-alpha file.",
+      "files": [
+        "files/15-alpha-badge/badge.html"
+      ],
+      "expectations": [
+        "[live-replica] It points out that this CSS animation could run live on the page with no video bytes, and says why a video is still wanted or recommends the live version.",
+        "[LV-WARN-ALPHA] Sources are listed HEVC with alpha first, then VP9 with alpha, then H.264 flattened over the hero's colour; it says VP9 alone turns opaque in Safari.",
+        "[sandbox] It produces the HEVC-with-alpha file through macOS VideoToolbox; if that encode fails with the sandbox error (exit 3), it asks to run it outside the agent sandbox or gives the user the command, instead of skipping or faking it. Where the encode succeeds, no question is needed.",
+        "[LV-RENDER-01] The frames are stepped from the paused animation with a transparent background, not taken from the built-in page recording.",
+        "[LV-ENC-02] No file carries an audio stream."
+      ],
+      "checks": [
+        "LV-WARN-ALPHA",
+        "LV-RENDER-01",
+        "LV-ENC-02"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "av1-only-card",
+      "prompt": "Our product page has a 5-second looping demo in a card, described in CARD.md. AV1 is so much smaller that we want to ship only the AV1 file. Set up the encode and the <video> markup.",
+      "expected_output": "AV1 first but never alone: an H.264 High file always ends the source list because WebKit plays AV1 only with a hardware decoder; every file inside the card budget of 400 KB; markup with muted playsinline preload=\"none\", no autoplay attribute, sources in data-src set when near, a lazy start image that is frame 0, and a labelled pause control for the loop.",
+      "files": [
+        "files/20-av1-card/CARD.md"
+      ],
+      "expectations": [
+        "[LV-WARN-AV1] It keeps an H.264 file and lists it last, with AV1 first, and says why: WebKit plays AV1 only with a hardware decoder, so an AV1-only set shows nothing on many Apple devices.",
+        "[LV-ENC-01] The H.264 file is High profile in yuv420p with limited range and the moov box first.",
+        "[LV-WARN-BUDGET] It states the card budget of 400 KB per file and checks or plans the files against it.",
+        "[LV-EMBED-01] The markup has no autoplay attribute, uses preload=\"none\" and gives the sources only when the card comes near the viewport.",
+        "[LV-EMBED-02] The looping clip has a visible, labelled pause control, and under reduced motion it does not play on its own."
+      ],
+      "checks": [
+        "LV-WARN-AV1",
+        "LV-ENC-01",
+        "LV-WARN-BUDGET",
+        "LV-EMBED-01",
+        "LV-EMBED-02"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,73 @@
 # Eval results
 
+## 2026-11-24: v0.2 round, routing and part evals (Mac)
+
+The release round for 0.2.0. Part evals ran with apple and without it on both hosts; a run without apple neither lists nor reads the skill. Each run was graded blind, with two independent graders per run and an adjudicator for every disagreement, except the Claude Code launch-video rerun, which two graders scored separately with no adjudication (both scores are shown).
+
+### Routing
+
+Claude Code with `claude-opus-5-5[1m]` at high, as in v0.1 (Claude Code 2.1.330 for r01 to r35, 2.1.331 from r36 after the weekly host limit stopped the first pass; only valid runs count), on aca4376. Codex codex-cli 0.171.0 with `gpt-6.2-sol` at high, on aca4376. The description is the one this release ships.
+
+| Bar | Claude Code | Codex |
+|---|---|---|
+| Recall (≥ 90 %) | **45/53 (84.9 %)** | 53/53 (100 %) |
+| False triggers (≤ 10 %) | 0/20 | 1/20 (5 %) |
+| First part (≥ 90 %) | 45/45 | 51/53 (96.2 %) |
+| Full reads (100 %) | 46/46 | 124/124 |
+| Wrong-path reads (0) | 0 | 0 |
+
+- **Claude Code misses the recall bar.** It answered r01, r02, r03, r04, r10, r45, r48 and r57 from its own knowledge without starting any skill: SwiftUI list performance, Swift 6 concurrency, XCTest to Swift Testing, type-check hotspots, alert or action sheet, an HTML onboarding screen rendered to MP4, and a WebKit login test. r03, r04, r10 and r45 also missed in v0.1 round 9. The same description scored 48/53 (90.6 %) at high on 2026-11-13 with an earlier Claude Code build. Released as a known limit; the router description is to be reworked in a patch release. When apple matters for a question, start it by name (`/apple` on Claude Code).
+- At medium effort (2026-11-21, Claude Code 2.1.330) Claude Code started apple on 40/53 rows (75.5 %), with one wrong-path read (r55 guessed `web-shells/UPSTREAM.json`; own parts have no such file). Effort changes routing on this host much more than on Codex.
+- Codex: r27 opened `asc-metadata-sync` instead of `asc-localize-metadata`, r41 answered the HIG review after reading only the router, and near miss n14 (a launch video template, which belongs to hyperframes) started apple and read launch-video. 12 near misses read the router only.
+
+### Part evals
+
+Claude Code `claude-opus-5-5[1m]` at high and Codex `gpt-6.1-sol` at high, on 79cd0bc (2026-11-13 to 2026-11-17). Expectations passed:
+
+| Part | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| launch-page (1, 2, 3, 4, 5, 17) | 20/24 (83.3 %) | 18/24 (75.0 %) | 18/24 (75.0 %) | 15/24 (62.5 %) |
+| launch-scroll (6, 7, 8, 9, 10, 16, 18, 19) | 22/28 (78.6 %) | 17/28 (60.7 %) | 23/28 (82.1 %) | 14/28 (50.0 %) |
+| launch-video (11, 12, 13, 14, 15, 20) | 13/28 (46.4 %) | 12/28 (42.9 %) | 15/28 (53.6 %) | 12/28 (42.9 %) |
+| menubar-widgets (1 to 6) | 20/29 (69.0 %) | 17/29 (58.6 %) | 26/29 (89.7 %) | 14/29 (48.3 %) |
+| web-shells (31 to 36) | 20/27 (74.1 %) | 19/27 (70.4 %) | 23/27 (85.2 %) | 17/27 (63.0 %) |
+
+Every part beats its no-skill baseline on both hosts. launch-video was the weakest, so its `PART.md` gained the section 0 checklist (e95a018, then 4967bbb), and it was run again with apple:
+
+- Codex, `gpt-6.1-sol` at high, on 4967bbb: 26/28 (92.9 %) against 15/28 before the checklist and 12/28 without apple. Only case 20 `av1-only-card` misses expectations (3/5).
+- Claude Code, `claude-opus-5-5[1m]` at medium, on aca4376, with and without apple: 14/28 and 15/28 with apple against 9/28 and 10/28 without (the two graders). Case 11 `record-a-demo` passes 4/4 with apple against 1/4; case 13 `rendered-or-recorded` stays 0/3 on both sides: Claude Code still gives a verdict on how another site made its clips.
+
+Per case, round on 79cd0bc (Claude with / without, Codex with / without):
+
+| Case | Claude with | Claude without | Codex with | Codex without |
+|---|---|---|---|---|
+| launch-page 1 `menu-bar-launch-page` | 7/7 | 5/7 | 5/7 | 3/7 |
+| launch-page 2 `sf-pro-from-cdn` | 3/3 | 3/3 | 3/3 | 3/3 |
+| launch-page 3 `reveal-durations` | 3/4 | 3/4 | 3/4 | 3/4 |
+| launch-page 4 `fluid-headlines` | 0/3 | 0/3 | 1/3 | 0/3 |
+| launch-page 5 `gallery-and-marquee` | 4/4 | 4/4 | 4/4 | 4/4 |
+| launch-page 17 `social-proof-hero` | 3/3 | 3/3 | 2/3 | 2/3 |
+| launch-video 11 `record-a-demo` | 2/4 | 0/4 | 1/4 | 1/4 |
+| launch-video 12 `rebuild-and-export` | 5/7 | 5/7 | 7/7 | 4/7 |
+| launch-video 13 `rendered-or-recorded` | 1/3 | 2/3 | 2/3 | 1/3 |
+| launch-video 14 `twelve-demos-slow-page` | 0/4 | 0/4 | 3/4 | 2/4 |
+| launch-video 15 `transparent-css-animation` | 3/5 | 3/5 | 0/5 | 2/5 |
+| launch-video 20 `av1-only-card` | 2/5 | 2/5 | 2/5 | 2/5 |
+| menubar-widgets 1 `cpu-after-dark-mode` | 4/5 | 4/5 | 4/5 | 4/5 |
+| menubar-widgets 2 `placeholders-after-self-update` | 3/5 | 3/5 | 4/5 | 2/5 |
+| menubar-widgets 3 `edit-widget-shows-nothing` | 3/4 | 3/4 | 4/4 | 3/4 |
+| menubar-widgets 4 `headless-widget-snapshots` | 2/5 | 1/5 | 5/5 | 2/5 |
+| menubar-widgets 5 `no-xcode-intents-missing` | 3/4 | 3/4 | 4/4 | 1/4 |
+| menubar-widgets 6 `design-timer-menu-bar-and-widget` | 5/6 | 3/6 | 5/6 | 2/6 |
+| web-shells 31 `stale-url-after-sync` | 4/4 | 4/4 | 4/4 | 4/4 |
+| web-shells 32 `basic-auth-home-screen` | 4/6 | 4/6 | 5/6 | 3/6 |
+| web-shells 33 `webkit-cookie-test` | 2/4 | 2/4 | 3/4 | 1/4 |
+| web-shells 34 `shell-or-home-screen` | 4/5 | 3/5 | 4/5 | 3/5 |
+| web-shells 35 `push-in-wrapper` | 4/4 | 4/4 | 4/4 | 4/4 |
+| web-shells 36 `marketing-site-instead` | 2/4 | 2/4 | 3/4 | 2/4 |
+
+launch-page case 4 (fluid headlines in expressive mode) passes almost nothing on either side, and Claude Code's launch-scroll case 10 (a pin with no change) stays 0/3 with apple in this round, though round 9 passed it 3/3.
+
 ## 2026-11-13: v0.1 round 9, routing and part evals on main (Mac)
 
 The release round: every routing row and all eight launch-scroll cases on both hosts at 61a3939 (main after #4 and #13, later than the last `PART.md` change in 16c1373), with the harness defaults: Claude Code 2.1.323 with `claude-opus-5-5[1m]` at high, Codex codex-cli 0.168.0 with `gpt-6.1-sol` at high. The first Claude routing pass stopped at the weekly host limit and was run again in full after the reset; only the complete pass is scored. All 32 part runs exited 0 within 9.8 minutes each, none timed out, and no run without apple read the skill. One grader per case judged every expectation from each run's answer and its diff; there was no independent recheck.

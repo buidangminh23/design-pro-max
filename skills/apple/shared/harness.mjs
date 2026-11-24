@@ -1,7 +1,8 @@
 /**
  * Red-first evaluation of a checker run against a fixture. A fail fixture proves its check can fail: the checker must
  * exit 1 and report an error for the fixture's rule. A pass fixture proves the reference passes: no error for the
- * rule and at least one pass for it, so a rule the checker silently skipped does not count as green.
+ * rule and at least one pass for it, so a rule the checker silently skipped does not count as green. A warn fixture
+ * proves a warning rule can fire: no error and at least one warning for it.
  */
 import { EXIT, parseReport } from './report.mjs';
 
@@ -14,7 +15,11 @@ export function evaluateRun({ rule, expect }, { code, stdout }) {
   for (const id of rules) {
     const errors = findings.filter((finding) => finding.rule === id && finding.level === 'error');
     const passes = findings.filter((finding) => finding.rule === id && finding.level === 'pass');
-    if (expect === 'fail') {
+    const warnings = findings.filter((finding) => finding.rule === id && finding.level === 'warn');
+    if (expect === 'warn') {
+      if (errors.length) problems.push(`${id} failed: ${errors.map((finding) => `${finding.where}: ${finding.measured}`).join('; ')}`);
+      if (!warnings.length) problems.push(`${id} reported no warning`);
+    } else if (expect === 'fail') {
       if (code !== EXIT.fail) problems.push(`expected exit ${EXIT.fail}, got ${code}`);
       if (!errors.length) problems.push(`${id} reported no error`);
     } else {

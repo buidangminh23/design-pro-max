@@ -1,0 +1,90 @@
+<!doctype html>
+<!-- launch-page reference: a hero intro that hands over to the real page (design-pro-max). The inline head script decides
+     before first paint; gate.js runIntro() ends the intro on the film's end, an error, a rejected play(), a scroll, a
+     key press or a 4 s timeout. Under reduced motion, on a reload that lands scrolled or at an anchor, and on a second
+     visit in the session, the intro is skipped and the end state shows at once. Without script the end state shows.
+     The film is the project's own clip (intro.mp4, H.264 first); everything else is drawn in CSS. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beacon: hero intro reference</title>
+<script>
+  (() => {
+    const html = document.documentElement;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches || html.classList.contains('reduced-motion');
+    let seen = false;
+    try { seen = sessionStorage.getItem('launch-intro-seen') === '1'; } catch { seen = false; }
+    if (reduce || seen || scrollY > 0 || (location.hash && location.hash !== '#')) {
+      html.dataset.intro = 'skipped';
+      return;
+    }
+    html.dataset.intro = 'play';
+    setTimeout(() => { if (html.dataset.intro === 'play') html.dataset.intro = 'done'; }, 3500);
+  })();
+</script>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--color-bg); color: var(--color-ink); }
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: var(--type-body-size);
+    line-height: var(--type-body-leading);
+    letter-spacing: var(--type-body-tracking);
+  }
+  button { font: inherit; letter-spacing: inherit; }
+  h1, p { margin: 0; }
+  :focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset); }
+  .wrap { width: min(100% - 2 * var(--page-gutter), var(--content-max)); margin-inline: auto; }
+
+  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; padding-block: var(--section-space); }
+  .hero-copy { display: grid; gap: var(--heading-after); justify-items: center; text-align: center; max-width: 40ch; }
+  .t-hero { font-size: var(--type-hero-size); line-height: var(--type-hero-leading); letter-spacing: var(--type-hero-tracking); font-weight: var(--type-hero-weight); text-wrap: balance; }
+  .t-lede { font-size: var(--type-lede-size); line-height: var(--type-lede-leading); letter-spacing: var(--type-lede-tracking); color: var(--color-muted); }
+  .t-caption { font-size: var(--type-caption-size); line-height: var(--type-caption-leading); letter-spacing: var(--type-caption-tracking); }
+  .ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--cta-gap); padding-block-start: var(--space-2); }
+  .button { display: inline-flex; align-items: center; min-height: 44px; padding: var(--space-1-5) var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent-fill); color: var(--color-on-accent); text-decoration: none; border: 1px solid var(--color-accent-fill); transition: background-color var(--duration-control) linear; }
+  .button--quiet { background: transparent; color: var(--color-accent); border-color: currentColor; }
+
+  .intro { position: absolute; inset: 0; display: none; place-items: center; background: var(--color-bg); }
+  .intro video { width: min(100% - 2 * var(--page-gutter), 960px); aspect-ratio: 16 / 9; border-radius: var(--radius-tile); background: var(--color-surface); }
+  .intro-skip { position: absolute; inset-block-end: var(--space-3); inset-inline-end: var(--space-3); }
+
+  html[data-intro="play"] .intro { display: grid; }
+  html[data-intro="play"] [data-intro-end] { opacity: 0; translate: 0 var(--reveal-rise); }
+  [data-intro-end] { transition: opacity var(--duration-reveal) var(--ease-out), translate var(--duration-reveal) var(--ease-out); }
+
+  .next { padding-block: var(--section-space); background: var(--color-surface); }
+</style>
+</head>
+<body>
+<main>
+  <section class="hero" aria-labelledby="hero-title" data-intro-root>
+    <div class="hero-copy wrap">
+      <h1 class="t-hero" id="hero-title" data-intro-end>Know where your afternoon went</h1>
+      <p class="t-lede" data-lede data-intro-end>Beacon sits in the menu bar, notes which app holds your focus, and turns each day into one honest timeline you can read in ten seconds.</p>
+      <div class="ctas" data-intro-end>
+        <a class="button" href="#next" data-cta>Download free</a>
+        <a class="button button--quiet" href="#next" data-cta>Take the tour</a>
+      </div>
+    </div>
+    <div class="intro">
+      <video data-intro-film aria-hidden="true" muted playsinline preload="none">
+        <source data-src="intro.mp4" type="video/mp4">
+      </video>
+      <button class="button button--quiet intro-skip t-caption" type="button" data-intro-skip>Skip intro</button>
+    </div>
+  </section>
+  <section class="next" id="next">
+    <div class="wrap"><p>The page continues here. The intro never hides this section.</p></div>
+  </section>
+</main>
+<script type="module">
+  import { markMotion, runIntro } from '../lib/gate.js';
+  markMotion();
+  runIntro(document.querySelector('[data-intro-root]'));
+</script>
+</body>
+</html>

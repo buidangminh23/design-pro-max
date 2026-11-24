@@ -1,0 +1,3 @@
+p4242
+n@APP@/Contents/PlugIns/ForecastWidget.appex/Contents/MacOS/ForecastWidget
+n/usr/lib/dyld

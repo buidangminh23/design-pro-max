@@ -1,0 +1,8 @@
+{
+  "name": "Orders dashboard",
+  "short_name": "Orders",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff"
+}

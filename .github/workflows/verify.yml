@@ -2,11 +2,12 @@ name: Verify
 
 on:
   push:
-    tags: ["v*"]
     branches: [main]
     paths:
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
+      - "skills/apple/menubar-widgets/**"
+      - "skills/apple/web-shells/**"
       - "rules.json"
       - "fixtures/**"
       - "evidence/**"
@@ -17,6 +18,8 @@ on:
     paths:
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
+      - "skills/apple/menubar-widgets/**"
+      - "skills/apple/web-shells/**"
       - "rules.json"
       - "fixtures/**"
       - "evidence/**"
@@ -24,12 +27,19 @@ on:
       - "scripts/lib/fixture-media.mjs"
       - ".github/workflows/verify.yml"
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to check out, such as the tag a release is about to publish
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
 
 concurrency:
-  group: verify-${{ github.ref }}
+  group: verify-${{ inputs.ref || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -42,6 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -54,5 +65,38 @@ jobs:
         run: |
           npm install --no-save --no-package-lock playwright@1.61.0
           npx playwright install --with-deps --only-shell chromium
+          npx playwright install --with-deps webkit
       - name: Every fixture judged red-first (L1 media, L3 browser)
         run: node scripts/verify.mjs
+
+  snapshots:
+    name: macOS widget snapshot checks
+    runs-on: macos-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Install ffmpeg
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: "1"
+          HOMEBREW_NO_INSTALL_CLEANUP: "1"
+        run: brew install ffmpeg
+      - name: Install Playwright for the tool check
+        run: npm install --no-save --no-package-lock playwright@1.61.0
+      - name: Swift is on PATH
+        run: swiftc --version
+      - name: Every darwin snapshot fixture judged red-first (MW-SNAP-01, MW-SNAP-02)
+        shell: bash
+        run: |
+          node scripts/verify.mjs --only MW-SNAP-01,MW-SNAP-02 | tee "$RUNNER_TEMP/snapshots.log"
+          if grep -q '^skip ' "$RUNNER_TEMP/snapshots.log"; then
+            echo "a snapshot case was skipped on macOS" >&2
+            exit 1
+          fi

@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- Fail fixture for LP-CONTRAST-01: a caption in an oklch() grey on an oklch() panel at about 2.6:1. Tailwind v4's
+     default palette is written in oklch(), so a checker that reads only rgb() skips this text and passes the page. -->
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-CONTRAST-01 fail: oklch</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .panel { padding: var(--space-3); border-radius: var(--radius-card); background: oklch(0.55 0.02 250); }
+  .panel p { color: oklch(0.8 0.02 250); }
+</style>
+</head>
+<body>
+<h1>A panel in the default palette</h1>
+<div class="panel"><p>Two neighbouring greys from a palette written in oklch, one on the other.</p></div>
+</body>
+</html>

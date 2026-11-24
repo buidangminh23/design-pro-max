@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Fail fixture for LV-EMBED-01: a lazy one-shot mounted with demo-embed.js, with no autoplay attribute,
+     preload="none" and its source in data-src, but with the poster attribute, which the browser fetches at load even
+     below the fold. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clip with an eager poster</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  [data-demo] { width: 400px; margin: 0 auto 100vh; }
+  [data-demo-frame] { position: relative; aspect-ratio: 16 / 9; }
+  [data-demo-frame] > video { position: absolute; inset: 0; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<figure data-demo>
+  <div data-demo-frame>
+    <video muted playsinline preload="none" poster="clip.start.jpg" aria-hidden="true" width="640" height="360">
+      <source data-src="clip.mp4" type='video/mp4; codecs="avc1.64001f"'>
+    </video>
+  </div>
+  <figcaption>A one-shot whose start image is a poster attribute.</figcaption>
+</figure>
+<script type="module">
+  import { mountDemos } from '../lib/demo-embed.js';
+  mountDemos(document);
+</script>
+</body>
+</html>

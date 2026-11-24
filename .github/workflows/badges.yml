@@ -22,12 +22,12 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-      - name: Render the GitHub view badge
+      - name: Render the npm download and GitHub view badges
         id: render
         continue-on-error: true
         env:
           ANALYTICS_TOKEN: ${{ secrets.ANALYTICS_TOKEN }}
-          BADGE_SOURCES: views
+          BADGE_SOURCES: npm,views
         run: node scripts/badges.mjs "$RUNNER_TEMP/badges"
       - name: Publish to the badges branch
         env:

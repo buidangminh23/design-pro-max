@@ -1,0 +1,6 @@
+{
+  "description": "The defect planted in CrashCatalog.swift: the second entry's view reads past the end of an array and traps while it renders. scripts/verify.mjs requires an MW-SNAP-01 error that names that entry, so the runner must have kept the line of the entry rendered before the crash and blamed the next one.",
+  "defects": [
+    { "defect": "a view that traps while the second entry renders", "rule": "MW-SNAP-01", "checker": "snapshot-widgets", "match": "small-broken" }
+  ]
+}

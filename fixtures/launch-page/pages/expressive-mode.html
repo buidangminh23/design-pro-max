@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Pass fixture for the expressive token set: fluid hero, heading and lede whose leading rounds to whole pixels at
+     every width, and section accents that keep 4.5:1. -->
+<html lang="en" data-launch-mode="expressive">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Expressive mode</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); letter-spacing: var(--type-body-tracking); color: var(--color-ink); background: var(--color-bg); }
+  h1, h2, p { margin: 0; }
+  section { padding: var(--section-space) var(--page-gutter); display: grid; gap: var(--heading-after); max-width: var(--content-max); margin-inline: auto; }
+  .eyebrow { color: var(--section-accent); font-size: var(--type-caption-size); line-height: var(--type-caption-leading); letter-spacing: var(--type-caption-tracking); font-weight: var(--type-display-weight); }
+  h1 { font-size: var(--type-hero-size); line-height: var(--type-hero-leading); letter-spacing: var(--type-hero-tracking); font-weight: var(--type-hero-weight); }
+  h2 { font-size: var(--type-heading-size); line-height: var(--type-heading-leading); letter-spacing: var(--type-heading-tracking); font-weight: var(--type-heading-weight); }
+  .lede { font-size: var(--type-lede-size); line-height: var(--type-lede-leading); letter-spacing: var(--type-lede-tracking); color: var(--color-muted); }
+</style>
+</head>
+<body>
+<section data-section-accent="rose">
+  <p class="eyebrow">Expressive mode</p>
+  <h1>Headlines that grow with the window</h1>
+  <p class="lede" data-lede>The hero, section headings and ledes scale between two sizes with the viewport, while every line box still rounds to whole pixels on the four pixel grid.</p>
+</section>
+<section data-section-accent="violet">
+  <p class="eyebrow">Section accent</p>
+  <h2>Each section may carry its own accent</h2>
+  <p>Accents come from the token set, so every pair keeps its contrast in light and dark schemes.</p>
+</section>
+</body>
+</html>

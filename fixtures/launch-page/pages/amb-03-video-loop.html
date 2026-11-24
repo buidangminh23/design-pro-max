@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Fail fixture for LP-AMB-01: an autoplaying, looping, muted video with no pause control, which keeps playing under
+     reduced motion too. Nothing on the page is a CSS animation or a DOM change, so only the media element moves. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-AMB-01 fail: looping video</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h2 { margin: 0 0 var(--heading-after); font-size: var(--type-title-size); line-height: var(--type-title-leading); }
+  video { display: block; width: min(100%, 640px); aspect-ratio: 16 / 9; background: var(--color-surface); }
+</style>
+</head>
+<body>
+<section aria-label="product loop">
+  <h2>A loop that never stops</h2>
+  <video autoplay muted loop playsinline src="loop.webm" aria-label="Product loop"></video>
+</section>
+</body>
+</html>

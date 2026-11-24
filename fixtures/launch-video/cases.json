@@ -1,0 +1,201 @@
+{
+  "description": "launch-video fixtures. Each case runs one checker against media files, a page or a render, built in a temporary folder by scripts/verify.mjs; media come from the recipes in scripts/lib/fixture-media.mjs, so no media file is committed. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it.",
+  "cases": [
+    {
+      "id": "enc-encoded",
+      "rule": ["LV-ENC-01", "LV-ENC-02", "LV-ENC-03"],
+      "expect": "pass",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-clip-webm", "lv-clip"]
+    },
+    {
+      "id": "enc-01-yuvj420p",
+      "rule": "LV-ENC-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-yuvj"]
+    },
+    {
+      "id": "enc-01-444",
+      "rule": "LV-ENC-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-444"]
+    },
+    {
+      "id": "enc-01-moov-at-end",
+      "rule": "LV-ENC-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-moov-end"]
+    },
+    {
+      "id": "enc-02-aac-in-muted-clip",
+      "rule": "LV-ENC-02",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-aac"]
+    },
+    {
+      "id": "enc-03-untagged",
+      "rule": "LV-ENC-03",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-untagged"]
+    },
+    {
+      "id": "poster-01-frame-zero",
+      "rule": "LV-POSTER-01",
+      "expect": "pass",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-clip"],
+      "poster": "lv-clip-start"
+    },
+    {
+      "id": "poster-01-wrong-frame",
+      "rule": "LV-POSTER-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "demo",
+      "files": ["lv-clip"],
+      "poster": "lv-start-wrong"
+    },
+    {
+      "id": "demo-embed",
+      "rule": ["LV-EMBED-01", "LV-EMBED-02"],
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "reference/demo-embed.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "loop.webm": "lv-loop-webm", "loop.start.jpg": "lv-loop-start", "clip.mp4": "lv-clip", "clip.start.jpg": "lv-clip-start" }
+    },
+    {
+      "id": "embed-01-autoplay",
+      "rule": "LV-EMBED-01",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-01-autoplay.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "loop.start.jpg": "lv-loop-start" }
+    },
+    {
+      "id": "embed-02-no-pause",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-no-pause.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-02-plays-after-load",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-plays-after-load.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-01-poster",
+      "rule": "LV-EMBED-01",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-01-poster.html",
+      "server": "range",
+      "media": { "clip.mp4": "lv-clip", "clip.start.jpg": "lv-clip-start" }
+    },
+    {
+      "id": "embed-01-ignores-scrub-film",
+      "rule": "LV-EMBED-01",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-scrub-film.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "clip.mp4": "lv-clip", "clip.start.jpg": "lv-clip-start" }
+    },
+    {
+      "id": "embed-02-dead-pause",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-dead-pause.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-02-unfocusable",
+      "rule": "LV-EMBED-02",
+      "expect": "fail",
+      "checker": "check-embed",
+      "page": "pages/embed-02-unfocusable.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "embed-02-share-first",
+      "rule": "LV-EMBED-02",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-02-share-first.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop", "loop.start.jpg": "lv-loop-start" }
+    },
+    {
+      "id": "embed-02-native-controls",
+      "rule": "LV-EMBED-02",
+      "expect": "pass",
+      "checker": "check-embed",
+      "page": "pages/embed-02-native-controls.html",
+      "server": "range",
+      "media": { "loop.mp4": "lv-loop" }
+    },
+    {
+      "id": "render-ui-mock",
+      "rule": "LV-RENDER-01",
+      "expect": "pass",
+      "checker": "render-frames",
+      "page": "reference/ui-mock.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "render-01-recorded",
+      "rule": "LV-RENDER-01",
+      "expect": "fail",
+      "checker": "render-frames",
+      "files": ["lv-recorded"],
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "render-01-broken-image",
+      "rule": "LV-RENDER-01",
+      "expect": "fail",
+      "checker": "render-frames",
+      "page": "pages/render-01-broken-image.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "render-01-image-never-loads",
+      "rule": "LV-RENDER-01",
+      "expect": "fail",
+      "checker": "render-frames",
+      "page": "pages/render-01-image-never-loads.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "1"]
+    },
+    {
+      "id": "render-01-clock-in-step",
+      "rule": "LV-RENDER-01",
+      "expect": "pass",
+      "checker": "render-frames",
+      "page": "pages/render-01-clock-in-step.html",
+      "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    }
+  ]
+}

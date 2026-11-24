@@ -469,6 +469,76 @@
       }
     },
     {
+      "id": "r47",
+      "kind": "row",
+      "row": "Launch and landing pages or a review of one",
+      "prompt": "Build a launch page for a new Mac menu-bar app: a hero, three feature tiles, pricing and an FAQ, with headlines that stay readable on phones and text that passes contrast. How should I set up the type and sections?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-page"
+      }
+    },
+    {
+      "id": "r48",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "Rebuild our app's onboarding screen in HTML and CSS and render it to a 5-second looping MP4 and WebM for a card on our product page. How do I render, encode and embed it so the page stays fast?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
+      "id": "r49",
+      "kind": "row",
+      "row": "Web page scenes that scrub a canvas image sequence on scroll",
+      "prompt": "On our product page a phone should rotate as the reader scrolls, drawn from about 120 images on a canvas. How do I keep the memory use down and still scrub smoothly?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-scroll"
+      }
+    },
+    {
+      "id": "r55",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Our dashboard is a Capacitor iOS app that loads https://app.example.com. After we changed server.url and ran npx cap sync, the simulator build still opens the old staging site, and people who added the site to the Home Screen get a blank page because it sits behind Basic Auth. How do we fix both?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
+      "id": "r56",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Staff open our internal orders site from an icon they added to their iPads' Home Screen. In Safari the site asks for a user name and password, but from the Home Screen icon it opens to a blank white page. The site sits behind HTTP Basic Auth on nginx. What should we change so it works from the icon?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
+      "id": "r57",
+      "kind": "row",
+      "row": "A web app on iPhone, iPad or Mac",
+      "prompt": "Our Playwright login test passes in the Chromium project but fails in the WebKit project: right after signing in, the next page sends us back to /login. The test server runs on http://localhost:3000 and the session cookie is HttpOnly and Secure. Why only WebKit, and how should we change the test setup?",
+      "expect": {
+        "trigger": true,
+        "part": "web-shells"
+      }
+    },
+    {
+      "id": "r50",
+      "kind": "row",
+      "row": "macOS menu bar apps and WidgetKit widgets",
+      "prompt": "My Mac menu bar app's widget shows grey placeholders after the app updates itself, and Edit Widget has no options. How do I fix both?",
+      "expect": {
+        "trigger": true,
+        "part": "menubar-widgets"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",
@@ -643,6 +713,26 @@
       "kind": "near-miss",
       "row": "web contrast split",
       "prompt": "Check a React web dashboard's text and icon colors against the WCAG 2.2 contrast requirements.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n25",
+      "kind": "near-miss",
+      "row": "Android shell split",
+      "prompt": "Wrap our React web app in Capacitor for Android only and make the hardware back button close our modals instead of leaving the app.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n19",
+      "kind": "near-miss",
+      "row": "Electron tray icon split",
+      "prompt": "Add a tray icon with a context menu to our Electron app that works on Windows and Linux.",
       "expect": {
         "trigger": false,
         "instead": "no skill"

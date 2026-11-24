@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { braceExpand, diffOf, extract, hitHostLimit, hostCommand, makeClaudeHome, partOf, RUN_DEFAULTS, runProfile, scoreRouting, shellAccesses } from '../evals/harness.mjs';
+import { braceExpand, diffOf, extract, hitHostLimit, hostCommand, linkOrCopy, makeClaudeHome, partOf, RUN_DEFAULTS, runProfile, scoreRouting, shellAccesses } from '../evals/harness.mjs';
 import { ROOT, removeTree, runScript, tempDir } from './helpers.mjs';
 
 const HARNESS = path.join(ROOT, 'evals', 'harness.mjs');
@@ -96,25 +96,44 @@ test('a user install gives Claude a config folder with the user skills, and appl
   assert.deepEqual(fs.readdirSync(path.join(withHome, 'skills')).sort(), ['animate', 'apple']);
   assert.equal(fs.readFileSync(path.join(withHome, 'skills', 'apple', 'SKILL.md'), 'utf8'), fs.readFileSync(path.join(ROOT, 'skills', 'apple', 'SKILL.md'), 'utf8'));
   assert.deepEqual(fs.readdirSync(path.join(withoutHome, 'skills')), ['animate']);
-  assert.ok(fs.lstatSync(path.join(withHome, 'CLAUDE.md')).isSymbolicLink());
+  assert.equal(fs.readFileSync(path.join(withHome, 'CLAUDE.md'), 'utf8'), '# rules\n');
   assert.ok(fs.lstatSync(path.join(withHome, 'rules')).isSymbolicLink());
+  assert.equal(fs.realpathSync.native(path.join(withHome, 'rules')), fs.realpathSync.native(path.join(user, 'rules')));
 });
 
 test('every run pins its model and effort instead of reading the user config', () => {
-  assert.deepEqual(RUN_DEFAULTS, { claude: { model: 'claude-opus-5-5[1m]', effort: 'high' }, codex: { model: 'gpt-6.1-sol', effort: 'high' } });
-  assert.deepEqual(runProfile('codex', { effort: 'xhigh' }), { model: 'gpt-6.1-sol', effort: 'xhigh' });
+  assert.deepEqual(RUN_DEFAULTS, { claude: { model: 'claude-opus-5-5[1m]', effort: 'medium' }, codex: { model: 'gpt-6.2-sol', effort: 'high' } });
+  assert.deepEqual(runProfile('codex', { effort: 'xhigh' }), { model: 'gpt-6.2-sol', effort: 'xhigh' });
   assert.throws(() => runProfile('claude', { effort: 'ultracode' }), /--effort for claude/);
   const suite = { maxTurns: 10 };
   const [claude, claudeArgs] = hostCommand('claude', 'hi', suite, false, runProfile('claude'));
   assert.equal(claude, 'claude');
-  assert.deepEqual(JSON.parse(claudeArgs[claudeArgs.indexOf('--settings') + 1]), { disableAllHooks: true, model: 'claude-opus-5-5[1m]', effortLevel: 'high' });
+  assert.deepEqual(JSON.parse(claudeArgs[claudeArgs.indexOf('--settings') + 1]), { disableAllHooks: true, model: 'claude-opus-5-5[1m]', effortLevel: 'medium' });
   assert.equal(claudeArgs[claudeArgs.indexOf('--model') + 1], 'claude-opus-5-5[1m]');
-  assert.equal(claudeArgs[claudeArgs.indexOf('--effort') + 1], 'high');
+  assert.equal(claudeArgs[claudeArgs.indexOf('--effort') + 1], 'medium');
   const [codex, codexArgs] = hostCommand('codex', 'hi', suite, false, runProfile('codex', { model: 'gpt-6-astra' }));
   assert.equal(codex, 'codex');
   assert.equal(codexArgs[codexArgs.indexOf('-m') + 1], 'gpt-6-astra');
   assert.equal(codexArgs[codexArgs.indexOf('-c') + 1], 'model_reasoning_effort="high"');
   assert.equal(codexArgs.at(-1), 'hi');
+});
+
+test('linkOrCopy falls back to a junction or a copy only for a Windows EPERM', (t) => {
+  const dir = tempDir();
+  t.after(() => removeTree(dir));
+  fs.mkdirSync(path.join(dir, 'rules'));
+  fs.writeFileSync(path.join(dir, 'CLAUDE.md'), '# rules\n');
+  const denied = () => {
+    throw Object.assign(new Error('denied'), { code: 'EPERM' });
+  };
+  if (process.platform === 'win32') {
+    linkOrCopy(path.join(dir, 'rules'), path.join(dir, 'rules-link'), denied);
+    linkOrCopy(path.join(dir, 'CLAUDE.md'), path.join(dir, 'CLAUDE-copy.md'), denied);
+    assert.ok(fs.lstatSync(path.join(dir, 'rules-link')).isSymbolicLink());
+    assert.equal(fs.readFileSync(path.join(dir, 'CLAUDE-copy.md'), 'utf8'), '# rules\n');
+  } else {
+    assert.throws(() => linkOrCopy(path.join(dir, 'CLAUDE.md'), path.join(dir, 'CLAUDE-copy.md'), denied), /denied/);
+  }
 });
 
 test('the diff of a run includes what the agent committed itself', (t) => {

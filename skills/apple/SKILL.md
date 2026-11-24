@@ -1,6 +1,6 @@
 ---
 name: apple
-description: For Apple app UI and code (SwiftUI, Xcode, HIG) and scroll scenes. Use when a question or task needs HIG reviews, App Store Connect (app records, TestFlight, signing, notarizing, ad hoc, What's New, ASO, Apple Ads, Wall of Apps, screenshots), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist apps or pinned or scrubbed web sections. Not for launch/preview videos, captioned screenshots, Play Store art, GSAP, web springs (apple-design) or Swift questions (write-swift).
+description: For Apple app UI and code (SwiftUI, Xcode, HIG), launch pages. Use when a question or task needs App Store Connect (TestFlight, signing, notarizing, What's New, ASO, Apple Ads, Wall of Apps), SwiftData, Swift 6, Swift Testing, Core Data, Xcode builds, disk space, Tuist, widgets, Capacitor, Home Screen and WebKit logins, demo clips, scroll scenes. Not for narrated/preview/Remotion/template videos, captioned screenshots, Play Store art, GSAP, springs (apple-design), plain Swift (write-swift).
 ---
 
 # apple
@@ -71,8 +71,12 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Subscription display names | `.vendor/app-store-connect/asc-subscription-localization/SKILL.md` | inactive |
 | RevenueCat catalog reconciliation | `.vendor/app-store-connect/asc-revenuecat-catalog-sync/SKILL.md` | inactive |
 | Wall of Apps entry, on an explicit request only | `.vendor/app-store-connect/asc-wall-submit/SKILL.md` | inactive |
-| Web page scenes that pin, zoom or scrub video or an image sequence on scroll; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
+| Web page scenes that pin, zoom or scrub video or a canvas image sequence on scroll; sequence memory budgets; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
+| Launch and landing pages (hero, feature tiles, galleries, marquees, pricing, FAQ) or a review of one: type scale, SF fonts on the web, contrast, reveals, hero intros, pause controls | `launch-page/PART.md` | active |
+| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
+| A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
+| macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
 
 Routing notes:
 
@@ -80,23 +84,26 @@ Routing notes:
 - Swift Testing: async test structure starts in `.vendor/swift-testing-pro/references/async-tests.md`; concurrency bugs found there follow the concurrency row.
 - SwiftData migrations: the part has one migration rule; use Apple's VersionedSchema documentation as well.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
+- Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design or HIG review goes to `hig`, Tuist manifests to the Tuist row, one SwiftUI API (a MenuBarExtra modifier) to SwiftUI.
 - Keywords in App Store metadata are limited to 100 bytes, not 100 characters.
+- A launch page with a scroll scene or demo clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
 
 Not covered by any part:
 
-- Launch pages and demo video rendered from code: not in this release; say so. A later release adds them.
-- Screen recording: not covered. Offer to rebuild the UI in HTML and CSS, or to embed a clip the user already has.
-- WidgetKit, App Intents, Live Activities: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, AppKit status items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
+- Screen recording: not covered; read `launch-video/PART.md` section 0 and answer from it: say so, then offer its two paths.
+- Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
+- Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
+- Android-only shells, React Native and Flutter: not covered; say so.
 - Never stretch a part to fit.
 
-Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native on a phone to `mobile-native`; store marketing images to `app-store-screenshots`, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
+Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native in mobile Safari to `mobile-native` (Home Screen or shell: the `web-shells` row); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion compositions and HyperFrames templates to their own skills; GSAP APIs to the GSAP skills, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
 
 ## Parts index
 
 `references/parts-index.md` lists every part with its group, status, activation check, prerequisites and errata pointers; each part's `UPSTREAM.json` holds the full text. Read a part's entry there before using it.
 
-- Active (8): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll` and `hig`.
+- Active (12): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets` and `web-shells`.
 - `xcode-build/` (6): inactive until `xcodebuild -list`, run outside the agent sandbox, lists a scheme. They need python3; say that `xcodebuild clean` will run before it does.
 - `macos-menubar-tuist-app`: inactive until Tuist.swift and Project.swift exist and `tuist version` succeeds.
 - `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public pull requests.

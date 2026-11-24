@@ -1,0 +1,125 @@
+{
+  "skill_name": "apple",
+  "part": "menubar-widgets",
+  "description": "Part evals for menubar-widgets in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "cpu-after-dark-mode",
+      "prompt": "My menu bar app sits at about 90 % CPU after I switch to dark mode and stays there while it is idle. The status item code is in StatusItem.swift. Find the cause and fix it.",
+      "expected_output": "A diagnosis that the effectiveAppearance observer redraws on every callback and feeds itself through the menu bar's snapshot of the item; a fix that compares the light or dark match with the last one and returns early; a way to confirm with sample on the running process; a note that a template image needs no observer when colour carries no meaning.",
+      "files": [
+        "files/01-cpu-dark-mode/StatusItem.swift"
+      ],
+      "expectations": [
+        "[diagnosis] It names the observer of effectiveAppearance that sets the title and marks the button for display on every callback as the cause, and explains that the redraw fires the observer again.",
+        "[MW-APPEAR-01] The fixed handler compares the light or dark match (bestMatch or an equivalent) with the last value and returns without redrawing when it has not changed; progress changes still redraw.",
+        "[confirm] It says how to confirm the loop and the fix on the running app, such as sample <pid> or Activity Monitor's CPU column after a dark mode switch.",
+        "[template] It mentions that a monochrome icon or title could use a template image or the system's own tinting and need no appearance observer, or explains why this item keeps colour (the orange warning).",
+        "[scope] It changes StatusItem.swift only where the loop is, keeps the monospaced title and the warning colour, and adds no timer that polls the appearance."
+      ],
+      "checks": [
+        "MW-APPEAR-01"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "placeholders-after-self-update",
+      "prompt": "Since our Mac app started updating itself, the desktop widgets show grey placeholders after every update until I log out and back in. AppDelegate.swift has our launch code and the updater. Why does this happen, and how do we fix it for good?",
+      "expected_output": "An explanation that the widget extension process from the replaced copy keeps running from the removed path, so WidgetKit keeps asking it; commands to confirm it with ps start times against the install time and lsof's executable mapping; a launch-time fix that stops only extension processes outside the installed bundle or older than it, re-registers the extension with pluginkit -a and reloads all timelines; no killing by name.",
+      "files": [
+        "files/02-placeholders/AppDelegate.swift"
+      ],
+      "expectations": [
+        "[cause] It explains that the old extension process keeps running from the copy the updater moved away and removed, and that reloadAllTimelines alone asks that stale process.",
+        "[confirm] It gives a way to confirm it: compare the extension process start time (ps -o lstart) with the install time and read its executable path (lsof -d txt), or the part's probe script.",
+        "[MW-STALE-01] The launch code stops extension processes whose executable lies outside the installed bundle or that started before it, runs pluginkit -a on the installed extension and then reloads all timelines.",
+        "[no-name-kill] It never stops processes by name (pkill, killall) and never touches processes other than the app's own extension.",
+        "[sandbox] It notes that a sandboxed host app cannot list or signal other processes, so the cleanup then belongs in the updater, or it states that this app is not sandboxed."
+      ],
+      "checks": [
+        "MW-STALE-01"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "edit-widget-shows-nothing",
+      "prompt": "Right-clicking our widget and choosing Edit Widget shows nothing. Users want to pick which city it shows; the cities come from CityStore.all. The widget is in WeatherWidget.swift. Make the city choosable.",
+      "expected_output": "A conversion from StaticConfiguration to AppIntentConfiguration with a WidgetConfigurationIntent that has a city parameter typed as an AppEntity with an EntityQuery over CityStore.all; an AppIntentTimelineProvider that reads the chosen city; the kind string kept as it was and moved into one constant that the reload call also uses.",
+      "files": [
+        "files/03-edit-widget/WeatherWidget.swift"
+      ],
+      "expectations": [
+        "[MW-CONFIG-01] The widget uses AppIntentConfiguration with a WidgetConfigurationIntent instead of StaticConfiguration, and the provider is an AppIntentTimelineProvider whose entries use the configured city.",
+        "[MW-WARN-PARAMS] The intent declares an @Parameter for the city, typed as an AppEntity with an EntityQuery that returns entities for identifiers and suggested entities from CityStore.all.",
+        "[MW-WARN-KIND] The kind stays \"WeatherWidget\" so placed widgets survive, and it is written once as a constant used by both the configuration and reloadTimelines(ofKind:).",
+        "[default] A widget with no city chosen yet still shows a sensible default city."
+      ],
+      "checks": [
+        "MW-CONFIG-01",
+        "MW-WARN-PARAMS",
+        "MW-WARN-KIND"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "headless-widget-snapshots",
+      "prompt": "I want a check that catches visual changes in my widget views without opening the GUI; I usually work on this Mac over SSH. The views are in WidgetViews.swift. Set it up so I can run it before every release.",
+      "expected_output": "An offscreen snapshot setup: a catalog of entries at the families' sizes in light and dark, rendered with ImageRenderer from a command-line build, one PNG per entry, byte-compared with a baseline written on the previous build; overflowing entries fail; the ProgressView and the Link render as placeholders offscreen, so progress is drawn with shapes or checked by hand; renders split across processes; no screen capture over SSH and no touching the installed app.",
+      "files": [
+        "files/04-headless-snapshots/WidgetViews.swift"
+      ],
+      "expectations": [
+        "[MW-SNAP-02] It renders each view offscreen with ImageRenderer at fixed sizes, writes PNGs and compares their bytes with a baseline from the previous build, with an explicit step to accept an intended change.",
+        "[MW-SNAP-01] Each entry is checked to fit its size: content that needs more height than the family, such as the notes list, fails instead of being clipped silently.",
+        "[placeholders] It says that ProgressView and Link draw as placeholders in offscreen renders, and draws progress with shapes or checks those parts on the placed widget.",
+        "[ssh] It does not rely on screencapture over SSH, which sees no windows, and does not install, stop or replace the person's installed app to run the check.",
+        "[MW-WARN-BATCH] Large catalogs are rendered in several processes, or it explains why one process is enough for this catalog."
+      ],
+      "checks": [
+        "MW-SNAP-01",
+        "MW-SNAP-02",
+        "MW-WARN-BATCH",
+        "MW-WARN-TESTCOPY"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "no-xcode-intents-missing",
+      "prompt": "We build our Mac app with build.sh and swiftc, no Xcode project. We moved the widget to AppIntentConfiguration, but in the built app Edit Widget still shows no options, and once it stopped loading at all after signing. What is build.sh missing?",
+      "expected_output": "The App Intents metadata extraction step that Xcode runs, listing the entity query, transient entity, intents package and dynamic options protocols, so the options exist in the extension's metadata; the extension signed first with its own sandbox entitlements and never replaced by a --deep signature with the app's entitlements; a secure timestamp for notarized builds; the WidgetBundle as the extension's entry point.",
+      "files": [
+        "files/05-no-xcode-intents/build.sh"
+      ],
+      "expectations": [
+        "[MW-WARN-INTENTS] It adds the App Intents metadata extraction for the widget extension and makes it gather constants for EntityQuery, TransientEntity, AppIntentsPackage and DynamicOptionsProvider (or explains the equivalent), and says why the options were missing.",
+        "[MW-WARN-EXTSIGN] It signs the extension first with its own entitlements including the app sandbox, then the app without --deep, so the app signature does not replace the extension's.",
+        "[timestamp] It adds --timestamp (a secure timestamp) for builds that will be notarized.",
+        "[entry] It keeps the WidgetBundle marked @main as the extension's entry point and adds no custom main."
+      ],
+      "checks": [
+        "MW-WARN-INTENTS",
+        "MW-WARN-EXTSIGN"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "design-timer-menu-bar-and-widget",
+      "prompt": "Design the menu bar presence and a small desktop widget for Tomato, a focus timer for Mac. It runs focus sessions, shows the time left and today's finished sessions, and has start, pause and skip. Settings hold the session length and sounds. Put the SwiftUI code in Sources/.",
+      "expected_output": "A short surface read before the build: a status item or MenuBarExtra whose title is the time left with monospaced digits, a plain menu or a compact popover for start, pause and skip, settings in a window; whether the widget earns its place (today's sessions at a glance) and what it leaves out; a small widget on standard margins with text no smaller than the minimum, a kind constant and content that fits; the HIG part consulted.",
+      "files": [],
+      "expectations": [
+        "[surface-read] Before or with the code it states which surface does what: the menu bar shows the time left, controls live in a menu or a compact popover, settings open in a window, and the widget shows today's sessions; it says what it leaves out.",
+        "[menu-bar] The menu bar item is short: an icon or the time left with monospaced digits, no sentence, and the icon is a template image or an SF Symbol tinted by the system.",
+        "[widget-design] The small widget uses standard margins, no text below the minimum size, no scrolling and no controls it cannot run; tapping it opens the app.",
+        "[MW-WARN-KIND] The widget kind is one constant, and the app reloads the widget's timeline with that constant when a session ends.",
+        "[MW-SNAP-01] The widget's content fits the small family without clipping, or it says how to check that (an offscreen render or a preview at the family size).",
+        "[hig] It follows the menu bar and widget guidelines (from the HIG part or equivalent) rather than inventing sizes."
+      ],
+      "checks": [
+        "MW-WARN-KIND",
+        "MW-SNAP-01"
+      ]
+    }
+  ]
+}

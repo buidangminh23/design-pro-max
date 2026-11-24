@@ -308,6 +308,20 @@ test('pack needs a clean tree, a current skills.json and HEAD at the tag', (t) =
   assert.throws(() => pack(root), /skills\.json does not match the skill folders; run node scripts\/gen\.mjs/);
 });
 
+test('pack on a commit after the release tag compares the archive with HEAD, not the tag', (t) => {
+  const root = releaseFixture(t, (base) => {
+    write(base, 'package.json', `${JSON.stringify({ name: `@minhspark/${NAME}`, version: '0.1.0' }, null, 2)}\n`);
+    write(base, 'CHANGELOG.md', '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n');
+  });
+  const git = gitIn(root, t);
+  git('tag', 'v0.1.0');
+  fs.appendFileSync(path.join(root, 'README.md'), 'More.\n');
+  write(root, 'skills/apple/references/after-the-tag.md', '# Added after the tag\n');
+  git('add', '-A');
+  git('commit', '--quiet', '-m', 'after the tag');
+  assert.equal(pack(root).zip, `${NAME}-v0.1.0.zip`);
+});
+
 test('check ties a tag to package.json and a dated CHANGELOG entry', (t) => {
   const changelog = '# Changelog\n\n## [Unreleased]\n\n## [0.1.0] - 2026-10-07\n\n### Added\n\n- First release.\n\n## [0.0.1] - 2026-10-01\n\n- Old.\n';
   const root = releaseFixture(t, (base) => {
@@ -366,7 +380,12 @@ test('the release commands report usage errors and results', (t) => {
 function statsRoot(t) {
   const root = tempDir('design-pro-max-stats-');
   t.after(() => removeTree(root));
-  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json', 'evals/apple/launch-scroll/evals.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const file of ['vendor/sources.json', 'evidence/ledger.json', 'rules.json', 'fixtures/launch-scroll/cases.json', 'evals/routing/cases.json']) write(root, file, fs.readFileSync(path.join(ROOT, ...file.split('/'))));
+  for (const part of fs.readdirSync(path.join(ROOT, 'evals', 'apple'))) write(root, `evals/apple/${part}/evals.json`, fs.readFileSync(path.join(ROOT, 'evals', 'apple', part, 'evals.json')));
+  for (const part of fs.readdirSync(path.join(ROOT, 'fixtures'))) {
+    const cases = path.join(ROOT, 'fixtures', part, 'cases.json');
+    if (fs.existsSync(cases)) write(root, `fixtures/${part}/cases.json`, fs.readFileSync(cases));
+  }
   write(root, 'package.json', `${JSON.stringify({ name: NAME, version: '0.0.0', private: true }, null, 2)}\n`);
   write(root, '.claude-plugin/plugin.json', `${JSON.stringify({ name: NAME, version: '0.0.0' }, null, 2)}\n`);
   write(root, '.claude-plugin/marketplace.json', `${JSON.stringify({ name: NAME, plugins: [{ name: NAME, version: '0.0.0', source: './' }] }, null, 2)}\n`);
@@ -381,7 +400,7 @@ test('stats count guides, active guides, sourced error rules, must-fail fixtures
   const root = statsRoot(t);
   assert.deepEqual(releaseStats(root), stats);
   const routing = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'routing', 'cases.json'), 'utf8')).cases.length;
-  const part = JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), 'utf8')).evals.length;
+  const part = fs.readdirSync(path.join(ROOT, 'evals', 'apple')).reduce((sum, name) => sum + JSON.parse(fs.readFileSync(path.join(ROOT, 'evals', 'apple', name, 'evals.json'), 'utf8')).evals.length, 0);
   assert.equal(stats.evalCases, routing + part);
   write(root, 'evals/routing/cases.json', `${JSON.stringify({ cases: [{ id: 'a' }, { id: 'b' }] })}\n`);
   write(root, 'evals/apple/other-part/evals.json', `${JSON.stringify({ skill_name: 'apple', evals: [{ id: 1 }] })}\n`);

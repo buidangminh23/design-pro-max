@@ -124,15 +124,18 @@ function shippedTopLevel(root) {
 
 /**
  * The tracked payload files of the commit a release of `version` comes from, as path to { mode, type, object }: the
- * tag v<version> when `root` has it, otherwise HEAD.
+ * tag v<version> when `root` has it, otherwise HEAD. `head` compares with HEAD even when the tag exists, for an archive
+ * just built from HEAD.
  */
-export function trackedPayload(root, version) {
+export function trackedPayload(root, version, { head = false } = {}) {
   const git = gitIn(root);
   let rev = 'HEAD';
-  try {
-    rev = git(['rev-parse', '--verify', '--quiet', `refs/tags/v${version}^{commit}`]);
-  } catch {
-    rev = 'HEAD';
+  if (!head) {
+    try {
+      rev = git(['rev-parse', '--verify', '--quiet', `refs/tags/v${version}^{commit}`]);
+    } catch {
+      rev = 'HEAD';
+    }
   }
   const tree = new Map();
   for (const record of git(['ls-tree', '-r', '-z', '--full-tree', rev, '--', ...PAYLOAD]).split('\0').filter(Boolean)) {
@@ -424,10 +427,10 @@ function bundleProblems(files, bundles) {
  * executable bit, and nothing else. An export-ignore or export-subst attribute in a nested .gitattributes or in
  * .git/info/attributes, or a line-ending filter, shows up here.
  */
-function treeProblems(root, version, files, report) {
+function treeProblems(root, version, files, report, head = false) {
   let payload;
   try {
-    payload = trackedPayload(root, version);
+    payload = trackedPayload(root, version, { head });
   } catch (error) {
     report(`the tracked files of ${root} cannot be read: ${String(error.stderr ?? '').trim() || error.message}`);
     return;
@@ -450,7 +453,7 @@ function treeProblems(root, version, files, report) {
  * Verify release assets in `dir` against the installer contract and, with `root`, against that checkout's manifest.
  * Returns a summary or throws an error listing every problem.
  */
-export function verifyAssets(dir, { root = null } = {}) {
+export function verifyAssets(dir, { root = null, head = false } = {}) {
   const problems = [];
   const zip = sumsEntry(dir, problems);
   if (!zip) throw new Error(`The release assets in ${dir} fail the installer contract:\n- ${problems.join('\n- ')}`);
@@ -505,7 +508,7 @@ export function verifyAssets(dir, { root = null } = {}) {
   const skills = skillProblems(files, problems);
   const parts = partProblems(files, problems);
   if (root) {
-    treeProblems(root, zip.version, files, report);
+    treeProblems(root, zip.version, files, report, head);
     const expected = loadSources(root).parts.map((part) => part.id).sort(compareStrings);
     const shipped = parts.filter((folder) => folder.startsWith(`${VENDOR_DIR}/`)).map((folder) => folder.slice(VENDOR_DIR.length + 1));
     const missing = expected.filter((id) => !shipped.includes(id));
@@ -541,7 +544,7 @@ export function pack(root = ROOT, tag = null) {
   const zipPath = path.join(dist, zipName);
   git(['-c', 'core.autocrlf=false', 'archive', '--format=zip', `--prefix=${NAME}-v${version}/`, `--output=${zipPath}`, 'HEAD']);
   writeRegular(path.join(dist, SUMS_FILE), `${sha256(fs.readFileSync(zipPath))}  ${zipName}\n`);
-  return { dist, ...verifyAssets(dist, { root }) };
+  return { dist, ...verifyAssets(dist, { root, head: true }) };
 }
 
 /** Eval cases: `cases` of evals/<suite>/cases.json plus `evals` of each part's evals/<design>/<part>/evals.json. */

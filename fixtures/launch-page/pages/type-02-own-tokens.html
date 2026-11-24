@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- Fail fixture for LP-TYPE-01: the page declares its own --type-body-size and --type-lede-size on :root at 17px and
+     23px, sizes picked by eye that are not on the shipped ladder, and every text box uses them. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-TYPE-01 fail: self-declared sizes</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  :root { --type-body-size: 17px; --type-lede-size: 23px; }
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .lede { font-size: var(--type-lede-size); line-height: var(--type-lede-leading); }
+</style>
+</head>
+<body>
+<h1>Tokens that are not on the scale</h1>
+<p class="lede">The lede uses the page's own lede token at 23px.</p>
+<p>The body uses the page's own body token at 17px.</p>
+</body>
+</html>

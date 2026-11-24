@@ -12,8 +12,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkScrubFile, checkSourceSet, probeMedia, runTool } from '../../shared/check-media.mjs';
-import { createReport, isMain, runMain, UsageError } from '../../shared/report.mjs';
+import { checkScrubFile, checkSourceSet, MEDIA_BOUNDARY, probeMedia, runTool } from '../../shared/check-media.mjs';
+import { createReport, dropProject, isMain, runMain, UsageError } from '../../shared/report.mjs';
 
 export const GENERATOR = 'design-pro-max launch-scroll encode-scrub';
 export const VERSION = '0.1.0';
@@ -91,7 +91,7 @@ export function encodeArgs(options, outputs) {
 }
 
 async function main() {
-  const options = parseArgs(process.argv.slice(2));
+  const options = parseArgs(dropProject(process.argv.slice(2)));
   if (!fs.existsSync(options.master)) throw new UsageError(`${options.master} does not exist.`);
   const outputs = plan(options);
   process.stderr.write(`encode-scrub ${VERSION} will write:\n${Object.values(outputs).map((file) => `  ${file}`).join('\n')}\n`);
@@ -102,7 +102,7 @@ async function main() {
   fs.mkdirSync(path.resolve(options.out), { recursive: true });
   for (const args of encodeArgs(options, outputs)) ffmpeg(args);
   fs.writeFileSync(outputs.manifest, `${JSON.stringify({ generator: GENERATOR, version: VERSION, master: path.basename(options.master), gop: gopFor(options.fps), ...options, master_path: undefined, out: undefined, files: Object.values(outputs).map((file) => path.basename(file)) }, null, 2)}\n`);
-  const report = createReport({ tool: 'encode-scrub' });
+  const report = createReport({ tool: 'encode-scrub', boundary: MEDIA_BOUNDARY });
   const films = [outputs.mp4, outputs.webm, outputs.hevc].filter(Boolean).map((file) => probeMedia(file));
   for (const info of films) checkScrubFile(info, report);
   checkSourceSet(films, report, 'encoded sources');

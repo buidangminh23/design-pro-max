@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- Fail fixture for LP-BASE-01: headings, the lede and the call to action start at opacity 0 in plain CSS and only a
+     script makes them visible, so without script nothing shows; the script ignores reduced motion too. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-BASE-01 fail</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; padding: var(--space-6) var(--page-gutter); font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  h1 { margin: 0 0 var(--heading-after); font-size: var(--type-hero-size); line-height: var(--type-hero-leading); }
+  .reveal { opacity: 0; transition: opacity var(--duration-reveal) var(--ease-out); }
+  .reveal.in { opacity: 1; }
+  .spacer { height: 150vh; }
+  a { color: var(--color-accent); }
+</style>
+</head>
+<body>
+<h1 class="reveal">Content that waits for a script</h1>
+<p class="reveal" data-lede>Every line here starts invisible and needs a script to appear, so a reader without script, or one who asked for less motion before the script ran, sees an empty page.</p>
+<p class="reveal"><a href="#more" data-cta>Get started</a></p>
+<div class="spacer"></div>
+<h2 class="reveal" id="more">A section further down</h2>
+<script type="module">
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) if (entry.isIntersecting) entry.target.classList.add('in');
+  });
+  document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+</script>
+</body>
+</html>

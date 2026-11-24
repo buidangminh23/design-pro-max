@@ -1,0 +1,9 @@
+body { margin: 0; font-family: system-ui, sans-serif; color: #1d1d1f; }
+html[data-motion="ok"] .reveal { opacity: 0; transform: translateY(24px); transition: opacity 1s ease-out, transform 1s ease-out; }
+html[data-motion="ok"] .reveal.is-revealed { opacity: 1; transform: none; }
+.button { padding: 12px 24px; border-radius: 999px; background: #0a6e66; color: #fff; transition: background-color 400ms ease, transform 400ms ease; }
+.button:hover { background: #075751; transform: translateY(-1px); }
+.nav-menu { transition: opacity 500ms ease; }
+@media (prefers-reduced-motion: reduce) {
+  html[data-motion="ok"] .reveal { opacity: 1; transform: none; transition: none; }
+}

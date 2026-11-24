@@ -13,7 +13,7 @@
  * Every run pins its model and effort, by default those in RUN_DEFAULTS, so a change to the user's own config does not
  * change a round; --model and --effort override them, and each run's meta records what it used.
  *
- *   node evals/harness.mjs run --suite routing|launch-scroll --host claude|codex --condition with|without --out <dir>
+ *   node evals/harness.mjs run --suite routing|launch-scroll|launch-page|launch-video|menubar-widgets|web-shells --host claude|codex --condition with|without --out <dir>
  *        [--ids a,b] [--listing] [--install project|user] [--model <id>] [--effort <level>]
  *                                  --listing keeps the session so the host's skill listing can be read back
  *   node evals/harness.mjs trace --out <dir>                re-extract every trace from the raw output
@@ -36,9 +36,13 @@ const SKILL = path.join(ROOT, 'skills', 'apple');
 const SUITES = {
   routing: { file: path.join(ROOT, 'evals', 'routing', 'cases.json'), list: (doc) => doc.cases, maxTurns: 10, timeout: 480 },
   'launch-scroll': { file: path.join(ROOT, 'evals', 'apple', 'launch-scroll', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
+  'launch-page': { file: path.join(ROOT, 'evals', 'apple', 'launch-page', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
+  'launch-video': { file: path.join(ROOT, 'evals', 'apple', 'launch-video', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
+  'menubar-widgets': { file: path.join(ROOT, 'evals', 'apple', 'menubar-widgets', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
+  'web-shells': { file: path.join(ROOT, 'evals', 'apple', 'web-shells', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
 };
 const SKILL_ROOT = { claude: '.claude/skills/apple', codex: '.agents/skills/apple' };
-export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'high' }, codex: { model: 'gpt-6.1-sol', effort: 'high' } };
+export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'medium' }, codex: { model: 'gpt-6.2-sol', effort: 'high' } };
 const EFFORTS = { claude: ['low', 'medium', 'high', 'xhigh', 'max'], codex: ['minimal', 'low', 'medium', 'high', 'xhigh'] };
 const USER_CLAUDE = process.env.DPM_EVAL_CLAUDE_HOME ?? path.join(os.homedir(), '.claude');
 const SKIPPED_USER_SKILLS = new Set(['apple', 'synced']);
@@ -72,6 +76,20 @@ function sh(cmd, args, cwd) {
 }
 
 /**
+ * Links target to source. Windows refuses symlinks without Developer Mode, so a folder falls back to a junction and a
+ * file to a copy.
+ */
+export function linkOrCopy(source, target, symlink = fs.symlinkSync) {
+  try {
+    symlink(source, target);
+  } catch (error) {
+    if (process.platform !== 'win32' || error.code !== 'EPERM') throw error;
+    if (fs.statSync(source).isDirectory()) fs.symlinkSync(source, target, 'junction');
+    else fs.copyFileSync(source, target);
+  }
+}
+
+/**
  * A temporary Claude config folder for --install user: the user's skills except apple, links to the user's CLAUDE.md
  * and rules, and apple itself only when the condition is with. The folder is named .claude so traces resolve skill
  * paths the same way as with a project install.
@@ -87,7 +105,7 @@ export function makeClaudeHome(condition, userHome = USER_CLAUDE) {
       fs.cpSync(path.join(userSkills, entry.name), path.join(skills, entry.name), { recursive: true, dereference: true });
     }
   }
-  for (const name of ['CLAUDE.md', 'rules']) if (fs.existsSync(path.join(userHome, name))) fs.symlinkSync(path.join(userHome, name), path.join(home, name));
+  for (const name of ['CLAUDE.md', 'rules']) if (fs.existsSync(path.join(userHome, name))) linkOrCopy(path.join(userHome, name), path.join(home, name));
   if (condition === 'with') fs.cpSync(SKILL, path.join(skills, 'apple'), { recursive: true });
   return home;
 }

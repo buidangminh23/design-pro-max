@@ -463,3 +463,31 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 0 error, 0 warn; evidence in `hig/references/evidence.md`
 - Checkers: 
+
+### `launch-video`
+
+- Guide: `launch-video/PART.md`
+- Status: active
+- Rules: 7 error, 8 warn; evidence in `launch-video/references/evidence.md`
+- Checkers: `shared/check-media.mjs`, `launch-video/scripts/check-embed.mjs`, `launch-video/scripts/render-frames.mjs`
+
+### `launch-page`
+
+- Guide: `launch-page/PART.md`
+- Status: active
+- Rules: 7 error, 9 warn; evidence in `launch-page/references/evidence.md`
+- Checkers: `launch-page/scripts/check-page.mjs`
+
+### `menubar-widgets`
+
+- Guide: `menubar-widgets/PART.md`
+- Status: active
+- Rules: 5 error, 6 warn; evidence in `menubar-widgets/references/evidence.md`
+- Checkers: `menubar-widgets/scripts/scan-swift.mjs`, `menubar-widgets/scripts/probe-extension.mjs`, `menubar-widgets/scripts/snapshot-widgets.mjs`
+
+### `web-shells`
+
+- Guide: `web-shells/PART.md`
+- Status: active
+- Rules: 5 error, 4 warn; evidence in `web-shells/references/evidence.md`
+- Checkers: `web-shells/scripts/check-shell.mjs`, `web-shells/scripts/probe-webkit.mjs`

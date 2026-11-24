@@ -8,7 +8,7 @@ import path from 'node:path';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { UsageError } from './report.mjs';
-import { rethrowSandbox } from './sandbox.mjs';
+import { currentCommand, rethrowSandbox } from './sandbox.mjs';
 
 export const INSTALL_HINT =
   'Install Playwright in the project that holds the page (npm install --save-dev playwright), then its browser ' +
@@ -27,10 +27,10 @@ export function findPlaywright(project = process.cwd()) {
   return null;
 }
 
-export async function loadPlaywright(project = process.cwd()) {
-  if (!fs.existsSync(path.resolve(project))) throw new UsageError(`Project folder ${project} does not exist.`, INSTALL_HINT);
+export async function loadPlaywright(project = process.cwd(), hint = INSTALL_HINT) {
+  if (!fs.existsSync(path.resolve(project))) throw new UsageError(`Project folder ${project} does not exist.`, hint);
   const found = findPlaywright(project);
-  if (!found) throw new UsageError(`Playwright is not installed in ${path.resolve(project)} or any folder above it.`, INSTALL_HINT);
+  if (!found) throw new UsageError(`Playwright is not installed in ${path.resolve(project)} or any folder above it.`, hint);
   const module = await import(pathToFileURL(found.entry).href);
   return module.default?.chromium ? module.default : module;
 }
@@ -43,6 +43,6 @@ export async function launchChromium(playwright, options = {}) {
     if (/Executable doesn't exist|browserType\.launch: .*not found|please run.*playwright install/i.test(String(error?.message))) {
       throw new UsageError('Playwright is installed but its Chromium browser is not.', INSTALL_HINT);
     }
-    return rethrowSandbox(error, 'the same checker command');
+    return rethrowSandbox(error, currentCommand());
   }
 }

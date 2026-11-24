@@ -14,7 +14,13 @@
  * progress stays in [0, 1] and never runs backwards on a forward sweep; LS-VID-03 no currentTime write while seeking
  * and no fastSeek(); LS-VID-04 the film is seekable (a Blob URL, MediaSource or 206 Range responses); LS-VID-05 the
  * start image is frame 0 and the video stays hidden until it has presented a frame. LS-VID-01 and LS-VID-02 run on
- * the film files through the shared check-media. Output follows the shared checker contract.
+ * the film files through the shared check-media. An image sequence (a canvas[data-sequence] whose data-src names a
+ * make-sequence manifest) gets the same gates, with its manifest and frames counted as scrub media; under LS-VID-05 its
+ * start image must match frame 0 of the sequence and its canvas stays hidden until the scene reports
+ * data-scrub-state="ready"; and the warning LS-WARN-SEQ: the page keeps a bounded window of decoded frames (live
+ * ImageBitmaps or loaded <img> frames), at most 2 x radius + 1 plus the decodes in flight, never the whole set.
+ * LS-GATE-01 counts only the scene's own media: a demo clip elsewhere on the page that loads when near is not a scrub film.
+ * Output follows the shared checker contract.
  */
 import fs from 'node:fs';
 import os from 'node:os';
@@ -25,14 +31,34 @@ import { launchChromium, loadPlaywright } from '../../shared/resolve-playwright.
 import { MODES, startServer } from '../../shared/server.mjs';
 
 export const DEFAULT_VIEWPORTS = [{ width: 1440, height: 900 }, { width: 390, height: 844 }];
+export const WINDOW_DEFAULTS = Object.freeze({ radius: 8, decodeConcurrency: 2 });
 export const LIMITS = Object.freeze({ ssim: 0.99, travelMinVh: 70, travelMaxVh: 300, sweepSteps: 48, settleMs: 3000, loadMs: 10000 });
 
 const VIDEO_URL = /\.(?:mp4|m4v|mov|webm)(?:[?#]|$)/i;
 const TOLERANCE = { px: 2, progress: 0.002 };
 
 export const INSTRUMENT = String.raw`(() => {
-  const log = { seekingWrites: 0, firstWrite: null, fastSeekCalls: 0, earlyVisible: [], playRejected: false };
+  const log = { seekingWrites: 0, firstWrite: null, fastSeekCalls: 0, earlyVisible: [], earlyCanvas: [], playRejected: false, bitmaps: { created: 0, live: 0, peak: 0, width: 0, height: 0 } };
   Object.defineProperty(window, '__lsProbe', { value: log, enumerable: false });
+  const images = [];
+  const imageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+  Object.defineProperty(HTMLImageElement.prototype, 'src', {
+    configurable: true,
+    enumerable: imageSrc.enumerable,
+    get() { return imageSrc.get.call(this); },
+    set(value) {
+      images.push(new WeakRef(this));
+      imageSrc.set.call(this, value);
+    },
+  });
+  Object.defineProperty(window, '__lsLoadedImages', {
+    enumerable: false,
+    value: (source) => {
+      const pattern = new RegExp(source);
+      const seen = new Set([...images.map((ref) => ref.deref()).filter(Boolean), ...document.images]);
+      return [...seen].filter((image) => image.complete && image.naturalWidth > 0 && pattern.test(image.currentSrc || image.src)).length;
+    },
+  });
   const media = HTMLMediaElement.prototype;
   const time = Object.getOwnPropertyDescriptor(media, 'currentTime');
   Object.defineProperty(media, 'currentTime', {
@@ -55,6 +81,29 @@ export const INSTRUMENT = String.raw`(() => {
       return Promise.reject(new DOMException('play() rejected by the probe', 'NotAllowedError'));
     };
   }
+  if (typeof window.createImageBitmap === 'function' && typeof ImageBitmap !== 'undefined') {
+    const nativeCreate = window.createImageBitmap;
+    const nativeClose = ImageBitmap.prototype.close;
+    const open = new WeakSet();
+    window.createImageBitmap = function createImageBitmap(...args) {
+      return nativeCreate.apply(this, args).then((bitmap) => {
+        open.add(bitmap);
+        log.bitmaps.created += 1;
+        log.bitmaps.live += 1;
+        log.bitmaps.peak = Math.max(log.bitmaps.peak, log.bitmaps.live);
+        log.bitmaps.width = Math.max(log.bitmaps.width, bitmap.width);
+        log.bitmaps.height = Math.max(log.bitmaps.height, bitmap.height);
+        return bitmap;
+      });
+    };
+    ImageBitmap.prototype.close = function close() {
+      if (open.has(this)) {
+        open.delete(this);
+        log.bitmaps.live -= 1;
+      }
+      return nativeClose.call(this);
+    };
+  }
   const presented = new WeakSet();
   const watched = new WeakSet();
   const flagged = new WeakSet();
@@ -75,9 +124,18 @@ export const INSTRUMENT = String.raw`(() => {
   const tick = () => {
     for (const video of document.querySelectorAll('video')) {
       watch(video);
+      if (window.__lsSceneSelector && !video.closest(window.__lsSceneSelector)) continue;
       if (!presented.has(video) && !flagged.has(video) && visible(video) && onScreen(video)) {
         flagged.add(video);
         log.earlyVisible.push(video.currentSrc || video.getAttribute('src') || '(no source yet)');
+      }
+    }
+    for (const canvas of document.querySelectorAll('canvas[data-sequence]')) {
+      const scene = canvas.closest(window.__lsSceneSelector || '[data-scene]');
+      if (!scene || flagged.has(canvas)) continue;
+      if (scene.dataset.scrubState !== 'ready' && visible(canvas) && onScreen(canvas)) {
+        flagged.add(canvas);
+        log.earlyCanvas.push(canvas.dataset.src || '(canvas)');
       }
     }
     requestAnimationFrame(tick);
@@ -146,6 +204,7 @@ function readScene(page, selector, index) {
     const sources = video ? [...video.querySelectorAll('source')].map((source) => source.dataset.src || source.getAttribute('src')).filter(Boolean) : [];
     if (video && !sources.length && (video.getAttribute('src') || video.dataset.src)) sources.push(video.dataset.src || video.getAttribute('src'));
     const start = scene.querySelector('[data-scene-startframe]');
+    const canvas = scene.querySelector('canvas[data-sequence]');
     return {
       pinned: stickies.length > 0,
       state: scene.dataset.sceneState ?? null,
@@ -174,6 +233,22 @@ function readScene(page, selector, index) {
         height: video.videoHeight,
       } : null,
       startframe: start ? new URL(start.currentSrc || start.getAttribute('src'), location.href).href : video?.poster || null,
+      media: (() => {
+        const urls = (element) => [element, ...element.querySelectorAll('source')]
+          .flatMap((node) => [node.getAttribute('src'), node.dataset.src, node.currentSrc])
+          .filter(Boolean)
+          .map((value) => new URL(value, location.href).href);
+        const all = [...document.querySelectorAll('video, audio')];
+        return {
+          inside: all.filter((element) => scene.contains(element)).flatMap(urls),
+          outside: all.filter((element) => !scene.contains(element)).flatMap(urls),
+        };
+      })(),
+      sequence: canvas && canvas.dataset.src ? {
+        manifest: new URL(canvas.dataset.src, location.href).href,
+        state: scene.dataset.scrubState ?? null,
+        frame: scene.dataset.sequenceFrame === undefined ? null : Number(scene.dataset.sequenceFrame),
+      } : null,
     };
   }, { sel: selector, at: index });
 }
@@ -184,8 +259,10 @@ async function newPage(browser, viewport, { reducedMotion = 'no-preference', rej
   await context.addInitScript(INSTRUMENT);
   const page = await context.newPage();
   const media = [];
+  const requests = [];
   const responses = new Map();
   page.on('request', (request) => {
+    requests.push(request.url());
     if (request.resourceType() === 'media' || VIDEO_URL.test(request.url())) media.push(request.url());
   });
   page.on('response', (response) => {
@@ -195,7 +272,7 @@ async function newPage(browser, viewport, { reducedMotion = 'no-preference', rej
     list.push(response.status());
     responses.set(response.url(), list);
   });
-  return { context, page, media, responses };
+  return { context, page, media, requests, responses };
 }
 
 async function sweep(page, selector, index, scene, steps = LIMITS.sweepSteps) {
@@ -237,8 +314,102 @@ async function waitForFilm(page, selector, index) {
   await page.waitForFunction(({ sel, at }) => {
     const scene = document.querySelectorAll(sel)[at];
     const video = scene?.querySelector('video[data-scrub]') ?? scene?.querySelector('video');
+    if (!video && scene?.querySelector('canvas[data-sequence]')) return ['ready', 'failed'].includes(scene.dataset.scrubState);
     return !video || video.readyState >= 2 || scene?.dataset.scrubState === 'failed';
   }, { sel: selector, at: index }, { timeout: LIMITS.loadMs }).catch(() => {});
+}
+
+export async function readManifest(context, url) {
+  try {
+    const response = await context.request.get(url);
+    return response.ok() ? await response.json() : null;
+  } catch {
+    return null;
+  }
+}
+
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const PLACEHOLDER = /%(?:0\d+)?d/;
+const SENTINEL = 'lsprobeframe';
+
+export function framePattern(manifestUrl, manifest) {
+  const template = typeof manifest?.frames === 'string' ? manifest.frames : '';
+  if (!PLACEHOLDER.test(template)) return null;
+  const resolved = new URL(template.replace(PLACEHOLDER, SENTINEL), manifestUrl).href;
+  return `^${escapeRegExp(resolved).replace(SENTINEL, '\\d+')}(?:[?#].*)?$`;
+}
+
+export function frameUrlOf(manifestUrl, manifest, index) {
+  const width = (match) => Number(match.slice(2, -1)) || 0;
+  return new URL(manifest.frames.replace(PLACEHOLDER, (match) => String(index).padStart(width(match), '0')), manifestUrl).href;
+}
+
+export function sequenceUrls(manifestUrl, manifest) {
+  const source = framePattern(manifestUrl, manifest);
+  const pattern = source ? new RegExp(source) : null;
+  return (url) => url === manifestUrl || Boolean(pattern?.test(url));
+}
+
+export function windowLimit(manifest, count) {
+  const radius = Number.isInteger(manifest?.radius) && manifest.radius >= 0 ? manifest.radius : WINDOW_DEFAULTS.radius;
+  return { radius, limit: Math.min(count, 2 * radius + 1 + WINDOW_DEFAULTS.decodeConcurrency) };
+}
+
+export function frameWindowVerdict(held, count, manifest = null, kind = 'decoded frame(s)') {
+  if (!(count > 0)) return { ok: false, measured: 'the manifest could not be read, so the frame count is unknown' };
+  const { radius, limit } = windowLimit(manifest, count);
+  const megabytes = Math.round((held.peak * held.width * held.height * 4) / 1048576);
+  return {
+    ok: held.peak <= limit || count <= 1,
+    measured: `${held.peak} ${kind} at most of ${count}, limit ${limit} (2 x radius ${radius} + 1 + ${WINDOW_DEFAULTS.decodeConcurrency} in flight), about ${megabytes} MB at ${held.width}x${held.height}`,
+  };
+}
+
+export function sceneRequests(media, requests, sceneMedia, isSequence) {
+  const inside = new Set(sceneMedia?.inside ?? []);
+  const outside = new Set((sceneMedia?.outside ?? []).filter((url) => !inside.has(url)));
+  return [...new Set([...media.filter((url) => !outside.has(url)), ...requests.filter(isSequence)])];
+}
+
+function ssimImages(first, second, width, height) {
+  const display = `scale=${width}:${height}:flags=accurate_rnd+full_chroma_int,format=rgb24,format=yuv444p`;
+  const result = runTool('ffmpeg', ['-hide_banner', '-nostats', '-i', first, '-i', second, '-filter_complex', `[0:v]${display}[a];[1:v]${display}[b];[a][b]ssim`, '-frames:v', '1', '-f', 'null', '-']);
+  const match = /All:([0-9.]+)/.exec(result.stderr);
+  return match ? Number(match[1]) : null;
+}
+
+async function checkSequence(report, where, run, scene, options, scratch) {
+  const manifest = await readManifest(run.context, scene.sequence.manifest);
+  const count = Number(manifest?.count) || 0;
+  report.check('LS-WARN-SEQ', scene.sequence.state === 'ready', `${where}: sequence`, `state ${scene.sequence.state ?? 'none'}, frame ${scene.sequence.frame ?? 'none'}`, 'frames drawn once the scene pins', 'warn');
+  const log = await run.page.evaluate(() => window.__lsProbe);
+  report.check('LS-VID-05', log.earlyCanvas.length === 0, `${where}: canvas reveal`, log.earlyCanvas.length ? `visible before data-scrub-state="ready": ${log.earlyCanvas.join(', ')}` : 'hidden until a frame was drawn', 'shown once the scene reports a drawn frame');
+  if (!manifest) report.warn('LS-WARN-SEQ', `${where}: manifest`, `${scene.sequence.manifest} could not be read`, 'a make-sequence manifest with count, size and the frame template');
+  const pattern = manifest ? framePattern(scene.sequence.manifest, manifest) : null;
+  const images = pattern ? await run.page.evaluate((source) => window.__lsLoadedImages(source), pattern) : 0;
+  if (!log.bitmaps.created && !images) {
+    report.warn('LS-WARN-SEQ', `${where}: decoded frames`, 'no createImageBitmap call and no loaded frame image seen', 'a bounded window of decoded frames (ImageBitmap, closed when it leaves)');
+  }
+  if (log.bitmaps.created) {
+    const verdict = frameWindowVerdict(log.bitmaps, count, manifest);
+    report.check('LS-WARN-SEQ', verdict.ok, `${where}: decoded frames`, verdict.measured, 'a bounded window of decoded frames, never the whole set', 'warn');
+  }
+  if (images) {
+    const verdict = frameWindowVerdict({ peak: images, width: manifest.width, height: manifest.height }, count, manifest, 'loaded frame <img> element(s)');
+    report.check('LS-WARN-SEQ', verdict.ok, `${where}: frame images`, verdict.measured, 'a bounded window of decoded frames, not every frame as an <img>', 'warn');
+  }
+  if (!options.media) {
+    report.skip('LS-VID-05', `${where}: start image`, '--no-media');
+  } else if (!scene.startframe) {
+    report.error('LS-VID-05', `${where}: start image`, 'none ([data-scene-startframe])', 'a start image equal to frame 0');
+  } else if (!pattern) {
+    report.skip('LS-VID-05', `${where}: start image`, 'the manifest could not be read');
+  } else {
+    const first = await download(run.context, frameUrlOf(scene.sequence.manifest, manifest, 0), scratch);
+    const image = await download(run.context, scene.startframe, scratch);
+    const score = ssimImages(first, image, manifest.width, manifest.height);
+    report.check('LS-VID-05', score !== null && score >= LIMITS.ssim, `${where}: start image`, score === null ? 'SSIM could not be measured' : `SSIM ${score.toFixed(4)} against frame 0 of the sequence`, `SSIM at least ${LIMITS.ssim}`);
+  }
 }
 
 async function fastSweep(page, scene) {
@@ -321,13 +492,15 @@ async function checkStatic(report, rule, where, browser, url, viewport, selector
     await settle(run.page, selector);
     const first = await readScene(run.page, selector, index);
     if (!first) return;
+    const isSequence = first.sequence ? sequenceUrls(first.sequence.manifest, await readManifest(run.context, first.sequence.manifest)) : () => false;
     const pageHeight = await run.page.evaluate(() => document.documentElement.scrollHeight);
     for (let y = 0; y <= pageHeight; y += Math.max(200, viewport.height / 2)) await scrollTo(run.page, y);
     await run.page.waitForTimeout(500);
     const scene = await readScene(run.page, selector, index);
     report.check(rule, !scene.pinned, `${where}: layout`, scene.pinned ? `still pinned (state ${scene.state ?? 'none'})` : 'normal flow', 'normal flow, no sticky stage');
     if (scene.exposed !== null) report.check(rule, scene.exposed >= 0.99, `${where}: end state`, `--scene-progress ${scene.exposed}`, 'end state (progress 1)');
-    report.check(rule, run.media.length === 0, `${where}: film requests`, run.media.length ? run.media.map((entry) => path.basename(new URL(entry).pathname)).join(', ') : 'none', 'no film requested');
+    const requested = sceneRequests(run.media, run.requests, scene.media, isSequence);
+    report.check(rule, requested.length === 0, `${where}: film requests`, requested.length ? requested.slice(0, 5).map((entry) => path.basename(new URL(entry).pathname)).join(', ') + (requested.length > 5 ? ` and ${requested.length - 5} more` : '') : 'none', 'no film or sequence frames requested');
   } finally {
     await run.context.close();
   }
@@ -363,6 +536,7 @@ export async function probe(options, report) {
     for (const viewport of options.viewports) {
       const label = `${viewport.width}x${viewport.height}`;
       const run = await newPage(browser, viewport);
+      await run.context.addInitScript(`window.__lsSceneSelector = ${JSON.stringify(options.scene)};`);
       let count = 0;
       try {
         await run.page.goto(url, { waitUntil: 'load' });
@@ -381,6 +555,16 @@ export async function probe(options, report) {
             checkGeometry(report, where, scene, samples);
             await checkShortViewport(report, where, browser, url, viewport, options.scene, index, scene);
           }
+          if (scene.sequence) {
+            if (scene.pinned) {
+              await scrollTo(run.page, scene.top);
+              await waitForFilm(run.page, options.scene, index);
+              await fastSweep(run.page, await readScene(run.page, options.scene, index));
+              await checkSequence(report, where, run, await readScene(run.page, options.scene, index), options, scratch);
+            } else {
+              report.skip('LS-WARN-SEQ', where, 'the scene does not pin, so nothing scrubs');
+            }
+          }
           if (scene.video) {
             if (scene.pinned) {
               await scrollTo(run.page, scene.top);
@@ -392,7 +576,7 @@ export async function probe(options, report) {
             }
           }
           await checkStatic(report, 'LS-GATE-01', `${where}, reduced motion`, browser, url, viewport, options.scene, index, { reducedMotion: 'reduce' });
-          if (scene.video) await checkStatic(report, 'LS-GATE-01', `${where}, rejected play()`, browser, url, viewport, options.scene, index, { rejectPlay: true });
+          if (scene.video || scene.sequence) await checkStatic(report, 'LS-GATE-01', `${where}, rejected play()`, browser, url, viewport, options.scene, index, { rejectPlay: true });
         }
       } finally {
         await run.context.close();

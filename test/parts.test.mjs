@@ -92,12 +92,16 @@ test('no own file in the skill names a research folder or a private path', () =>
 });
 
 test('every fixture case names an existing page, a known checker and known media', async () => {
-  const { buildFixtureMedia } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'lib', 'fixture-media.mjs')).href);
-  const recipes = buildFixtureMedia.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, ''));
+  const { buildFixtureMedia, buildLaunchVideoMedia } = await import(pathToFileURL(path.join(ROOT, 'scripts', 'lib', 'fixture-media.mjs')).href);
+  const recipes = [buildFixtureMedia, buildLaunchVideoMedia].flatMap((build) => build.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, '')));
   for (const part of OWN_PARTS) {
     for (const entry of loadCases(ROOT, part)) {
-      assert.ok(['probe-scene', 'check-media'].includes(entry.checker), entry.id);
-      assert.ok(['pass', 'fail'].includes(entry.expect), entry.id);
+      assert.ok(['probe-scene', 'check-media', 'check-embed', 'render-frames', 'check-page', 'lint-css', 'scan-swift', 'probe-extension', 'snapshot-widgets', 'check-shell', 'probe-webkit'].includes(entry.checker), entry.id);
+      for (const folder of [entry.project, entry.bundle].filter(Boolean)) assert.ok(fs.existsSync(path.join(ROOT, 'fixtures', part, folder)), `${entry.id}: ${folder}`);
+      if (entry.app) assert.ok(fs.existsSync(entry.app.startsWith('assets/') ? path.join(ROOT, SKILL_DIR, part, entry.app) : path.join(ROOT, 'fixtures', part, entry.app)), `${entry.id}: ${entry.app}`);
+      if (entry.poster) assert.ok(recipes.includes(entry.poster), `${entry.id}: ${entry.poster}`);
+      if (entry.expected) assert.ok(fs.existsSync(path.join(ROOT, 'fixtures', part, entry.expected)), `${entry.id}: ${entry.expected}`);
+      assert.ok(['pass', 'fail', 'warn'].includes(entry.expect), entry.id);
       if (entry.page) {
         const page = entry.page.startsWith('reference/') ? path.join(ROOT, SKILL_DIR, part, 'assets', entry.page) : path.join(ROOT, 'fixtures', part, entry.page);
         assert.ok(fs.existsSync(page), `${entry.id}: ${entry.page}`);
@@ -119,6 +123,9 @@ test('the harness judges fail and pass runs red-first', async () => {
   assert.equal(evaluateRun({ rule: 'LS-VID-04', expect: 'pass' }, green).ok, true);
   assert.equal(evaluateRun({ rule: ['LS-VID-04', 'LS-VID-05'], expect: 'pass' }, green).ok, false, 'an unchecked rule is not green');
   assert.equal(evaluateRun({ rule: 'LS-VID-04', expect: 'fail' }, { code: 2, stdout: '' }).ok, false);
+  const warned = { code: 0, stdout: [line('LS-WARN-SEQ', 'warn'), summary].join('\n') };
+  assert.equal(evaluateRun({ rule: 'LS-WARN-SEQ', expect: 'warn' }, warned).ok, true);
+  assert.equal(evaluateRun({ rule: 'LS-WARN-SEQ', expect: 'warn' }, green).ok, false, 'a warn fixture needs a warning');
 });
 
 const box = (type, ...parts) => {

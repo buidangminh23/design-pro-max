@@ -77,9 +77,17 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  fixtures:
+    name: Fixture verification
+    uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
+    with:
+      ref: refs/tags/${{ inputs.tag || github.ref_name }}
+
   publish:
     name: Publish as Latest
-    needs: verify
+    needs: [verify, fixtures]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:

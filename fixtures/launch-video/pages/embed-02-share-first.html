@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- Pass fixture for LV-EMBED-02: the reference demo-embed.js loop, with a labelled Share button placed before its
+     Pause toggle in the same figure; the Share button does nothing to the clip and the toggle pauses it. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loop with a share button first</title>
+<style>
+  body { margin: 0; font: 17px/1.5 system-ui, sans-serif; }
+  .intro { min-height: 200vh; }
+  [data-demo] { width: 400px; margin: 0 auto 100vh; }
+  [data-demo-frame] { position: relative; aspect-ratio: 16 / 9; }
+  [data-demo-frame] > img, [data-demo-frame] > video { position: absolute; inset: 0; width: 100%; height: 100%; }
+  button { min-height: 44px; }
+</style>
+</head>
+<body>
+<section class="intro"><p>Scroll down.</p></section>
+<figure data-demo>
+  <div data-demo-frame>
+    <img data-demo-start src="loop.start.jpg" width="640" height="360" alt="" loading="lazy" decoding="async">
+    <video muted playsinline loop preload="none" aria-hidden="true" width="640" height="360">
+      <source data-src="loop.mp4" type='video/mp4; codecs="avc1.64001f"'>
+    </video>
+  </div>
+  <button type="button" data-share>Share</button>
+  <button type="button" data-demo-toggle>Pause</button>
+  <figcaption>A looping clip with a share button before its pause button.</figcaption>
+</figure>
+<script type="module">
+  import { mountDemos } from '../lib/demo-embed.js';
+  mountDemos(document);
+  document.querySelector('[data-share]').addEventListener('click', (event) => event.currentTarget.setAttribute('aria-pressed', 'true'));
+</script>
+</body>
+</html>

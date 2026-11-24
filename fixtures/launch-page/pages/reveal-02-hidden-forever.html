@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- Fail fixture for LP-REVEAL-01: a reveal observer with a 10% threshold and a 15% bottom margin. The closing line sits
+     in the last 15% of the page, so it never enters the observer's root and stays at opacity 0 for every script user. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-REVEAL-01 fail: never revealed</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body { margin: 0; font-family: var(--font-sans); font-size: var(--type-body-size); line-height: var(--type-body-leading); color: var(--color-ink); background: var(--color-bg); }
+  section { min-height: 90vh; padding: var(--space-12) var(--page-gutter); }
+  h2 { margin: 0 0 var(--heading-after); font-size: var(--type-heading-size); line-height: var(--type-heading-leading); }
+  .closing { margin: 0; padding: 0 var(--page-gutter); }
+  [data-reveal] { transition: opacity var(--duration-reveal) var(--ease-out); }
+  html[data-motion="ok"] [data-reveal]:not([data-revealed]) { opacity: 0; }
+</style>
+</head>
+<body>
+<section><h2 data-reveal>First section</h2><p>Shown on arrival.</p></section>
+<section><h2 data-reveal>Second section</h2><p>Shown on arrival.</p></section>
+<p class="closing" data-reveal>The closing line at the very end of the page.</p>
+<script type="module">
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.dataset.motion = 'ok';
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.setAttribute('data-revealed', '');
+        observer.unobserve(entry.target);
+      }
+    }, { rootMargin: '0px 0px -15% 0px', threshold: 0.1 });
+    document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
+  }
+</script>
+</body>
+</html>
