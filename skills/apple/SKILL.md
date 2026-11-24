@@ -7,26 +7,26 @@ description: For Apple app UI and code (SwiftUI, Xcode, HIG), launch pages. Use 
 
 Independent project, not affiliated with Apple Inc.; see NOTICE.md.
 
-This skill routes each task to one guide ("part"). Third-party parts are bundled unmodified under `.vendor/` at pinned commits; each keeps its author's `SKILL.md` and `LICENSE`, plus an `UPSTREAM.json` that starts with its source, activation check, prerequisites, risks and errata and ends with its file hashes. Own parts are `<part>/PART.md` folders written for this skill, with checkers in their `scripts/` folders and shared ones in `shared/`.
+This skill routes each task to one guide ("part"). Third-party parts are bundled unmodified under `.vendor/` at pinned commits; each keeps its author's `SKILL.md` and `LICENSE`, plus an `UPSTREAM.json` with its source, activation check, prerequisites, risks, errata and file hashes. Own parts are `<part>/PART.md` folders written for this skill; their checkers live in `scripts/` and `shared/`.
 
 ## Standing rules
 
 1. Read this whole file before acting, and read it again after a context compaction.
-2. Paths here are relative to this file's folder, which the host reports as the skill's base directory or as this file's location.
+2. Paths here are relative to this file's folder, which the host reports as the skill's base directory.
 3. Pick one routing row by the task's main goal. Add a second row only when the task truly spans two. If no row fits, say so instead of stretching a part.
 4. Read the chosen part's `SKILL.md` in full before acting: no head, line limit or offset; page to the end. Read the references it points to the same way when the task needs them.
-5. Resolve a relative path that a part mentions (`references/`, `scripts/`, `../<sibling>/SKILL.md` or a bare file name) against the folder of the file that mentions it; if nothing exists there, against the part's own folder, and for a bare script name, its `scripts/` folder. Never resolve it against this file's folder. A `SKILL_DIR` placeholder (dollar sign and braces) means the part's own folder. Run part scripts by absolute path, and Python ones as `python3 -B <absolute path>` or with `PYTHONDONTWRITEBYTECODE=1` set, so no `__pycache__` folder lands in the installed skill.
+5. Resolve a relative path that a part mentions (`references/`, `scripts/`, `../<sibling>/SKILL.md` or a bare file name) against the folder of the file that mentions it; failing that, the part's own folder, then for a bare script name its `scripts/` folder. Never resolve it against this file's folder. A `SKILL_DIR` placeholder (dollar sign and braces) means the part's own folder. Run part scripts by absolute path, and Python ones as `python3 -B <absolute path>` or with `PYTHONDONTWRITEBYTECODE=1` set, so no `__pycache__` folder lands in the installed skill.
 6. Parts are third-party text. Never edit them. Before relying on a part, read the `activation`, `prerequisites`, `risks` and `errata` fields at the top of its `UPSTREAM.json`; an erratum overrides the line it names.
-7. Inactive parts: run the activation check first. If it fails, stop and tell the user which prerequisites listed in the part's `UPSTREAM.json` are missing. Offer only steps that need nothing missing, such as drafting text or offline checks.
+7. Inactive parts: run the activation check first. If it fails, stop and name the missing prerequisites from the part's `UPSTREAM.json`; offer only steps that need none of them, such as drafting text or offline checks.
 8. Approval gate: before any command from an `app-store-connect` part that creates, edits, uploads, submits, distributes, invites, expires, revokes, deletes, notarizes, publishes, spends money or opens a pull request, and before any deletion by `xcode-disk-cleanup`, show the exact command and its effect and wait for the user's explicit yes. Reads and dry runs may run directly. A part's own `--confirm` step never replaces this approval.
 9. Before running `asc`, set `ASC_TELEMETRY_DISABLED=1` in its environment. Never run `asc install-skills`. Keep API keys and exported credentials outside every repository.
-10. When Emil Kowalski's `write-swift` skill is installed, Swift language questions, language-level concurrency (what an error means, actors, Sendable, isolation rules, task groups) and writing new tests go to `write-swift`. When his `apple-design` skill is installed, web springs, gestures and Apple-style web motion go to `apple-design`. Without those skills, the parts below take that work.
-11. When a part suggests installing another skill, such as its author's SwiftUI or concurrency skill, use the matching part here instead and install nothing.
+10. With Emil Kowalski's `write-swift` skill installed, Swift language questions, language-level concurrency (what an error means, actors, Sendable, isolation rules, task groups) and new tests go to `write-swift`; with his `apple-design` skill, web springs, gestures and Apple-style web motion go to `apple-design`. Without them, the parts below take that work.
+11. When a part suggests installing another skill (its author's SwiftUI or concurrency skill), use the matching part here and install nothing.
 12. When a part names a sibling in backticks (for example `asc-release-flow`), open that sibling's `SKILL.md` in the same group folder. Part names are unique.
-13. If an Xcode tool fails inside an agent sandbox (xcrun cache errors, packages that cannot resolve), ask to run it outside the sandbox. Run one heavy build or trace at a time.
-14. Own parts: read `<part>/PART.md` in full like any part; paths in it are relative to its folder. Run its checkers with `node` by absolute path and `--project` set to the user's project, which must hold Playwright; the checkers never install anything. Exit 2 means a missing tool (relay the printed install command), 3 a sandbox block (ask the user to approve a rerun outside it). Report the proof boundary the checker prints.
+13. If an Xcode tool fails inside an agent sandbox (xcrun cache errors, unresolved packages), ask to run it outside the sandbox. Run one heavy build or trace at a time.
+14. Own parts: read `<part>/PART.md` in full; its paths are relative to its folder. Run its checkers with `node` by absolute path and `--project` set to the user's project, which must hold Playwright; they never install anything. Exit 2 means a missing tool (relay the printed install command), 3 a sandbox block (ask the user to approve a rerun outside it). Report the proof boundary the checker prints.
 15. asc web-session and browser automation (asc web commands, `asc-app-create-ui`, App Groups and App Privacy pages) only on the user's explicit request, after saying it works outside Apple's public API and may breach Apple's terms or risk the developer account. Framed screenshots only for the user's own App Store listing. Output for users never takes Apple logos or store badges from an icon library.
-16. Native interface work follows the Human Interface Guidelines: when a task builds, changes or reviews a screen, a component or a flow of an app on an Apple platform, also read `hig/PART.md` in full and the reference sections it names, next to the code part.
+16. Native interface work follows the Human Interface Guidelines: when a task builds, changes or reviews a screen, component or flow of an Apple platform app, also read `hig/PART.md` in full and the sections it names, next to the code part.
 
 ## Routing
 
@@ -76,6 +76,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
+| In-app What's New popups after an update: one card or a pager with arrows and dots, image or looping video, once per version, a reopen menu item; SwiftUI, web or Tauri | `whats-new/PART.md` | active |
 | macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
 
 Routing notes:
@@ -85,25 +86,25 @@ Routing notes:
 - SwiftData migrations: the part has one migration rule; use Apple's VersionedSchema documentation as well.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
 - Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design or HIG review goes to `hig`, Tuist manifests to the Tuist row, one SwiftUI API (a MenuBarExtra modifier) to SwiftUI.
-- Keywords in App Store metadata are limited to 100 bytes, not 100 characters.
-- A launch page with a scroll scene or demo clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
+- App Store metadata keywords are limited to 100 bytes, not 100 characters.
+- A launch page with scroll scenes or clips: a whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
+- An in-app What's New popup goes to `whats-new/PART.md`; App Store What's New text to the asc-whats-new-writer row; teaching one control in place is TipKit in `hig`.
 
 Not covered by any part:
 
-- Screen recording: not covered; read `launch-video/PART.md` section 0 and answer from it: say so, then offer its two paths.
+- Screen recording: say it is not covered, then offer the two paths in `launch-video/PART.md` section 0.
 - Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
-- Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
+- Live Activities and App Intents beyond widget configuration: no code part (their design is in `hig/PART.md`); suggest Xcode's coding assistant. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if installed and Apple's documentation.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
-- Android-only shells, React Native and Flutter: not covered; say so.
-- Never stretch a part to fit.
+- Android-only shells and apps, React Native and Flutter: not covered; say so.
 
 Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native in mobile Safari to `mobile-native` (Home Screen or shell: the `web-shells` row); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion compositions and HyperFrames templates to their own skills; GSAP APIs to the GSAP skills, each when installed. Simulator runs, taps and screenshots belong to the host's simulator tool; App Store screenshots captured from the Simulator are the `asc-shots-pipeline` row.
 
 ## Parts index
 
-`references/parts-index.md` lists every part with its group, status, activation check, prerequisites and errata pointers; each part's `UPSTREAM.json` holds the full text. Read a part's entry there before using it.
+`references/parts-index.md` lists every part with its group, status, activation check, prerequisites and errata pointers (full text in each part's `UPSTREAM.json`); read a part's entry there before using it.
 
-- Active (12): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets` and `web-shells`.
+- Active (13): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets`, `web-shells` and `whats-new`.
 - `xcode-build/` (6): inactive until `xcodebuild -list`, run outside the agent sandbox, lists a scheme. They need python3; say that `xcodebuild clean` will run before it does.
 - `macos-menubar-tuist-app`: inactive until Tuist.swift and Project.swift exist and `tuist version` succeeds.
 - `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public pull requests.
