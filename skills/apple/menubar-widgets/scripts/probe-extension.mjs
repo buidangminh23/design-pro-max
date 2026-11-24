@@ -118,19 +118,27 @@ const samePath = (a, b) => {
   return [...variants(b)].some((value) => left.has(value));
 };
 
+const SEPARATORS = path.sep === '\\' ? ['/', '\\'] : ['/'];
+
+const isAbsolutePath = (file) => typeof file === 'string' && (file.startsWith('/') || (path.sep === '\\' && path.win32.isAbsolute(file)));
+
 export function launchedPath(args, executable) {
-  const tail = `.appex/Contents/MacOS/${executable}`;
-  for (let from = args.indexOf(tail); from >= 0; from = args.indexOf(tail, from + 1)) {
-    const end = from + tail.length;
-    if (end === args.length || args[end] === ' ') return args.slice(0, end);
+  for (const sep of SEPARATORS) {
+    const tail = ['.appex', 'Contents', 'MacOS', executable].join(sep);
+    for (let from = args.indexOf(tail); from >= 0; from = args.indexOf(tail, from + 1)) {
+      const end = from + tail.length;
+      if (end === args.length || args[end] === ' ') return args.slice(0, end);
+    }
   }
   return null;
 }
 
-const appName = (file) => /([^/]+\.app)\/Contents\/PlugIns\/[^/]+\.appex\/Contents\/MacOS\/[^/]+$/.exec(file)?.[1] ?? null;
+const APP_NAME = path.sep === '\\' ? /([^/\\]+\.app)[/\\]Contents[/\\]PlugIns[/\\][^/\\]+\.appex[/\\]Contents[/\\]MacOS[/\\][^/\\]+$/ : /([^/]+\.app)\/Contents\/PlugIns\/[^/]+\.appex\/Contents\/MacOS\/[^/]+$/;
+
+const appName = (file) => APP_NAME.exec(file)?.[1] ?? null;
 
 export function ownsProcess(extension, launched) {
-  if (!launched?.startsWith('/')) return false;
+  if (!isAbsolutePath(launched)) return false;
   if (samePath(launched, extension.binary)) return true;
   const info = path.join(path.dirname(path.dirname(path.dirname(launched))), 'Contents', 'Info.plist');
   if (fs.existsSync(info)) return extension.identifier !== null && plistString(readPlist(info), 'CFBundleIdentifier') === extension.identifier;
@@ -141,7 +149,7 @@ export function extensionProcesses(processes, extension) {
   return processes.flatMap((process) => {
     const launched = launchedPath(process.args, extension.executable);
     if (!launched) return [];
-    if (!launched.startsWith('/')) return [{ ...process, launched: null }];
+    if (!isAbsolutePath(launched)) return [{ ...process, launched: null }];
     return ownsProcess(extension, launched) ? [{ ...process, launched }] : [];
   });
 }
