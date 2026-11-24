@@ -238,10 +238,10 @@ test('the release publishes only after the verify workflow passes for the tag', 
   assert.match(release.find((job) => job.name === 'npm').lines.join('\n'), /^ {4}needs: publish$/m);
 });
 
-test('the badges workflow renders only the view badge and pushes only to the badges branch', () => {
+test('the badges workflow renders the npm and view badges and pushes only to the badges branch', () => {
   const badges = read('badges.yml');
   assert.match(badges, /cron: "41 \*\/6 \* \* \*"/);
-  assert.match(badges, /^ {10}BADGE_SOURCES: views$/m);
+  assert.match(badges, /^ {10}BADGE_SOURCES: npm,views$/m);
   assert.match(badges, /^ {10}ANALYTICS_TOKEN: \$\{\{ secrets\.ANALYTICS_TOKEN \}\}$/m);
   assert.ok(runScripts(badges).includes('node scripts/badges.mjs "$RUNNER_TEMP/badges"'));
   assert.match(badges, /git push -q origin HEAD:refs\/heads\/badges/);
