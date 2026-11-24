@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-25
+
 ### Added
 
 - A seventh own part, `skills/apple/whats-new/`: the in-app What's New popup an app shows after an update, for SwiftUI apps on macOS and iOS and for web UIs, including Tauri and Capacitor shells around React. `PART.md` first decides whether a popup is warranted at all (nothing for a fix, a tip in place for one small change, one card, a pager for two to five changes, onboarding rather than this on a first install), then the hard rules, recipes, build steps, a never-ship list, verify, report and routing; four references (`design.md`, `behaviour-and-storage.md`, `swiftui.md`, `testing.md`) and a generated `references/evidence.md`. One feature gets one card with no arrows, dots or counter; several get named previous and next buttons that are disabled at the ends rather than hidden, page dots with 24 by 24 CSS px hit areas, an "N of M" label, and a primary button that reads Next until the last page. Every page sits in one grid cell, so the card keeps one size; videos are muted, inline, have a poster and play only on the current page, a loop over five seconds gets a pause control, and under reduced motion nothing starts by itself and pages change without a transform. It shows once per version, only after an update: a first install stores the version silently, and the version is stored when the popup is dismissed, not when it opens.
@@ -17,7 +19,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 - The router routes in-app What's New popups to `whats-new`, with a routing note that keeps App Store What's New text on the asc-whats-new-writer row and teaching one control in place with TipKit in `hig`; the not-covered list names Android-only apps beside Android-only shells. To stay within 15,000 characters, several standing rules and notes are worded more tightly with no rule or route dropped, and the duplicate "never stretch a part" line is gone (standing rule 3 says it). The parts index lists 13 active parts: the 6 vendored ones and the own parts launch-scroll, launch-page, launch-video, hig, menubar-widgets, web-shells and whats-new.
 - The router description puts first the SwiftUI and Swift questions Claude Code answered from its own knowledge in the v0.2 round (lists, alerts, sheets, data races, XCTest to Swift Testing, slow type-checking) and adds "even if known"; to stay within 500 characters it drops Apple Ads and Home Screen. Measured in the 0.2.1 round (`evals/RESULTS.md`): Claude Code started apple on six of those eight rows in a 15-prompt pilot; Codex kept recall at 55/56 but started on 3 of 21 near misses and made 3 partial reads, two bars it met in 0.2.0, recorded as known limits.
-- The verify workflow also runs on changes under `skills/apple/whats-new/`, and `web-card.json` carries the recomputed stats (45 guides, 13 active, 39 error rules, 99 fail fixtures, 118 eval cases, 362 ledger claims); the version stays 0.2.0 until the release.
+- The verify workflow also runs on changes under `skills/apple/whats-new/`, and `web-card.json` carries the recomputed stats (45 guides, 13 active, 39 error rules, 99 fail fixtures, 118 eval cases, 362 ledger claims).
 
 ## [0.2.0] - 2026-11-24
 
