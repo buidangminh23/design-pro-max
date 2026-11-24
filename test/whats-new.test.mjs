@@ -70,7 +70,7 @@ test('the argument parser serves a lone --page from its folder and rejects bad u
 });
 
 test('the size, ratio, position and pause helpers judge the thresholds the rules state', async () => {
-  const { sameSize, sameRatio, spread, exposesPosition, needsPause, targetLevel, LIMITS } = await checker();
+  const { sameSize, sameRatio, spread, exposesPosition, showsCounter, rewound, needsPause, targetLevel, LIMITS } = await checker();
   assert.equal(spread([3, 1, 2]), 2);
   assert.ok(sameSize([{ width: 620, height: 658.8 }, { width: 620, height: 659.6 }]));
   assert.ok(!sameSize([{ width: 620, height: 555 }, { width: 620, height: 703 }]));
@@ -82,6 +82,14 @@ test('the size, ratio, position and pause helpers judge the thresholds the rules
   assert.ok(exposesPosition('slide | Feature 3 of 12', 3, 12));
   assert.ok(!exposesPosition('13 of 3', 1, 3));
   assert.ok(!exposesPosition("What's new", 1, 3));
+  assert.ok(showsCounter('2 / 3', 2, 3));
+  assert.ok(showsCounter('Feature 2 of 3', 2, 3));
+  assert.ok(!showsCounter('Version 1.1 lets you move 1 file at a time.', 1, 1));
+  assert.ok(!showsCounter('1 tap, then 3 steps', 1, 3));
+  assert.ok(!showsCounter('2 of 30', 2, 3));
+  assert.ok(rewound({ readyState: 4, currentTime: 0 }));
+  assert.ok(rewound({ readyState: 0, currentTime: 2 }));
+  assert.ok(!rewound({ readyState: 2, currentTime: 1.9 }));
   assert.ok(needsPause({ loop: true, duration: 6 }));
   assert.ok(!needsPause({ loop: true, duration: LIMITS.pauseAfterSeconds }));
   assert.ok(!needsPause({ loop: false, duration: 30 }));

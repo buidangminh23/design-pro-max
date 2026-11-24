@@ -3,7 +3,8 @@
 // show nothing), a different one is an update (show), and markSeen() runs when the sheet is dismissed, not when it
 // opens. WhatsNewSheet is one card for one feature and a pager with arrows and dots for several; every page sits in one
 // ZStack, so the card keeps one size. Attach .whatsNew(store:features:) to the root view and WhatsNewCommands to the
-// scene for the "What's New…" menu item.
+// scene for the "What's New…" menu item. With several windows on one store, only the first one still open shows the
+// sheet. Builds for macOS 13 and iOS 16 and later.
 
 import SwiftUI
 
@@ -74,6 +75,7 @@ public final class WhatsNewStore: ObservableObject {
     }
 
     @Published public var isPresented = false
+    @Published private var presenters: [UUID] = []
     public let currentVersion: String
     private let key: String
     private let defaults: UserDefaults
@@ -111,6 +113,18 @@ public final class WhatsNewStore: ObservableObject {
 
     public func markSeen() {
         defaults.set(currentVersion, forKey: key)
+    }
+
+    func register(_ presenter: UUID) {
+        if !presenters.contains(presenter) { presenters.append(presenter) }
+    }
+
+    func unregister(_ presenter: UUID) {
+        presenters.removeAll { $0 == presenter }
+    }
+
+    func isPresenting(_ presenter: UUID) -> Bool {
+        isPresented && presenters.first == presenter
     }
 }
 
@@ -398,9 +412,12 @@ private struct WhatsNewPresenter: ViewModifier {
     @ObservedObject var store: WhatsNewStore
     let features: [WhatsNewFeature]
     let labels: WhatsNewLabels
+    @State private var presenter = UUID()
 
     func body(content: Content) -> some View {
         content
+            .onAppear { store.register(presenter) }
+            .onDisappear { store.unregister(presenter) }
             .task {
                 guard !features.isEmpty else {
                     store.markSeen()
@@ -409,7 +426,10 @@ private struct WhatsNewPresenter: ViewModifier {
                 try? await Task.sleep(for: .milliseconds(400))
                 store.presentIfUpdated()
             }
-            .sheet(isPresented: $store.isPresented, onDismiss: store.markSeen) {
+            .sheet(isPresented: Binding(
+                get: { store.isPresenting(presenter) },
+                set: { if !$0 { store.isPresented = false } }
+            ), onDismiss: store.markSeen) {
                 WhatsNewSheet(features: features, labels: labels)
             }
     }

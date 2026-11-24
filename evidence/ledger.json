@@ -4488,7 +4488,7 @@
       "sourceSha": "ddc42a65448be0f3220e289eb8d01654d5879c45d4cb0cb8ca576b4ca40eb2a1"
     },
     "WH-1": {
-      "claim": "A dialog element opened with showModal sits in the top layer above a backdrop, makes the rest of the page inert, and fires a cancel event on Escape before it closes; modal dialogs are exposed to assistive technology as aria-modal true; MDN leaves focus return to the author.",
+      "claim": "A dialog element opened with showModal sits in the top layer above a backdrop, makes the rest of the page inert, and fires a cancel event on Escape before it closes; modal dialogs are exposed to assistive technology as aria-modal true; the page says where focus goes when the dialog opens but not where it goes when it closes.",
       "value": "showModal: top layer, backdrop, outside inert, Escape fires cancel then closes; widely available since March 2022",
       "label": "documented",
       "date": "2026-11-24",
@@ -4592,8 +4592,8 @@
       "sourceSha": "5ea3ee741b1026b2803a8c60935db77ba50945321d8b402db96b9d12cba6e31e"
     },
     "WH-9": {
-      "claim": "With Reduce Motion on, cut automatic and repeating animation, replace slide transitions with fades, and do not autoplay video without discoverable controls.",
-      "value": "slides become fades; no autoplay without start and stop controls",
+      "claim": "With Reduce Motion on, tone down automatic and repeating animation such as zooms, scaling and motion at the edges of the view, and swap movement along any axis for fades. Separately, and not tied to Reduce Motion, the same page's media guidance says not to autoplay audio or video unless controls to start and stop it are offered.",
+      "value": "Reduce Motion: less automatic and repeating animation, fades in place of axis movement; separately: no autoplay without start and stop controls",
       "label": "documented",
       "date": "2026-11-24",
       "source": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
@@ -4657,8 +4657,8 @@
       "sourceSha": "b3a9bf648b1870a327c1050944ddf4820184574fdab48a6c932b7893472eac9d"
     },
     "WH-14": {
-      "claim": "An open-source What's New library keeps one entry per version, records presented versions in a version store backed by UserDefaults by default, and counts a version as shown when the screen is dismissed.",
-      "value": "one entry per version; stored as shown on dismissal",
+      "claim": "An open-source What's New library keeps one entry per version and records presented versions in a version store backed by UserDefaults by default; its UIKit and AppKit WhatsNewViewController saves the version when it is dismissed, and the README does not say when the SwiftUI sheet modifier records it.",
+      "value": "one entry per version; the view controller stores it on dismissal",
       "label": "documented",
       "date": "2026-11-24",
       "source": "https://github.com/SvenTiigi/WhatsNewKit",
@@ -4696,8 +4696,8 @@
       "sourceSha": "4f6d0680d6f1c0f6924d63f60d3e43f79bc11ecc2dea09b251a9e7c26ddc92d2"
     },
     "WH-17": {
-      "claim": "Each planted defect on top of the shipped library fails its rule in the checker and the shipped reference pages pass: a div popup, hidden end arrows, arrows on one card, a page-sized card, an unmuted posterless video, every video playing, a 6 s loop without pause, slides under reduced motion, autoplay under reduced motion, 16 px dots, a popup on first install and a version marked on open; under reduced motion the library starts no video and swaps pages with no transform transition.",
-      "value": "12 of 12 planted defects caught; 4 of 4 pass cases green; under reduced motion 0 video starts and no transform transition",
+      "claim": "Each planted defect on top of the shipped library fails its rule in the checker and the shipped reference pages pass: a div popup, hidden end arrows, arrows on one card, a page-sized card, an unmuted posterless video, every video playing, a 6 s loop without pause, slides under reduced motion, autoplay under reduced motion, 16 px dots, a popup on first install, a version marked on open, a hidden clip left mid-way, a sliding page track, page contents sliding in and a version marked a second after opening; under reduced motion the library starts no video and swaps pages with no transform transition.",
+      "value": "16 of 16 planted defects caught; 8 of 8 pass cases green; under reduced motion 0 video starts and no transform transition",
       "label": "measured",
       "date": "2026-11-24",
       "source": "local benchmark",

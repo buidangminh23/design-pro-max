@@ -21,7 +21,7 @@
         "label": "Luật lỗi có nguồn"
       },
       {
-        "value": "95",
+        "value": "99",
         "label": "Fixture phải trượt"
       },
       {
@@ -53,7 +53,7 @@
         "label": "Sourced error rules"
       },
       {
-        "value": "95",
+        "value": "99",
         "label": "Must-fail fixtures"
       },
       {

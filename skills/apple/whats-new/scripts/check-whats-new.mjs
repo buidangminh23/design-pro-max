@@ -39,7 +39,10 @@ export const LIMITS = Object.freeze({
   stepMs: 450,
   playMs: 900,
   metadataMs: 3000,
-  watchAdvanceMs: 3000,
+  watchAdvanceMs: 8000,
+  watchPollMs: 200,
+  onceOpenMs: 3000,
+  rewoundSeconds: 0.05,
   watchMotionMs: 400,
 });
 
@@ -151,6 +154,14 @@ export function exposesPosition(text, n, m) {
   return new RegExp(`(?:^|\\D)${n}\\D+${m}(?:\\D|$)`).test(String(text ?? ''));
 }
 
+export function showsCounter(text, n, m) {
+  return new RegExp(`(?:^|[^\\d.,])${n}(?:\\s*/\\s*|\\s+\\p{L}{1,5}\\s+)${m}(?!\\d|[.,]\\d)`, 'u').test(String(text ?? ''));
+}
+
+export function rewound(video, limit = LIMITS.rewoundSeconds) {
+  return !(video.readyState >= 1) || !Number.isFinite(video.currentTime) || video.currentTime <= limit;
+}
+
 export function needsPause({ loop, duration }, limit = LIMITS.pauseAfterSeconds) {
   return Boolean(loop) && Number.isFinite(duration) && duration > limit;
 }
@@ -211,12 +222,21 @@ export function installProbe() {
   if (window.__wnCheck) return;
   const playing = [];
   document.addEventListener('playing', (event) => playing.push(event.target), true);
+  const focused = [];
+  document.addEventListener('focusin', (event) => focused.push(event.target), true);
+  const writes = [];
+  const setItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function setItemWatched(key, value) {
+    if (this === window.localStorage) writes.push({ key: String(key), value: String(value), at: performance.now() });
+    return setItem.call(this, key, value);
+  };
   const NAMES = {
     close: /^(?:close|dismiss|đóng)\b/i,
     prev: /\b(?:previous|prev|back)\b|trước/i,
     next: /\bnext (?:feature|page|slide|item)\b|\bforward\b|tính năng sau|trang sau/i,
     primary: /^(?:got it|done|continue|next|ok|hiểu rồi|tiếp|xong)$/i,
     pause: /\b(?:pause|play|stop|start)\b|tạm dừng|phát|dừng/i,
+    halt: /\b(?:stop|pause)\b.*\b(?:advanc\w*|rotat\w*|slides?|pages?|carousel|auto\w*)\b|dừng tự chuyển|dừng chuyển trang/i,
   };
   const all = (root, selector) => {
     try {
@@ -322,6 +342,7 @@ export function installProbe() {
     loop: video.loop,
     duration: video.duration,
     readyState: video.readyState,
+    currentTime: video.currentTime,
   });
   const pauseControl = (video, page, selectors) => {
     const scope = page ?? video.parentElement;
@@ -386,9 +407,19 @@ export function installProbe() {
     const labels = [];
     if (current && current !== dialog) labels.push(current.getAttribute('aria-label') ?? '');
     for (const dot of all(dialog, '[aria-current="true"], [aria-selected="true"]')) labels.push(nameOf(dot));
-    labels.push(textOf(dialog));
+    for (const counter of all(dialog, '[class*="counter" i], [class*="page-count" i], [class*="pagecount" i]').filter(shown)) labels.push(textOf(counter));
     return labels.join(' | ');
   };
+  const insidePopup = (element, selectors) => {
+    if (!element || element.nodeType !== 1) return false;
+    if (element.closest('dialog, [role="dialog"], [role="alertdialog"], [aria-modal="true"]')) return true;
+    try {
+      return Boolean(element.closest(selectors.dialog));
+    } catch {
+      return false;
+    }
+  };
+  const outsideBefore = (selectors) => [...focused].reverse().find((element) => !insidePopup(element, selectors)) ?? null;
   window.__wnCheck = {
     playing,
     state(selectors, custom) {
@@ -417,6 +448,7 @@ export function installProbe() {
         index,
         pageLabels: pages.map((page) => page.getAttribute('aria-label') ?? ''),
         counter: counterText(dialog, current),
+        visibleText: textOf(dialog),
         close: controlState(controls.close),
         prev: controlState(controls.prev),
         next: controlState(controls.next),
@@ -433,12 +465,34 @@ export function installProbe() {
     },
     closedState(selectors) {
       const active = document.activeElement;
+      const onBody = !active || active === document.body || active === document.documentElement;
+      const before = outsideBefore(selectors);
       return {
         open: Boolean(findDialog(selectors)),
         active: describe(active),
+        before: before && before !== document.body ? describe(before) : null,
         onOpener: Boolean(active && active.hasAttribute('data-wn-opener')),
-        onBody: !active || active === document.body || active === document.documentElement,
+        onBody,
+        onBefore: before && before !== document.body && before.isConnected ? active === before : onBody,
       };
+    },
+    halt(selectors, custom) {
+      const { dialog, pages } = resolve(selectors, custom);
+      if (!dialog) return { halted: null };
+      const control = all(dialog, 'button, [role="button"]').find((button) => shown(button) && !pages.some((page) => page.contains(button)) && NAMES.halt.test(nameOf(button)));
+      if (control) {
+        const name = nameOf(control);
+        control.click();
+        return { halted: `pressed "${name}"` };
+      }
+      const target = ['primary', 'next'].map((role) => all(dialog, `[data-wn-check="${role}"]`).find(shown)).find(Boolean);
+      target?.focus();
+      return { halted: target ? 'moved focus into the popup' : null };
+    },
+    writes(key, reset) {
+      const found = writes.filter((write) => write.key === key);
+      if (reset) writes.length = 0;
+      return found;
     },
     async watchMotion(selectors, custom, ms) {
       const { dialog, pages, controls } = resolve(selectors, custom);
@@ -447,19 +501,34 @@ export function installProbe() {
       const moving = new Set();
       const values = new Map();
       const transformish = /^(?:transform|translate|rotate|scale|all)$/;
+      const ancestors = [];
+      for (let node = pages[0].parentElement; node && node !== dialog && dialog.contains(node); node = node.parentElement) ancestors.push(node);
+      const watched = [...ancestors.map((node) => ({ node, label: describe(node) })), ...pages.flatMap((page, at) => [page, ...page.querySelectorAll('*')].map((node) => ({ node, label: `page ${at + 1}${node === page ? '' : ` ${describe(node)}`}` })))];
+      const origin = () => dialog.getBoundingClientRect();
+      const note = (key, value) => {
+        if (!values.has(key)) values.set(key, new Set());
+        values.get(key).add(value);
+      };
       const sample = () => {
+        const base = origin();
+        for (const { node, label } of watched) {
+          const style = getComputedStyle(node);
+          note(`${label}: transform`, `${style.transform}|${style.translate}|${style.rotate}|${style.scale}`);
+        }
         for (const [at, page] of pages.entries()) {
-          const style = getComputedStyle(page);
-          const value = `${style.transform}|${style.translate}`;
-          if (!values.has(at)) values.set(at, new Set());
-          values.get(at).add(value);
-          for (const animation of page.getAnimations?.() ?? []) {
-            const timing = animation.effect?.getComputedTiming?.() ?? {};
-            if (!(Number(timing.duration) > 0) || animation.playState !== 'running') continue;
-            if (animation.transitionProperty && transformish.test(animation.transitionProperty)) moving.add(`page ${at + 1}: ${animation.transitionProperty} transition of ${Math.round(timing.duration)} ms`);
-            const frames = animation.effect?.getKeyframes?.() ?? [];
-            if (!animation.transitionProperty && frames.some((frame) => 'transform' in frame || 'translate' in frame)) moving.add(`page ${at + 1}: transform animation of ${Math.round(timing.duration)} ms`);
-          }
+          const rect = page.getBoundingClientRect();
+          note(`page ${at + 1}: position`, `${Math.round((rect.x - base.x) * 2) / 2},${Math.round((rect.y - base.y) * 2) / 2}`);
+        }
+        const roots = ancestors.length ? [ancestors[0]] : pages;
+        const animations = [...roots.flatMap((root) => root.getAnimations?.({ subtree: true }) ?? []), ...ancestors.slice(1).flatMap((node) => node.getAnimations?.() ?? [])];
+        for (const animation of animations) {
+          const timing = animation.effect?.getComputedTiming?.() ?? {};
+          if (!(Number(timing.duration) > 0) || animation.playState !== 'running') continue;
+          const target = animation.effect?.target;
+          const label = target ? describe(target) : 'an element';
+          if (animation.transitionProperty && transformish.test(animation.transitionProperty)) moving.add(`${label}: ${animation.transitionProperty} transition of ${Math.round(timing.duration)} ms`);
+          const frames = animation.effect?.getKeyframes?.() ?? [];
+          if (!animation.transitionProperty && frames.some((frame) => 'transform' in frame || 'translate' in frame)) moving.add(`${label}: transform animation of ${Math.round(timing.duration)} ms`);
         }
       };
       sample();
@@ -469,7 +538,7 @@ export function installProbe() {
         await new Promise((done) => requestAnimationFrame(done));
         sample();
       }
-      for (const [at, seen] of values) if (seen.size > 1) moving.add(`page ${at + 1}: transform took ${seen.size} values, ${[...seen][0]} to ${[...seen].at(-1)}`);
+      for (const [key, seen] of values) if (seen.size > 1) moving.add(`${key} took ${seen.size} values, ${[...seen][0]} to ${[...seen].at(-1)}`);
       return { watched: true, moving: [...moving] };
     },
     storage(key, value) {
@@ -638,6 +707,7 @@ function checkVideos(report, label, snapshot, seen) {
     const playing = !video.paused && !video.ended;
     if (video.page !== snapshot.index && video.page >= 0) {
       report.check('WN-MEDIA-01', !playing, `${where}, page ${snapshot.index + 1} shown`, playing ? 'plays while its page is hidden' : 'paused while its page is hidden', 'only the current page plays its video');
+      if (!playing) report.check('WN-MEDIA-01', rewound(video), `${where}, page ${snapshot.index + 1} shown: position`, `at ${round(Number(video.currentTime) || 0, 2)} s`, `rewound to the start (at most ${LIMITS.rewoundSeconds} s) while its page is hidden`);
     } else if (needsPause(video)) {
       report.check('WN-MEDIA-01', Boolean(video.pause), `${where}, pause control`, video.pause ? `"${video.pause.name}" (${video.pause.tag})` : `a ${round(video.duration)} s loop with no visible labelled pause control`, `a pause control with an accessible name for a loop over ${LIMITS.pauseAfterSeconds} s`);
     }
@@ -665,9 +735,19 @@ async function watchAdvance(report, label, page, options, snapshot) {
   }
   const before = snapshot.index;
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(LIMITS.watchAdvanceMs);
-  const after = await state(page, options);
-  report.check('WN-WARN-AUTOADVANCE', after.index === before, label, after.index === before ? `stayed on page ${before + 1} for ${LIMITS.watchAdvanceMs / 1000} s` : `moved from page ${before + 1} to page ${after.index + 1} on its own`, 'no auto-advance; if pages advance on a timer, a pause control first in the tab order', 'warn');
+  const started = Date.now();
+  let after = snapshot;
+  while (Date.now() - started < LIMITS.watchAdvanceMs && after.index === before) {
+    await page.waitForTimeout(LIMITS.watchPollMs);
+    after = await state(page, options);
+  }
+  const seconds = round((Date.now() - started) / 1000);
+  report.check('WN-WARN-AUTOADVANCE', after.index === before, label, after.index === before ? `stayed on page ${before + 1} for ${LIMITS.watchAdvanceMs / 1000} s` : `moved from page ${before + 1} to page ${after.index + 1} on its own after ${seconds} s`, 'no auto-advance; if pages advance on a timer, a pause control first in the tab order', 'warn');
+}
+
+async function haltAdvance(page, options) {
+  await page.evaluate(({ selectors, custom }) => window.__wnCheck.halt(selectors, custom), { selectors: options.selectors, custom: options.custom });
+  await settle(page);
 }
 
 async function walkPages(report, label, page, options, first, context) {
@@ -701,11 +781,11 @@ async function checkNavigation(report, label, page, options, first, walk) {
   const named = (control) => control.present && control.visible && Boolean(control.name);
   if (count < 2) {
     const extra = ['prev', 'next'].filter((name) => first[name].present && first[name].visible).concat(first.dots.some((dot) => dot.visible) ? ['dots'] : []);
-    const counter = exposesPosition(first.counter, 1, 1);
+    const counter = exposesPosition(first.counter, 1, 1) || showsCounter(first.visibleText, 1, 1);
     report.check('WN-NAV-01', !extra.length && !counter, `${label}: one feature`, extra.length || counter ? `shows ${[...extra, counter ? 'a 1 of 1 counter' : null].filter(Boolean).join(', ')}` : 'no arrows, dots or counter', 'one feature shows no arrows, dots or page counter');
   } else {
     report.check('WN-NAV-01', named(first.prev) && named(first.next), `${label}: arrows`, `previous ${first.prev.present ? `"${first.prev.name}"` : 'missing'}, next ${first.next.present ? `"${first.next.name}"` : 'missing'}`, 'visible previous and next buttons with accessible names');
-    const indicator = exposesPosition(first.counter, first.index + 1, count);
+    const indicator = exposesPosition(first.counter, first.index + 1, count) || showsCounter(first.visibleText, first.index + 1, count);
     report.check('WN-NAV-01', indicator, `${label}: page indicator`, indicator ? `exposes ${first.index + 1} of ${count}` : `no "${first.index + 1} of ${count}" in the slide label, the current dot or the text`, 'a page indicator that exposes N of M');
     const expected = Array.from({ length: count }, (_, at) => at);
     report.check('WN-NAV-01', walk.visited.join(',') === expected.join(','), `${label}: next`, `pages ${walk.visited.map((at) => at + 1).join(', ')}`, `next steps through pages ${expected.map((at) => at + 1).join(', ')}`);
@@ -771,8 +851,8 @@ async function checkEscape(report, label, browser, url, viewport, options) {
     report.check('WN-DIALOG-01', closed, `${label}: Escape`, closed ? 'Escape closed the popup' : 'still open after Escape', 'Escape closes the popup');
     if (!closed) return;
     const after = await closedState(run.page, options);
-    const returned = options.open ? after.onOpener : after.onBody;
-    report.check('WN-DIALOG-01', returned, `${label}: focus after close`, `focus on ${after.active ?? 'nothing'}`, options.open ? `focus back on ${options.open}` : 'focus back where it was before the popup opened (the page body)');
+    const returned = options.open ? after.onOpener : after.onBefore;
+    report.check('WN-DIALOG-01', returned, `${label}: focus after close`, `focus on ${after.active ?? 'nothing'}`, options.open ? `focus back on ${options.open}` : `focus back where it was before the popup opened (${after.before ?? 'the page body'})`);
   } finally {
     await run.context.close();
   }
@@ -791,6 +871,7 @@ async function checkMain(report, label, browser, url, viewport, options, want) {
     if (want('WN-DIALOG-01')) checkDialogStatic(report, label, first);
     if (want('WN-WARN-COUNT')) report.check('WN-WARN-COUNT', first.count <= LIMITS.maxPages, label, `${first.count} page(s)`, `${LIMITS.maxPages} pages or fewer`, 'warn');
     if (want('WN-WARN-AUTOADVANCE')) await watchAdvance(report, label, run.page, options, first);
+    if (first.count > 1) await haltAdvance(run.page, options);
     const context = { cards: [], media: [], videosSeen: new Set(), scheme: 'light' };
     const quiet = { ...report, check: (rule, ...rest) => (want(rule) ? report.check(rule, ...rest) : undefined), pass: (rule, ...rest) => (want(rule) ? report.pass(rule, ...rest) : undefined), error: (rule, ...rest) => (want(rule) ? report.error(rule, ...rest) : undefined) };
     const walk = await walkPages(quiet, label, run.page, options, await state(run.page, options), context);
@@ -866,8 +947,15 @@ async function checkOnce(report, label, browser, url, viewport, options) {
     const opened = await waitOpen(run.page, options);
     report.check('WN-ONCE-01', opened, `${where}: update`, opened ? `opened with ${OLDER_VERSION} stored` : `nothing opened with ${OLDER_VERSION} stored`, 'the popup opens after an update');
     if (!opened) return;
+    const writes = (reset) => run.page.evaluate(({ key, clear }) => window.__wnCheck.writes(key, clear), { key: options.storageKey, clear: reset });
+    const atOpen = await stored();
+    await writes(true);
+    await run.page.waitForTimeout(LIMITS.onceOpenMs);
     const whileOpen = await stored();
-    report.check('WN-ONCE-01', whileOpen !== version, `${where}: while open`, `stored ${whileOpen ?? 'nothing'}`, `still ${OLDER_VERSION}: marked seen on dismissal, not on open`);
+    const marked = (await writes(false)).filter((write) => write.value !== OLDER_VERSION);
+    const early = atOpen !== OLDER_VERSION || whileOpen !== OLDER_VERSION || marked.length > 0;
+    const measured = marked.length ? `wrote ${marked.map((write) => write.value).join(', ')} while open` : `stored ${atOpen ?? 'nothing'} on open, ${whileOpen ?? 'nothing'} ${LIMITS.onceOpenMs / 1000} s later`;
+    report.check('WN-ONCE-01', !early, `${where}: while open`, measured, `still ${OLDER_VERSION}: marked seen on dismissal, not on open or while open`);
     await run.page.keyboard.press('Escape');
     if (!(await waitClosed(run.page, options))) {
       await run.page.evaluate((selectors) => (document.querySelector('[data-wn-check="close"]') ?? document.querySelector('[data-wn-check="primary"]'))?.click(), options.selectors);

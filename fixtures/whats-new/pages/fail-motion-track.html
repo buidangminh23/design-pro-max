@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whats-new fixture: the page track slides under reduced motion</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>body { margin: 0; min-height: 100dvh; font-family: system-ui, sans-serif; background: #f2f2f5; } main { padding: 32px; }
+.wn .wn-track { transition: transform 400ms ease-out; }</style>
+</head>
+<body>
+<main><h1>Fixture app</h1><button type="button" id="show">What's New…</button></main>
+<script type="module">
+import { artFeatures, run, whenOpen } from './fixture.js';
+run(() => artFeatures(3));
+whenOpen((dialog) => {
+  const track = dialog.querySelector('.wn-track');
+  new MutationObserver(() => {
+    track.style.transform = `translateX(${-(Number(dialog.dataset.page || 1) - 1) * 30}px)`;
+  }).observe(dialog, { attributes: true, attributeFilter: ['data-page'] });
+});
+</script>
+</body>
+</html>

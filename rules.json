@@ -757,7 +757,7 @@
       "values": "modal; a name; a named, visible close control; focus in on open; Escape closes; focus returns",
       "evidence": ["WH-0", "WH-1", "WH-15"],
       "check": "whats-new/scripts/check-whats-new.mjs",
-      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-div-popup"] },
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger", "wn-focus-return", "wn-hidden-modal"], "fail": ["wn-div-popup"] },
       "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
     },
     {
@@ -768,7 +768,7 @@
       "values": "no arrows or dots for 1 page; named arrows, N of M, ends disabled not hidden, last primary dismisses for 2 or more",
       "evidence": ["WH-2", "WH-3"],
       "check": "whats-new/scripts/check-whats-new.mjs",
-      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-hidden-ends", "wn-single-arrows"] },
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger", "wn-hidden-modal", "wn-single-digits", "wn-slow-advance-nav"], "fail": ["wn-hidden-ends", "wn-single-arrows"] },
       "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
     },
     {
@@ -790,7 +790,7 @@
       "values": "muted, playsinline, a poster; only the current page plays; a named pause control for a loop over 5 s",
       "evidence": ["WH-7", "WH-8", "PV-21"],
       "check": "whats-new/scripts/check-whats-new.mjs",
-      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-video-unmuted", "wn-video-all-playing", "wn-video-no-pause"] },
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-video-unmuted", "wn-video-all-playing", "wn-video-no-pause", "wn-video-no-rewind"] },
       "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
     },
     {
@@ -801,7 +801,7 @@
       "values": "no video starts on its own; page changes with no transform, or a transition of 0 ms",
       "evidence": ["WH-9", "WH-10", "WH-17"],
       "check": "whats-new/scripts/check-whats-new.mjs",
-      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-reduced-slide", "wn-reduced-autoplay"] },
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-reduced-slide", "wn-reduced-autoplay", "wn-reduced-track", "wn-reduced-children"] },
       "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
     },
     {
@@ -823,7 +823,7 @@
       "values": "first install: nothing opens, version stored; update: opens, still unmarked while open; dismissed: version stored, reload shows nothing",
       "evidence": ["WH-11", "WH-12", "WH-13", "WH-14"],
       "check": "whats-new/scripts/check-whats-new.mjs",
-      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-first-install-opens", "wn-marked-on-open"] },
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-first-install-opens", "wn-marked-on-open", "wn-marked-while-open"] },
       "implementedBy": ["whats-new/assets/lib/whats-new.js"]
     },
     {

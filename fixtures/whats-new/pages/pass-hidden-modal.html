@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whats-new fixture: the app keeps a hidden sign-in modal in the page</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>body { margin: 0; min-height: 100dvh; font-family: system-ui, sans-serif; background: #f2f2f5; } main { padding: 32px; }
+.app-modal { display: none; }</style>
+</head>
+<body>
+<main><h1>Fixture app</h1><button type="button" id="show">What's New…</button></main>
+<script type="module">
+document.body.insertAdjacentHTML('beforeend', '<div class="app-modal" role="dialog" aria-modal="true" aria-label="Sign in"></div>');
+const { artFeatures, run } = await import('./fixture.js');
+run(() => artFeatures(2));
+</script>
+</body>
+</html>

@@ -7,9 +7,10 @@
 // button), so a crash before dismissal shows it again. Pass force: true from a "What's New…" menu item to reopen it.
 //
 // showWhatsNew(options) returns a Promise that resolves on close with { shown: true, reason, page }, or at once with
-// { shown: false, reason } when nothing opens. Media per feature: { type: 'image', src, alt }, { type: 'video', src,
-// poster } or { type: 'element', element }. Only the current page's video plays; under reduced motion no video starts
-// on its own and pages change without movement; a looping video longer than 5 s gets a pause control.
+// { shown: false, reason } when nothing opens; a second call while one is waiting or open gets that call's result, so
+// the popup never shows twice. Media per feature: { type: 'image', src, alt }, { type: 'video', src, poster } or
+// { type: 'element', element }. Only the current page's video plays; under reduced motion no video starts on its own
+// and pages change without movement; a looping video longer than 5 s gets a pause control.
 
 export const DEFAULTS = Object.freeze({
   storageKey: 'whats-new:last-seen',
@@ -37,6 +38,7 @@ export const LABELS = Object.freeze({
 const REDUCED = '(prefers-reduced-motion: reduce)';
 const TEXT_FIELD = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
 let instances = 0;
+let pending = null;
 
 export function format(template, n, m) {
   return String(template).replaceAll('{n}', String(n)).replaceAll('{m}', String(m));
@@ -111,12 +113,21 @@ function nextFrame(win) {
   });
 }
 
-function openModal(doc) {
+function rendered(node) {
+  if (typeof node.checkVisibility === 'function') return node.checkVisibility({ visibilityProperty: true });
+  return node.getClientRects().length > 0;
+}
+
+function nativeModal(doc) {
   try {
-    return doc.querySelector('dialog:modal, [role="dialog"][aria-modal="true"]:not([hidden])');
+    return doc.querySelector('dialog:modal');
   } catch {
-    return doc.querySelector('[role="dialog"][aria-modal="true"]:not([hidden])');
+    return null;
   }
+}
+
+function openModal(doc) {
+  return nativeModal(doc) ?? [...doc.querySelectorAll('[role="dialog"][aria-modal="true"]:not([hidden])')].find(rendered) ?? null;
 }
 
 async function waitForOtherModals(win) {
@@ -191,6 +202,7 @@ export function showWhatsNew({
     }
     return result;
   };
+  if (pending) return pending.then((result) => finish(result));
   if (!force) {
     if (!version) throw new TypeError('showWhatsNew needs the current app version unless force is true');
     const decision = whatsNewDecision(readStored(storage, storageKey), String(version));
@@ -207,12 +219,22 @@ export function showWhatsNew({
   if (features.length > DEFAULTS.maxPages) {
     win.console?.warn?.(`whats-new: ${features.length} pages; keep it to ${DEFAULTS.maxPages} or fewer.`);
   }
-  return (async () => {
+  const run = (async () => {
     await waitForLoad(win);
     await nextFrame(win);
     await waitForOtherModals(win);
+    if (!force) {
+      const decision = whatsNewDecision(readStored(storage, storageKey), String(version));
+      if (decision !== 'update') return finish({ shown: false, reason: decision });
+    }
     return open();
   })();
+  pending = run;
+  const release = () => {
+    if (pending === run) pending = null;
+  };
+  run.then(release, release);
+  return run;
 
   function open() {
     const uid = ++instances;

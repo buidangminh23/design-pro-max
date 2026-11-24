@@ -104,14 +104,14 @@ struct WhatsNewVideo: View {
         }
         .onAppear(perform: sync)
         .onDisappear { looping.stop() }
-        .onChange(of: isActive) {
+        .modifier(OnValueChange(value: isActive) {
             if !isActive {
                 userPaused = false
                 userStarted = false
             }
             sync()
-        }
-        .onChange(of: reduceMotion) { sync() }
+        })
+        .modifier(OnValueChange(value: reduceMotion) { sync() })
     }
 
     private func sync() {
@@ -182,3 +182,16 @@ final class PlayerHostView: UIView {
     }
 }
 #endif
+
+private struct OnValueChange<Value: Equatable>: ViewModifier {
+    let value: Value
+    let action: () -> Void
+
+    func body(content: Content) -> some View {
+        if #available(macOS 14, iOS 17, *) {
+            content.onChange(of: value) { action() }
+        } else {
+            content.onChange(of: value) { _ in action() }
+        }
+    }
+}

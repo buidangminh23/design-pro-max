@@ -13,15 +13,15 @@
 
 | Rule | The checker | Does not prove |
 |---|---|---|
-| [WN-DIALOG-01] | a modal dialog is open (`dialog:modal` or `role="dialog"` with `aria-modal`), it has an accessible name and a named close button, focus is inside, Escape closes it, focus goes back to where it was | what VoiceOver or another screen reader announces |
-| [WN-NAV-01] | one page has no arrows, dots or counter; several have named previous and next buttons and an "N of M" label; next and previous change the page; the ends are disabled and still visible; the last primary button closes | swipe gestures on a touch screen |
+| [WN-DIALOG-01] | a modal dialog is open (`dialog:modal` or `role="dialog"` with `aria-modal`), it has an accessible name and a named close button, focus is inside, Escape closes it, focus goes back to the element that had it before the popup opened (the body when nothing did) | what VoiceOver or another screen reader announces |
+| [WN-NAV-01] | one page has no arrows, dots or counter; several have named previous and next buttons and an "N of M" in the slide label, the current dot or a counter such as "2 / 3"; next and previous change the page; the ends are disabled and still visible; the last primary button closes | swipe gestures on a touch screen |
 | [WN-LAYOUT-01] | the card's box and the media frame's ratio on every page, at each viewport | how it looks in a real Tauri or Capacitor WebView |
-| [WN-MEDIA-01] | every video is muted, inline and has a poster; only the current one plays; a long loop has a named pause control | the clip's content, or playback on a device |
-| [WN-MOTION-01] | in a reduced-motion context, no video plays by itself and a page change has no transform or a zero-length transition | the system setting itself, or a SwiftUI sheet |
+| [WN-MEDIA-01] | every video is muted, inline and has a poster; only the current one plays and hidden ones are rewound; a long loop has a named pause control | the clip's content, or playback on a device |
+| [WN-MOTION-01] | in a reduced-motion context, no video plays by itself and a page change moves nothing: no transform on the pages, their track or their contents, no transform transition or animation, and no shift in the pages' position | the system setting itself, or a SwiftUI sheet |
 | [WN-TARGET-01] | the close, arrow and primary buttons and each dot's hit area are at least 24x24 CSS px | touch accuracy on a device |
-| [WN-ONCE-01] | three loads in one context: empty storage opens nothing and stores the version, an older version opens it and is not stored until dismissal, a reload after dismissal opens nothing | storage on a device, or a Swift `UserDefaults` store |
+| [WN-ONCE-01] | three loads in one context: empty storage opens nothing and stores the version, an older version opens it and nothing writes the version for `3 s` while it stays open, it is stored on dismissal, a reload after dismissal opens nothing | storage on a device, or a Swift `UserDefaults` store |
 
-The warnings [WN-WARN-COUNT], [WN-WARN-AUTOADVANCE], [WN-WARN-TARGET44], [WN-WARN-CONTRAST] and [WN-WARN-TEXT] are reported at the `warn` level and never fail the run.
+The warnings [WN-WARN-COUNT], [WN-WARN-AUTOADVANCE], [WN-WARN-TARGET44], [WN-WARN-CONTRAST] and [WN-WARN-TEXT] are reported at the `warn` level and never fail the run. The auto-advance watch lasts up to `8 s`; once pages are seen moving, the checker presses the pager's stop control (or moves focus inside) before it walks the pages.
 
 All of it runs in Playwright's Chromium, or its WebKit with `--browser webkit`, at the viewports it used. It does not check SwiftUI code: read that against PART.md section 3 and type-check it (`references/swiftui.md`).
 

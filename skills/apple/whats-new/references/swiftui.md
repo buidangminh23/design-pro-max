@@ -13,7 +13,7 @@
 
 ## The pieces in the reference
 
-`assets/swift/WhatsNew.swift` and `assets/swift/WhatsNewVideo.swift` need only SwiftUI and AVFoundation and build for macOS and iOS:
+`assets/swift/WhatsNew.swift` and `assets/swift/WhatsNewVideo.swift` need only SwiftUI and AVFoundation and build for macOS 13 and iOS 16 or later:
 
 | Type | Job |
 |---|---|
@@ -42,7 +42,7 @@ struct NotesApp: App {
 }
 ```
 
-- Attach the presenter to the main window's root view only, so the sheet lands on that window and never on a settings window or a second document window.
+- Attach the presenter to the main window's root view only, so the sheet lands on that window and never on a settings window. In a `WindowGroup` every window runs the presenter, so the store hands the sheet to the first window still open and the others show nothing; the menu item reopens it there too. To show it in the window the person is using, open a dedicated `Window` scene with `openWindow` instead.
 - The presenter waits a moment after the view appears before it decides, so the sheet slides over a drawn screen, not over launch. An empty feature list stores the version and shows nothing.
 - `markSeen()` runs in the sheet's `onDismiss`, so the close button, Escape, the last "Got it" and a swipe down on iOS all count, and a crash before dismissal does not [WN-ONCE-01].
 - iOS has no menu bar: add a row in settings or the about screen that calls `whatsNew.present()`.
@@ -87,7 +87,7 @@ On iOS 17 and macOS 14 and later, a horizontal `ScrollView` with `.scrollTargetB
 ## Keyboard
 
 - Return activates the primary button (`.keyboardShortcut(.defaultAction)`), Escape closes (`.cancelAction`) [WN-DIALOG-01].
-- Left and Right arrows change the page through `onKeyPress`, which needs macOS 14 or iOS 17; the reference guards it with `if #available`, so earlier systems page with the buttons only.
+- Left and Right arrows change the page through `onKeyPress`, which needs macOS 14 or iOS 17; the reference guards it with `if #available`, so macOS 13 and iOS 16 page with the buttons only.
 - With Full Keyboard Access, Tab reaches the close button, the arrows and the primary button; the dots are reached as one adjustable element.
 
 ## Type-checking

@@ -28,11 +28,11 @@ Two to five features share one card that changes its content, not its size:
 
 - A navigation row centred between the media and the text: the previous arrow, the page dots, the next arrow [WN-NAV-01].
 - The arrows are round buttons named "Previous feature" and "Next feature". On the first page the previous arrow is disabled, on the last the next arrow is; both stay visible, so nothing in the row moves.
-- One dot per page, the current one filled. Each dot is a button that jumps to its page, named "Feature N of M", with a hit area padded to at least 24x24 CSS px even when the drawn dot is small [WN-TARGET-01]; the current one carries `aria-current="true"`. Dot colours hold 3:1 against the card.
+- One dot per page, the current one filled. Each dot is a button that jumps to its page, named "Feature N of M", with a hit area padded to at least 24x24 CSS px even when the drawn dot is small [WN-TARGET-01]; the current one carries `aria-current="true"`. The current dot takes the ink colour and the others a mid grey that stays distinct from the card in both schemes.
 - The primary button reads "Next" on every page but the last and "Got it" on the last. It keeps one width: both labels are laid out and the inactive one is hidden, so the button does not jump when the label changes.
 - Every page is rendered in the same grid cell, inactive ones hidden with `visibility: hidden`, `inert` and `aria-hidden`; the card is as tall as its tallest page and keeps that height on every page [WN-LAYOUT-01].
 - The pager region is a group with `aria-roledescription="carousel"` and a label that does not contain the word carousel ("What's new"); each page is a group with `aria-roledescription="slide"` labelled "N of M"; the wrapper is `aria-live="polite"` so a page change is announced.
-- No auto-advance by default [WN-WARN-AUTOADVANCE]. An integrator who turns it on gets a rotation control first in the tab order, and advance stops on focus and pauses on hover.
+- No auto-advance by default [WN-WARN-AUTOADVANCE]. An integrator who turns it on gets a rotation control first in the tab order, and advance stops on focus and pauses on hover. On a card narrower than `520px` that control moves to the top corner opposite the close button, so it never overlaps the previous arrow.
 
 ## The design tokens
 
@@ -47,7 +47,9 @@ Two to five features share one card that changes its content, not its size:
 | `--wn-accent`, `--wn-on-accent` | a system-like blue, white | the primary button and the badge tint |
 | `--wn-duration`, `--wn-shift` | `220ms`, `24px` | page change: a short slide plus a fade |
 
-The light and dark sets are both in the file; every text pair holds 4.5:1 against its background in both [WN-WARN-CONTRAST] (WH-6). Type: the badge at `13px` semibold with `0.06em` tracking, the title at `24px` bold with `1.2` line height, the description at `15px`. Below `520px` the primary button moves under the text and spans the card.
+The light and dark sets are both in the file; every text pair holds 4.5:1 against its background in both [WN-WARN-CONTRAST] (WH-6).
+
+Type: the badge at `13px` semibold with `0.06em` tracking, the title at `24px` bold with `1.2` line height, the description at `15px`. Below `520px` the primary button moves under the text and spans the card.
 
 On Apple platforms let the system colours and fonts do this work: the accent colour, the secondary label colour, the title and body text styles, and the system materials for the sheet. Match the layout, not the hex values.
 

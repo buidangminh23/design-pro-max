@@ -40,6 +40,42 @@
       "args": ["--version", "3.1.0", "--open", "#show", "--only", "WN-DIALOG-01,WN-NAV-01,WN-LAYOUT-01,WN-TARGET-01"]
     },
     {
+      "id": "wn-focus-return",
+      "rule": ["WN-DIALOG-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/pass-focus-return.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-DIALOG-01"]
+    },
+    {
+      "id": "wn-hidden-modal",
+      "rule": ["WN-DIALOG-01", "WN-NAV-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/pass-hidden-modal.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-DIALOG-01,WN-NAV-01"]
+    },
+    {
+      "id": "wn-single-digits",
+      "rule": ["WN-NAV-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/pass-nav-digits.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-NAV-01"]
+    },
+    {
+      "id": "wn-slow-advance-nav",
+      "rule": ["WN-NAV-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/warn-slow-advance.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--viewport", "1280x900", "--viewport", "320x568", "--only", "WN-NAV-01,WN-WARN-AUTOADVANCE"]
+    },
+    {
       "id": "wn-div-popup",
       "rule": ["WN-DIALOG-01"],
       "expect": "fail",
@@ -152,6 +188,43 @@
       "args": ["--version", "3.1.0", "--only", "WN-ONCE-01"]
     },
     {
+      "id": "wn-video-no-rewind",
+      "rule": ["WN-MEDIA-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-media-no-rewind.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--only", "WN-MEDIA-01"]
+    },
+    {
+      "id": "wn-reduced-track",
+      "rule": ["WN-MOTION-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-motion-track.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-MOTION-01"]
+    },
+    {
+      "id": "wn-reduced-children",
+      "rule": ["WN-MOTION-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-motion-children.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-MOTION-01"]
+    },
+    {
+      "id": "wn-marked-while-open",
+      "rule": ["WN-ONCE-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-once-mark-later.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-ONCE-01"]
+    },
+    {
       "id": "wn-six-pages",
       "rule": ["WN-WARN-COUNT"],
       "expect": "warn",
@@ -166,6 +239,15 @@
       "expect": "warn",
       "checker": "check-whats-new",
       "page": "pages/warn-autoadvance.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-AUTOADVANCE"]
+    },
+    {
+      "id": "wn-slow-advance",
+      "rule": ["WN-WARN-AUTOADVANCE"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-slow-advance.html",
       "server": "range",
       "args": ["--version", "3.1.0", "--only", "WN-WARN-AUTOADVANCE"]
     },
