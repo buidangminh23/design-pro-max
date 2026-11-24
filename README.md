@@ -4,7 +4,7 @@
 
 ### Design Skills for AI Coding Agents
 
-*One skill per design. A router for Apple-platform work with its own HIG, launch-page, demo-clip, scroll-scene, menu bar and widget, and web-shell guides, plus spacing rhythm and an exact-icon catalog, bundled.*
+*One skill per design. A router for Apple-platform work with its own HIG, launch-page, demo-clip, scroll-scene, menu bar and widget, web-shell and What's New guides, plus spacing rhythm and an exact-icon catalog, bundled.*
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@minhspark/design-pro-max"><img src="https://img.shields.io/npm/v/@minhspark/design-pro-max?logo=npm&amp;color=CB3837" height="20" alt="npm" /></a>
@@ -102,6 +102,12 @@ skills/
       assets/                a login page with a session cookie, remote-shell configs for Capacitor and Tauri, a web app manifest,
                              and the offline page that is all a remote shell's webDir or frontendDist should hold
       scripts/               check-shell.mjs (the origin a shell loads), probe-webkit.mjs (WebKit sign-in and cookie probe)
+    whats-new/               own part: in-app What's New popups after an update, one card or a pager
+      PART.md                the guide the router sends to
+      references/            design, once-per-version behaviour and storage, SwiftUI, testing, generated evidence
+      assets/                a dependency-free popup module and its CSS, a single-card and a pager reference page,
+                             and Swift references: the version store, the sheet, a looping muted video, the menu command
+      scripts/               check-whats-new.mjs (dialog, pager, media, motion and once-per-version checks in a browser)
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -153,7 +159,7 @@ The same constraint shapes the rest of the tree: each skill's own `skills/<name>
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Own parts (6)
+### Own parts (7)
 
 Written for this project and released under its MIT licence. Each has a `PART.md` guide; a part with checkers has error rules in `rules.json` that they enforce, and a pass and a fail fixture for every error rule.
 
@@ -164,13 +170,14 @@ Written for this project and released under its MIT licence. Each has a `PART.md
 | `launch-video` | Demo clips rendered from code, never screen recordings: whether a still or a live replica is enough, an HTML and CSS rebuild of the UI rendered frame by frame at 2x, H.264, VP9, AV1 and transparent encodes with a frame-0 start image, and a lazy embed that starts late, plays one clip at a time and can be paused. 7 error rules and 8 warnings | Node 22 or later; ffmpeg and ffprobe; Playwright with Chromium in the user's project; macOS outside an agent sandbox for HEVC with alpha |
 | `menubar-widgets` | macOS menu bar apps and WidgetKit widgets: whether a menu or a window is enough, status items that redraw only when light or dark changes, Edit Widget options through AppIntentConfiguration, stale extension processes after a self-update, offscreen widget snapshots with byte baselines, and testing beside the installed copy. 5 error rules and 6 warnings | Node 22 or later; on macOS, Swift for the snapshot checks (they skip elsewhere); `ps` and `lsof` for the read-only probe |
 | `web-shells` | Web apps on iPhone, iPad and Mac: a home-screen web app or a Capacitor or Tauri shell, the origin a built shell really loads, sign-in with a login page and a session cookie instead of HTTP Basic Auth, and cookies in WebKit tests. 5 error rules and 4 warnings | Node 22 or later; Playwright with WebKit in the user's project for the probe; openssl for its local HTTPS server |
+| `whats-new` | In-app What's New popups after an update: one card for one feature, a pager with named arrows and page dots for several, an image or a muted looping clip that plays only on its page, a card that keeps one size, shown once per version and never on a first install, reopenable from a menu item; a web module for React, Tauri and Capacitor UIs and a SwiftUI reference. 7 error rules and 5 warnings | Node 22 or later; Playwright with Chromium (or WebKit) in the user's project for the checker; Swift 6 to type-check the Swift reference |
 | `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
 
 Known limit, measured in `evals/RESULTS.md`: on Claude Code, apple started on 45 of the 53 routing rows at high effort (the bar is 90 %) and on 40 at medium; for plain knowledge questions such as Swift 6 migration or Swift Testing, Claude Code often answers without starting a skill. Start it by name with `/apple` when the answer should follow this skill. Codex started it on all 53.
 
 Known limit, measured in `evals/RESULTS.md`: asked for a scroll-scrub film in AV1 or HEVC only, Codex reads the part's rule and still delivers those codecs alone, recommending H.264 only in its advice; Claude Code adds the H.264 source. Check the delivered `<source>` list with `skills/apple/shared/check-media.mjs` before shipping.
 
-The checkers print one JSON line per finding and a summary that states what they prove and what they do not. They exit 0 when every check passes, 1 on an error, 2 when an argument or a tool is missing, and 3 when a sandbox blocks the browser or ffmpeg. The browser checkers (`probe-scene`, `bench-scrub`, `check-page`, `check-embed`, `render-frames` and `probe-webkit`) load Playwright from the project passed with `--project`. `check-shell` reads that project's configs with no browser; the static and ffmpeg checkers, and the menubar-widgets checkers, accept `--project` and ignore it, and need no Playwright. No checker installs anything or fetches third-party pages.
+The checkers print one JSON line per finding and a summary that states what they prove and what they do not. They exit 0 when every check passes, 1 on an error, 2 when an argument or a tool is missing, and 3 when a sandbox blocks the browser or ffmpeg. The browser checkers (`probe-scene`, `bench-scrub`, `check-page`, `check-embed`, `render-frames`, `probe-webkit` and `check-whats-new`) load Playwright from the project passed with `--project`. `check-shell` reads that project's configs with no browser; the static and ffmpeg checkers, and the menubar-widgets checkers, accept `--project` and ignore it, and need no Playwright. No checker installs anything or fetches third-party pages.
 
 ### Vendored, active (6)
 
@@ -289,7 +296,7 @@ Node 22 or later; no dependencies.
 | `node scripts/release.mjs push-tag vX.Y.Z` | Creates the annotated tag on HEAD once HEAD is `origin/main`, the tree is clean and `check vX.Y.Z` passes; pushes the tag by name, retries up to three times, and succeeds only when `git ls-remote` lists the tag at HEAD |
 | `node scripts/badges.mjs <dir>` | Network. Writes the README badges into `<dir>`: `github-views.svg` from the GitHub traffic API, which needs `ANALYTICS_TOKEN` with Administration read on the repository, and the npm download badges once `package.json` names a public package. `BADGE_SOURCES` limits the sources, for example `views`. A source that has no data yet is skipped and leaves the published badge in place; a rejected request fails the run |
 | `node scripts/ci-local.mjs [--skip-verify] [--json]` | Runs every step of CI's test job in order, read from `ci.yml`, then `scripts/verify.mjs` when ffmpeg, ffprobe and Playwright are installed, and lists what the run did not cover: the OS and Node matrix, L2 media, the GitHub-side release and sync steps, and verify when it could not run. For use when GitHub Actions is unavailable |
-| `node scripts/verify.mjs [--only <case or rule>[,<more>]] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. A case with an expected file, such as the planted-defect launch page, must also report exactly the error rules that file lists for its checker. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium`. The web-shells cases also need WebKit (`npx playwright install webkit`) and openssl; the menubar-widgets snapshot cases need Swift on macOS and are listed as skipped elsewhere |
+| `node scripts/verify.mjs [--only <case or rule>[,<more>]] [--keep] [--json]` | Copies `shared/` and each own part outside the repository, builds the fixture media with ffmpeg, serves every case and runs the part's checkers on it. A fail case passes only when its checker exits 1 with an error for the case's rule; a pass case only when the checker passes that rule without skipping it. A case with an expected file, such as the planted-defect launch page, must also report exactly the error rules that file lists for its checker. Exits 2 when ffmpeg or Playwright is missing; install Playwright with `npm install --no-save --no-package-lock playwright` and `npx playwright install chromium`. The web-shells cases also need WebKit (`npx playwright install webkit`) and openssl, and the whats-new video cases ffmpeg for their clips; the menubar-widgets snapshot cases need Swift on macOS and are listed as skipped elsewhere |
 | `node scripts/lint-tokens.mjs [<file.css> ...] [--json]` | Fails a token set that matches 3 or more of the measured reference values within 1 px or 0.001 em; by default it lints the shipped `tokens.css` and `theme.tailwind.css`, each mode and `:lang()` set on its own. The measured values sit hashed in `evidence/token-hashes.json` so the file is not a copyable token sheet; they are public measurements and the hashes can be reversed. Runs inside `npm test` |
 | `node scripts/import-findings.mjs --check <research folder>` | Recomputes each ledger entry's source hash from the private research folder it was written from and fails on any difference; `--write` records new hashes. The research folder never enters the repository |
 | `npm test` | The test suite, including sync runs against local fake upstream repositories, the evidence ledger and rules, the citation lint, the own-part checkers' pure code and a red-first check of the harness |
