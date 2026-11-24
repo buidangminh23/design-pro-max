@@ -106,7 +106,7 @@ SOFTWARE.
 
 - Authors: Paul Hudson
 - Repository: https://github.com/twostraws/SwiftData-Agent-Skill
-- Commit: `922d989473a9914210b41529a1ac5636aff4b8c1`
+- Commit: `8051f177a0076e7fd45bdf4ee687b070ba58fdc6`
 - Licence: MIT
 - Parts (1): `swiftdata-pro`
 
@@ -234,7 +234,7 @@ SOFTWARE.
 
 - Authors: Rudrank Riyam
 - Repository: https://github.com/rorkai/app-store-connect-cli-skills
-- Commit: `9c7e769f09a18237c9bd9c70f70aef65f0cd0391`
+- Commit: `0915e9da1016a6cc953659d43906dcf7839a4c52`
 - Licence: MIT
 - Parts (25): `app-store-connect/asc-cli-usage`, `app-store-connect/asc-id-resolver`, `app-store-connect/asc-app-create-ui`, `app-store-connect/asc-signing-setup`, `app-store-connect/asc-xcode-build`, `app-store-connect/asc-build-lifecycle`, `app-store-connect/asc-testflight-orchestration`, `app-store-connect/asc-crash-triage`, `app-store-connect/asc-analytics-reports`, `app-store-connect/asc-submission-health`, `app-store-connect/asc-release-flow`, `app-store-connect/asc-metadata-sync`, `app-store-connect/asc-localize-metadata`, `app-store-connect/asc-whats-new-writer`, `app-store-connect/asc-aso-audit`, `app-store-connect/asc-screenshot-resize`, `app-store-connect/asc-shots-pipeline`, `app-store-connect/asc-notarization`, `app-store-connect/asc-ad-hoc-distribution`, `app-store-connect/asc-workflow`, `app-store-connect/asc-apple-ads`, `app-store-connect/asc-ppp-pricing`, `app-store-connect/asc-subscription-localization`, `app-store-connect/asc-revenuecat-catalog-sync`, `app-store-connect/asc-wall-submit`
 

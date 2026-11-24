@@ -3,7 +3,7 @@
   "id": "app-store-connect/asc-xcode-build",
   "name": "asc-xcode-build",
   "repo": "rorkai/app-store-connect-cli-skills",
-  "commit": "9c7e769f09a18237c9bd9c70f70aef65f0cd0391",
+  "commit": "0915e9da1016a6cc953659d43906dcf7839a4c52",
   "path": "skills/asc-xcode-build",
   "exclude": [],
   "license": {
@@ -12,7 +12,7 @@
     "sha256": "56fde5f70d5af10b746863208dee6bf0b99e49066da1f76e1800c760e276139b",
     "copyright": "Copyright (c) 2026 Rudrank Riyam"
   },
-  "fetched": "2026-10-06",
+  "fetched": "2026-10-26",
   "active": false,
   "activation": "`command -v asc` succeeds, `asc auth status --validate` passes, and the user confirms a paid Apple Developer Program account.",
   "prerequisites": [
@@ -35,8 +35,14 @@
     },
     {
       "path": "SKILL.md",
-      "sha256": "41e3504f7b4c054e12873989ac784fafb8129458ee2c35aa59e3cda552841224",
-      "bytes": 8274,
+      "sha256": "c23dd50df490ea4b95bda0d1c5846bd0420f82ed001b9e6e2877abeb05c079f3",
+      "bytes": 8455,
+      "executable": false
+    },
+    {
+      "path": "references/portable-ios.md",
+      "sha256": "447380405514dff3a861096446e34dcf81dfbb2e6baebd906c0123783d90bddb",
+      "bytes": 2507,
       "executable": false
     }
   ]

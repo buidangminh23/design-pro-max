@@ -3,7 +3,7 @@
   "id": "swiftdata-pro",
   "name": "swiftdata-pro",
   "repo": "twostraws/SwiftData-Agent-Skill",
-  "commit": "922d989473a9914210b41529a1ac5636aff4b8c1",
+  "commit": "8051f177a0076e7fd45bdf4ee687b070ba58fdc6",
   "path": "swiftdata-pro",
   "exclude": [
     "agents/**",
@@ -15,7 +15,7 @@
     "sha256": "b9b479e6df9f27cbc8e7abe91f771b396f3f0fa114d070c7c0b02c820c6b74dc",
     "copyright": "Copyright (c) 2026 Paul Hudson."
   },
-  "fetched": "2026-10-06",
+  "fetched": "2026-10-26",
   "active": true,
   "activation": "None; active by default.",
   "prerequisites": [
