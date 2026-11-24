@@ -748,6 +748,138 @@
       "check": null,
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": []
+    },
+    {
+      "id": "WN-DIALOG-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "The What's New popup is a modal dialog: a <dialog> opened with showModal() or role dialog with aria-modal true, an accessible name, a visible close control with an accessible name, focus inside when it opens, Escape closes it, and focus returns to the element that had it before.",
+      "values": "modal; a name; a named, visible close control; focus in on open; Escape closes; focus returns",
+      "evidence": ["WH-0", "WH-1", "WH-15"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-div-popup"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-NAV-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "Controls match the page count: one feature shows no arrows, dots or counter; several show previous and next buttons with accessible names and a page indicator that exposes N of M; next and previous change the page, the end buttons are disabled rather than hidden, and the last page's primary button dismisses the popup.",
+      "values": "no arrows or dots for 1 page; named arrows, N of M, ends disabled not hidden, last primary dismisses for 2 or more",
+      "evidence": ["WH-2", "WH-3"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-hidden-ends", "wn-single-arrows"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-LAYOUT-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "The card keeps the same size on every page, within 1 CSS px, and the media frame keeps one aspect ratio, 16:9 by default.",
+      "values": "card size spread within 1 CSS px; one media aspect ratio (16:9 by default)",
+      "evidence": ["WH-16"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-height-jump"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-MEDIA-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "Every feature video is muted, inline (playsinline) and has a poster; only the current page's video plays; a looping video longer than 5 s has a visible pause control with an accessible name.",
+      "values": "muted, playsinline, a poster; only the current page plays; a named pause control for a loop over 5 s",
+      "evidence": ["WH-7", "WH-8", "PV-21"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-video-unmuted", "wn-video-all-playing", "wn-video-no-pause"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-MOTION-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "Under reduced motion no video in the popup starts on its own, and changing pages uses no transform movement: no transform or translate transition or animation, or one of 0 ms.",
+      "values": "no video starts on its own; page changes with no transform, or a transition of 0 ms",
+      "evidence": ["WH-9", "WH-10", "WH-17"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-reduced-slide", "wn-reduced-autoplay"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-TARGET-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "The close, previous, next and primary controls are at least 24x24 CSS px, and each page dot's hit area (its border box) is at least 24x24 CSS px.",
+      "values": "at least 24x24 CSS px for every control and each dot's hit area",
+      "evidence": ["WH-4"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video", "wn-open-trigger"], "fail": ["wn-small-dots"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js", "whats-new/assets/lib/whats-new.css"]
+    },
+    {
+      "id": "WN-ONCE-01",
+      "part": "whats-new",
+      "level": "error",
+      "statement": "The popup shows once per version, after an update only: with no stored version (a first install) nothing opens and the current version is stored; with an older stored version it opens, and the version is not marked seen while it is open; after it is dismissed the current version is stored and a reload shows nothing.",
+      "values": "first install: nothing opens, version stored; update: opens, still unmarked while open; dismissed: version stored, reload shows nothing",
+      "evidence": ["WH-11", "WH-12", "WH-13", "WH-14"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": ["wn-ref-single", "wn-ref-pager", "wn-pager-video"], "fail": ["wn-first-install-opens", "wn-marked-on-open"] },
+      "implementedBy": ["whats-new/assets/lib/whats-new.js"]
+    },
+    {
+      "id": "WN-WARN-COUNT",
+      "part": "whats-new",
+      "level": "warn",
+      "statement": "More than 5 feature pages: keep the popup to the current version's few features; the system guidance gets hard to read at about 10 dots.",
+      "values": "5 pages or fewer; about 10 dots is too many",
+      "evidence": ["WH-3"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WN-WARN-AUTOADVANCE",
+      "part": "whats-new",
+      "level": "warn",
+      "statement": "Pages advance on a timer: leave paging to the person; if pages must advance, add a rotation control first in the tab order and stop on hover and focus.",
+      "values": "no auto-advance; otherwise a pause control first in the tab order, stopping on hover and focus, for motion over 5 s",
+      "evidence": ["WH-2", "PV-21"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WN-WARN-TARGET44",
+      "part": "whats-new",
+      "level": "warn",
+      "statement": "The close, previous, next or primary control is at least 24 but below 44x44 CSS px, under Apple's 44x44 pt recommendation for a hit region.",
+      "values": "44x44 pt or larger (24x24 CSS px is the floor)",
+      "evidence": ["WH-5", "WH-4"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WN-WARN-CONTRAST",
+      "part": "whats-new",
+      "level": "warn",
+      "statement": "Text in the popup is below 4.5:1 against its solid background (3:1 for large text) in the light or the dark scheme.",
+      "values": "4.5:1 for text, 3:1 for large text, in light and dark",
+      "evidence": ["WH-6"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "WN-WARN-TEXT",
+      "part": "whats-new",
+      "level": "warn",
+      "statement": "A feature description runs longer than 3 lines at the card width; say it in a sentence or two and link to the full release notes.",
+      "values": "3 lines or fewer",
+      "evidence": ["WH-11", "WH-16"],
+      "check": "whats-new/scripts/check-whats-new.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
     }
   ]
 }

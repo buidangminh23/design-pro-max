@@ -13,7 +13,7 @@
  *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
  * playwright, then npx playwright install chromium-headless-shell); the web-shells cases also need its WebKit (npx
- * playwright install webkit) and openssl. Exit codes: 0 every case judged right, 1 a case
+ * playwright install webkit) and openssl; the whats-new cases build their clips with ffmpeg at run time. Exit codes: 0 every case judged right, 1 a case
  * judged wrong, 2 a missing tool.
  */
 import fs from 'node:fs';
@@ -21,9 +21,9 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
-import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
+import { buildFixtureMedia, buildLaunchVideoMedia, buildWhatsNewMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -144,6 +144,10 @@ function runCase(entry, skill, media, scratch) {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
     args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
+  } else if (entry.checker === 'check-whats-new') {
+    const site = path.join(scratch, 'sites', entry.id);
+    buildSite(entry, skill, media, site);
+    args = [path.join(skill, entry.part, 'scripts', 'check-whats-new.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server ?? 'range', '--project', ROOT, ...(entry.args ?? [])];
   } else if (entry.checker === 'check-shell') {
     const fixture = (folder) => path.join(ROOT, 'fixtures', entry.part, ...folder.split('/'));
     args = [path.join(skill, entry.part, 'scripts', 'check-shell.mjs'), ...(entry.project ? ['--project', fixture(entry.project)] : []), ...(entry.bundle ? ['--bundle', fixture(entry.bundle)] : []), ...(entry.args ?? [])];
@@ -158,7 +162,7 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
@@ -209,6 +213,7 @@ async function main(argv) {
   const media = {
     ...(needed.has('launch-scroll') || needed.has('launch-page') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs'), makeSequence: path.join(skill, 'launch-scroll', 'scripts', 'make-sequence.mjs') }) : {}),
     ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs') }) : {}),
+    ...(needed.has('whats-new') ? buildWhatsNewMedia(path.join(scratch, 'media-whats-new')) : {}),
   };
   const results = [];
   for (const entry of cases) {

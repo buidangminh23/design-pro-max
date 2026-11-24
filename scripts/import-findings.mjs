@@ -18,7 +18,7 @@ import path from 'node:path';
 import { LEDGER_FILE, loadLedger } from './lib/evidence.mjs';
 import { ROOT, formatJson, isMainModule, sha256 } from './lib/vendor.mjs';
 
-export const AREAS = { AM: 'apple-motion', AD: 'apple-design', TQ: 'techniques-2026', PV: 'product-video', SC: 'scroll-cinema', EC: 'ecosystem', HG: 'apple-hig' };
+export const AREAS = { AM: 'apple-motion', AD: 'apple-design', TQ: 'techniques-2026', PV: 'product-video', SC: 'scroll-cinema', EC: 'ecosystem', HG: 'apple-hig', WH: 'whats-new' };
 
 const FINDINGS_SUFFIX = '.findings.json';
 const INPUTS_SUFFIX = '.inputs.json';

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whats-new fixture: arrows on one feature</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>body { margin: 0; min-height: 100dvh; font-family: system-ui, sans-serif; background: #f2f2f5; } main { padding: 32px; }</style>
+</head>
+<body>
+<main><h1>Fixture app</h1><button type="button" id="show">What's New…</button></main>
+<script type="module">
+import { artFeatures, run, whenOpen } from './fixture.js';
+whenOpen((dialog) => {
+  for (const [name, label] of [['wn-prev', 'Previous feature'], ['wn-next', 'Next feature']]) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = name;
+    button.setAttribute('aria-label', label);
+    dialog.querySelector('.wn-card').append(button);
+  }
+});
+run(() => artFeatures(1));
+</script>
+</body>
+</html>

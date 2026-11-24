@@ -1,0 +1,200 @@
+{
+  "description": "Red-first cases for the whats-new checker. Pages are served from a built site: the part's lib and reference pages plus these fixture pages; clips and posters are built at run time by buildWhatsNewMedia. Each fail page plants one defect on top of the shipped lib and runs only its rule.",
+  "cases": [
+    {
+      "id": "wn-ref-single",
+      "rule": ["WN-DIALOG-01", "WN-NAV-01", "WN-LAYOUT-01", "WN-MEDIA-01", "WN-MOTION-01", "WN-TARGET-01", "WN-ONCE-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "reference/whats-new-single.html",
+      "server": "range",
+      "args": ["--version", "2.4.0"]
+    },
+    {
+      "id": "wn-ref-pager",
+      "rule": ["WN-DIALOG-01", "WN-NAV-01", "WN-LAYOUT-01", "WN-MEDIA-01", "WN-MOTION-01", "WN-TARGET-01", "WN-ONCE-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "reference/whats-new-pager.html",
+      "server": "range",
+      "args": ["--version", "2.4.0", "--viewport", "1280x900", "--viewport", "390x844"]
+    },
+    {
+      "id": "wn-pager-video",
+      "rule": ["WN-DIALOG-01", "WN-NAV-01", "WN-LAYOUT-01", "WN-MEDIA-01", "WN-MOTION-01", "WN-TARGET-01", "WN-ONCE-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/pass-video.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0"]
+    },
+    {
+      "id": "wn-open-trigger",
+      "rule": ["WN-DIALOG-01", "WN-NAV-01", "WN-LAYOUT-01", "WN-TARGET-01"],
+      "expect": "pass",
+      "checker": "check-whats-new",
+      "page": "pages/pass-video.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--open", "#show", "--only", "WN-DIALOG-01,WN-NAV-01,WN-LAYOUT-01,WN-TARGET-01"]
+    },
+    {
+      "id": "wn-div-popup",
+      "rule": ["WN-DIALOG-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-dialog-div.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--dialog", ".popup", "--only", "WN-DIALOG-01"]
+    },
+    {
+      "id": "wn-hidden-ends",
+      "rule": ["WN-NAV-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-nav-hidden-ends.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-NAV-01"]
+    },
+    {
+      "id": "wn-single-arrows",
+      "rule": ["WN-NAV-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-nav-single-arrows.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-NAV-01"]
+    },
+    {
+      "id": "wn-height-jump",
+      "rule": ["WN-LAYOUT-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-layout-jump.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-LAYOUT-01"]
+    },
+    {
+      "id": "wn-video-unmuted",
+      "rule": ["WN-MEDIA-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-media-unmuted.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--only", "WN-MEDIA-01"]
+    },
+    {
+      "id": "wn-video-all-playing",
+      "rule": ["WN-MEDIA-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-media-all-playing.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--only", "WN-MEDIA-01"]
+    },
+    {
+      "id": "wn-video-no-pause",
+      "rule": ["WN-MEDIA-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-media-no-pause.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--only", "WN-MEDIA-01"]
+    },
+    {
+      "id": "wn-reduced-slide",
+      "rule": ["WN-MOTION-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-motion-transform.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-MOTION-01"]
+    },
+    {
+      "id": "wn-reduced-autoplay",
+      "rule": ["WN-MOTION-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-motion-autoplay.html",
+      "server": "range",
+      "media": { "wn-loop.mp4": "wn-loop", "wn-loop.jpg": "wn-loop-poster", "wn-short.mp4": "wn-short", "wn-short.jpg": "wn-short-poster" },
+      "args": ["--version", "3.1.0", "--only", "WN-MOTION-01"]
+    },
+    {
+      "id": "wn-small-dots",
+      "rule": ["WN-TARGET-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-target-small-dots.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-TARGET-01"]
+    },
+    {
+      "id": "wn-first-install-opens",
+      "rule": ["WN-ONCE-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-once-first-install.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-ONCE-01"]
+    },
+    {
+      "id": "wn-marked-on-open",
+      "rule": ["WN-ONCE-01"],
+      "expect": "fail",
+      "checker": "check-whats-new",
+      "page": "pages/fail-once-mark-on-open.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-ONCE-01"]
+    },
+    {
+      "id": "wn-six-pages",
+      "rule": ["WN-WARN-COUNT"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-count.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-COUNT"]
+    },
+    {
+      "id": "wn-auto-advance",
+      "rule": ["WN-WARN-AUTOADVANCE"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-autoadvance.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-AUTOADVANCE"]
+    },
+    {
+      "id": "wn-close-32",
+      "rule": ["WN-WARN-TARGET44"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-target44.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-TARGET44"]
+    },
+    {
+      "id": "wn-pale-text",
+      "rule": ["WN-WARN-CONTRAST"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-contrast.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-CONTRAST"]
+    },
+    {
+      "id": "wn-long-text",
+      "rule": ["WN-WARN-TEXT"],
+      "expect": "warn",
+      "checker": "check-whats-new",
+      "page": "pages/warn-text.html",
+      "server": "range",
+      "args": ["--version", "3.1.0", "--only", "WN-WARN-TEXT"]
+    }
+  ]
+}
