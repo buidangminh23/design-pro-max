@@ -102,7 +102,13 @@ function waitForLoad(win) {
 }
 
 function nextFrame(win) {
-  return new Promise((resolve) => win.requestAnimationFrame(() => win.requestAnimationFrame(() => resolve())));
+  return new Promise((resolve) => {
+    const timer = win.setTimeout(resolve, 120);
+    win.requestAnimationFrame(() => win.requestAnimationFrame(() => {
+      win.clearTimeout(timer);
+      resolve();
+    }));
+  });
 }
 
 function openModal(doc) {
@@ -244,12 +250,17 @@ export function showWhatsNew({
         page.setAttribute('aria-roledescription', 'slide');
         page.setAttribute('aria-label', format(labels.pageOf, at + 1, count));
       }
-      return { page, titleId, ...media, userPaused: false, userStarted: false, rejected: false, long: false };
+      return { page, titleId, ...media, userPaused: false, userStarted: false, rejected: false, long: false, rewind: false };
     });
 
     const track = element(doc, 'div', { class: 'wn-track' }, pages.map((entry) => entry.page));
     const region = element(doc, 'div', { class: 'wn-pages' }, [track]);
-    const primary = element(doc, 'button', { type: 'button', class: 'wn-primary', autofocus: true });
+    const primaryNext = element(doc, 'span', { class: 'wn-primary-label', 'data-label': 'next', text: labels.nextButton });
+    const primaryDone = element(doc, 'span', { class: 'wn-primary-label', 'data-label': 'done', text: labels.done });
+    const primary = element(doc, 'button', { type: 'button', class: 'wn-primary', autofocus: true }, [
+      pager ? primaryNext : null,
+      primaryDone,
+    ]);
     let prev = null;
     let next = null;
     let dots = [];
@@ -330,7 +341,7 @@ export function showWhatsNew({
               try {
                 video.currentTime = 0;
               } catch {
-                /* rewinding before metadata is harmless to skip */
+                entry.rewind = true;
               }
             }
           }
@@ -344,6 +355,8 @@ export function showWhatsNew({
       if (!video) return;
       video.addEventListener('loadedmetadata', () => {
         entry.long = video.loop && Number.isFinite(video.duration) && video.duration > DEFAULTS.pauseAfterSeconds;
+        if (entry.rewind && pages[index] !== entry) video.currentTime = 0;
+        entry.rewind = false;
         updateToggle(entry);
       }, { signal });
       video.addEventListener('play', () => updateToggle(entry), { signal });
@@ -383,7 +396,12 @@ export function showWhatsNew({
       });
       if (prev) setAria(prev, index === 0);
       if (next) setAria(next, index === count - 1);
-      primary.textContent = index === count - 1 ? labels.done : labels.nextButton;
+      const last = index === count - 1;
+      primary.dataset.label = last ? 'done' : 'next';
+      primaryDone.toggleAttribute('data-active', last);
+      primaryNext.toggleAttribute('data-active', !last);
+      const active = doc.activeElement;
+      if (active && pages.some((entry) => entry.page.hasAttribute('inert') && entry.page.contains(active))) primary.focus();
       dialog.dataset.page = String(index + 1);
       syncMedia();
       scheduleAdvance();
