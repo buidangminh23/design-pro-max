@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Changed
 
 - The router routes in-app What's New popups to `whats-new`, with a routing note that keeps App Store What's New text on the asc-whats-new-writer row and teaching one control in place with TipKit in `hig`; the not-covered list names Android-only apps beside Android-only shells. To stay within 15,000 characters, several standing rules and notes are worded more tightly with no rule or route dropped, and the duplicate "never stretch a part" line is gone (standing rule 3 says it). The parts index lists 13 active parts: the 6 vendored ones and the own parts launch-scroll, launch-page, launch-video, hig, menubar-widgets, web-shells and whats-new.
+- The router description puts first the SwiftUI and Swift questions Claude Code answered from its own knowledge in the v0.2 round (lists, alerts, sheets, data races, XCTest to Swift Testing, slow type-checking) and adds "even if known"; to stay within 500 characters it drops Apple Ads and Home Screen. The routing round that measures it has not run yet.
 - The verify workflow also runs on changes under `skills/apple/whats-new/`, and `web-card.json` carries the recomputed stats (45 guides, 13 active, 39 error rules, 99 fail fixtures, 118 eval cases, 362 ledger claims); the version stays 0.2.0 until the release.
 
 ## [0.2.0] - 2026-11-24
