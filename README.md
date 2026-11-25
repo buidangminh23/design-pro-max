@@ -203,7 +203,7 @@ Whole skills that the owner releases from their own repositories, shipped here u
 
 | Skill | Repository | Release | Commit | Files | Images |
 |---|---|---|---|---|---|
-| `design-spacing-rhythm` | [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill) | [v2.19.0](https://github.com/buidangminh23/spacing-skill/releases/tag/v2.19.0) | `eba13d7515a5` | 8 | none |
+| `design-spacing-rhythm` | [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill) | [v2.20.0](https://github.com/buidangminh23/spacing-skill/releases/tag/v2.20.0) | `25b4e7173756` | 8 | none |
 | `icons-pro-max` | [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max) | [v2.4.0](https://github.com/buidangminh23/icons-pro-max/releases/tag/v2.4.0) | `f197f6b78c9b` | 827 | 825 brand images, outside the MIT licence |
 
 <!-- /gen:bundles -->
