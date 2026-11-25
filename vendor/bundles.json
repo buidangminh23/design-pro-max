@@ -4,8 +4,8 @@
     {
       "name": "design-spacing-rhythm",
       "repo": "buidangminh23/spacing-skill",
-      "tag": "v2.19.0",
-      "commit": "eba13d7515a59978da39bf7e8fc0bf58b695ca20",
+      "tag": "v2.20.0",
+      "commit": "25b4e717375692085ef17172b6f04e01fb064a7d",
       "path": "skills/spacing-skill",
       "license": {
         "file": "LICENSE",
@@ -27,8 +27,8 @@
         },
         {
           "path": "references/documents.md",
-          "sha256": "c6e817122e011fe28de95a66f4d9db2b3d4681c64e041f4a1414073a90bb7fe7",
-          "bytes": 6441,
+          "sha256": "77d3688ca5442b39bb11c8bbc4fa4053d2bb183cda4bef6147d128fc9549ed8e",
+          "bytes": 8026,
           "executable": false
         },
         {
