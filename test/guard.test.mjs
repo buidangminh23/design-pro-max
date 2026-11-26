@@ -73,6 +73,7 @@ test('detectors find hidden characters, secrets and personal data', () => {
   assert.deepEqual(secretFindings(['-----BEGIN', 'OPENSSH PRIVATE KEY-----'].join(' ')), ['private key']);
   assert.deepEqual(secretFindings('no secrets here'), []);
   assert.deepEqual(personalFindings(['/Us', 'ers/someone/code'].join('')), ['home path']);
+  assert.deepEqual(personalFindings(['/Vol', 'umes/Backup/Projects'].join('')), []);
   assert.deepEqual(personalFindings(['/Vol', 'umes/Data/repo'].join('')), ['volume path']);
   assert.deepEqual(personalFindings(['someone', 'example.org'].join('@')), ['email address']);
   assert.deepEqual(personalFindings(['bot', 'users.noreply.github.com'].join('@')), []);

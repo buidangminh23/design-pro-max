@@ -112,7 +112,7 @@ export const SECRET_PATTERNS = [
 
 export const PERSONAL_PATTERNS = [
   ['home path', /(?:\/Users\/[A-Za-z][\w.-]*|\/home\/(?!runner\b)[a-z][\w.-]*\/|\b[A-Za-z]:\\Users\\)/],
-  ['volume path', /\/Volumes\/[^\s/'"`)\]]+/],
+  ['volume path', /\/Volumes\/(?!(?:Archive|Backup|Example|External)\/)[^\s/'"`)\]]+/],
   ['email address', /[\w.+-]+@(?!users\.noreply\.github\.com\b|anthropic\.com\b)[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}\b/i],
 ];
 

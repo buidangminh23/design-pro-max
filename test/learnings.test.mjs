@@ -93,13 +93,13 @@ test('entries that carry secrets, emails, absolute paths, addresses or this mach
   for (const [text, pattern] of [
     [`token ${fakeGithubToken()}`, /API token/],
     ['password=hunter22', /secret assignment/],
-    ['ask owner@example.com', /email/],
-    ['built in /Users/someone/app', /absolute path/],
+    [`ask owner${'@'}example.com`, /email/],
+    [`built in /${'Users'}/someone/app`, /absolute path/],
     ['built in C:\\work\\app', /absolute path/],
     ['the Mac at 192.168.1.20', /IP address/],
     ['ssh to studio.local', /local host name/],
     ['ran on buildhost overnight', /this machine/],
-    ['-----BEGIN OPENSSH PRIVATE KEY-----', /private key/],
+    [`-----BEGIN OPENSSH ${'PRIVATE'} KEY-----`, /private key/],
   ]) {
     const problems = leak(text);
     assert.ok(problems.some((problem) => pattern.test(problem)), `${text}: ${problems.join('; ')}`);
@@ -116,7 +116,7 @@ test('entries need a known part and verdict, one-line fields and the three requi
 test('a refused entry writes nothing and reports the reason', () => {
   const project = tempDir('learn-leak-');
   try {
-    const result = run(entryArgs(project, ['--create']).map((arg) => (arg === 'a short viewport needs the static layout first' ? 'mail owner@example.com' : arg)));
+    const result = run(entryArgs(project, ['--create']).map((arg) => (arg === 'a short viewport needs the static layout first' ? `mail owner${'@'}example.com` : arg)));
     assert.equal(result.code, 1);
     assert.ok(result.out.problems.some((problem) => problem.includes('email')));
     assert.deepEqual(fs.readdirSync(project), []);

@@ -33,7 +33,7 @@ export function shellLines(text) {
     } else {
       pending = { number: index + 1, text: line };
     }
-    if (/\\\s*$/.test(pending.text)) pending.text = pending.text.replace(/\\\s*$/, '');
+    if (/\\\s*$/.test(pending.text)) pending.text = pending.text.replace(/\\\s*$/, '').trimEnd();
     else {
       if (pending.text.trim()) out.push({ number: pending.number, text: pending.text.trim() });
       pending = null;
