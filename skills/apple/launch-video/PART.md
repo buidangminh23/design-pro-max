@@ -65,7 +65,8 @@ Copy `assets/lib/demo-embed.js` and follow `assets/reference/demo-embed.html` an
 
 - Markup ships `muted playsinline preload="none"`, no `autoplay`, sources in `data-src`, best codec first and H.264 last [LV-WARN-AV1], and a lazy `<img>` start image instead of the eager `poster` attribute (PV-13).
 - The component loads a clip within the load margin, plays it while at least half is visible and pauses it otherwise [LV-WARN-PLAYBACK], and reveals the video after its first presented frame. One clip plays at a time by default (`maxActive: 1`), a choice of the component, not a measured rule.
-- Motion over 5 s, which includes every loop, gets a labelled pause button a keyboard reaches and presses [LV-EMBED-02]. Under reduced motion, and under Save-Data (a component choice; only Chromium sends it, PV-24), nothing loads or plays until the reader presses Play.
+- Motion over 5 s, which includes every loop, gets a labelled pause button a keyboard reaches and presses [LV-EMBED-02]. Under reduced motion nothing loads or plays until the reader presses Play.
+- Save-Data also waits for Play: a component choice; only Chromium sends it (PV-24).
 
 ## 7. Hard rules
 

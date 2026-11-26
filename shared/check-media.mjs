@@ -301,7 +301,7 @@ function checkPreviewAudio(info, report, where, prores) {
     report.check('LV-APP-01', APP_PREVIEW.sampleRates.includes(track.sampleRate), `${label} sample rate`, `${track.sampleRate ?? '?'} Hz`, '44.1 or 48 kHz');
     if (track.codec === 'aac' && track.bitRate) {
       const total = track.bitRate * (tracks.length === 2 ? 2 : 1);
-      report.check('LV-WARN-APP-BITRATE', Math.abs(total - APP_PREVIEW.aacBitRate) <= 16000, `${label} bit rate`, `${Math.round(total / 1000)} kbps`, '256 kbps AAC', 'warn');
+      report.check('LV-WARN-BITRATE', Math.abs(total - APP_PREVIEW.aacBitRate) <= 16000, `${label} bit rate`, `${Math.round(total / 1000)} kbps`, '256 kbps AAC', 'warn');
     }
   }
 }
@@ -320,10 +320,10 @@ function checkPreviewVideoCodec(info, report, where) {
   report.check('LV-APP-01', APP_PREVIEW.h264Profiles.includes(video.profile), `${where}: profile`, video.profile ?? 'unknown', 'up to High');
   report.check('LV-APP-01', video.level !== null && video.level <= APP_PREVIEW.maxH264Level, `${where}: level`, video.level === null ? 'unknown' : (video.level / 10).toFixed(1), 'at most 4.0');
   report.check('LV-APP-01', video.pixFmt === 'yuv420p' && isLimitedRange(video), `${where}: pixel format`, `${video.pixFmt}, ${video.colorRange ?? 'unknown'} range`, 'yuv420p in limited range');
-  if (info.mp4) report.check('LV-WARN-APP-BITRATE', info.mp4.moovFirst, `${where}: box order`, info.mp4.order.join(','), 'moov before mdat', 'warn');
+  if (info.mp4) report.check('LV-WARN-BITRATE', info.mp4.moovFirst, `${where}: box order`, info.mp4.order.join(','), 'moov before mdat', 'warn');
   if (video.bitRate) {
     const [low, high] = APP_PREVIEW.h264TargetBitRate;
-    report.check('LV-WARN-APP-BITRATE', video.bitRate >= low * 0.5 && video.bitRate <= high * 1.25, `${where}: video bit rate`, `${(video.bitRate / 1e6).toFixed(1)} Mbps`, 'about 10-12 Mbps for H.264', 'warn');
+    report.check('LV-WARN-BITRATE', video.bitRate >= low * 0.5 && video.bitRate <= high * 1.25, `${where}: video bit rate`, `${(video.bitRate / 1e6).toFixed(1)} Mbps`, 'about 10-12 Mbps for H.264', 'warn');
   }
   return false;
 }
@@ -347,7 +347,7 @@ export function checkAppPreviewFile(info, report, device) {
   report.check('LV-APP-01', seconds !== null && seconds >= APP_PREVIEW.minSeconds - 0.05 && seconds <= APP_PREVIEW.maxSeconds + 0.05, `${where}: duration`, seconds ? `${seconds.toFixed(2)} s` : 'unknown', '15 to 30 seconds');
   report.check('LV-APP-01', info.size <= APP_PREVIEW.maxBytes, `${where}: file size`, `${Math.round(info.size / 1e6)} MB`, 'at most 500 MB');
   checkPreviewAudio(info, report, where, prores);
-  report.warn('LV-WARN-APP-SOURCE', `${where}: content`, 'cannot be checked from the file', 'screen captures of the app itself, with optional narration and overlays (App Review 2.3.4)');
+  report.warn('LV-WARN-FOOTAGE', `${where}: content`, 'cannot be checked from the file', 'screen captures of the app itself, with optional narration and overlays (App Review 2.3.4)');
 }
 
 export function checkFiles(files, report, { profile = 'scrub', device = null, ...demo } = {}) {

@@ -9,27 +9,27 @@
     "desc": "Dự án độc lập, không liên kết với Apple Inc. Skill apple là bộ định tuyến gửi mỗi việc tới đúng một hướng dẫn: 38 hướng dẫn MIT chép nguyên văn cho SwiftUI, Swift, Xcode và App Store Connect, phần Human Interface Guidelines viết lại bằng lời riêng cho đủ 158 trang, và các hướng dẫn riêng kèm script kiểm cho trang ra mắt, clip demo dựng từ code, cảnh cuộn ghim và tua video theo cuộn trên web, ứng dụng thanh menu và widget, ứng dụng web trên Màn hình chính hoặc trong vỏ Capacitor, Tauri, và popup Có gì mới trong ứng dụng sau mỗi bản cập nhật. Đi kèm hai skill căn chỉnh khoảng cách và icon. Mọi con số có nguồn; eval đã đo phần định tuyến v0.1 và phần cảnh cuộn trên Claude Code và Codex, eval của các phần thêm ở bản 0.2 chưa chạy.",
     "stats": [
       {
-        "value": "45",
+        "value": "47",
         "label": "Hướng dẫn"
       },
       {
-        "value": "13",
+        "value": "15",
         "label": "Hướng dẫn đang bật"
       },
       {
-        "value": "39",
+        "value": "58",
         "label": "Luật lỗi có nguồn"
       },
       {
-        "value": "99",
+        "value": "147",
         "label": "Fixture phải trượt"
       },
       {
-        "value": "118",
+        "value": "137",
         "label": "Case eval"
       },
       {
-        "value": "362",
+        "value": "387",
         "label": "Dữ kiện có ngày đo"
       }
     ]
@@ -41,27 +41,27 @@
     "desc": "An independent project, not affiliated with Apple Inc. The apple skill routes each task to one guide: 38 vendored MIT guides for SwiftUI, Swift, Xcode and App Store Connect, Apple's Human Interface Guidelines restated in its own words across all 158 pages, and its own guides with checkers for launch pages, demo clips rendered from code, scroll-pinned and scroll-scrubbed web scenes, menu bar apps and widgets, web apps on the Home Screen or in a Capacitor or Tauri shell, and in-app What's New popups after an update. Spacing and icon skills ship alongside. Every number is sourced; evals measured the v0.1 routing and the scroll-scene part on Claude Code and Codex, and the evals of the parts added in 0.2 have not run yet.",
     "stats": [
       {
-        "value": "45",
+        "value": "47",
         "label": "Guides"
       },
       {
-        "value": "13",
+        "value": "15",
         "label": "Active guides"
       },
       {
-        "value": "39",
+        "value": "58",
         "label": "Sourced error rules"
       },
       {
-        "value": "99",
+        "value": "147",
         "label": "Must-fail fixtures"
       },
       {
-        "value": "118",
+        "value": "137",
         "label": "Eval cases"
       },
       {
-        "value": "362",
+        "value": "387",
         "label": "Dated claims"
       }
     ]

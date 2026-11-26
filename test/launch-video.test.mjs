@@ -17,10 +17,10 @@ const collect = async () => {
 };
 const levels = (report, rule) => report.findings.filter((finding) => finding.rule === rule).map((finding) => finding.level);
 
-test('launch-video has the seven error rules of the plan, each with fixtures, and the warnings', () => {
+test('launch-video has the nine error rules of the plan, each with fixtures, and the warnings', () => {
   const own = loadRules(ROOT).filter((rule) => rule.part === 'launch-video');
-  assert.deepEqual(own.filter((rule) => rule.level === 'error').map((rule) => rule.id), ['LV-ENC-01', 'LV-ENC-02', 'LV-ENC-03', 'LV-POSTER-01', 'LV-EMBED-01', 'LV-EMBED-02', 'LV-RENDER-01']);
-  assert.deepEqual(own.filter((rule) => rule.level === 'warn').map((rule) => rule.id), ['LV-WARN-DIRECTION', 'LV-WARN-BUDGET', 'LV-WARN-DENSITY', 'LV-WARN-FPS', 'LV-WARN-AV1', 'LV-WARN-SEAM', 'LV-WARN-ALPHA', 'LV-WARN-PLAYBACK']);
+  assert.deepEqual(own.filter((rule) => rule.level === 'error').map((rule) => rule.id), ['LV-ENC-01', 'LV-ENC-02', 'LV-ENC-03', 'LV-POSTER-01', 'LV-EMBED-01', 'LV-EMBED-02', 'LV-RENDER-01', 'LV-APP-01', 'LV-CAP-01']);
+  assert.deepEqual(own.filter((rule) => rule.level === 'warn').map((rule) => rule.id), ['LV-WARN-DIRECTION', 'LV-WARN-BUDGET', 'LV-WARN-DENSITY', 'LV-WARN-FPS', 'LV-WARN-AV1', 'LV-WARN-SEAM', 'LV-WARN-ALPHA', 'LV-WARN-PLAYBACK', 'LV-WARN-BITRATE', 'LV-WARN-FOOTAGE', 'LV-WARN-REGION', 'LV-WARN-CAPTURE']);
   const cases = JSON.parse(fs.readFileSync(path.join(ROOT, 'fixtures', 'launch-video', 'cases.json'), 'utf8')).cases;
   for (const recipe of ['lv-yuvj', 'lv-444', 'lv-aac', 'lv-untagged', 'lv-moov-end']) {
     assert.ok(cases.some((entry) => entry.expect === 'fail' && entry.files?.includes(recipe)), `bad recipe ${recipe} is a fail case`);
