@@ -1,7 +1,7 @@
 {
   "name": "design-pro-max",
-  "description": "Design skills for coding agents: a router for Apple-platform work with vendored MIT guides, Apple Human Interface Guidelines in its own words, and its own guides for launch pages, demo clips, scroll-pinned web scenes, menu bar apps and widgets, web apps on the Home Screen or in Capacitor or Tauri shells, and in-app What's New popups, plus spacing and icon skills. Independent project, not affiliated with Apple Inc.",
-  "version": "0.2.1",
+  "description": "Design skills for coding agents: a router for Apple-platform work with vendored MIT guides, Apple Human Interface Guidelines in its own words, and its own guides for launch pages, demo clips, scroll-pinned web scenes, menu bar apps and widgets, web apps on the Home Screen or in Capacitor or Tauri shells, in-app What's New popups, running a Mac from an agent and Mac apps shipped outside the App Store, plus spacing and icon skills. Independent project, not affiliated with Apple Inc.",
+  "version": "0.3.0",
   "author": {
     "name": "buidangminh23",
     "url": "https://github.com/buidangminh23"

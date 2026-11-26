@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-26
+
 ### Added
 
 - Opt-in field learnings for the apple skill's own parts, the plan's "opt-in LEARNINGS" item from Later. `skills/apple/shared/learnings.md` is the contract: off by default, on only after the user asks (then `--create`) or when the user's project already holds a journal whose first line is `# Apple field learnings` (`APPLE-LEARNINGS.md` at the project root or a relative path the user names); one dated entry per finished task with Read, Changed, Learned and Evidence lines and a `covered`, `gap` or `refinement` verdict; never written outside the user's project or into the installed skill, never sent, committed or turned into a skill change, and never holding secrets, emails, absolute paths, IP addresses or host and user names. `shared/learnings.mjs` (`status`, `append`, `check`) enforces it and exits 0, 1 (refused) or 2 (usage). Each own part's report and the end of `hig/PART.md` point to it in one line, except `launch-video`, which is over its PART.md cap already; standing rule 14 in the router names it, paid for by tighter wording elsewhere, and the router stays within 15,000 characters. `test/learnings.test.mjs` covers the opt-in, the format, the privacy screen and the path containment.
