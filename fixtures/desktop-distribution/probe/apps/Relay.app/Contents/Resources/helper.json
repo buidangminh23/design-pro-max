@@ -1,0 +1,6 @@
+{
+  "command": "Contents/Resources/runtime/node",
+  "args": [
+    "Contents/Resources/helper/main.js"
+  ]
+}
