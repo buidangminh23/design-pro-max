@@ -1,0 +1,112 @@
+<!-- Lucian UX/UI Prompt #379 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#379 -->
+<!--
+Element: Growing streak flame
+ID: 379 · Category: Promos & Rewards · Tags: streak, flame, habit, gamification, progress
+What it does: Fill today's slot among the week's seven and a check hops into place as the flame in the middle flares up, then settles one size larger while throwing off more sparks. The day count rolls up by one, and filling all seven slots makes a full-week badge sparkle. The flame keeps burning in three layers—outer, inner and core—each swaying its tip to its own rhythm.
+How to use it: Press Done today to keep your streak going
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#379
+-->
+<style>
+.u379{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 70% at 50% 35%,#3B1F0E,#170B05 75%);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#FFF4E6}
+.u379-fl{position:absolute;left:50%;top:26px;width:120px;height:144px;margin-left:-60px;transform-origin:50% 96%;transition:transform .6s cubic-bezier(.3,1.5,.5,1)}
+.u379-fl svg{width:100%;height:100%;overflow:visible}
+.u379-fo{filter:drop-shadow(0 0 10px rgba(255,110,40,.55))}
+.u379-sp circle{fill:#FFD08A}
+.u379-glow{position:absolute;left:50%;top:60px;width:200px;height:200px;margin-left:-100px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,146,43,.35),transparent);transition:opacity .6s,transform .6s;pointer-events:none}
+.u379-ct{position:absolute;left:0;right:0;top:172px;display:flex;align-items:baseline;justify-content:center;gap:6px}
+.u379-nw{display:inline-block;height:44px;overflow:hidden}
+.u379-ns{display:block;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.u379-ns i{display:block;height:44px;font-style:normal;font-size:40px;line-height:44px;font-weight:900;font-variant-numeric:tabular-nums;color:#FFA94D;text-align:center}
+.u379-ct b{font-size:14px;font-weight:800;color:#FFD8A8}
+.u379-wk{position:absolute;left:22px;right:22px;top:232px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.u379-dy{font-size:10px;font-weight:800;color:#C9A68A}
+.u379-dt{width:30px;height:30px;margin:4px auto 0;border-radius:50%;border:2px dashed rgba(255,216,168,.35);display:grid;place-items:center}
+.u379-dt.is-on{border:0;background:linear-gradient(135deg,#FF922B,#F03E3E);animation:u379-pop .45s cubic-bezier(.3,1.8,.5,1)}
+.u379-dt.is-on::after{content:"";width:9px;height:5px;border-left:2.5px solid #fff;border-bottom:2.5px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.u379-dt.is-today{box-shadow:0 0 0 2px #FFD8A8}
+@keyframes u379-pop{from{transform:scale(.3)}}
+.u379-go{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);border:0;padding:9px 20px;border-radius:999px;background:linear-gradient(90deg,#FF922B,#F03E3E);color:#fff;font:inherit;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 8px 18px -8px rgba(240,62,62,.7)}
+.u379-go:focus-visible{outline:2px solid #FFD8A8;outline-offset:3px}
+.u379-bd{position:absolute;right:18px;top:18px;padding:5px 10px;border-radius:999px;background:#FFD43B;color:#3B1F0E;font-size:11px;font-weight:900;opacity:0;transform:scale(.5) rotate(-10deg);transition:opacity .25s,transform .45s cubic-bezier(.3,1.8,.5,1)}
+.u379.is-week .u379-bd{opacity:1;transform:rotate(6deg)}
+@media (prefers-reduced-motion: reduce){.u379-fl{transition:none}}
+</style>
+<div class="ux u379">
+  <div class="u379-glow" aria-hidden="true"></div>
+  <div class="u379-fl" aria-hidden="true"><svg viewBox="0 0 120 144"><defs></defs><g class="u379-sp"></g><path class="u379-fo"/><path class="u379-fm"/><path class="u379-fc"/></svg></div>
+  <div class="u379-ct" aria-live="polite"><span class="u379-nw"><span class="u379-ns"></span></span><b>day streak</b></div>
+  <div class="u379-wk"></div>
+  <div class="u379-bd">Full week!</div>
+  <button type="button" class="u379-go"></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fl = root.querySelector('.u379-fl'), glow = root.querySelector('.u379-glow'), ns = root.querySelector('.u379-ns'), wk = root.querySelector('.u379-wk'), go = root.querySelector('.u379-go');
+  var DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  var streak = 11, done = 3, D = [];
+  for (var i = 0; i < 60; i++) { var n = document.createElement('i'); n.textContent = i; ns.appendChild(n); }
+  DAYS.forEach(function (d, i) { var c = document.createElement('div'); c.innerHTML = '<div class="u379-dy">' + d + '</div><div class="u379-dt"></div>'; wk.appendChild(c); D.push(c.querySelector('.u379-dt')); });
+  function info() {
+    ns.style.transform = 'translateY(' + (-streak * 44) + 'px)';
+    D.forEach(function (d, i) { d.classList.toggle('is-on', i < done); d.classList.toggle('is-today', i === done); });
+    var s = 0.8 + done * 0.05; fl.style.transform = 'scale(' + s.toFixed(2) + ')'; glow.style.opacity = (0.4 + done * 0.09).toFixed(2); glow.style.transform = 'scale(' + (0.8 + done * 0.06).toFixed(2) + ')';
+    root.classList.toggle('is-week', done >= 7);
+    go.textContent = done >= 7 ? 'Start next week' : 'Done today';
+  }
+  var svg = fl.querySelector('svg'), uid = 'u379' + Math.random().toString(36).slice(2, 7);
+  svg.querySelector('defs').innerHTML = '<linearGradient id="' + uid + 'o" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".55" stop-color="#F5462A"/><stop offset="1" stop-color="#D9262B"/></linearGradient><linearGradient id="' + uid + 'm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFC24A"/><stop offset="1" stop-color="#FF8A1F"/></linearGradient><linearGradient id="' + uid + 'c" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFFBEA"/><stop offset="1" stop-color="#FFE27A"/></linearGradient>';
+  var LY = [
+    { el: svg.querySelector('.u379-fo'), g: 'o', w: 40, h: 126, ph: 0, sw: 1 },
+    { el: svg.querySelector('.u379-fm'), g: 'm', w: 28, h: 88, ph: 1.7, sw: 0.8 },
+    { el: svg.querySelector('.u379-fc'), g: 'c', w: 15, h: 48, ph: 3.1, sw: 0.55 }
+  ];
+  LY.forEach(function (L) { L.el.setAttribute('fill', 'url(#' + uid + L.g + ')'); });
+  var PRO = [[0.05, 0.6], [0.19, 0.96], [0.37, 1], [0.55, 0.8], [0.71, 0.52], [0.85, 0.26]];
+  var CX = 60, BASE = 138, flare = 0;
+  function outline(L, t) {
+    var w = L.w * (1 + flare * 0.08), h = L.h * (1 + flare * 0.2), sw = function (f) { return (Math.sin(t * 1.7 + L.ph) * 0.6 + Math.sin(t * 2.9 + L.ph * 2) * 0.4) * h * 0.13 * L.sw * Math.pow(f, 1.5); };
+    var R = [], Lf = [];
+    PRO.forEach(function (q) {
+      var f = q[0], y = BASE - f * h, x = q[1] * w, s0 = sw(f);
+      R.push([CX + x + s0 + Math.sin(t * 6.1 + f * 7 + L.ph) * w * 0.07 * f, y]);
+      Lf.unshift([CX - x + s0 - Math.sin(t * 5.3 + f * 6 + L.ph + 2) * w * 0.07 * f, y]);
+    });
+    var tip = [CX + sw(1) + Math.sin(t * 4.3 + L.ph) * w * 0.12, BASE - h * (1 + Math.sin(t * 5.2 + L.ph) * 0.035)];
+    var P = [[CX, BASE]].concat(R, [tip, tip], Lf), n = P.length, d = 'M' + P[0][0].toFixed(1) + ' ' + P[0][1].toFixed(1);
+    for (var i = 0; i < n; i++) {
+      var a = P[(i - 1 + n) % n], b = P[i], c = P[(i + 1) % n], e = P[(i + 2) % n];
+      d += ' C' + (b[0] + (c[0] - a[0]) / 6).toFixed(1) + ' ' + (b[1] + (c[1] - a[1]) / 6).toFixed(1) + ' ' + (c[0] - (e[0] - b[0]) / 6).toFixed(1) + ' ' + (c[1] - (e[1] - b[1]) / 6).toFixed(1) + ' ' + c[0].toFixed(1) + ' ' + c[1].toFixed(1);
+    }
+    L.el.setAttribute('d', d + 'Z');
+  }
+  var spg = svg.querySelector('.u379-sp'), SP = [];
+  for (var k = 0; k < 7; k++) { var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); spg.appendChild(c); SP.push({ el: c, t0: -1 }); }
+  function sparks(now) {
+    SP.forEach(function (p, k) {
+      var on = k < 2 + Math.round(done * 0.7 + flare * 3);
+      if (p.t0 < 0 || now - p.t0 > p.life) { if (!on) { p.el.setAttribute('r', 0); p.t0 = -1; return; } p.t0 = now + Math.random() * 600; p.life = 900 + Math.random() * 700; p.x = CX + (Math.random() - 0.5) * 30; p.dx = (Math.random() - 0.5) * 30; p.r = 1 + Math.random() * 1.6; }
+      var q = (now - p.t0) / p.life; if (q < 0) { p.el.setAttribute('r', 0); return; }
+      p.el.setAttribute('cx', (p.x + p.dx * q + Math.sin(q * 9 + k) * 3).toFixed(1)); p.el.setAttribute('cy', (BASE - 70 - q * 80).toFixed(1));
+      p.el.setAttribute('r', (p.r * (1 - q)).toFixed(2)); p.el.setAttribute('opacity', (1 - q).toFixed(2));
+    });
+  }
+  var vis = true;
+  function frame(now) {
+    if (!root.isConnected) return;
+    if (vis) { var t = now / 1000; flare = Math.max(0, flare - 0.02); LY.forEach(function (L) { outline(L, t); }); sparks(now); }
+    requestAnimationFrame(frame);
+  }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(root);
+  go.addEventListener('click', function () {
+    if (done >= 7) { done = 0; info(); return; }
+    done++; streak++; flare = 1; info();
+    if (rm) LY.forEach(function (L) { flare = 0; outline(L, 0); });
+  });
+  info();
+  if (rm) LY.forEach(function (L) { outline(L, 0); }); else requestAnimationFrame(frame);
+})();
+</script>

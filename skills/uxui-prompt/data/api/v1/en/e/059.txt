@@ -1,0 +1,138 @@
+<!-- Lucian UX/UI Prompt #059 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#059 -->
+<!--
+Element: Event RSVP card
+ID: 059 · Category: Cards & Content · Tags: event, rsvp, avatars, segmented, confetti
+What it does: Choose “Going” and your face pushes into the front of the attendee row while the head count rolls up, a little confetti bursts and an Add to Calendar button unfolds. Switch to “Can’t go” and your face drops out as the row closes up again.
+How to use it: Switch between Going, Maybe and Can’t go below. With a keyboard, use the left and right arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#059
+-->
+<style>
+.u059{position:relative;width:340px;height:440px;display:flex;flex-direction:column;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u059-top{position:relative;height:128px;flex:none;padding:18px;background:linear-gradient(140deg,#22C3A6,#3D8BFF 55%,#7B61FF);color:#fff;overflow:hidden}
+.u059-top::before{content:"";position:absolute;width:220px;height:220px;right:-60px;top:-90px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 65%)}
+.u059-top::after{content:"";position:absolute;inset:auto -20px -60px -20px;height:110px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.12) 0 2px,transparent 2px 22px);transform:perspective(200px) rotateX(55deg)}
+.u059-date{position:relative;z-index:1;width:56px;height:62px;border-radius:14px;background:#fff;color:#16151B;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 10px 20px -10px rgba(0,0,0,.4)}
+.u059-date small{font-size:11px;font-weight:800;color:#E5484D;letter-spacing:.06em}
+.u059-date b{font-size:24px;font-weight:850;line-height:1;letter-spacing:-.04em}
+.u059-tag{position:absolute;right:16px;top:18px;z-index:1;height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(255,255,255,.2);font-size:11.5px;font-weight:800}
+.u059-body{padding:16px 20px 0;flex:1;display:flex;flex-direction:column}
+.u059-t{margin:0;font-size:19px;font-weight:800;letter-spacing:-.035em}
+.u059-m{display:flex;gap:14px;margin-top:6px;font-size:12.5px;font-weight:650;color:var(--ux-ink-3)}
+.u059-m span{display:inline-flex;align-items:center;gap:4px}
+.u059-m svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u059-ppl{display:flex;align-items:center;gap:10px;margin-top:16px;height:40px}
+.u059-stack{display:flex;padding-left:10px}
+.u059-av{position:relative;width:36px;height:36px;margin-left:-10px;border-radius:50%;background:var(--g);box-shadow:0 0 0 3px var(--ux-surface);transition:margin .5s var(--ux-spring),width .5s var(--ux-spring),opacity .3s,transform .5s var(--ux-spring)}
+.u059-av.me{z-index:2;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;width:0;margin-left:0;opacity:0;transform:scale(.3) translateX(-20px)}
+.u059.is-yes .u059-av.me{width:36px;margin-left:-10px;opacity:1;transform:none}
+.u059-cnt{display:flex;align-items:baseline;gap:4px;font-size:13px;font-weight:650;color:var(--ux-ink-2)}
+.u059-od{display:inline-flex;height:20px;overflow:hidden;font-size:16px;font-weight:850;line-height:20px;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u059-od i{font-style:normal}
+.u059-od span{display:flex;flex-direction:column;transform:translateY(calc(var(--d) * -20px));transition:transform .6s var(--ux-spring)}
+.u059-cal{margin-left:auto;height:32px;padding:0 11px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,var(--ux-mint) 15%,transparent);color:var(--ux-mint);font-size:12px;font-weight:750;opacity:0;transform:scale(.6);pointer-events:none;transition:opacity .3s,transform .5s var(--ux-spring)}
+.u059-cal svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.u059.is-yes .u059-cal{opacity:1;transform:none;pointer-events:auto;transition-delay:.15s}
+.u059-cal:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u059-cal.added{background:var(--ux-mint);color:var(--ux-accent-ink)}
+.u059-desc{margin:14px 0 0;font-size:13.5px;line-height:1.6;color:var(--ux-ink-2)}
+.u059-cap{margin:14px 0 16px}
+.u059-cap div{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u059-cap div b{color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u059-cap>span{display:block;height:6px;margin-top:6px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u059-cap>span i{display:block;height:100%;width:calc(var(--n) / 50 * 100%);border-radius:inherit;background:linear-gradient(90deg,#22C3A6,#3D8BFF);transition:width .7s var(--ux-spring)}
+.u059-seg{position:relative;display:flex;margin-top:auto;margin-bottom:20px;padding:4px;border-radius:16px;background:var(--ux-surface-2)}
+.u059-k{position:absolute;top:4px;bottom:4px;left:0;width:var(--w,0);border-radius:12px;background:var(--kc,var(--ux-ink));transform:translateX(var(--x,0));opacity:var(--ko,0);transition:transform .5s var(--ux-spring),width .5s var(--ux-spring),background-color .4s,opacity .3s}
+.u059-seg button{position:relative;flex:1;height:46px;border:0;border-radius:12px;background:none;display:inline-flex;align-items:center;justify-content:center;gap:5px;font-size:14px;font-weight:750;color:var(--ux-ink-2);transition:color .3s}
+.u059-seg button[aria-checked="true"]{color:var(--ux-accent-ink)}
+.u059-seg button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u059-cf{position:absolute;left:0;top:0;width:7px;height:10px;border-radius:2px;pointer-events:none}
+</style>
+<div class="ux u059">
+  <div class="u059-top"><div class="u059-date"><small>OCT</small><b>24</b></div><span class="u059-tag">In-person meetup</span></div>
+  <div class="u059-body">
+    <h3 class="u059-t">Motion design evening</h3>
+    <div class="u059-m"><span><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 1.5"/></svg>Fri 7:30 PM</span><span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14s5-4.2 5-8A5 5 0 0 0 3 6c0 3.8 5 8 5 8z"/><circle cx="8" cy="6" r="1.8"/></svg>Seongsu Lounge</span></div>
+    <div class="u059-ppl">
+      <div class="u059-stack" aria-hidden="true"><span class="u059-av me" style="--g:linear-gradient(140deg,#FFB547,#FF6B8B)">Me</span><span class="u059-av" style="--g:linear-gradient(140deg,#8B6CFF,#5B8CFF)"></span><span class="u059-av" style="--g:linear-gradient(140deg,#22C3A6,#0EA5E9)"></span><span class="u059-av" style="--g:linear-gradient(140deg,#FF7A93,#B04FD0)"></span><span class="u059-av" style="--g:linear-gradient(140deg,#FFD08A,#D2702A)"></span></div>
+      <span class="u059-cnt" aria-live="polite"><span class="u059-od" role="text"></span> going</span>
+      <button class="u059-cal" type="button" tabindex="-1"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg>Calendar</button>
+    </div>
+    <p class="u059-desc">An evening of taking apart one small interaction together. Just bring a laptop.</p>
+    <div class="u059-cap"><div><span>50 spots</span><b class="u059-left">13 spots left</b></div><span aria-hidden="true"><i></i></span></div>
+    <div class="u059-seg" role="radiogroup" aria-label="Are you going?">
+      <span class="u059-k" aria-hidden="true"></span>
+      <button type="button" role="radio" aria-checked="false" data-c="var(--ux-mint)">Going</button>
+      <button type="button" role="radio" aria-checked="false" data-c="var(--ux-warn)">Maybe</button>
+      <button type="button" role="radio" aria-checked="false" data-c="var(--ux-danger)">Can’t go</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var seg = root.querySelector('.u059-seg'), k = root.querySelector('.u059-k'), opts = Array.prototype.slice.call(seg.querySelectorAll('button'));
+  var od = root.querySelector('.u059-od'), cal = root.querySelector('.u059-cal'), left = root.querySelector('.u059-left');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BASE = 37, sel = -1;
+  function count(n) {
+    var s = String(n);
+    if (od.children.length !== s.length) {
+      od.innerHTML = s.split('').map(function (c) { var h = ''; for (var i = 0; i < 10; i++) h += '<i>' + i + '</i>'; return '<span style="--d:' + c + '">' + h + '</span>'; }).join('');
+    } else s.split('').forEach(function (c, i) { od.children[i].style.setProperty('--d', c); });
+    od.setAttribute('aria-label', s);
+  }
+  function burst() {
+    if (rm) return;
+    var b = opts[0], cx = b.offsetLeft + b.offsetWidth / 2 + seg.offsetLeft, cy = seg.offsetTop + 10;
+    var C = ['#FFB547', '#FF6B8B', '#22C3A6', '#7B61FF', '#3D8BFF'];
+    for (var i = 0; i < 16; i++) {
+      var p = document.createElement('i');
+      p.className = 'u059-cf';
+      p.style.background = C[i % C.length];
+      root.appendChild(p);
+      var a = -Math.PI / 2 + (Math.random() - 0.5) * 2.2, v = 70 + Math.random() * 70;
+      var dx = Math.cos(a) * v, dy = Math.sin(a) * v;
+      p.animate([
+        { transform: 'translate(' + cx + 'px,' + cy + 'px) rotate(0)', opacity: 1 },
+        { transform: 'translate(' + (cx + dx) + 'px,' + (cy + dy) + 'px) rotate(' + (Math.random() * 360) + 'deg)', opacity: 1, offset: .6 },
+        { transform: 'translate(' + (cx + dx * 1.2) + 'px,' + (cy + dy + 60) + 'px) rotate(' + (Math.random() * 720) + 'deg)', opacity: 0 }
+      ], { duration: 900 + Math.random() * 300, easing: 'cubic-bezier(.2,.7,.4,1)' }).onfinish = function () { this.effect.target.remove(); };
+    }
+  }
+  function pick(i, focus) {
+    if (i === sel) return;
+    var was = sel;
+    sel = i;
+    opts.forEach(function (o, j) { o.setAttribute('aria-checked', String(j === i)); o.tabIndex = j === i ? 0 : -1; });
+    if (focus) opts[i].focus();
+    var o = opts[i];
+    k.style.setProperty('--x', o.offsetLeft + 'px');
+    k.style.setProperty('--w', o.offsetWidth + 'px');
+    k.style.setProperty('--kc', o.getAttribute('data-c'));
+    k.style.setProperty('--ko', 1);
+    root.classList.toggle('is-yes', i === 0);
+    cal.tabIndex = i === 0 ? 0 : -1;
+    count(BASE + (i === 0 ? 1 : 0));
+    root.style.setProperty('--n', BASE + (i === 0 ? 1 : 0));
+    left.textContent = (50 - BASE - (i === 0 ? 1 : 0)) + ' spots left';
+    if (i === 0 && was !== 0) burst();
+  }
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () { pick(i); });
+    o.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); pick(((sel < 0 ? 0 : sel) + d + 3) % 3, true); }
+    });
+  });
+  opts[0].tabIndex = 0; opts[1].tabIndex = -1; opts[2].tabIndex = -1;
+  cal.addEventListener('click', function () {
+    var on = !cal.classList.contains('added');
+    cal.classList.toggle('added', on);
+    cal.lastChild.textContent = on ? 'Added' : 'Calendar';
+  });
+  count(BASE);
+  root.style.setProperty('--n', BASE);
+})();
+</script>

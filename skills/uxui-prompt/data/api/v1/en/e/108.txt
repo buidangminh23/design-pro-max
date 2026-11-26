@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #108 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#108 -->
+<!--
+Element: Time zone overlap
+ID: 108 · Category: Layout, Schedule & Design · Tags: timezone, native, spatial
+What it does: A meeting planner that lines up the time in Seoul, London and New York. Move the UTC time and all three clocks and their work status change together.
+How to use it: Move the UTC slider to find a time when all three cities are at work
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#108
+-->
+<style>
+.u108{width:100%;max-width:400px;min-width:0;font-size:13px}.u108 button{font:inherit;color:inherit;cursor:pointer}.u108 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u108 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u108{padding:10px 4px;max-width:380px}.u108 .zone{padding:16px 0;display:grid;grid-template-columns:50px 1fr 68px;gap:14px;align-items:center;border-bottom:1px solid var(--ux-line)}.u108 .city{font-weight:650}.u108 .clock{font-size:19px;font-variant-numeric:tabular-nums;text-align:right}.u108 .clock small{display:block;color:var(--ux-ink-2);font-size:11px;margin-top:3px}.u108 .hours{height:16px;background:var(--ux-surface-3);position:relative;border-radius:3px;overflow:hidden}.u108 .work{position:absolute;inset:0 auto 0 37.5%;width:37.5%;background:var(--ux-accent-soft)}.u108 .needle{position:absolute;top:0;bottom:0;width:3px;background:var(--ux-accent);left:var(--h)}.u108 label{display:flex;align-items:center;gap:13px;margin-top:22px;color:var(--ux-ink-2)}.u108 label input{flex:1;height:26px}.u108 .utc{font-variant-numeric:tabular-nums;min-width:40px}
+</style>
+<div class="ux u108"><div class="zones"></div><label>UTC<input class="time" type="range" min="0" max="23" value="10" aria-label="UTC meeting time"><output class="utc">10:00</output></label><output class="sr result" aria-live="polite"></output></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const zones=[['Seoul','Asia/Seoul'],['London','Europe/London'],['New York','America/New_York']];q('.zones').innerHTML=zones.map(([name])=>`<div class="zone"><span class="city">${name}</span><div class="hours"><span class="work"></span><span class="needle"></span></div><span class="clock"></span></div>`).join('');function paint(){const h=+q('.time').value,date=new Date('2026-10-12T'+String(h).padStart(2,'0')+':00:00Z');let ok=0;qa('.zone').forEach((r,i)=>{const hour=+new Intl.DateTimeFormat('en-GB',{timeZone:zones[i][1],hour:'2-digit',hourCycle:'h23'}).format(date),good=hour>=9&&hour<18;r.querySelector('.clock').innerHTML=String(hour).padStart(2,'0')+':00<small>'+(good?'At work':'Off')+'</small>';r.style.setProperty('--h',hour/24*100+'%');if(good)ok++});q('.utc').textContent=String(h).padStart(2,'0')+':00';q('.result').textContent='Cities in work hours: '+ok+' / 3'}q('.time').oninput=paint;paint();})();
+</script>

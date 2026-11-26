@@ -1,0 +1,18 @@
+<!-- Lucian UX/UI Prompt #127 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#127 -->
+<!--
+Element: Change hunk review
+ID: 127 · Category: Document & Data Editing · Tags: diff-hunk, editing, interactive
+What it does: A review panel for accepting one code change or keeping the original. Accept and the removed line disappears; reject and the added line goes, leaving only the final code.
+How to use it: Press “Accept” or “Keep original”
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#127
+-->
+<style>
+.u127{width:min(100%,370px);font-size:14px;line-height:1.6;color:var(--ux-ink)}.u127 button,.u127 input,.u127 textarea,.u127 select{font:inherit;color:inherit;max-width:100%;min-width:0}.u127 button{cursor:pointer;min-height:44px;border:1px solid var(--ux-line-2);border-radius:8px;background:var(--ux-surface);padding:8px 12px}.u127 input,.u127 textarea,.u127 select{border:1px solid var(--ux-line-2);border-radius:6px;background:var(--ux-surface);padding:8px 10px}.u127 .quiet{color:var(--ux-ink-2)}.u127 .primary{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:transparent}.u127 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u127 [hidden]{display:none!important}.u127 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.u127 *{animation:none!important;transition:none!important}}
+.u127{border-left:3px solid var(--ux-line-2);background:var(--ux-surface);padding:23px 0 15px}.u127 .code{font:14px/1.9 ui-monospace,monospace;overflow-wrap:anywhere}.u127 .line{padding:5px 20px}.u127 .minus{background:color-mix(in srgb,var(--ux-danger) 9%,var(--ux-surface));color:var(--ux-ink-2)}.u127 .plus{background:color-mix(in srgb,var(--ux-mint) 14%,var(--ux-surface));color:var(--ux-ink)}.u127 .actions{display:flex;gap:8px;padding:18px 20px 0}.u127 .actions button{font-size:13px}.u127 [data-choice="accepted"]{border-left-color:var(--ux-mint)}
+</style>
+<div class="ux u127"><div class="code" aria-label="garden.js changes"><div class="line">function waterGarden() {</div><div class="line minus">− &nbsp;return 7;</div><div class="line plus">+ &nbsp;return 3;</div><div class="line">}</div></div><div class="actions"><button class="primary" data-accept>Accept</button><button data-reject>Keep original</button></div><span class="sr" data-state aria-live="polite"></span></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,$=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)],esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const motion=(node,frames,opts={})=>{if(node?.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.8,.2,1)',...opts})};function choose(v){root.dataset.choice=v;$('.minus').hidden=v==='accepted';$('.plus').hidden=v==='rejected';$('[data-accept]').textContent=v?'Review again':'Accept';$('[data-state]').textContent=v==='accepted'?'Accepted · return 3;':v==='rejected'?'Rejected · return 7;':'Awaiting review';$('[data-accept]').setAttribute('aria-pressed',String(v==='accepted'));$('[data-reject]').setAttribute('aria-pressed',String(v==='rejected'));motion($('.code'),[{transform:'translateX(-4px)'},{transform:'none'}])}$('[data-accept]').onclick=()=>choose(root.dataset.choice?'':'accepted');$('[data-reject]').onclick=()=>choose(root.dataset.choice==='rejected'?'':'rejected');choose('');})();
+</script>

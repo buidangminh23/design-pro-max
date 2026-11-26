@@ -1,0 +1,57 @@
+<!-- Lucian UX/UI Prompt #389 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#389 -->
+<!--
+Element: Side-expanding photo panels
+ID: 389 · Category: Sections & Content · Tags: accordion, panels, gallery, hover, expand
+What it does: Hover one of five narrow vertical photo strips and it opens wide while the others narrow. Folded strips show only a sideways name; the moment one opens, its name stands upright and a description and button float up from below.
+How to use it: Hover or tap a photo strip. ←/→ keys move between them too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#389
+-->
+<style>
+.u389{position:relative;width:340px;height:320px;display:flex;gap:6px;padding:12px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u389-p{position:relative;flex:1 1 0;min-width:0;border:0;padding:0;border-radius:18px;overflow:hidden;background:var(--bg);color:#fff;text-align:left;transition:flex-grow .6s cubic-bezier(.3,1,.3,1)}
+.u389-p.on{flex-grow:5}
+.u389-p::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,rgba(0,0,0,.55));pointer-events:none}
+.u389-lb{position:absolute;left:50%;bottom:16px;z-index:1;white-space:nowrap;font-size:14px;font-weight:850;transform-origin:0 0;transform:rotate(-90deg) translate(0,-50%);transition:transform .5s var(--ux-spring),left .5s var(--ux-spring),bottom .5s,font-size .4s}
+.u389-p.on .u389-lb{left:16px;bottom:74px;transform:none;font-size:22px}
+.u389-ds{position:absolute;left:16px;right:16px;bottom:16px;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:8px;opacity:0;transform:translateY(12px);transition:opacity .2s,transform .4s var(--ux-spring)}
+.u389-p.on .u389-ds{opacity:1;transform:none;transition-delay:.25s}
+.u389-ds span{max-width:100%;font-size:12.5px;font-weight:650;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u389-ds i{flex:none;font-style:normal;padding:6px 10px;border-radius:999px;background:#fff;color:#111;font-size:11.5px;font-weight:800}
+.u389-p:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u389" role="group" aria-label="Trip themes"></div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var P = [['Peaks', 'Sunrise hike on the ridge'], ['Ocean', 'Surfing with the sound of waves'], ['Desert', 'Stargazing on the dunes'], ['Forest', 'Walking mossy trails'], ['City', 'A night walk through the lights']];
+  var BG = ['linear-gradient(#FFC078,#E8590C 40%,#5C3D2E 70%,#2B2118)', 'linear-gradient(#A5D8FF,#1C7ED6 55%,#0B7285)', 'radial-gradient(30% 20% at 70% 25%,#FFF3BF,transparent 70%),linear-gradient(#FFD8A8,#F59F00 55%,#C2410C)', 'radial-gradient(60% 40% at 50% 20%,#D3F9D8,transparent 70%),linear-gradient(#2F9E44,#1B4332)', 'radial-gradient(2px 2px at 30% 30%,#FFE066,transparent),radial-gradient(2px 2px at 60% 50%,#FFE066,transparent),linear-gradient(#1B1035,#364FC7 70%,#0B0C12)'];
+  var cur = 0;
+  var ps = P.map(function (p, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u389-p';
+    b.style.setProperty('--bg', BG[i]);
+    b.innerHTML = '<span class="u389-lb"></span><span class="u389-ds"><span></span><i>' + 'Explore' + '</i></span>';
+    b.querySelector('.u389-lb').textContent = p[0];
+    b.querySelector('.u389-ds span').textContent = p[1];
+    b.addEventListener('pointerenter', function () { open(i); });
+    b.addEventListener('focus', function () { open(i); });
+    b.addEventListener('click', function () { open(i); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      var n = Math.max(0, Math.min(P.length - 1, cur + d));
+      open(n); ps[n].focus();
+    });
+    root.appendChild(b);
+    return b;
+  });
+  function open(i) {
+    cur = i;
+    ps.forEach(function (b, k) { b.classList.toggle('on', k === i); b.setAttribute('aria-expanded', String(k === i)); });
+  }
+  open(0);
+})();
+</script>

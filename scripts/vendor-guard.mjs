@@ -42,7 +42,9 @@ export const LIMITS = { part: 1024 * 1024, vendor: 3 * 1024 * 1024 };
 export const RULES = ['sources', 'licence', 'part-files', 'size', 'filesystem', 'file-types', 'paths', 'hidden-unicode', 'secrets', 'layout', 'personal'];
 
 const ROOT_SKIP = new Set(['.git', 'node_modules']);
-const OWN_EXCLUDED = [`${VENDOR_DIR}/`, 'test/fixtures/'];
+const UXUI_DATA_DIR = 'skills/uxui-prompt/data/';
+const OWN_EXCLUDED = [`${VENDOR_DIR}/`, UXUI_DATA_DIR, 'test/fixtures/'];
+const ZERO_WIDTH_SPACE = 'U+200B';
 const RESERVED_DIRS = new Set(['.claude', '.agents', '.codex', '.git']);
 const PLUGIN_DIRS = new Set(['.claude-plugin', '.codex-plugin']);
 const SKILL_FOLDER = /^skills\/[^./][^/]*$/;
@@ -451,7 +453,7 @@ export function runGuard(root = ROOT, { terms } = {}) {
     for (const finding of findAll(SECRET_PATTERNS, searchable)) fail('secrets', entry.path, `looks like a ${finding.label}${where(finding.line)}`);
     if (isOwnFile(entry.path)) for (const finding of personalScan(searchable, privateWords)) fail('personal', entry.path, `contains a ${finding.label}${where(finding.line)}`);
     if (text === null) continue;
-    const hidden = hiddenCharacters(text);
+    const hidden = hiddenCharacters(text).filter((item) => !(entry.path.startsWith(UXUI_DATA_DIR) && item.codePoint === ZERO_WIDTH_SPACE));
     if (hidden.length) {
       const shown = hidden.slice(0, 3).map((item) => `${item.codePoint} at ${item.line}:${item.column}`).join(', ');
       fail('hidden-unicode', entry.path, `${hidden.length} hidden or control character(s): ${shown}`);

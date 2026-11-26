@@ -1,0 +1,97 @@
+<!-- Lucian UX/UI Prompt #227 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#227 -->
+<!--
+Element: Live table with incoming orders
+ID: 227 · Category: Data Motion · Tags: data-table, realtime, sorting, dashboard, orders
+What it does: Every few seconds a new order slides in at the top of an order table and glows briefly as the rows below glide down. Press the Amount or Time header and the rows slide past each other into the new order while the sort arrow spins. Press Pause at the top and new orders just pile up; resume and “N new orders” come in all at once.
+How to use it: Press the Amount header to sort, and pause the stream
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#227
+-->
+<style>
+.u227{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u227-hd{position:absolute;left:18px;right:14px;top:16px;display:flex;align-items:center;gap:8px}
+.u227-hd b{margin-right:auto;display:flex;align-items:center;gap:7px;font-size:14.5px;font-weight:900}
+.u227-hd b i{width:8px;height:8px;border-radius:50%;background:#E11D48;box-shadow:0 0 0 3px color-mix(in srgb,#E11D48 25%,transparent);animation:u227-lv 1.4s ease-in-out infinite}
+.u227.is-pause .u227-hd b i{animation:none;background:var(--ux-ink-3);box-shadow:none}
+@keyframes u227-lv{50%{opacity:.35}}
+.u227-pz{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;border:0;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.u227-pz em{font-style:normal;padding:1px 6px;border-radius:999px;background:var(--ux-accent);color:#fff;font-size:9.5px;font-weight:900}
+.u227-pz em:empty{display:none}
+.u227-tb{position:absolute;left:10px;right:10px;top:56px;bottom:10px;border-radius:16px;background:var(--ux-surface-2);overflow:hidden}
+.u227-hr,.u227-r{display:grid;grid-template-columns:1.25fr .9fr 1fr;align-items:center;padding:0 12px}
+.u227-hr{height:32px;border-bottom:1px solid var(--ux-line);font-size:10px;font-weight:850;color:var(--ux-ink-3)}
+.u227-hr>span:first-child{font-size:10px}
+.u227-th{display:inline-flex;align-items:center;gap:3px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+.u227-th[aria-sort="ascending"],.u227-th[aria-sort="descending"]{color:var(--ux-ink)}
+.u227-th svg{width:9px;height:9px;opacity:.35;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .2s}
+.u227-th[aria-sort="ascending"] svg{opacity:1;transform:rotate(180deg)}
+.u227-th[aria-sort="descending"] svg{opacity:1}
+.u227-th:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px;border-radius:4px}
+.u227-bd{position:relative}
+.u227-r{position:absolute;left:0;right:0;height:42px;border-bottom:1px solid var(--ux-line);transition:transform .45s cubic-bezier(.3,1.1,.4,1),opacity .35s;font-size:11px;font-weight:700}
+.u227-r.is-new{animation:u227-gl 1.4s ease}
+@keyframes u227-gl{0%{background:color-mix(in srgb,var(--ux-accent) 22%,transparent)}100%{background:transparent}}
+.u227-r .nm{display:flex;flex-direction:column;min-width:0}
+.u227-r .nm b{font-size:11.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u227-r .nm small{font-size:9.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u227-r .am{font-weight:900;font-variant-numeric:tabular-nums}
+.u227-r .st{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:var(--c)}
+.u227-r .st::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+@media (prefers-reduced-motion: reduce){.u227-r{transition:none}.u227-r.is-new,.u227-hd b i{animation:none}}
+</style>
+<div class="ux u227">
+  <div class="u227-hd"><b><i aria-hidden="true"></i>Live orders</b><button type="button" class="u227-pz"><span></span><em></em></button></div>
+  <div class="u227-tb" role="table"><div class="u227-hr" role="row"></div><div class="u227-bd" role="rowgroup"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var hr = root.querySelector('.u227-hr'), bd = root.querySelector('.u227-bd'), pz = root.querySelector('.u227-pz'), pzl = pz.querySelector('span'), pzn = pz.querySelector('em');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TH = ['Time', 'Amount', 'Status'], NM = ['Seoyeon K.', 'Junho L.', 'Haeun P.', 'Minjun C.', 'Yuna J.', 'Jiho H.', 'Jia Y.', 'Taemin O.'];
+  var ST = [['Paid', '#10B981'], ['Packing', '#0EA5E9'], ['Reviewing', '#F59E0B']];
+  var UNIT = 1, RH = 42, MAX = 6, seq = 0, now0 = Date.now();
+  var rows = [], sort = { k: 0, d: -1 }, paused = false, queue = [], vis = true;
+  var H = TH.map(function (t, i) {
+    if (i === 2) { var s = document.createElement('span'); s.textContent = t; s.setAttribute('role', 'columnheader'); hr.appendChild(s); return null; }
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u227-th'; b.setAttribute('role', 'columnheader'); b.innerHTML = '<span></span><svg viewBox="0 0 9 9" aria-hidden="true"><path d="M2 3.5l2.5 2.5L7 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'; b.firstChild.textContent = t;
+    b.addEventListener('click', function () { sort = { k: i, d: sort.k === i ? -sort.d : -1 }; head(); place(); });
+    hr.appendChild(b); return b;
+  });
+  function head() { H.forEach(function (b, i) { if (b) b.setAttribute('aria-sort', sort.k === i ? (sort.d > 0 ? 'ascending' : 'descending') : 'none'); }); }
+  function make() {
+    seq++; var a = Math.round((12 + Math.random() * 230)) * UNIT, o = { id: seq, t: Date.now(), a: a, n: NM[seq % NM.length], s: ST[Math.floor(Math.random() * 3)] };
+    var r = document.createElement('div'); r.className = 'u227-r'; r.setAttribute('role', 'row'); r.style.setProperty('--c', o.s[1]);
+    r.innerHTML = '<span class="nm" role="cell"><b></b><small></small></span><span class="am" role="cell"></span><span class="st" role="cell"></span>';
+    r.querySelector('b').textContent = o.n; r.querySelector('.am').textContent = '$' + a.toLocaleString('en-US'); r.querySelector('.st').textContent = o.s[0];
+    o.el = r; o.ago = r.querySelector('small'); return o;
+  }
+  function ago(o) { var s = Math.round((Date.now() - o.t) / 1000); return s < 3 ? 'now' : s + 's ago'; }
+  function place() {
+    rows.sort(function (x, y) { var v = sort.k === 1 ? x.a - y.a : x.t - y.t; return v * sort.d || y.id - x.id; });
+    rows.forEach(function (o, i) { o.el.style.transform = 'translateY(' + (i * RH) + 'px)'; o.el.style.opacity = i < MAX ? 1 : 0; o.ago.textContent = ago(o); });
+    while (rows.length > MAX + 2) { var g = rows.pop(); (function (el) { setTimeout(function () { el.remove(); }, 450); })(g.el); }
+  }
+  function push(o, glow) {
+    o.el.style.transition = 'none'; o.el.style.transform = 'translateY(' + (sort.k === 0 && sort.d < 0 ? -RH : MAX * RH) + 'px)'; o.el.style.opacity = 0;
+    bd.appendChild(o.el); void o.el.offsetWidth; o.el.style.transition = '';
+    if (glow && !rm) { o.el.classList.remove('is-new'); void o.el.offsetWidth; o.el.classList.add('is-new'); }
+    rows.push(o); place();
+  }
+  function label() { pzl.textContent = paused ? 'Resume' : 'Pause'; pzn.textContent = paused && queue.length ? 'New orders: ' + queue.length + '' : ''; root.classList.toggle('is-pause', paused); }
+  pz.addEventListener('click', function () {
+    paused = !paused;
+    if (!paused) queue.splice(0).forEach(function (o, i) { setTimeout(function () { push(o, true); }, rm ? 0 : i * 90); });
+    label();
+  });
+  for (var i = 0; i < 5; i++) { var o = make(); o.t = now0 - (5 - i) * 7000; push(o, false); }
+  head(); label();
+  (function loop() {
+    if (!root.isConnected) return;
+    if (vis) { var o = make(); if (paused) { queue.push(o); label(); } else push(o, true); }
+    setTimeout(loop, rm ? 5000 : 2300);
+  })();
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(root);
+})();
+</script>

@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #120 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#120 -->
+<!--
+Element: Linked corner radius
+ID: 120 · Category: Layout, Schedule & Design · Tags: corner-radii, native, spatial
+What it does: A sample that rounds all four corners together. Drag the corner handle and every corner follows while the radius value updates.
+How to use it: Drag the top-left handle or move it with the arrow keys. Esc resets
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#120
+-->
+<style>
+.u120{width:100%;max-width:400px;min-width:0;font-size:13px}.u120 button{font:inherit;color:inherit;cursor:pointer}.u120 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u120 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u120{max-width:340px}.u120 .shape-stage{height:245px;position:relative;display:grid;place-items:center;background:var(--ux-surface-2)}.u120 .shape{width:190px;height:145px;background:linear-gradient(150deg,#80a79b,#477768);border-radius:var(--r,20px);transition:border-radius .2s;position:relative}.u120 .handle{position:absolute;left:calc(50% - 109px);top:calc(50% - 85px);width:44px;height:44px;border:0;padding:0;background:transparent;touch-action:none;cursor:nwse-resize}.u120 .handle:before{content:"";position:absolute;left:15px;top:15px;width:12px;height:12px;background:var(--ux-surface);border:2px solid var(--ux-accent);border-radius:50%}.u120 output{position:absolute;bottom:19px;left:0;right:0;text-align:center;font-size:13px;color:var(--ux-ink-2)}
+</style>
+<div class="ux u120"><div class="shape-stage"><div class="shape" aria-label="Corner radius sample"></div><button class="handle" aria-label="Radius of all four corners" role="slider" aria-valuemin="0" aria-valuemax="50" aria-valuenow="20"></button><output aria-live="polite">20 px</output></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let v=20,start;function set(n){v=Math.max(0,Math.min(50,Math.round(n)));root.style.setProperty('--r',v+'px');q('.handle').setAttribute('aria-valuenow',v);q('output').textContent=v+' px'}q('.handle').onkeydown=e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','Escape'].includes(e.key)){e.preventDefault();set(e.key==='Escape'?20:e.key==='Home'?0:e.key==='End'?50:v+(['ArrowRight','ArrowDown'].includes(e.key)?5:-5))}};q('.handle').onpointerdown=e=>{start={x:e.clientX,v};e.currentTarget.setPointerCapture(e.pointerId)};q('.handle').onpointermove=e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))set(start.v+(e.clientX-start.x)/2)};})();
+</script>

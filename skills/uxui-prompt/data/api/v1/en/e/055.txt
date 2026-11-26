@@ -1,0 +1,154 @@
+<!-- Lucian UX/UI Prompt #055 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#055 -->
+<!--
+Element: Vinyl record player card
+ID: 055 · Category: Cards & Content · Tags: music, player, vinyl, tonearm, seek
+What it does: Press play and the record slides out of its sleeve and spins while the tonearm lowers onto it. Skip to the next track and the sleeve swaps sideways as the record’s label color changes. Drag the progress bar to seek.
+How to use it: Press play to see the record come out, then try previous, next and the heart. Drag the progress bar or use the arrow keys
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#055
+-->
+<style>
+.u055{--a1:#FF8A65;--a2:#B04FD0;position:relative;width:330px;height:456px;display:flex;flex-direction:column;padding:0 22px 20px;border-radius:32px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u055::before{content:"";position:absolute;left:-40px;right:-40px;top:-80px;height:300px;background:radial-gradient(closest-side,color-mix(in srgb,var(--a1) 30%,transparent),transparent);transition:background .8s;pointer-events:none}
+.u055-stage{position:relative;height:250px;flex:none;margin:0 -22px}
+.u055-disc{position:absolute;left:30px;top:34px;width:190px;height:190px;border-radius:50%;transition:transform .9s var(--ux-spring)}
+.u055.is-on .u055-disc{transform:translateX(86px)}
+.u055-vinyl{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,transparent 20%,rgba(255,255,255,.06) 20.5%,transparent 21%),repeating-radial-gradient(circle,#121219 0 2px,#1E1E28 2px 3.2px);box-shadow:0 18px 30px -16px rgba(0,0,0,.6);animation:u055-spin 2.2s linear infinite paused}
+.u055-vinyl::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,transparent,rgba(255,255,255,.14) 10%,transparent 22%,transparent 50%,rgba(255,255,255,.1) 60%,transparent 72%)}
+.u055-vinyl::after{content:"";position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:radial-gradient(circle,#111 0 3px,transparent 3.5px),linear-gradient(140deg,var(--a1),var(--a2));transition:background .6s}
+.u055.is-on .u055-vinyl{animation-play-state:running}
+.u055-sleeve{position:absolute;left:20px;top:24px;width:210px;height:210px;border-radius:14px;overflow:hidden;background:linear-gradient(150deg,var(--a1),var(--a2));box-shadow:0 24px 36px -20px rgba(30,10,60,.6)}
+.u055-sleeve::before{content:"";position:absolute;width:150px;height:150px;left:-30px;bottom:-40px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),transparent 65%)}
+.u055-sleeve::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,.18),transparent 40%)}
+.u055-sleeve b{position:absolute;right:14px;top:14px;font-size:28px;font-weight:900;letter-spacing:-.06em;color:rgba(255,255,255,.9);line-height:.9;text-align:right}
+.u055-arm{position:absolute;right:20px;top:20px;width:20px;height:116px;transform-origin:10px 10px;transform:rotate(-8deg);transition:transform .8s var(--ux-spring)}
+.u055.is-on .u055-arm{transform:rotate(28deg);transition-delay:.35s}
+.u055-arm::before{content:"";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--ux-surface-3);box-shadow:inset 0 0 0 5px var(--ux-surface),0 2px 6px rgba(0,0,0,.2)}
+.u055-arm::after{content:"";position:absolute;left:8px;top:16px;width:4px;height:84px;border-radius:2px;background:var(--ux-ink-3)}
+.u055-arm i{position:absolute;left:5px;top:96px;width:10px;height:18px;border-radius:3px;background:var(--ux-ink-2)}
+.u055-row{position:relative;display:flex;align-items:center;gap:10px}
+.u055-t{flex:1;min-width:0}
+.u055-t b{display:block;font-size:20px;font-weight:800;letter-spacing:-.04em;white-space:nowrap}
+.u055-t small{display:block;margin-top:2px;font-size:13px;font-weight:600;color:var(--ux-ink-3)}
+.u055-like{width:42px;height:42px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-3);transition:transform .35s var(--ux-spring),color .3s}
+.u055-like svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.u055-like[aria-pressed="true"]{color:#FF5A6E}
+.u055-like[aria-pressed="true"] svg{fill:currentColor;animation:u055-pop .45s var(--ux-spring)}
+@keyframes u055-pop{40%{transform:scale(1.35)}}
+.u055-prog{position:relative;height:28px;margin-top:14px;display:flex;align-items:center;cursor:pointer;touch-action:none}
+.u055-rail{position:relative;width:100%;height:5px;border-radius:5px;background:var(--ux-surface-3);transition:height .25s}
+.u055-prog:hover .u055-rail,.u055-prog.drag .u055-rail{height:8px}
+.u055-fill{position:absolute;left:0;top:0;bottom:0;width:var(--p);border-radius:inherit;background:linear-gradient(90deg,var(--a1),var(--a2));transition:background .6s}
+.u055-knob{position:absolute;top:50%;left:var(--p);width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25);transform:scale(.7);transition:transform .3s var(--ux-spring)}
+.u055-prog:hover .u055-knob,.u055-prog.drag .u055-knob,.u055-prog:focus-visible .u055-knob{transform:none}
+.u055-prog:focus-visible{outline:none}
+.u055-prog:focus-visible .u055-rail{box-shadow:0 0 0 3px var(--ux-accent-soft)}
+.u055-times{display:flex;justify-content:space-between;font-size:11.5px;font-weight:650;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u055-ctl{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:auto}
+.u055-c{width:48px;height:48px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink);transition:transform .3s var(--ux-spring),background-color .3s}
+.u055-c:hover{background:var(--ux-surface-2)}
+.u055-c:active{transform:scale(.88)}
+.u055-c svg{width:24px;height:24px;fill:currentColor}
+.u055-pp{width:70px;height:70px;background:var(--ux-ink);color:var(--ux-page);box-shadow:0 14px 24px -12px var(--ux-shadow-strong)}
+.u055-pp:hover{background:var(--ux-ink);transform:scale(1.05)}
+.u055-pp svg{width:28px;height:28px}
+.u055-c:focus-visible,.u055-like:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@keyframes u055-spin{to{transform:rotate(360deg)}}
+</style>
+<div class="ux u055">
+  <div class="u055-stage" aria-hidden="true">
+    <div class="u055-disc"><div class="u055-vinyl"></div></div>
+    <div class="u055-sleeve"><b>SOFT<br>SPRING</b></div>
+    <span class="u055-arm"><i></i></span>
+  </div>
+  <div class="u055-row">
+    <div class="u055-t" aria-live="polite"><b>Soft Spring</b><small>Lumen · 2026</small></div>
+    <button class="u055-like" type="button" aria-pressed="false" aria-label="Like"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+  </div>
+  <div class="u055-prog" role="slider" tabindex="0" aria-label="Playback position" aria-valuemin="0"><div class="u055-rail"><span class="u055-fill"></span><span class="u055-knob"></span></div></div>
+  <div class="u055-times"><span class="u055-cur">0:00</span><span class="u055-tot">0:00</span></div>
+  <div class="u055-ctl">
+    <button class="u055-c u055-prev" type="button" aria-label="Previous track"><svg viewBox="0 0 24 24"><path d="M7 6h2v12H7zM20 6.5v11a.5.5 0 0 1-.8.4L11 12.4a.5.5 0 0 1 0-.8l8.2-5.5a.5.5 0 0 1 .8.4z"/></svg></button>
+    <button class="u055-c u055-pp" type="button" aria-label="Play"><svg viewBox="0 0 24 24"><path d="M8 5.5l11 6.5-11 6.5z"/></svg></button>
+    <button class="u055-c u055-next" type="button" aria-label="Next track"><svg viewBox="0 0 24 24"><path d="M15 6h2v12h-2zM4 6.5v11a.5.5 0 0 0 .8.4L13 12.4a.5.5 0 0 0 0-.8L4.8 6.1a.5.5 0 0 0-.8.4z"/></svg></button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var pp = root.querySelector('.u055-pp'), like = root.querySelector('.u055-like');
+  var prog = root.querySelector('.u055-prog'), cur = root.querySelector('.u055-cur'), tot = root.querySelector('.u055-tot');
+  var sleeve = root.querySelector('.u055-sleeve'), title = root.querySelector('.u055-t');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var T = [
+    ['Soft Spring', 'Lumen · 2026', 220, '#FF8A65', '#B04FD0', 'SOFT<br>SPRING'],
+    ['Blue Hour', 'Sola · 2025', 194, '#5B8CFF', '#22C3A6', 'BLUE<br>HOUR'],
+    ['Paper Moon', 'Haru · 2026', 251, '#FFC24B', '#E5484D', 'PAPER<br>MOON']
+  ];
+  var PLAY = 'M8 5.5l11 6.5-11 6.5z', PAUSE = 'M7 5h3.6v14H7zM13.4 5H17v14h-3.6z';
+  var ti = 0, pos = 68, on = false, timer = 0;
+  function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + ('0' + s % 60).slice(-2); }
+  function paint() {
+    var t = T[ti][2];
+    prog.style.setProperty('--p', (pos / t * 100).toFixed(2) + '%');
+    prog.setAttribute('aria-valuemax', t);
+    prog.setAttribute('aria-valuenow', Math.round(pos));
+    prog.setAttribute('aria-valuetext', fmt(pos) + ' / ' + fmt(t));
+    cur.textContent = fmt(pos); tot.textContent = fmt(t);
+  }
+  function load(i) {
+    var t = T[i];
+    root.style.setProperty('--a1', t[3]); root.style.setProperty('--a2', t[4]);
+    sleeve.querySelector('b').innerHTML = t[5];
+    title.innerHTML = '<b>' + t[0] + '</b><small>' + t[1] + '</small>';
+  }
+  function setPlay(v) {
+    on = v;
+    root.classList.toggle('is-on', v);
+    pp.setAttribute('aria-label', v ? 'Pause' : 'Play');
+    pp.querySelector('path').setAttribute('d', v ? PAUSE : PLAY);
+    clearInterval(timer);
+    if (!v) return;
+    timer = setInterval(function () {
+      if (!root.isConnected) { clearInterval(timer); return; }
+      pos += 1;
+      if (pos >= T[ti][2]) { pos = 0; skip(1); return; }
+      paint();
+    }, 1000);
+  }
+  function skip(dir) {
+    ti = (ti + dir + T.length) % T.length;
+    pos = 0;
+    if (rm) { load(ti); paint(); return; }
+    sleeve.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateX(' + (-dir * 60) + 'px) rotate(' + (-dir * 8) + 'deg)', opacity: 0 }], { duration: 220, easing: 'ease-in' }).onfinish = function () {
+      load(ti); paint();
+      sleeve.animate([{ transform: 'translateX(' + (dir * 60) + 'px) rotate(' + (dir * 8) + 'deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: 'cubic-bezier(.34,1.4,.64,1)' });
+    };
+    title.animate([{ opacity: 1 }, { opacity: 0, offset: .3 }, { opacity: 1 }], { duration: 600 });
+  }
+  pp.addEventListener('click', function () { setPlay(!on); });
+  root.querySelector('.u055-next').addEventListener('click', function () { skip(1); });
+  root.querySelector('.u055-prev').addEventListener('click', function () { if (pos > 3) { pos = 0; paint(); } else skip(-1); });
+  like.addEventListener('click', function () {
+    var p = like.getAttribute('aria-pressed') !== 'true';
+    like.setAttribute('aria-pressed', String(p));
+    like.setAttribute('aria-label', p ? 'Unlike' : 'Like');
+  });
+  function seek(e) {
+    var r = prog.getBoundingClientRect();
+    pos = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * T[ti][2];
+    paint();
+  }
+  prog.addEventListener('pointerdown', function (e) { prog.setPointerCapture(e.pointerId); prog.classList.add('drag'); seek(e); });
+  prog.addEventListener('pointermove', function (e) { if (prog.classList.contains('drag')) seek(e); });
+  prog.addEventListener('pointerup', function () { prog.classList.remove('drag'); pos = Math.round(pos); });
+  prog.addEventListener('pointercancel', function () { prog.classList.remove('drag'); });
+  prog.addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 5 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -5 : 0;
+    if (e.key === 'Home') d = -pos; if (e.key === 'End') d = T[ti][2] - 1 - pos;
+    if (d) { e.preventDefault(); pos = Math.max(0, Math.min(T[ti][2] - 1, pos + d)); paint(); }
+  });
+  load(0); paint();
+})();
+</script>

@@ -1,0 +1,181 @@
+<!-- Lucian UX/UI Prompt #095 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#095 -->
+<!--
+Element: Bar chart that changes shape
+ID: 095 · Category: Widgets & Charts · Tags: chart, bar, morph, tooltip, scrub
+What it does: Switch between week, month and year and the bars don’t regrow; their count, width and height carry over into the new shape while the axis numbers and average line move along. Sweep across the bars and only the one under you darkens while the big number and tooltip switch to its value and change from the previous one.
+How to use it: Move the mouse or sweep a finger across the bars. Click a bar to pin it, and switch the period with W·M·Y in the top right. On a keyboard, use ←/→ on the bars
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#095
+-->
+<style>
+.u095{position:relative;width:340px;height:410px;display:flex;flex-direction:column;padding:20px 18px 14px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u095-h{display:flex;align-items:flex-start;justify-content:space-between}
+.u095-h small{display:block;font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u095-v{margin-top:2px}
+.u095-v b{font-size:29px;font-weight:850;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.u095-top{display:flex;align-items:baseline;gap:6px}
+.u095-dl{font-size:12px;font-weight:800;color:var(--ux-mint);white-space:nowrap}
+.u095-dl.dn{color:var(--ux-danger)}
+.u095-seg{position:relative;display:flex;padding:3px;border-radius:12px;background:var(--ux-surface-2)}
+.u095-seg::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:36px;border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 4px -1px var(--ux-shadow-strong);transform:translateX(calc(var(--k,0) * 36px));transition:transform .45s var(--ux-spring)}
+.u095-seg button{position:relative;width:36px;height:30px;border:0;padding:0;background:transparent;font-size:12.5px;font-weight:800;color:var(--ux-ink-3);transition:color .2s}
+.u095-seg button[aria-pressed="true"]{color:var(--ux-ink)}
+.u095-ch{position:relative;flex:1;margin-top:18px;padding-right:44px}
+.u095-grid{position:absolute;inset:0 0 26px 0}
+.u095-gl{position:absolute;left:0;right:0;height:0;border-top:1px dashed var(--ux-line-2)}
+.u095-gl span{position:absolute;right:0;top:-7px;transition:opacity .3s;font-size:10.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u095-gl:first-child{border-top-style:solid}
+.u095-avg{position:absolute;left:0;right:40px;bottom:calc(26px + var(--a,0) * (100% - 26px));height:0;border-top:1.5px dashed var(--ux-accent);transition:bottom .6s var(--ux-spring);z-index:2;pointer-events:none}
+.u095-avg span{position:absolute;right:-44px;top:-10px;height:20px;padding:0 6px;border-radius:6px;display:grid;place-items:center;background:var(--ux-accent);color:var(--ux-accent-ink);font-size:10px;font-weight:800}
+.u095-bars{position:absolute;left:0;right:44px;top:0;bottom:0;display:flex;align-items:stretch}
+.u095-b{position:relative;flex:var(--on,1) 1 0;min-width:0;padding:0 var(--pad,4px);border:0;background:transparent;display:flex;flex-direction:column;justify-content:flex-end;transition:flex-grow .55s var(--ux-ease),padding .55s var(--ux-ease),opacity .3s}
+.u095-b.off{--on:0;padding:0;opacity:0;pointer-events:none}
+.u095-b i{display:block;height:calc(var(--h,0) * (100% - 26px));margin-bottom:26px;border-radius:8px 8px 4px 4px;background:var(--ux-surface-3);transition:height .65s var(--ux-spring),background-color .25s,opacity .25s;transition-delay:calc(var(--d,0) * 28ms),0s,0s}
+.u095-b.last i{background:var(--ux-grad)}
+.u095-b em{position:absolute;left:-6px;right:-6px;bottom:4px;font-style:normal;text-align:center;font-size:11px;font-weight:700;color:var(--ux-ink-3);white-space:nowrap;transition:color .2s}
+.u095.has .u095-b:not(.on) i{opacity:.5}
+.u095-b.on i{background:var(--ux-accent);opacity:1}
+.u095-b.on em{color:var(--ux-ink)}
+.u095-b.pin i{box-shadow:0 0 0 2px var(--ux-surface),0 0 0 4px var(--ux-accent)}
+.u095-b:focus-visible{outline:none}
+.u095-b:focus-visible i{box-shadow:0 0 0 2px var(--ux-surface),0 0 0 4px var(--ux-accent)}
+.u095-tip{position:absolute;left:0;top:0;z-index:3;height:28px;padding:0 10px;border-radius:9px;display:flex;align-items:center;gap:6px;background:var(--ux-ink);color:var(--ux-page);font-size:12px;font-weight:800;white-space:nowrap;pointer-events:none;transform:translate(var(--tx),var(--ty));opacity:0;transition:opacity .2s,transform .3s var(--ux-ease)}
+.u095.has .u095-tip{opacity:1}
+.u095-tip small{font-size:11px;font-weight:800;color:var(--ux-mint)}
+.u095-tip small.dn{color:#FF8F92}
+.u095-seg button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px;border-radius:9px}
+</style>
+<div class="ux u095">
+  <div class="u095-h">
+    <div><div class="u095-top"><small class="u095-lab">This week</small><span class="u095-dl"></span></div><div class="u095-v"><b>₩0K</b></div></div>
+    <div class="u095-seg" role="group" aria-label="Period"><button type="button" aria-pressed="true">W</button><button type="button" aria-pressed="false">M</button><button type="button" aria-pressed="false">Y</button></div>
+  </div>
+  <div class="u095-ch">
+    <div class="u095-grid" aria-hidden="true"></div>
+    <div class="u095-bars" role="group" aria-label="Sales bars"></div>
+    <div class="u095-avg" aria-hidden="true"><span></span></div>
+    <div class="u095-tip" aria-hidden="true"><span></span><small></small></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var lab = root.querySelector('.u095-lab'), big = root.querySelector('.u095-v b'), dl = root.querySelector('.u095-dl'), segs = root.querySelectorAll('.u095-seg button');
+  var grid = root.querySelector('.u095-grid'), bars = root.querySelector('.u095-bars'), avg = root.querySelector('.u095-avg'), tip = root.querySelector('.u095-tip'), ch = root.querySelector('.u095-ch');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [
+    { t: 'This week', p: 'vs last week', d: 0.12, l: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], f: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Today'], v: [32, 45, 38, 52, 61, 74, 58] },
+    { t: 'October', p: 'vs last month', d: 0.08, l: ['W1', 'W2', 'W3', 'W4', 'W5'], f: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'This week'], v: [210, 245, 198, 276, 302] },
+    { t: 'This year', p: 'vs last year', d: -0.04, l: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'], f: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'], v: [1200, 1420, 1080, 1610, 1830, 1700, 2120, 2380, 2210, 2640, 2290, 3100] }
+  ];
+  var B = [];
+  for (var i = 0; i < 12; i++) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u095-b off'; b.tabIndex = -1;
+    b.innerHTML = '<i></i><em></em>';
+    bars.appendChild(b); B.push(b);
+  }
+  var G = [0, 1, 2, 3].map(function (k) { var g = document.createElement('div'); g.className = 'u095-gl'; g.style.bottom = (k / 3 * 100).toFixed(3) + '%'; g.innerHTML = '<span></span>'; grid.appendChild(g); return g; });
+  var set = 0, act = -1, pin = -1, shown = 0, tw = 0;
+  function fmt(v) { return v < 100 ? '₩' + Math.round(v * 10) + 'K' : '₩' + (v / 100).toFixed(v < 1000 ? 2 : 1) + 'M'; }
+  function axis(v) { return !v ? '0' : v < 100 ? Math.round(v * 10) + 'K' : +(v / 100).toFixed(1) + 'M'; }
+  function nice(m) { var p = Math.pow(10, Math.floor(Math.log10(m / 3))), s = [1, 2, 2.5, 5, 10].map(function (k) { return k * p; }).filter(function (k) { return k * 3 >= m; })[0]; return s * 3; }
+  function roll(to) {
+    cancelAnimationFrame(tw);
+    var from = shown, t0 = performance.now(), dur = rm ? 1 : 420;
+    (function f(n) {
+      if (!root.isConnected) return;
+      var k = Math.min(1, (n - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      shown = from + (to - from) * e; big.textContent = fmt(shown);
+      if (k < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  function pct(a, b) { var r = (a - b) / b; return (r >= 0 ? '+' : '−') + Math.abs(Math.round(r * 100)) + '%'; }
+  function header() {
+    var d = D[set], idx = act >= 0 ? act : pin;
+    if (idx >= 0) {
+      lab.textContent = d.f[idx];
+      roll(d.v[idx]);
+      dl.textContent = idx ? pct(d.v[idx], d.v[idx - 1]) + ' vs previous' : '';
+      dl.classList.toggle('dn', idx > 0 && d.v[idx] < d.v[idx - 1]);
+    } else {
+      var sum = d.v.reduce(function (a, b) { return a + b; }, 0);
+      lab.textContent = d.t; roll(sum);
+      dl.textContent = (d.d >= 0 ? '+' : '−') + Math.abs(Math.round(d.d * 100)) + '% ' + d.p;
+      dl.classList.toggle('dn', d.d < 0);
+    }
+  }
+  function draw(k, first) {
+    set = k; act = -1; pin = -1;
+    var d = D[k], n = d.v.length, max = nice(Math.max.apply(null, d.v)), mean = d.v.reduce(function (a, b) { return a + b; }, 0) / n;
+    segs.forEach(function (s, j) { s.setAttribute('aria-pressed', String(j === k)); });
+    root.querySelector('.u095-seg').style.setProperty('--k', k);
+    B.forEach(function (b, j) {
+      var on = j < n;
+      b.classList.toggle('off', !on); b.classList.remove('on', 'pin');
+      b.classList.toggle('last', j === n - 1);
+      b.style.setProperty('--d', j);
+      b.style.setProperty('--pad', n > 8 ? '2.5px' : '5px');
+      if (on) {
+        b.querySelector('em').textContent = d.l[j];
+        b.setAttribute('aria-label', d.f[j] + ' ' + fmt(d.v[j]));
+        b.style.setProperty('--h', first ? 0 : (d.v[j] / max).toFixed(3));
+      } else b.style.setProperty('--h', 0);
+      b.tabIndex = on && j === n - 1 ? 0 : -1;
+    });
+    if (first) requestAnimationFrame(function () { requestAnimationFrame(function () { B.forEach(function (b, j) { if (j < n) b.style.setProperty('--h', (d.v[j] / max).toFixed(3)); }); }); });
+    G.forEach(function (g, j) { g.firstChild.textContent = axis(max * j / 3); g.firstChild.style.opacity = Math.abs(j / 3 - mean / max) < 0.07 ? 0 : 1; });
+    avg.style.setProperty('--a', (mean / max).toFixed(3));
+    avg.firstChild.textContent = 'Avg';
+    root.classList.remove('has');
+    header();
+  }
+  function show(j) {
+    act = j;
+    B.forEach(function (b, k) { b.classList.toggle('on', k === j || (j < 0 && k === pin)); });
+    var idx = j >= 0 ? j : pin;
+    root.classList.toggle('has', idx >= 0);
+    if (idx >= 0) {
+      var d = D[set], b = B[idx], i = b.querySelector('i');
+      tip.firstChild.textContent = fmt(d.v[idx]);
+      var sm = tip.querySelector('small');
+      sm.textContent = idx ? pct(d.v[idx], d.v[idx - 1]) : '';
+      sm.classList.toggle('dn', idx > 0 && d.v[idx] < d.v[idx - 1]);
+      var cw = ch.clientWidth, tw2 = tip.offsetWidth, cx = b.offsetLeft + b.offsetWidth / 2;
+      var hh = parseFloat(b.style.getPropertyValue('--h')) * (ch.clientHeight - 26);
+      tip.style.setProperty('--tx', Math.max(0, Math.min(cw - tw2, cx - tw2 / 2)).toFixed(1) + 'px');
+      tip.style.setProperty('--ty', Math.max(-6, ch.clientHeight - 26 - hh - 36).toFixed(1) + 'px');
+    }
+    header();
+  }
+  function idxAt(x) {
+    var n = D[set].v.length, best = 0;
+    for (var j = 0; j < n; j++) { var r = B[j].getBoundingClientRect(); if (x >= r.left) best = j; }
+    return best;
+  }
+  bars.addEventListener('pointermove', function (e) { show(idxAt(e.clientX)); });
+  bars.addEventListener('pointerdown', function (e) { if (e.pointerType !== 'mouse') { bars.setPointerCapture(e.pointerId); show(idxAt(e.clientX)); } });
+  bars.addEventListener('pointerleave', function () { show(-1); });
+  bars.addEventListener('click', function (e) {
+    var b = e.target.closest('.u095-b'); if (!b) return;
+    var j = B.indexOf(b);
+    pin = pin === j ? -1 : j;
+    B.forEach(function (x, k) { x.classList.toggle('pin', k === pin); });
+    show(j);
+  });
+  bars.addEventListener('keydown', function (e) {
+    var n = D[set].v.length, j = B.indexOf(document.activeElement);
+    var to = e.key === 'ArrowRight' ? j + 1 : e.key === 'ArrowLeft' ? j - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? n - 1 : null;
+    if (to === null) return;
+    e.preventDefault();
+    to = Math.max(0, Math.min(n - 1, to));
+    B.forEach(function (b, k) { b.tabIndex = k === to ? 0 : -1; });
+    B[to].focus(); show(to);
+  });
+  bars.addEventListener('focusin', function (e) { var j = B.indexOf(e.target); if (j >= 0) show(j); });
+  bars.addEventListener('focusout', function (e) { if (!bars.contains(e.relatedTarget)) show(-1); });
+  segs.forEach(function (s, k) { s.addEventListener('click', function () { if (k !== set) draw(k); }); });
+  draw(0, !rm);
+})();
+</script>

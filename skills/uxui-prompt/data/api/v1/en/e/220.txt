@@ -1,0 +1,85 @@
+<!-- Lucian UX/UI Prompt #220 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#220 -->
+<!--
+Element: Selection quote-share tooltip
+ID: 220 · Category: Text Motion · Tags: text-selection, tooltip, share, highlight, blog
+What it does: In a blog post, drag to select a sentence or press one, and a small tooltip pops up above it with highlight, copy and share buttons. Press highlight and color paints in beneath the sentence from left to right and stays; press copy and the button turns into a check as a ‘Quote copied’ notice slides up from below.
+How to use it: Press or drag-select a sentence in the article, then use the tooltip buttons
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#220
+-->
+<style>
+.u220{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u220-ar{position:absolute;inset:0;padding:30px 26px}
+.u220-ar small{font-size:10px;font-weight:850;letter-spacing:.08em;color:var(--ux-accent)}
+.u220-ar h3{margin:6px 0 14px;font-size:19px;font-weight:900;letter-spacing:-.035em}
+.u220-ar p{margin:0;font-size:13px;line-height:1.75;font-weight:600;color:var(--ux-ink-2)}
+.u220-s{cursor:text;border-radius:3px;background-image:linear-gradient(color-mix(in srgb,#FDE047 75%,transparent),color-mix(in srgb,#FDE047 75%,transparent));background-repeat:no-repeat;background-size:0% 42%;background-position:0 88%;transition:background-size .6s cubic-bezier(.3,.9,.3,1),background-color .2s,color .2s}
+.u220-s.is-hl{background-size:100% 42%;color:var(--ux-ink)}
+.u220-s.is-sel{background-color:color-mix(in srgb,var(--ux-accent) 22%,transparent);color:var(--ux-ink)}
+.u220-tip{position:absolute;left:0;top:0;display:flex;gap:2px;padding:4px;border-radius:12px;background:var(--ux-ink);box-shadow:0 10px 24px -10px var(--ux-shadow-strong);transform:translate(-50%,-100%) scale(.85);transform-origin:50% 100%;opacity:0;pointer-events:none;transition:opacity .15s,transform .25s cubic-bezier(.3,1.6,.5,1);z-index:3}
+.u220-tip::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:var(--ux-ink)}
+.u220-tip.is-on{opacity:1;pointer-events:auto;transform:translate(-50%,calc(-100% - 8px)) scale(1)}
+.u220-tip button{width:30px;height:28px;border:0;border-radius:8px;background:none;color:var(--ux-surface);display:grid;place-items:center;cursor:pointer}
+.u220-tip button:hover{background:rgba(255,255,255,.14)}
+.u220-tip button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px}
+.u220-tip svg{width:15px;height:15px}
+.u220-cp .u220-ok{display:none}
+.u220-cp.is-ok .u220-ok{display:block}
+.u220-cp.is-ok .u220-cpi{display:none}
+.u220-toast{position:absolute;left:50%;bottom:16px;padding:8px 14px;border-radius:999px;background:var(--ux-ink);color:var(--ux-surface);font-size:11px;font-weight:800;transform:translate(-50%,40px);opacity:0;transition:transform .35s cubic-bezier(.3,1.5,.5,1),opacity .2s;white-space:nowrap}
+.u220-toast.is-on{transform:translate(-50%,0);opacity:1}
+@media (prefers-reduced-motion: reduce){.u220-s,.u220-tip,.u220-toast{transition:none}}
+</style>
+<div class="ux u220">
+  <div class="u220-ar"><small>Design notes</small><h3>Thinking small-screen first</h3><p></p></div>
+  <div class="u220-tip" role="toolbar" aria-label="Quote tools">
+    <button type="button" class="u220-hl" aria-label="Highlight"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5l4 4-6 6H3.5v-4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 14.5h12" stroke="#FDE047" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <button type="button" class="u220-cp" aria-label="Copy"><svg class="u220-cpi" viewBox="0 0 16 16" aria-hidden="true"><rect x="5" y="5" width="8.5" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 3.2V3a1.5 1.5 0 0 0-1.5-1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg class="u220-ok" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="#4ADE80" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <button type="button" class="u220-sh" aria-label="Share"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10V2.5M5 5.5l3-3 3 3M3 9v3.5A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5V9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="u220-toast" role="status"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var p = root.querySelector('.u220-ar p'), tip = root.querySelector('.u220-tip'), hl = root.querySelector('.u220-hl'), cp = root.querySelector('.u220-cp'), sh = root.querySelector('.u220-sh'), toast = root.querySelector('.u220-toast');
+  var S = ['The smaller the screen, the more courage it takes to cut.', 'Keep only what matters and it looks tidy on big screens too.', 'When every button and sentence finds its place, people never get lost.', 'Good layout works quietly without drawing attention.'];
+  var cur = null, tt = 0;
+  S.forEach(function (s, i) { var sp = document.createElement('span'); sp.className = 'u220-s'; sp.textContent = s; p.appendChild(sp); if (i < S.length - 1) p.appendChild(document.createTextNode(' ')); });
+  var SP = Array.prototype.slice.call(p.querySelectorAll('.u220-s'));
+  function show(rect, el) {
+    var r = root.getBoundingClientRect(), k = root.offsetWidth / (r.width || 1);
+    tip.style.left = Math.max(56, Math.min(284, (rect.left + rect.width / 2 - r.left) * k)) + 'px';
+    tip.style.top = Math.max(42, (rect.top - r.top) * k) + 'px';
+    tip.classList.add('is-on'); cp.classList.remove('is-ok');
+    SP.forEach(function (s) { s.classList.toggle('is-sel', s === el); }); cur = el;
+  }
+  function hide() { tip.classList.remove('is-on'); SP.forEach(function (s) { s.classList.remove('is-sel'); }); cur = null; }
+  SP.forEach(function (s) {
+    s.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed && root.contains(sel.anchorNode)) return;
+      if (cur === s) { hide(); return; }
+      var rs = s.getClientRects(); show(rs[0] || s.getBoundingClientRect(), s);
+    });
+  });
+  p.addEventListener('mouseup', function () {
+    var sel = window.getSelection && window.getSelection();
+    if (!sel || sel.isCollapsed || !p.contains(sel.anchorNode)) return;
+    var rg = sel.getRangeAt(0), el = sel.anchorNode.parentElement && sel.anchorNode.parentElement.closest('.u220-s');
+    show(rg.getClientRects()[0] || rg.getBoundingClientRect(), el);
+  });
+  hl.addEventListener('click', function () { if (cur) cur.classList.toggle('is-hl'); hide(); });
+  function note(msg) { clearTimeout(tt); toast.textContent = msg; toast.classList.add('is-on'); tt = setTimeout(function () { toast.classList.remove('is-on'); }, 1600); }
+  cp.addEventListener('click', function () {
+    var text = cur ? cur.textContent : '';
+    try { if (navigator.clipboard && text) navigator.clipboard.writeText('“' + text + '”').catch(function () {}); } catch (e) {}
+    cp.classList.add('is-ok'); note('Quote copied');
+    setTimeout(hide, 700);
+  });
+  sh.addEventListener('click', function () { if (navigator.share && cur) { navigator.share({ text: cur.textContent }).catch(function () {}); } else cp.click(); });
+  root.querySelector('.u220-ar').addEventListener('click', function (e) { if (!e.target.closest('.u220-s')) hide(); });
+})();
+</script>

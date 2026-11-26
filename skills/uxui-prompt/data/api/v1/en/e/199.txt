@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #199 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#199 -->
+<!--
+Element: Checksum verifier
+ID: 199 · Category: Workflow & Systems · Tags: checksum-verifier, new-century
+What it does: A verifier that hashes a document and checks it against the original. Change a single character and the checksum changes at once, flagging the mismatch (FNV-1a demo).
+How to use it: Edit the sentence a little and watch the checksum change
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#199
+-->
+<style>
+.u199 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u199 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u199 button:active{transform:translateY(1px)}.u199 button:disabled{opacity:.4;cursor:default}.u199 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u199 .muted{color:var(--ux-ink-2);font-size:12px}.u199 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u199 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u199 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u199 input,.u199 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u199 output{font-variant-numeric:tabular-nums}.u199 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u199 *,.u199 *::before,.u199 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u199 textarea{width:100%;resize:vertical;min-height:64px;max-height:120px;padding:12px;margin:7px 0 8px;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;font:12px/1.5 ui-monospace;box-sizing:border-box}.u199 .hashline{margin:7px 0}.u199 .hashline label{display:block;font-size:10px;color:var(--ux-ink-2);margin-bottom:7px;letter-spacing:1px}.u199 .tiles{display:flex;gap:4px}.u199 .tiles span{flex:1;padding:8px 0;text-align:center;font:18px ui-monospace;background:var(--ux-surface-2);border:1px solid var(--ux-line);border-radius:4px;transition:background .4s,transform .4s,border-color .4s}.u199 .tiles span.match{background:light-dark(#e4eddb,#304434);border-color:light-dark(#779268,#90ad7c)}.u199 .tiles span.mismatch{background:light-dark(#f7e3db,#51352e);border-color:light-dark(#b77258,#bc816e);transform:translateY(2px)}.u199 .status{min-height:30px;font-size:12px;color:var(--ux-ink-2);margin-top:12px}.u199 .actions{margin-top:7px}.u199 .actions button{font-size:12px}.u199 .reset{border:0;background:none}.u199 .tamper{font-size:11px;background:none;border:0;min-height:24px;padding:1px 7px}
+
+/* Focused composition */
+.u199{max-width:320px}.u199 textarea{display:block;min-height:84px;max-height:120px;resize:none;margin:0 0 22px;border:0;border-bottom:1px solid var(--ux-line-2);border-radius:0;background:none;padding:12px 0;font:14px/1.7 ui-monospace}.u199 .hashline{margin:0}.u199 .tiles{gap:5px}.u199 .tiles span{font-size:20px;padding:8px 0;background:var(--ux-surface);border:1px solid var(--ux-line);border-radius:5px}.u199 .status{margin:15px 0 0;min-height:18px;text-align:center;font-size:11px;color:var(--ux-ink-2)}</style>
+<div class="ux u199" data-state="initial"><textarea aria-label="Document to checksum" spellcheck="false">LucianLabs / Design with intent.</textarea><div class="hashline"><div class="tiles actual"></div></div><div class="status" aria-live="polite">Original</div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};const original='LucianLabs / Design with intent.';function hash(s){let h=0x811c9dc5;for(const n of new TextEncoder().encode(s)){h^=n;h=Math.imul(h,0x01000193)}return (h>>>0).toString(16).toUpperCase().padStart(8,'0')}const saved=hash(original);function render(){const current=hash(q('textarea').value),same=current===saved;q('.actual').innerHTML=[...current].map((c,i)=>'<span class="'+(!same&&c!==saved[i]?'mismatch':'')+'">'+c+'</span>').join('');q('.status').textContent=same?'✓ Matches the original':'Content has changed';state(same?'match':'mismatch');pulse(q('.actual'),[{opacity:.45},{opacity:1}],250)}q('textarea').oninput=render;render();})();
+</script>

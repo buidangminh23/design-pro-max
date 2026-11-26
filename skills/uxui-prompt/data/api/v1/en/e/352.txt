@@ -1,0 +1,70 @@
+<!-- Lucian UX/UI Prompt #352 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#352 -->
+<!--
+Element: Swirling flow field
+ID: 352 · Category: Hero & Backgrounds · Tags: flow-field, generative, particles, canvas, trails
+What it does: A generative drawing where countless particles drift along an invisible current, leaving silky trails. The current slowly reshapes over time; hover and a vortex forms around the cursor, wrapping the particles around it. Press to switch the color scheme and start drawing anew.
+How to use it: Hover to create a vortex, and press to change colors
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#352
+-->
+<style>
+.u352{position:relative;width:340px;height:330px;border-radius:30px;overflow:hidden;background:#120A1F;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);transition:background-color .6s}
+.u352-cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
+.u352-nm{position:absolute;right:14px;bottom:14px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);font-size:11.5px;font-weight:750;pointer-events:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+</style>
+<div class="ux u352"><canvas class="u352-cv" role="img" aria-label="Flow field, press to change colors"></canvas><span class="u352-nm" aria-live="polite"></span></div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u352-cv'), cx = cv.getContext('2d'), nm = root.querySelector('.u352-nm');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PAL = [['Dusk', '#120A1F', [16, 36]], ['Deep sea', '#04121C', [175, 215]], ['Forest', '#08140C', [80, 140]]];
+  var W = 340, H = 330, dpr = Math.min(2, window.devicePixelRatio || 1), pal = 0, ptr = null, t = 0;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var P = [];
+  function spawn(p) { p.x = Math.random() * W; p.y = Math.random() * H; p.life = 60 + Math.random() * 160; p.h = Math.random(); return p; }
+  for (var i = 0; i < 900; i++) P.push(spawn({}));
+  function angle(x, y) { return (Math.sin(x * 0.011 + t * 0.25) + Math.cos(y * 0.013 - t * 0.19) + Math.sin((x + y) * 0.006 + t * 0.12)) * Math.PI * 0.66; }
+  function clear() { cx.fillStyle = PAL[pal][1]; cx.fillRect(0, 0, W, H); root.style.backgroundColor = PAL[pal][1]; nm.textContent = PAL[pal][0]; }
+  function step(dt) {
+    var bg = PAL[pal][1];
+    cx.globalAlpha = 0.07; cx.fillStyle = bg; cx.fillRect(0, 0, W, H); cx.globalAlpha = 1;
+    var groups = [[], [], [], [], [], []], hr = PAL[pal][2];
+    P.forEach(function (p) {
+      var a = angle(p.x, p.y), vx = Math.cos(a) * 46, vy = Math.sin(a) * 46;
+      if (ptr) {
+        var dx = p.x - ptr.x, dy = p.y - ptr.y, d = Math.hypot(dx, dy);
+        if (d < 95 && d > 1) { var f = (1 - d / 95) * 160; vx += -dy / d * f - dx / d * f * 0.25; vy += dx / d * f - dy / d * f * 0.25; }
+      }
+      var nx = p.x + vx * dt, ny = p.y + vy * dt;
+      groups[Math.min(5, (p.h * 6) | 0)].push(p.x, p.y, nx, ny);
+      p.x = nx; p.y = ny; p.life -= 1;
+      if (p.life < 0 || nx < -5 || nx > W + 5 || ny < -5 || ny > H + 5) spawn(p);
+    });
+    cx.lineWidth = 1.1; cx.lineCap = 'round';
+    groups.forEach(function (g, k) {
+      var hue = hr[0] + (hr[1] - hr[0]) * k / 5;
+      cx.strokeStyle = 'hsla(' + hue.toFixed(0) + ',85%,' + (58 + k * 4) + '%,.55)';
+      cx.beginPath();
+      for (var j = 0; j < g.length; j += 4) { cx.moveTo(g[j], g[j + 1]); cx.lineTo(g[j + 2], g[j + 3]); }
+      cx.stroke();
+    });
+  }
+  var vis = true, raf = 0, last = 0;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.04, Math.max(0, (now - last) / 1000)); last = now; t += dt;
+    step(dt);
+    raf = requestAnimationFrame(frame);
+  }
+  function run() { if (rm) { clear(); for (var k = 0; k < 120; k++) { t += 0.016; step(0.016); } return; } if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  function loc(e) { var r = cv.getBoundingClientRect(), k = cv.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  cv.addEventListener('pointermove', function (e) { ptr = loc(e); });
+  cv.addEventListener('pointerleave', function () { ptr = null; });
+  cv.addEventListener('click', function () { pal = (pal + 1) % PAL.length; P.forEach(spawn); clear(); if (rm) run(); });
+  clear(); run();
+})();
+</script>

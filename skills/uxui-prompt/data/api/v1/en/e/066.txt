@@ -1,0 +1,102 @@
+<!-- Lucian UX/UI Prompt #066 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#066 -->
+<!--
+Element: Social sign-in buttons
+ID: 066 · Category: Sign-in & Sign-up · Tags: social-login, oauth, collapse, loading, provider
+What it does: Pick a provider and the other buttons fold away, leaving only yours with a connecting spinner. Once connected the button becomes an account row, and “Use another method” unfolds the hidden buttons again one by one.
+How to use it: Press any provider button. When it connects, press “Use another method” to start over
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#066
+-->
+<style>
+.u066{position:relative;width:340px;height:420px;display:flex;flex-direction:column;padding:28px 24px 24px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u066 h3{margin:0;font-size:23px;font-weight:850;letter-spacing:-.045em}
+.u066>p{margin:6px 0 20px;font-size:13.5px;color:var(--ux-ink-3)}
+.u066-list{display:flex;flex-direction:column}
+.u066-it{display:grid;grid-template-rows:1fr;opacity:1;transition:grid-template-rows .45s var(--ux-ease),opacity .3s,margin .45s var(--ux-ease);margin-bottom:10px}
+.u066-it>div{min-height:0;overflow:hidden;padding:2px}
+.u066-it.gone{grid-template-rows:0fr;opacity:0;margin-bottom:0;transition-delay:calc(var(--i) * 40ms)}
+.u066-b{position:relative;width:100%;height:54px;border:0;border-radius:16px;display:flex;align-items:center;gap:12px;padding:0 16px;background:var(--bg);color:var(--fg);font-size:15px;font-weight:720;text-align:left;box-shadow:var(--bd,none);transition:transform .3s var(--ux-spring),height .45s var(--ux-ease),border-radius .45s}
+.u066-b:hover{transform:translateY(-1px)}
+.u066-b:active{transform:scale(.98)}
+.u066-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u066-ic{width:24px;height:24px;flex:none;display:grid;place-items:center}
+.u066-ic svg{width:22px;height:22px}
+.u066-tx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u066-tx small{display:block;font-size:12px;font-weight:600;opacity:.7}
+.u066-recent{height:22px;padding:0 8px;border-radius:999px;display:inline-flex;align-items:center;background:var(--ux-accent-soft);color:var(--ux-accent);font-size:11px;font-weight:800}
+.u066-st{width:0;height:22px;flex:none;position:relative;margin-left:-12px;transition:width .3s,margin .3s}
+.u066-b.busy .u066-st,.u066-b.ok .u066-st{width:22px;margin-left:0}
+.u066-b.busy .u066-recent,.u066-b.ok .u066-recent{display:none}
+.u066-st i{position:absolute;inset:0;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;opacity:0;animation:u066-spin .7s linear infinite}
+.u066-st svg{position:absolute;inset:0;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.u066-st path{stroke-dasharray:22;stroke-dashoffset:22;transition:stroke-dashoffset .4s var(--ux-ease)}
+.u066-b.busy .u066-st i{opacity:1}
+.u066-b.ok .u066-st path{stroke-dashoffset:0}
+.u066-b.ok{height:72px;border-radius:20px}
+@keyframes u066-spin{to{transform:rotate(360deg)}}
+.u066-or{display:flex;align-items:center;gap:10px;margin:8px 0 14px;font-size:12px;font-weight:700;color:var(--ux-ink-3);transition:opacity .3s}
+.u066-or::before,.u066-or::after{content:"";flex:1;height:1px;background:var(--ux-line-2)}
+.u066-mail{height:50px;border:0;border-radius:15px;background:var(--ux-surface-2);color:var(--ux-ink);font-size:14.5px;font-weight:700;transition:opacity .3s,transform .3s var(--ux-spring)}
+.u066-mail:focus-visible,.u066-back:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u066.is-pick .u066-or,.u066.is-pick .u066-mail{opacity:0;pointer-events:none}
+.u066-back{position:absolute;left:24px;right:24px;bottom:24px;height:46px;border:0;border-radius:15px;background:none;box-shadow:inset 0 0 0 1.5px var(--ux-line-2);color:var(--ux-ink-2);font-size:14px;font-weight:700;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .3s,transform .4s var(--ux-spring)}
+.u066.is-done .u066-back{opacity:1;transform:none;pointer-events:auto}
+.u066-msg:empty{min-height:0;margin:0}
+.u066-msg{margin:0 0 4px;font-size:13px;font-weight:650;color:var(--ux-ink-3);text-align:center;min-height:20px;transition:transform .45s var(--ux-ease)}
+</style>
+<div class="ux u066">
+  <h3>Ready to start?</h3>
+  <p>Use an account you already have</p>
+  <div class="u066-list">
+    <div class="u066-it" style="--i:0"><div><button class="u066-b" type="button" style="--bg:#FEE500;--fg:#191600" data-p="Kakao" data-a="seoyeon.kim@example.com"><span class="u066-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4C7 4 3 7.1 3 11c0 2.5 1.7 4.7 4.2 6l-1 3.6c-.1.3.3.6.6.4l4.2-2.8c.3 0 .7.1 1 .1 5 0 9-3.1 9-7S17 4 12 4z" fill="#191600"/></svg></span><span class="u066-tx">Continue with Kakao</span><span class="u066-st" aria-hidden="true"><i></i><svg viewBox="0 0 22 22"><path d="M5 11.5l4 4L17 7"/></svg></span></button></div></div>
+    <div class="u066-it" style="--i:1"><div><button class="u066-b" type="button" style="--bg:var(--ux-surface);--fg:var(--ux-ink);--bd:inset 0 0 0 1.5px var(--ux-line-2)" data-p="Google" data-a="seoyeon@example.com"><span class="u066-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21.6 12.2c0-.7-.1-1.3-.2-1.9H12v3.7h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z" fill="#4285F4"/><path d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z" fill="#34A853"/><path d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1A10 10 0 0 0 2 12c0 1.6.4 3.1 1.1 4.6z" fill="#FBBC05"/><path d="M12 6c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10C7.2 7.7 9.4 6 12 6z" fill="#EA4335"/></svg></span><span class="u066-tx">Continue with Google<small>Last used</small></span><span class="u066-st" aria-hidden="true"><i></i><svg viewBox="0 0 22 22"><path d="M5 11.5l4 4L17 7"/></svg></span></button></div></div>
+    <div class="u066-it" style="--i:2"><div><button class="u066-b" type="button" style="--bg:var(--ux-ink);--fg:var(--ux-page)" data-p="Apple" data-a="s.kim@example.com"><span class="u066-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M16.4 12.6c0-2.3 1.9-3.4 2-3.5a4.3 4.3 0 0 0-3.4-1.8c-1.4-.1-2.8.9-3.5.9s-1.9-.9-3.1-.8a4.6 4.6 0 0 0-3.9 2.4c-1.7 2.9-.4 7.2 1.2 9.5.8 1.1 1.7 2.4 2.9 2.4s1.6-.8 3-.8 1.8.8 3 .7 2-1.1 2.8-2.3a9.6 9.6 0 0 0 1.3-2.6c-.1 0-2.3-.9-2.3-4.1zM14.1 5.8a3.9 3.9 0 0 0 .9-2.8 4 4 0 0 0-2.6 1.4 3.7 3.7 0 0 0-.9 2.7 3.3 3.3 0 0 0 2.6-1.3z" fill="currentColor"/></svg></span><span class="u066-tx">Continue with Apple</span><span class="u066-st" aria-hidden="true"><i></i><svg viewBox="0 0 22 22"><path d="M5 11.5l4 4L17 7"/></svg></span></button></div></div>
+  </div>
+  <p class="u066-msg" aria-live="polite"></p>
+  <div class="u066-or">or</div>
+  <button class="u066-mail" type="button">Continue with email</button>
+  <button class="u066-back" type="button" tabindex="-1">Use another method</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var its = Array.prototype.slice.call(root.querySelectorAll('.u066-it'));
+  var bs = its.map(function (it) { return it.querySelector('.u066-b'); });
+  var msg = root.querySelector('.u066-msg'), back = root.querySelector('.u066-back'), mail = root.querySelector('.u066-mail');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var busy = false, t = 0;
+  bs.forEach(function (b) { b.setAttribute('data-l', b.querySelector('.u066-tx').innerHTML); });
+  bs.forEach(function (b, i) {
+    b.addEventListener('click', function () {
+      if (busy || b.classList.contains('ok')) return;
+      busy = true;
+      root.classList.add('is-pick');
+      its.forEach(function (it, k) { if (k !== i) { it.classList.add('gone'); it.querySelector('button').tabIndex = -1; } });
+      b.classList.add('busy');
+      b.setAttribute('aria-busy', 'true');
+      msg.textContent = 'Opening ' + b.getAttribute('data-p') + '…';
+      mail.tabIndex = -1;
+      t = setTimeout(function () {
+        if (!root.isConnected) return;
+        busy = false;
+        b.classList.remove('busy'); b.classList.add('ok');
+        b.removeAttribute('aria-busy');
+        b.querySelector('.u066-tx').innerHTML = 'Continue as Seoyeon Kim<small>' + b.getAttribute('data-a') + '</small>';
+        msg.textContent = b.getAttribute('data-p') + ' account connected';
+        root.classList.add('is-done');
+        back.tabIndex = 0;
+      }, rm ? 300 : 1500);
+    });
+  });
+  back.addEventListener('click', function () {
+    clearTimeout(t); busy = false;
+    root.classList.remove('is-pick', 'is-done');
+    its.forEach(function (it, k) { it.classList.remove('gone'); it.style.setProperty('--i', k); });
+    bs.forEach(function (b) { b.classList.remove('busy', 'ok'); b.tabIndex = 0; b.querySelector('.u066-tx').innerHTML = b.getAttribute('data-l'); });
+    mail.tabIndex = 0; back.tabIndex = -1; msg.textContent = '';
+    bs[0].focus({ preventScroll: true });
+  });
+  mail.addEventListener('click', function () { msg.textContent = 'Taking you to the email screen'; });
+})();
+</script>

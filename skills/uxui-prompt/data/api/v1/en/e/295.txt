@@ -1,0 +1,123 @@
+<!-- Lucian UX/UI Prompt #295 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#295 -->
+<!--
+Element: Contact form that adapts to the request
+ID: 295 · Category: Forms & Input · Tags: contact-form, conditional, form, attachment, support
+What it does: Choose Sales, Support or Partnership at the top of a contact form and the pill slides over while the fields below fold and unfold into questions for that type. In Support, pressing Attach screenshot adds a file chip whose upload bar fills. The ring beside the message box fills with the characters you've typed, and Send moves you to a received card with a ticket number.
+How to use it: Switch the request type, write a message and send it
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#295
+-->
+<style>
+.u295{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u295-fm{position:absolute;inset:0;padding:24px 18px 18px;display:flex;flex-direction:column;transition:opacity .3s,transform .4s}
+.u295.is-sent .u295-fm{opacity:0;transform:scale(.97);pointer-events:none}
+.u295 h3{margin:0;font-size:20px;font-weight:900;letter-spacing:-.035em}
+.u295-fm>p{margin:3px 0 0;font-size:10.5px;font-weight:650;color:var(--ux-ink-3)}
+.u295-sg{position:relative;display:flex;margin-top:14px;padding:3px;border-radius:12px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u295-pl{position:absolute;left:3px;top:3px;bottom:3px;width:calc((100% - 6px) / 3);border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 4px -1px var(--ux-shadow-strong),0 0 0 1px var(--ux-line);transition:transform .35s cubic-bezier(.3,1.3,.5,1)}
+.u295-tp{position:relative;flex:1;height:30px;border:0;border-radius:9px;background:none;color:var(--ux-ink-3);font:inherit;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap;transition:color .2s}
+.u295-tp[aria-checked="true"]{color:var(--ux-ink)}
+.u295-dy{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .4s cubic-bezier(.3,1,.4,1),opacity .25s}
+.u295-dy>div{min-height:0;overflow:hidden}
+.u295-dy.is-on{grid-template-rows:1fr;opacity:1;transition-delay:.12s}
+.u295 label,.u295-lb{display:block;margin-top:12px;font-size:10.5px;font-weight:800;color:var(--ux-ink-2)}
+.u295-ip{width:100%;height:38px;margin-top:5px;padding:0 11px;border:0;border-radius:10px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:12px;font-weight:700;outline:none;box-sizing:border-box}
+.u295-ip:focus,.u295-tx:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u295-ch{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.u295-ch button{height:30px;padding:0 10px;border:0;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s}
+.u295-ch button[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-surface);box-shadow:none}
+.u295-at{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;height:38px;margin-top:8px;border:1.5px dashed var(--ux-line);border-radius:10px;background:none;color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.u295-at svg{width:13px;height:13px}
+.u295-fl{display:none;align-items:center;gap:8px;margin-top:8px;padding:7px 8px 7px 10px;border-radius:10px;background:var(--ux-surface-2);font-size:10.5px;font-weight:750;animation:u295-in .35s cubic-bezier(.3,1.4,.5,1)}
+.u295-fl.is-on{display:flex}
+.u295.is-file .u295-at{display:none}
+@keyframes u295-in{from{opacity:0;transform:scale(.92)}}
+.u295-fl i{flex:none;width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#A5B4FC,#F0ABFC)}
+.u295-fl div{flex:1;min-width:0}
+.u295-fl small{display:block;font-size:9px;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u295-fl em{display:block;height:3px;margin-top:3px;border-radius:2px;background:var(--ux-surface-3);overflow:hidden}
+.u295-fl em b{display:block;height:100%;width:0;background:var(--ux-accent);transition:width 1s cubic-bezier(.3,.8,.3,1)}
+.u295-fl button{flex:none;width:22px;height:22px;border:0;border-radius:6px;background:none;color:var(--ux-ink-3);cursor:pointer;display:grid;place-items:center}
+.u295-fl button svg{width:9px;height:9px}
+.u295-mw{position:relative;margin-top:5px}
+.u295-tx{display:block;width:100%;height:76px;padding:9px 40px 9px 11px;border:0;border-radius:10px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:12px;line-height:1.45;font-weight:650;outline:none;resize:none;box-sizing:border-box}
+.u295-rg{position:absolute;right:9px;bottom:9px;width:22px;height:22px;transform:rotate(-90deg)}
+.u295-rg circle{fill:none;stroke-width:3}
+.u295-rg .t{stroke:var(--ux-surface-3)}
+.u295-rg .f{stroke:var(--ux-accent);stroke-linecap:round;stroke-dasharray:56.5;stroke-dashoffset:56.5;transition:stroke-dashoffset .2s,stroke .2s}
+.u295-go{width:100%;height:46px;margin-top:auto;border:0;border-radius:13px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:13px;font-weight:850;cursor:pointer;transition:opacity .2s}
+.u295-go:disabled{opacity:.3;cursor:not-allowed}
+.u295-dn{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px;text-align:center;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .35s .15s,transform .45s cubic-bezier(.3,1.3,.5,1) .15s}
+.u295.is-sent .u295-dn{opacity:1;transform:none;pointer-events:auto}
+.u295-dn i{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#34D399,#059669);display:grid;place-items:center;box-shadow:0 16px 30px -14px #059669}
+.u295-dn i::after{content:"";width:12px;height:22px;margin-top:-6px;border:solid #fff;border-width:0 4px 4px 0;transform:rotate(45deg)}
+.u295-dn b{margin-top:16px;font-size:18px;font-weight:900}
+.u295-dn p{margin:6px 0 0;font-size:11px;font-weight:650;color:var(--ux-ink-3)}
+.u295-dn div{margin-top:16px;padding:10px 16px;border-radius:12px;background:var(--ux-surface-2);font-size:11px;font-weight:750;color:var(--ux-ink-2)}
+.u295-dn div strong{display:block;margin-top:2px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;color:var(--ux-ink)}
+.u295 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u295-pl,.u295-dy,.u295-fm,.u295-dn,.u295-fl em b{transition:none}.u295-fl{animation:none}}
+</style>
+<div class="ux u295">
+  <div class="u295-fm">
+    <h3>Contact us</h3><p>We usually reply within a day</p>
+    <div class="u295-sg" role="radiogroup" aria-label="Request type"><span class="u295-pl" aria-hidden="true"></span></div>
+    <div class="u295-dy"><div>
+      <label>Company<input class="u295-ip" placeholder="e.g. Lucian Labs"></label>
+      <span class="u295-lb">Team size</span><div class="u295-ch"><button type="button" class="u295-sz" aria-pressed="false">1–10</button><button type="button" class="u295-sz" aria-pressed="false">11–50</button><button type="button" class="u295-sz" aria-pressed="false">51+</button></div>
+    </div></div>
+    <div class="u295-dy"><div>
+      <span class="u295-lb">Where’s the problem?</span><div class="u295-ch"><button type="button" aria-pressed="false">Sign-in</button><button type="button" aria-pressed="false">Billing</button><button type="button" aria-pressed="false">Other</button></div>
+      <button type="button" class="u295-at"><svg viewBox="0 0 13 13" aria-hidden="true"><path d="M9.5 6.2L6 9.7a2.3 2.3 0 0 1-3.3-3.3l4.2-4.2a1.5 1.5 0 0 1 2.2 2.2L5 8.5a.7.7 0 0 1-1-1l3.4-3.4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Attach screenshot</button>
+      <div class="u295-fl"><i aria-hidden="true"></i><div>screenshot.png<small>0 / 240 KB</small><em><b></b></em></div><button type="button" aria-label="Remove attachment"><svg viewBox="0 0 9 9" aria-hidden="true"><path d="M1.5 1.5l6 6M7.5 1.5l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></div>
+    </div></div>
+    <div class="u295-dy"><div>
+      <label>Website<input class="u295-ip" placeholder="https://"></label>
+      <span class="u295-lb">Partnership type</span><div class="u295-ch"><button type="button" aria-pressed="false">Integration</button><button type="button" aria-pressed="false">Reseller</button><button type="button" aria-pressed="false">Co-marketing</button></div>
+    </div></div>
+    <span class="u295-lb">Message</span>
+    <div class="u295-mw"><textarea class="u295-tx" maxlength="200" aria-label="Message"></textarea><svg class="u295-rg" viewBox="0 0 22 22" aria-hidden="true"><circle class="t" cx="11" cy="11" r="9"/><circle class="f" cx="11" cy="11" r="9"/></svg></div>
+    <button type="button" class="u295-go" disabled>Send</button>
+  </div>
+  <div class="u295-dn" role="status"><i aria-hidden="true"></i><b>Request received</b><p>We’ll reply by email</p><div>Ticket<strong class="u295-no"></strong></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sg = root.querySelector('.u295-sg'), pl = root.querySelector('.u295-pl'), DY = root.querySelectorAll('.u295-dy'), tx = root.querySelector('.u295-tx'), rgf = root.querySelector('.u295-rg .f'), go = root.querySelector('.u295-go'), at = root.querySelector('.u295-at'), fl = root.querySelector('.u295-fl'), flb = fl.querySelector('em b'), fls = fl.querySelector('small'), no = root.querySelector('.u295-no');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TP = ['Sales', 'Support', 'Partnership'], MAX = 200, cur = -1;
+  var T = TP.map(function (t, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u295-tp'; b.setAttribute('role', 'radio'); b.textContent = t;
+    b.addEventListener('click', function () { pick(i); });
+    sg.appendChild(b); return b;
+  });
+  function pick(i) {
+    if (i === cur) return; cur = i;
+    T.forEach(function (b, k) { b.setAttribute('aria-checked', k === i); });
+    pl.style.transform = 'translateX(' + i * 100 + '%)';
+    Array.prototype.forEach.call(DY, function (d, k) { d.classList.toggle('is-on', k === i); d.setAttribute('aria-hidden', k !== i); d.inert = k !== i; });
+  }
+  Array.prototype.forEach.call(root.querySelectorAll('.u295-ch'), function (g) {
+    Array.prototype.forEach.call(g.children, function (b) { b.addEventListener('click', function () { Array.prototype.forEach.call(g.children, function (o) { o.setAttribute('aria-pressed', o === b); }); }); });
+  });
+  at.addEventListener('click', function () {
+    root.classList.add('is-file'); fl.classList.add('is-on'); flb.style.width = '0';
+    var t0 = performance.now(), ms = rm ? 1 : 1000;
+    requestAnimationFrame(function () { flb.style.width = '100%'; });
+    (function f(now) { var k = Math.min(1, (now - t0) / ms); fls.textContent = Math.round(240 * k) + ' / 240 KB'; if (k < 1) requestAnimationFrame(f); })(t0);
+  });
+  fl.querySelector('button').addEventListener('click', function () { root.classList.remove('is-file'); fl.classList.remove('is-on'); at.focus({ preventScroll: true }); });
+  tx.addEventListener('input', function () {
+    var n = tx.value.length, k = n / MAX; rgf.style.strokeDashoffset = (56.5 * (1 - k)).toFixed(1); rgf.style.stroke = k > .9 ? '#F59E0B' : '';
+    go.disabled = tx.value.trim().length < 2;
+  });
+  go.addEventListener('click', function () {
+    if (go.disabled) return;
+    no.textContent = '#' + ['A', 'B', 'C'][cur] + '-' + (2040 + Math.floor(Math.random() * 60));
+    root.classList.add('is-sent');
+  });
+  pick(0);
+})();
+</script>

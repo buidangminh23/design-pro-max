@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #180 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#180 -->
+<!--
+Element: Approval sign-off line
+ID: 180 · Category: Workflow & Systems · Tags: approval-signoff, new-century
+What it does: An approval line that collects three signatures in order: drafted, reviewed, approved. Each press stamps the next box, and after final approval you can start over.
+How to use it: Press the approve button step by step
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#180
+-->
+<style>
+.u180 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u180 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u180 button:active{transform:translateY(1px)}.u180 button:disabled{opacity:.4;cursor:default}.u180 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u180 .muted{color:var(--ux-ink-2);font-size:12px}.u180 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u180 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u180 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u180 input,.u180 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u180 output{font-variant-numeric:tabular-nums}.u180 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u180 *,.u180 *::before,.u180 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u180 .paper{background:var(--ux-surface);border:1px solid var(--ux-line-2);padding:23px 20px 18px;position:relative;border-radius:3px;box-shadow:5px 5px 0 var(--ux-surface-3)}.u180 .paper h3{font-size:24px;letter-spacing:-1px;margin:6px 0 2px}.u180 .signs{display:flex;margin:24px 0 18px;border:1px solid var(--ux-line-2)}.u180 .person{width:33.33%;text-align:center;padding:10px 2px;position:relative;border-right:1px solid var(--ux-line-2)}.u180 .person:last-child{border:0}.u180 .person small{display:block;font-size:11px;color:var(--ux-ink-2)}.u180 .seal{display:grid;place-items:center;width:55px;height:55px;margin:10px auto 0;border:2px dashed var(--ux-line-2);border-radius:50%;font:16px Georgia,serif;color:var(--ux-ink-2);transition:transform .45s,background .35s,color .35s}.u180 .person.done .seal{border:2px solid light-dark(#b44335,#ff9b85);color:light-dark(#b44335,#ff9b85);transform:rotate(-12deg);background:color-mix(in srgb,#b44335 8%,transparent)}.u180 .person.done .seal::after{content:'✓';margin-left:3px}.u180 .actions{justify-content:space-between;margin-top:12px}.u180 .reset{background:none;border:0;padding:5px;font-size:12px}
+
+/* Focused composition */
+.u180{max-width:320px}.u180 .paper{padding:24px 19px 20px;box-shadow:4px 4px 0 var(--ux-surface-3)}.u180 .paper h3{font-size:19px;margin:0;font-weight:550}.u180 .signs{margin:22px 0;border:0}.u180 .person{border-right:1px solid var(--ux-line);padding:0 3px}.u180 .seal{width:52px;height:52px;font-size:15px}.u180 .approve{display:block;margin:auto;min-width:135px;font-size:12px}</style>
+<div class="ux u180" data-state="initial"><div class="paper"><h3>Brand draft</h3><div class="signs"><div class="person done"><small>Draft</small><div class="seal">Seoyeon</div></div><div class="person"><small>Review</small><div class="seal">Minho</div></div><div class="person"><small>Approve</small><div class="seal">Jisoo</div></div></div><button class="approve primary">Approve review</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let n=1;function render(){qa('.person').forEach((p,i)=>p.classList.toggle('done',i<n));q('.approve').textContent=n===1?'Approve review':n===2?'Final approval':'Approved · Reset';state('approved-'+n)}q('.approve').onclick=()=>{n=n===3?1:n+1;render();pulse(qa('.seal')[n-1],[{transform:'rotate(-25deg) scale(1.35)',opacity:.2},{transform:'rotate(-12deg) scale(1)',opacity:1}])};})();
+</script>

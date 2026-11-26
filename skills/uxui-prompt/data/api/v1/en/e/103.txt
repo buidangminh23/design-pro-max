@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #103 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#103 -->
+<!--
+Element: Breadcrumb path
+ID: 103 · Category: Layout, Schedule & Design · Tags: breadcrumb, native, spatial
+What it does: A one-line path through nested folders. Press a parent to climb back up, then pick a subfolder below to go down again.
+How to use it: Press “Projects” in the path, then pick a folder below
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#103
+-->
+<style>
+.u103{width:100%;max-width:400px;min-width:0;font-size:13px}.u103 button{font:inherit;color:inherit;cursor:pointer}.u103 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u103 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u103{padding:16px 0;max-width:380px}.u103 nav{display:flex;align-items:center;flex-wrap:wrap;gap:3px;border-bottom:1px solid var(--ux-line-2);padding-bottom:10px}.u103 button{border:0;background:transparent;min-height:44px;padding:8px 10px;border-radius:5px}.u103 nav button[aria-current=page]{font-weight:700;color:var(--ux-accent)}.u103 nav span{color:var(--ux-ink-3)}.u103 .places{display:flex;gap:12px;padding-top:15px;min-height:74px}.u103 .place{flex:1;text-align:left;border:1px solid var(--ux-line-2);background:var(--ux-surface);display:flex;gap:10px;align-items:center}.u103 .place span{font-size:20px;color:var(--ux-accent)}.u103 .empty{margin:14px 10px;color:var(--ux-ink-2);font-size:13px}
+</style>
+<div class="ux u103"><nav aria-label="Document path"></nav><div class="places"></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const tree={name:'Studio',children:[{name:'Projects',children:[{name:'Aurora',children:[{name:'Draft',children:[]},{name:'Cover',children:[]}]},{name:'Archive',children:[]}]},{name:'Personal',children:[]}]};let path=[tree,tree.children[0],tree.children[0].children[0]];function paint(){q('nav').innerHTML=path.map((x,i)=>`<button data-i="${i}" ${i===path.length-1?'aria-current="page"':''}>${x.name}</button>${i<path.length-1?'<span aria-hidden="true">/</span>':''}`).join('');q('.places').innerHTML=path.at(-1).children.map((x,i)=>`<button class="place" data-child="${i}"><span aria-hidden="true">▱</span>${x.name}</button>`).join('')||'<p class="empty">Empty folder</p>';qa('[data-i]').forEach(b=>b.onclick=()=>{path=path.slice(0,+b.dataset.i+1);paint()});qa('[data-child]').forEach(b=>b.onclick=()=>{path.push(path.at(-1).children[+b.dataset.child]);paint()})}root.onkeydown=e=>{if(e.key==='Escape'){path=[tree,tree.children[0],tree.children[0].children[0]];paint();q('[aria-current]').focus()}};paint();})();
+</script>

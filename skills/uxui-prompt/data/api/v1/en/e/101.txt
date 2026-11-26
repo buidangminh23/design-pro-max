@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #101 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#101 -->
+<!--
+Element: Split workspace
+ID: 101 · Category: Layout, Schedule & Design · Tags: split-pane, native, spatial
+What it does: A split view with a document beside its cover preview. Drag the divider to resize both panes, or set the same widths from the keyboard.
+How to use it: Drag the divider left and right. With it focused, ←/→ adjust it too, and Esc restores the original width
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#101
+-->
+<style>
+.u101{width:100%;max-width:400px;min-width:0;font-size:13px}.u101 button{font:inherit;color:inherit;cursor:pointer}.u101 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u101 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u101{border:1px solid var(--ux-line-2);border-radius:10px;overflow:hidden;background:var(--ux-surface)}.u101 .panes{display:grid;grid-template-columns:minmax(0,var(--split,42%)) 24px minmax(0,1fr);height:230px}.u101 .doc{padding:27px 15px;background:var(--ux-surface-2);overflow:hidden}.u101 h3{margin:0 0 16px;font:500 21px/1.3 Georgia,serif;letter-spacing:-.05em}.u101 p{font-size:13px;line-height:1.8;margin:0}.u101 .sep{padding:0;border:0;background:var(--ux-surface-3);cursor:col-resize;touch-action:none;color:var(--ux-ink-2);font-size:24px}.u101 .preview{padding:25px 16px}.u101 .poster{height:180px;border-radius:90px 90px 5px 5px;background:linear-gradient(150deg,#edc170,#bf6f58);position:relative;overflow:hidden}.u101 .poster:after{content:"";position:absolute;width:110px;height:110px;background:#384563;border-radius:50%;left:25%;top:70px}
+</style>
+<div class="ux u101"><div class="panes"><section class="doc"><h3>City<br>and light</h3><p>As the sun sets,<br>the alleys change hue.</p></section><button class="sep" role="separator" aria-label="Document width, adjust with arrow keys" aria-orientation="vertical" aria-valuemin="25" aria-valuemax="65" aria-valuenow="42">⋮</button><section class="preview"><div class="poster" aria-label="Cover preview"></div></section></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let v=42;const set=x=>{v=Math.max(25,Math.min(65,Math.round(x)));root.style.setProperty("--split",v+"%");q(".sep").setAttribute("aria-valuenow",v)};q(".sep").onkeydown=e=>{if(["ArrowLeft","ArrowRight","Home","End","Escape"].includes(e.key)){e.preventDefault();set(e.key==="Escape"?42:e.key==="Home"?25:e.key==="End"?65:v+(e.key==="ArrowRight"?3:-3))}};q(".sep").onpointerdown=e=>e.currentTarget.setPointerCapture(e.pointerId);q(".sep").onpointermove=e=>{if(e.currentTarget.hasPointerCapture(e.pointerId)){const b=q(".panes").getBoundingClientRect();set((e.clientX-b.left)/b.width*100)}};})();
+</script>

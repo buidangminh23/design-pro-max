@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #183 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#183 -->
+<!--
+Element: Ranked ballot
+ID: 183 · Category: Workflow & Systems · Tags: ranked-ballot, new-century
+What it does: A ranked-choice ballot where you reorder the options before voting. Move an option up one place with its arrow, and voting scores each one by its rank.
+How to use it: Reorder with ↑, then press “Vote”
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#183
+-->
+<style>
+.u183 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u183 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u183 button:active{transform:translateY(1px)}.u183 button:disabled{opacity:.4;cursor:default}.u183 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u183 .muted{color:var(--ux-ink-2);font-size:12px}.u183 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u183 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u183 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u183 input,.u183 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u183 output{font-variant-numeric:tabular-nums}.u183 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u183 *,.u183 *::before,.u183 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u183 .ballot{border:1px solid var(--ux-line-2);border-radius:4px;background:var(--ux-surface);padding:18px;border-top:5px solid #a05771}.u183 .ballot h3{font:italic 29px Georgia;margin:5px 0 18px;color:var(--ux-ink)}.u183 .choices{display:flex;flex-direction:column;gap:8px}.u183 .choice{display:flex;align-items:center;gap:10px;padding:9px 8px;background:var(--ux-surface-2);border-radius:6px;transition:all .3s}.u183 .rank{font:italic 23px Georgia;color:light-dark(#8d405b,#eea6bf);width:23px}.u183 .choice b{flex:1;font-size:13px}.u183 .choice button{min-height:31px;padding:3px 8px;border:0;background:transparent}.u183 .score{font:11px ui-monospace;color:var(--ux-ink-2)}.u183 .submit{width:100%;margin-top:15px}.u183 .results{margin-top:10px;font-size:12px;min-height:20px;color:var(--ux-ink-2)}
+
+/* Focused composition */
+.u183{max-width:320px}.u183 .ballot{border:0;padding:0;background:none;max-width:285px;margin:auto}.u183 .choices{gap:10px}.u183 .choice{padding:13px 14px;background:var(--ux-surface);border:1px solid var(--ux-line);border-radius:8px;min-height:55px}.u183 .choice b{font-size:14px;font-weight:550}.u183 .rank{font-size:23px}.u183 .submit{margin-top:18px;font-size:12px}.u183 [hidden]{display:none!important}</style>
+<div class="ux u183" data-state="initial"><div class="ballot"><div class="choices"></div><button class="submit primary">Vote</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let order=['City walk','Pottery class','Forest picnic'],voted=false;function render(){q('.choices').innerHTML=order.map((x,i)=>'<div class="choice"><span class="rank">'+(i+1)+'</span><b>'+x+'</b><span class="score" '+(voted?'':'hidden')+'>'+(3-i)+' pts</span><button class="up" data-i="'+i+'" aria-label="'+x+', move up" '+(voted?'hidden':'')+' '+(!i?'disabled':'')+'>↑</button></div>').join('');qa('.up').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;if(i){[order[i-1],order[i]]=[order[i],order[i-1]];render();qa('.up')[i-1]?.focus();pulse(q('.choices'),[{opacity:.5},{opacity:1}])}});q('.submit').textContent=voted?'✓ Voted · Edit':'Vote';state('rank-'+order.join('-')+(voted?'-voted':''))}q('.submit').onclick=()=>{voted=!voted;render()};render();})();
+</script>

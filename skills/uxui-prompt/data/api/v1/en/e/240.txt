@@ -1,0 +1,126 @@
+<!-- Lucian UX/UI Prompt #240 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#240 -->
+<!--
+Element: Cart drawer with free-shipping bar
+ID: 240 · Category: Commerce & Pricing · Tags: cart, drawer, free-shipping, ecommerce, quantity
+What it does: Press Add to cart on a product page and the cart drawer slides in from the right, with the item you just added flashing. The bar at the top is filled toward free shipping, and raising a quantity rolls the subtotal while the bar fills completely and turns into a free-shipping message. Removing an item slides its row out and folds it away, and pressing outside or close tucks the drawer back in.
+How to use it: Press Add to cart, then raise a quantity or remove an item
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#240
+-->
+<style>
+.u240{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u240-pg{position:absolute;inset:0}
+.u240-ph{height:270px;background:linear-gradient(160deg,#F5F5F4,#D6D3D1);background:linear-gradient(160deg,light-dark(#F5F5F4,#2B2927),light-dark(#D6D3D1,#121110));position:relative}
+.u240-ph::after{content:"";position:absolute;left:50%;top:50%;width:110px;height:130px;transform:translate(-50%,-45%);border-radius:30px 30px 10px 10px;background:#FAFAF9;background:light-dark(#FAFAF9,#E4E1DC);box-shadow:0 20px 30px -18px rgba(0,0,0,.35);box-shadow:0 20px 30px -18px light-dark(rgba(0,0,0,.35),rgba(0,0,0,.8))}
+.u240-pg h3{margin:18px 20px 0;font-size:17px;font-weight:900}
+.u240-pg p{margin:4px 20px 0;font-size:15px;font-weight:850;color:var(--ux-ink-2)}
+.u240-add{position:absolute;left:20px;right:20px;bottom:24px;height:48px;border:0;border-radius:14px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:13.5px;font-weight:850;cursor:pointer;transition:transform .15s}
+.u240-add:active{transform:scale(.98)}
+.u240-ov{position:absolute;inset:0;background:rgba(10,10,20,.4);opacity:0;pointer-events:none;transition:opacity .35s}
+.u240.is-open .u240-ov{opacity:1;pointer-events:auto}
+.u240-dr{position:absolute;top:0;right:0;bottom:0;width:268px;display:flex;flex-direction:column;background:var(--ux-surface);box-shadow:-20px 0 40px -20px rgba(0,0,0,.35);transform:translateX(105%);transition:transform .45s cubic-bezier(.3,1,.3,1);border-radius:24px 0 0 24px}
+.u240.is-open .u240-dr{transform:none}
+.u240-dh{display:flex;align-items:center;padding:22px 14px 10px 18px}
+.u240-dh b{margin-right:auto;font-size:16px;font-weight:900}
+.u240-dh b i{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--ux-accent);color:var(--ux-accent-ink);font-style:normal;font-size:10px;font-weight:850;vertical-align:2px}
+.u240-x{width:30px;height:30px;border:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink-2);display:grid;place-items:center;cursor:pointer}
+.u240-x svg{width:11px;height:11px}
+.u240-fs{margin:2px 18px 6px;padding:10px 12px;border-radius:12px;background:var(--ux-surface-2);font-size:10.5px;font-weight:750;color:var(--ux-ink-2)}
+.u240-fs b{color:var(--ux-ink);font-weight:900}
+.u240-fs.is-ok{background:color-mix(in srgb,#10B981 14%,transparent);color:#047857;color:light-dark(#047857,#6EE7B7)}
+.u240-bar{height:6px;margin-top:7px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u240-bar i{display:block;height:100%;border-radius:3px;background:var(--ux-accent);transition:width .6s cubic-bezier(.3,1.2,.5,1),background .3s}
+.u240-fs.is-ok .u240-bar i{background:#10B981}
+.u240-ls{flex:1;overflow-y:auto;scrollbar-width:none;padding:0 12px}
+.u240-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .4s cubic-bezier(.3,.8,.3,1) .15s,opacity .25s}
+.u240-it>div{min-height:0;overflow:hidden}
+.u240-it.is-gone{grid-template-rows:0fr;opacity:0}
+.u240-in{display:flex;gap:10px;align-items:center;padding:10px 6px;border-bottom:1px solid var(--ux-line);transition:transform .3s cubic-bezier(.5,0,.75,0)}
+.u240-it.is-gone .u240-in{transform:translateX(110%)}
+.u240-it.is-fl .u240-in{animation:u240-fl 1.2s ease}
+@keyframes u240-fl{20%{background:color-mix(in srgb,var(--ux-accent) 12%,transparent)}}
+.u240-th{flex:none;width:46px;height:52px;border-radius:10px}
+.u240-tx{flex:1;min-width:0}
+.u240-tx b{display:block;font-size:12px;font-weight:850}
+.u240-tx small{display:block;font-size:9.5px;font-weight:650;color:var(--ux-ink-3)}
+.u240-qt{display:inline-flex;align-items:center;margin-top:6px;border-radius:8px;box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u240-qt button{width:24px;height:24px;border:0;background:none;color:var(--ux-ink-2);font:inherit;font-size:14px;font-weight:700;cursor:pointer;line-height:1}
+.u240-qt span{min-width:16px;text-align:center;font-size:11px;font-weight:850;font-variant-numeric:tabular-nums}
+.u240-pr{display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-size:11.5px;font-weight:850;font-variant-numeric:tabular-nums}
+.u240-rm{width:22px;height:22px;border:0;border-radius:6px;background:none;color:var(--ux-ink-3);display:grid;place-items:center;cursor:pointer}
+.u240-rm:hover,.u240-rm.g-hov{background:var(--ux-surface-2);color:#E11D48}
+.u240-rm svg{width:12px;height:12px}
+.u240-ft{padding:12px 16px 20px;border-top:1px solid var(--ux-line)}
+.u240-sm{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;font-weight:750;color:var(--ux-ink-2)}
+.u240-sm b{font-size:18px;font-weight:900;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u240-ck{width:100%;height:44px;margin-top:10px;border:0;border-radius:12px;background:var(--ux-accent);color:var(--ux-accent-ink);font:inherit;font-size:13px;font-weight:850;cursor:pointer}
+.u240 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u240-dg{display:inline-block;height:1.2em;overflow:hidden;line-height:1.2;vertical-align:bottom}
+.u240-dg span{display:block;transition:transform .45s cubic-bezier(.3,1.25,.5,1)}
+@media (prefers-reduced-motion: reduce){.u240-dr,.u240-ov,.u240-it,.u240-in,.u240-bar i,.u240-dg span{transition:none}.u240-it.is-fl .u240-in{animation:none}}
+</style>
+<div class="ux u240">
+  <div class="u240-pg"><div class="u240-ph" aria-hidden="true"></div><h3>Linen shirt</h3><p>$39</p><button type="button" class="u240-add">Add to cart</button></div>
+  <div class="u240-ov" aria-hidden="true"></div>
+  <aside class="u240-dr" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="u240-dh"><b>Cart<i class="u240-ct"></i></b><button type="button" class="u240-x" aria-label="Close cart"><svg viewBox="0 0 11 11" aria-hidden="true"><path d="M2 2l7 7M9 2L2 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="u240-fs" aria-live="polite"><span class="u240-fm"></span><div class="u240-bar"><i></i></div></div>
+    <div class="u240-ls"></div>
+    <div class="u240-ft"><div class="u240-sm">Subtotal<b class="u240-tt"></b></div><button type="button" class="u240-ck">Checkout</button></div>
+  </aside>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var add = root.querySelector('.u240-add'), ov = root.querySelector('.u240-ov'), dr = root.querySelector('.u240-dr'), x = root.querySelector('.u240-x'), ls = root.querySelector('.u240-ls'), ct = root.querySelector('.u240-ct'), fs = root.querySelector('.u240-fs'), fm = root.querySelector('.u240-fm'), bar = root.querySelector('.u240-bar i'), tt = root.querySelector('.u240-tt');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var IT = [['Linen shirt', 'Ivory · L', 39, 1, '#E7E5E4'], ['Half pants', 'Navy · M', 32, 1, '#BFDBFE'], ['Bucket hat', 'Beige · One size', 19, 1, '#FDE68A']];
+  var FREE = 100;
+  function won(n) { return '$' + n.toLocaleString('en-US'); }
+  var items = [];
+  function row(d, flash) {
+    var it = { d: d, q: d[3], el: document.createElement('div') };
+    it.el.className = 'u240-it' + (flash ? ' is-fl' : '');
+    it.el.innerHTML = '<div><div class="u240-in"><span class="u240-th" style="background:linear-gradient(150deg,' + d[4] + ',color-mix(in srgb,' + d[4] + ' 70%,#000))"></span><div class="u240-tx"><b></b><small></small><div class="u240-qt"><button type="button" class="u240-mn">−</button><span></span><button type="button" class="u240-pl">+</button></div></div><div class="u240-pr"><span class="u240-lp"></span><button type="button" class="u240-rm"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 3.5h7M4.8 3.5V2.3h2.4v1.2M3.5 3.5l.5 6.2h4l.5-6.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button></div></div></div>';
+    it.el.querySelector('b').textContent = d[0]; it.el.querySelector('small').textContent = d[1];
+    it.el.querySelector('.u240-mn').setAttribute('aria-label', 'Decrease quantity'); it.el.querySelector('.u240-pl').setAttribute('aria-label', 'Increase quantity'); it.el.querySelector('.u240-rm').setAttribute('aria-label', d[0] + ' remove');
+    it.el.querySelector('.u240-mn').addEventListener('click', function () { if (it.q > 1) { it.q--; sum(); } });
+    it.el.querySelector('.u240-pl').addEventListener('click', function () { if (it.q < 9) { it.q++; sum(); } });
+    it.el.querySelector('.u240-rm').addEventListener('click', function () { items.splice(items.indexOf(it), 1); it.el.classList.add('is-gone'); setTimeout(function () { it.el.remove(); }, rm ? 0 : 600); sum(); });
+    return it;
+  }
+  var cells = [];
+  function digits(s) {
+    while (cells.length < s.length) { var d = document.createElement('span'); d.className = 'u240-dg'; d.innerHTML = '<span></span>'; tt.appendChild(d); cells.push({ el: d, ch: null }); }
+    while (cells.length > s.length) cells.pop().el.remove();
+    s.split('').forEach(function (ch, i) {
+      var c = cells[i]; if (c.ch === ch) return; var inner = c.el.firstChild;
+      if (/\d/.test(ch)) { if (c.ch === null || !/\d/.test(c.ch)) inner.innerHTML = '0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9'; inner.style.transform = 'translateY(' + (-+ch * 1.2) + 'em)'; } else { inner.textContent = ch; inner.style.transform = 'none'; }
+      c.ch = ch;
+    });
+    tt.setAttribute('aria-label', s);
+  }
+  function sum() {
+    var s = 0, n = 0;
+    items.forEach(function (it) { s += it.d[2] * it.q; n += it.q; it.el.querySelector('.u240-qt span').textContent = it.q; it.el.querySelector('.u240-lp').textContent = won(it.d[2] * it.q); });
+    ct.textContent = n; digits(won(s));
+    var ok = s >= FREE; fs.classList.toggle('is-ok', ok); bar.style.width = Math.min(100, s / FREE * 100) + '%';
+    fm.innerHTML = ''; if (ok) fm.textContent = 'You’ve unlocked free shipping!'; else { var b = document.createElement('b'); b.textContent = won(FREE - s); fm.appendChild(b); fm.appendChild(document.createTextNode(' more for free shipping')); }
+  }
+  function setOpen(v) {
+    root.classList.toggle('is-open', v); dr.setAttribute('aria-hidden', !v);
+    if (v) setTimeout(function () { x.focus({ preventScroll: true }); }, rm ? 0 : 300); else add.focus({ preventScroll: true });
+  }
+  items.push(row(IT[1]), row(IT[2])); items.forEach(function (it) { ls.appendChild(it.el); }); sum();
+  var added = false;
+  add.addEventListener('click', function () {
+    if (!added) { added = true; var it = row(IT[0], true); items.unshift(it); ls.insertBefore(it.el, ls.firstChild); }
+    else { items[0].q = Math.min(9, items[0].q + 1); items[0].el.classList.remove('is-fl'); void items[0].el.offsetWidth; items[0].el.classList.add('is-fl'); }
+    sum(); setOpen(true);
+  });
+  x.addEventListener('click', function () { setOpen(false); });
+  ov.addEventListener('click', function () { setOpen(false); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) setOpen(false); });
+})();
+</script>

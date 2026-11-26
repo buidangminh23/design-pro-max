@@ -1,0 +1,109 @@
+<!-- Lucian UX/UI Prompt #026 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#026 -->
+<!--
+Element: 6-digit code input
+ID: 026 · Category: Inputs & Search · Tags: otp, code, verification, input, paste
+What it does: Each digit pops up from below as you fill a box, and the cursor moves on to the next. With all six filled the boxes ripple while checking — green if it matches, or a shake and an empty row if it does not.
+How to use it: Type 482915 for success; any other code shows the failure flow. Paste and Backspace work too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#026
+-->
+<style>
+.u026{position:relative;width:350px;height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.u026-ic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#5B8CFF,#8B6CFF);box-shadow:0 14px 26px -14px rgba(91,108,255,.8);transition:background .5s var(--ux-ease)}
+.u026-ic svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u026.is-ok .u026-ic{background:linear-gradient(140deg,#2FD8A8,#119C72)}
+.u026-t{margin:16px 0 0;font-size:18px;font-weight:760;letter-spacing:-.03em}
+.u026-s{margin:6px 0 20px;font-size:13.5px;color:var(--ux-ink-3)}
+.u026-s b{color:var(--ux-ink-2);font-weight:650}
+.u026-row{position:relative;display:flex;gap:8px}
+.u026-row i.sep{width:10px;align-self:center;height:2px;border-radius:2px;background:var(--ux-line-2)}
+.u026-c{position:relative;width:46px;height:58px;border-radius:14px;background:var(--ux-surface);box-shadow:inset 0 0 0 1.5px var(--ux-line-2);display:grid;place-items:center;overflow:hidden;
+  font-size:26px;font-weight:760;font-variant-numeric:tabular-nums;transition:box-shadow .25s var(--ux-ease),background-color .4s var(--ux-ease),color .4s,transform .45s var(--ux-spring)}
+.u026-c span{display:block;animation:u026-in .4s var(--ux-spring)}
+@keyframes u026-in{from{transform:translateY(70%);opacity:0}}
+.u026-c.cur{box-shadow:inset 0 0 0 2px var(--ux-accent),0 0 0 4px var(--ux-accent-soft)}
+.u026-c.cur::after{content:"";position:absolute;left:50%;top:16px;bottom:16px;width:2px;margin-left:-1px;border-radius:1px;background:var(--ux-accent);animation:u026-blink 1s steps(1) infinite}
+.u026-c.cur.has::after{display:none}
+@keyframes u026-blink{50%{opacity:0}}
+.u026.is-check .u026-c{animation:u026-wave .5s var(--ux-ease);animation-delay:calc(var(--i) * 60ms)}
+@keyframes u026-wave{40%{transform:translateY(-8px)}}
+.u026.is-ok .u026-c{background:color-mix(in srgb,var(--ux-mint) 14%,var(--ux-surface));box-shadow:inset 0 0 0 2px var(--ux-mint);color:var(--ux-mint);transition-delay:calc(var(--i) * 50ms)}
+.u026.is-bad .u026-row{animation:u026-shake .45s var(--ux-ease)}
+.u026.is-bad .u026-c{box-shadow:inset 0 0 0 2px var(--ux-danger);color:var(--ux-danger)}
+@keyframes u026-shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.u026-real{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;font-size:16px;cursor:text;caret-color:transparent;color:transparent;background:transparent}
+.u026-msg{height:20px;margin:16px 0 0;font-size:13.5px;font-weight:650;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}
+.u026.is-ok .u026-msg{color:var(--ux-mint)}
+.u026.is-bad .u026-msg{color:var(--ux-danger)}
+.u026-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.u026-real:focus-visible{outline:none}
+</style>
+<div class="ux u026">
+  <span class="u026-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 18.5h3"/></svg></span>
+  <p class="u026-t">Enter the verification code</p>
+  <p class="u026-s">The 6-digit code sent to <b>•••• 2981</b></p>
+  <div class="u026-row">
+    <span class="u026-c" style="--i:0"></span><span class="u026-c" style="--i:1"></span><span class="u026-c" style="--i:2"></span>
+    <i class="sep" aria-hidden="true"></i>
+    <span class="u026-c" style="--i:3"></span><span class="u026-c" style="--i:4"></span><span class="u026-c" style="--i:5"></span>
+    <input class="u026-real" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" aria-label="6-digit verification code">
+  </div>
+  <p class="u026-msg">Resend code in 2:59</p>
+  <span class="u026-live" aria-live="polite"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var input = root.querySelector('.u026-real');
+  var cells = Array.prototype.slice.call(root.querySelectorAll('.u026-c'));
+  var msg = root.querySelector('.u026-msg');
+  var live = root.querySelector('.u026-live');
+  function say(t) { msg.textContent = t; live.textContent = t; }
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CODE = '482915', prev = '', timers = [], left = 179, tick = 0;
+  function later(fn, ms) { timers.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function paint() {
+    var v = input.value;
+    cells.forEach(function (c, i) {
+      var ch = v[i] || '';
+      if (ch !== (prev[i] || '')) c.innerHTML = ch ? '<span>' + ch + '</span>' : '';
+      c.classList.toggle('has', !!ch);
+      c.classList.toggle('cur', document.activeElement === input && (i === Math.min(v.length, 5)));
+    });
+    prev = v;
+  }
+  function verify() {
+    root.classList.add('is-check');
+    say('Checking');
+    later(function () {
+      root.classList.remove('is-check');
+      if (input.value === CODE) {
+        root.classList.add('is-ok');
+        say('Verified');
+        input.blur();
+        clearInterval(tick);
+      } else {
+        root.classList.add('is-bad');
+        say('That code doesn’t match. Try again');
+        later(function () { root.classList.remove('is-bad'); input.value = ''; paint(); input.focus(); }, rm ? 600 : 900);
+      }
+    }, rm ? 60 : 640);
+  }
+  input.addEventListener('input', function () {
+    input.value = input.value.replace(/\D/g, '').slice(0, 6);
+    if (root.classList.contains('is-ok')) root.classList.remove('is-ok');
+    paint();
+    if (input.value.length === 6) verify();
+  });
+  input.addEventListener('focus', paint);
+  input.addEventListener('blur', paint);
+  tick = setInterval(function () {
+    if (!root.isConnected) { clearInterval(tick); return; }
+    if (root.classList.contains('is-bad') || root.classList.contains('is-check') || root.classList.contains('is-ok')) return;
+    left = Math.max(0, left - 1);
+    msg.textContent = left ? 'Resend code in ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0') : 'You can resend the code now';
+  }, 1000);
+  paint();
+})();
+</script>

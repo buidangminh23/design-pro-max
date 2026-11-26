@@ -1,0 +1,103 @@
+<!-- Lucian UX/UI Prompt #033 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#033 -->
+<!--
+Element: Inline title editing
+ID: 033 · Category: Inputs & Search · Tags: inline-edit, input, title, save, cancel
+What it does: Press the title and it becomes a field in the very same type, with an underline drawn from the left. Save with Enter and a green gleam sweeps across while the edit time updates; Esc puts the original title back.
+How to use it: Press the title or the pencil icon to edit it. Enter saves, Esc cancels
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#033
+-->
+<style>
+.u033{position:relative;width:350px;height:210px;display:flex;flex-direction:column;justify-content:center;padding:0 24px;border-radius:26px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 26px 50px -34px var(--ux-shadow-strong)}
+.u033-crumb{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ux-ink-3)}
+.u033-crumb i{width:18px;height:18px;border-radius:6px;background:linear-gradient(140deg,#FFB547,#FF7A45)}
+.u033-row{position:relative;display:flex;align-items:center;gap:8px;height:50px;margin:12px 0 10px}
+.u033-view,.u033-in{font:inherit;font-size:28px;font-weight:800;letter-spacing:-.045em;line-height:44px;color:var(--ux-ink)}
+.u033-view{position:relative;max-width:290px;padding:0 6px;margin-left:-6px;border:0;border-radius:10px;background:none;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;transition:background-color .25s var(--ux-ease)}
+.u033-view:hover{background:var(--ux-surface-2)}
+.u033-view:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u033-view.flash::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(100deg,transparent 20%,color-mix(in srgb,var(--ux-mint) 40%,transparent) 50%,transparent 80%);animation:u033-sweep .8s var(--ux-ease) forwards}
+@keyframes u033-sweep{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.u033-pen{width:34px;height:34px;flex:none;border:0;padding:0;border-radius:10px;background:var(--ux-surface-2);color:var(--ux-ink-2);display:grid;place-items:center;opacity:0;transform:translateX(-6px);transition:opacity .25s,transform .4s var(--ux-spring)}
+.u033-row:hover .u033-pen,.u033-pen:focus-visible{opacity:1;transform:none}
+@media (hover:none){.u033-pen{opacity:1;transform:none}}
+.u033-pen:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u033-pen svg,.u033-act svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u033-edit{position:absolute;inset:0;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s var(--ux-ease)}
+.u033-in{flex:1;min-width:0;height:44px;padding:0;border:0;outline:0;background:none}
+.u033-line{position:absolute;left:0;right:88px;bottom:0;height:2.5px;border-radius:2px;background:var(--ux-accent);transform:scaleX(0);transform-origin:0 50%;transition:transform .45s var(--ux-ease)}
+.u033-act{width:38px;height:38px;flex:none;border:0;padding:0;border-radius:12px;display:grid;place-items:center;transform:scale(.6);opacity:0;transition:transform .45s var(--ux-spring),opacity .2s}
+.u033-act.ok{background:var(--ux-ink);color:var(--ux-page)}
+.u033-act.no{background:var(--ux-surface-2);color:var(--ux-ink-2)}
+.u033-act:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u033.is-edit .u033-view,.u033.is-edit .u033-pen{visibility:hidden}
+.u033.is-edit .u033-edit{opacity:1;pointer-events:auto}
+.u033.is-edit .u033-line{transform:none}
+.u033.is-edit .u033-act{transform:none;opacity:1}
+.u033.is-edit .u033-act.no{transition-delay:.05s}
+.u033.is-shake .u033-row{animation:u033-shake .4s var(--ux-ease)}
+@keyframes u033-shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-2px)}}
+.u033-meta{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ux-ink-3)}
+.u033-av{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#BFE3FF,#5B8CFF 60%,#8B6CFF)}
+.u033-when{transition:color .4s var(--ux-ease)}
+.u033-when.is-new{color:var(--ux-mint);font-weight:650}
+.u033-in:focus-visible{outline:none}
+</style>
+<div class="ux u033">
+  <div class="u033-crumb"><i aria-hidden="true"></i>Marketing <span aria-hidden="true">/</span> Planning</div>
+  <div class="u033-row">
+    <button class="u033-view" type="button" aria-label="Edit title: Q4 campaign plan">Q4 campaign plan</button>
+    <button class="u033-pen" type="button" aria-label="Edit title" tabindex="-1"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M11.5 3.5l3 3L6 15H3v-3z"/></svg></button>
+    <div class="u033-edit">
+      <input class="u033-in" type="text" aria-label="Document title" maxlength="40">
+      <button class="u033-act ok" type="button" aria-label="Save"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.2 3.2L14 5.5"/></svg></button>
+      <button class="u033-act no" type="button" aria-label="Cancel"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M5 5l8 8M13 5l-8 8"/></svg></button>
+      <span class="u033-line" aria-hidden="true"></span>
+    </div>
+  </div>
+  <div class="u033-meta"><span class="u033-av" aria-hidden="true"></span>Seojun Yoon · <span class="u033-when" aria-live="polite">Edited 3 min ago</span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var view = root.querySelector('.u033-view');
+  var pen = root.querySelector('.u033-pen');
+  var input = root.querySelector('.u033-in');
+  var ok = root.querySelector('.ok'), no = root.querySelector('.no');
+  var when = root.querySelector('.u033-when');
+  var title = view.textContent;
+  function edit() {
+    root.classList.add('is-edit');
+    input.value = title;
+    input.focus();
+    input.select();
+  }
+  function shake() { root.classList.remove('is-shake'); void root.offsetWidth; root.classList.add('is-shake'); }
+  function done(save) {
+    if (!root.classList.contains('is-edit')) return;
+    var v = input.value.trim();
+    if (save && !v) { shake(); input.focus(); return; }
+    root.classList.remove('is-edit');
+    if (save && v !== title) {
+      title = v;
+      view.textContent = v;
+      view.setAttribute('aria-label', 'Edit title: ' + v);
+      view.classList.remove('flash'); void view.offsetWidth; view.classList.add('flash');
+      when.textContent = 'Saved just now';
+      when.classList.add('is-new');
+    } else if (!save) shake();
+    view.focus();
+  }
+  view.addEventListener('click', edit);
+  pen.addEventListener('click', edit);
+  ok.addEventListener('click', function () { done(true); });
+  no.addEventListener('click', function () { done(false); });
+  input.addEventListener('keydown', function (e) {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Enter') { e.preventDefault(); done(true); }
+    if (e.key === 'Escape') { e.preventDefault(); done(false); }
+  });
+  input.addEventListener('blur', function () { setTimeout(function () { if (root.isConnected && !root.contains(document.activeElement)) done(true); }, 0); });
+})();
+</script>

@@ -1,0 +1,169 @@
+<!-- Lucian UX/UI Prompt #100 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#100 -->
+<!--
+Element: Folding flip timer
+ID: 100 · Category: Widgets & Charts · Tags: timer, flip-clock, countdown, pomodoro, 3d
+What it does: The top half of each digit card folds forward from the center hinge and the bottom half follows, unfolding into the next number. Only the digits that change flip; in the last 10 seconds the digits turn orange, and when it ends the cards shake once and a restart button appears.
+How to use it: Pick 15s and press Start to watch the last 10 seconds and the finish. “+1m” adds a minute even while it runs
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#100
+-->
+<style>
+.u100{position:relative;width:340px;height:400px;display:flex;flex-direction:column;align-items:center;padding:22px 18px 18px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u100-h{align-self:stretch;display:flex;align-items:baseline;justify-content:space-between}
+.u100-h b{font-size:19px;font-weight:850;letter-spacing:-.04em}
+.u100-st{font-size:12.5px;font-weight:750;color:var(--ux-ink-3);transition:color .3s}
+.u100.warn .u100-st{color:#F59E0B}
+.u100.done .u100-st{color:var(--ux-mint)}
+.u100-clk{display:flex;align-items:center;gap:6px;margin-top:26px}
+.u100-clk.shake{animation:u100-sh .5s var(--ux-ease)}
+@keyframes u100-sh{20%{transform:translateX(-6px) rotate(-1deg)}45%{transform:translateX(5px) rotate(1deg)}70%{transform:translateX(-3px)}}
+.u100-fl{position:relative;width:60px;height:88px;border-radius:12px;font-size:66px;font-weight:800;letter-spacing:-.03em;line-height:88px;text-align:center;color:#F3F1EC;box-shadow:0 0 0 1px var(--ux-line),0 10px 20px -12px rgba(0,0,0,.6);font-variant-numeric:tabular-nums}
+.u100.warn .u100-fl{color:#FFB547}
+.u100-fl>span{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:#1F2027}
+.u100-fl>span b{position:absolute;left:0;right:0;height:88px;font:inherit;transition:color .3s}
+.u100-t,.u100-ft{top:0;border-radius:12px 12px 0 0;transform-origin:50% 100%;background:linear-gradient(#26272F,#1F2027)!important}
+.u100-b,.u100-fb{bottom:0;border-radius:0 0 12px 12px;transform-origin:50% 0}
+.u100-b b,.u100-fb b{top:-44px}
+.u100-t b,.u100-ft b{top:0}
+.u100-ft{z-index:2;transform:perspective(320px) rotateX(-90deg)}
+.u100-fb{z-index:2;transform:perspective(320px) rotateX(90deg)}
+.u100-fl::after{content:"";position:absolute;left:0;right:0;top:50%;z-index:3;height:2px;margin-top:-1px;background:rgba(0,0,0,.55)}
+.u100-co{display:flex;flex-direction:column;gap:14px;padding:0 3px}
+.u100-co i{width:8px;height:8px;border-radius:50%;background:var(--ux-ink-3)}
+.u100.run .u100-co i{animation:u100-blink 1s steps(1) infinite}
+@keyframes u100-blink{50%{opacity:.25}}
+.u100-pr{align-self:stretch;height:4px;margin:24px 8px 0;border-radius:2px;background:var(--ux-surface-3);overflow:hidden}
+.u100-pr i{display:block;height:100%;border-radius:inherit;background:var(--ux-accent);transform-origin:0 50%;transform:scaleX(var(--p,1));transition:transform .3s linear,background-color .3s}
+.u100.warn .u100-pr i{background:#F59E0B}
+.u100.done .u100-pr i{background:var(--ux-mint)}
+.u100-ps{display:flex;gap:6px;margin-top:22px}
+.u100-ps button{height:34px;padding:0 13px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:12.5px;font-weight:780;color:var(--ux-ink-2);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}
+.u100-ps button:hover{background:var(--ux-surface-3);color:var(--ux-ink)}
+.u100-ps button:active{transform:scale(.94)}
+.u100-ps button[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-page)}
+.u100-ps .more{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ux-line-2)}
+.u100-ss{align-self:stretch;display:flex;align-items:center;gap:10px;margin-top:auto;padding:10px 14px;border-radius:14px;background:var(--ux-surface-2);font-size:12.5px;font-weight:700;color:var(--ux-ink-2)}
+.u100-ss span{display:flex;gap:5px}
+.u100-ss i{width:10px;height:10px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ux-line-2);transition:background-color .3s,box-shadow .3s}
+.u100-ss i.on{background:var(--ux-accent);box-shadow:none}
+.u100-ss i.pop{animation:u100-pop .6s var(--ux-spring)}
+@keyframes u100-pop{40%{transform:scale(1.8)}}
+.u100-ctl{align-self:stretch;display:flex;gap:8px;margin-top:14px}
+.u100-go{flex:1;height:52px;border:0;border-radius:17px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--ux-accent);color:var(--ux-accent-ink);font-size:15px;font-weight:800;transition:transform .3s var(--ux-spring),background-color .3s}
+.u100-go:active{transform:scale(.97)}
+.u100.run .u100-go{background:var(--ux-ink);color:var(--ux-page)}
+.u100-go svg{width:16px;height:16px;fill:currentColor}
+.u100-rs{width:52px;height:52px;border:0;padding:0;border-radius:17px;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-2);transition:transform .4s var(--ux-spring),background-color .2s}
+.u100-rs:hover{background:var(--ux-surface-3)}
+.u100-rs:active{transform:rotate(-60deg) scale(.92)}
+.u100-rs svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u100-ps button:focus-visible,.u100-go:focus-visible,.u100-rs:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u100">
+  <div class="u100-h"><b>Focus timer</b><span class="u100-st" role="status">Ready</span></div>
+  <div class="u100-clk" role="timer" aria-live="off"></div>
+  <div class="u100-pr" aria-hidden="true"><i></i></div>
+  <div class="u100-ps" role="group" aria-label="Pick a duration"></div>
+  <div class="u100-ss"><span aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i></span><b class="u100-sn">2 focus sessions today</b></div>
+  <div class="u100-ctl"><button class="u100-go" type="button"></button><button class="u100-rs" type="button" aria-label="Reset"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3.5 9a5.5 5.5 0 1 0 1.6-3.9M3.5 2.8v3h3"/></svg></button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var clk = root.querySelector('.u100-clk'), st = root.querySelector('.u100-st'), pr = root.querySelector('.u100-pr i'), ps = root.querySelector('.u100-ps'), go = root.querySelector('.u100-go'), rs = root.querySelector('.u100-rs');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.4v11.2L13.2 8z"/></svg>', PAUSE = '<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3.4" y="2.6" width="3.2" height="10.8" rx="1"/><rect x="9.4" y="2.6" width="3.2" height="10.8" rx="1"/></svg>';
+  var cards = [];
+  [0, 1, 'c', 2, 3].forEach(function (k) {
+    if (k === 'c') { var c = document.createElement('span'); c.className = 'u100-co'; c.setAttribute('aria-hidden', 'true'); c.innerHTML = '<i></i><i></i>'; clk.appendChild(c); return; }
+    var f = document.createElement('span');
+    f.className = 'u100-fl'; f.setAttribute('aria-hidden', 'true');
+    f.innerHTML = '<span class="u100-t"><b>0</b></span><span class="u100-b"><b>0</b></span><span class="u100-ft"><b>0</b></span><span class="u100-fb"><b>0</b></span>';
+    clk.appendChild(f);
+    cards.push({ el: f, v: '0', t: f.querySelector('.u100-t b'), b: f.querySelector('.u100-b b'), ft: f.querySelector('.u100-ft'), fb: f.querySelector('.u100-fb') });
+  });
+  function flip(c, v) {
+    if (c.v === v) return;
+    var old = c.v; c.v = v;
+    c.t.textContent = v;
+    c.ft.firstChild.textContent = old; c.fb.firstChild.textContent = v;
+    if (rm) { c.b.textContent = v; return; }
+    c.b.textContent = old;
+    c.ft.getAnimations().forEach(function (a) { a.cancel(); }); c.fb.getAnimations().forEach(function (a) { a.cancel(); });
+    c.ft.animate([{ transform: 'perspective(320px) rotateX(0deg)', filter: 'brightness(1)' }, { transform: 'perspective(320px) rotateX(-90deg)', filter: 'brightness(.6)' }], { duration: 240, easing: 'cubic-bezier(.55,0,.9,.6)' });
+    var a = c.fb.animate([{ transform: 'perspective(320px) rotateX(90deg)', filter: 'brightness(1.5)' }, { transform: 'perspective(320px) rotateX(0deg)', filter: 'brightness(1)' }], { duration: 300, delay: 240, easing: 'cubic-bezier(.2,.9,.3,1.25)', fill: 'forwards' });
+    a.onfinish = function () { c.b.textContent = c.v; a.cancel(); };
+  }
+  var PRE = [[15, '15s'], [60, '1m'], [300, '5m'], [1500, '25m']];
+  var total = 60, left = 60000, end = 0, run = false, timer = 0, last = '', sessions = 2;
+  var pb = PRE.map(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = p[1]; b.setAttribute('aria-pressed', String(p[0] === 60));
+    b.addEventListener('click', function () { setTotal(p[0]); pb.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); });
+    ps.appendChild(b);
+    return b;
+  });
+  var more = document.createElement('button');
+  more.type = 'button'; more.className = 'more'; more.textContent = '+1m';
+  ps.appendChild(more);
+  function show(ms, quiet) {
+    var s = Math.ceil(ms / 1000), str = ('0' + Math.floor(s / 60)).slice(-2) + ('0' + s % 60).slice(-2);
+    if (str.length > 4) str = '9959';
+    str.split('').forEach(function (ch, i) { if (quiet) { cards[i].v = ch; cards[i].t.textContent = ch; cards[i].b.textContent = ch; } else flip(cards[i], ch); });
+    pr.style.setProperty('--p', Math.max(0, Math.min(1, ms / (total * 1000))).toFixed(4));
+    root.classList.toggle('warn', run && s <= 10 && s > 0);
+    if (str !== last) { clk.setAttribute('aria-label', 'Time left ' + Math.floor(s / 60) + ' min ' + s % 60 + ' sec'); last = str; }
+    if (run && s <= 10 && s > 0) st.textContent = s + ' sec left';
+  }
+  function label() { go.innerHTML = (run ? PAUSE + 'Pause' : PLAY + (root.classList.contains('done') ? 'Restart' : left < total * 1000 ? 'Resume' : 'Start')); }
+  function loop() {
+    timer = 0;
+    if (!root.isConnected || !run) return;
+    left = Math.max(0, end - performance.now());
+    show(left);
+    if (left <= 0) return finish();
+    timer = setTimeout(loop, 200);
+  }
+  function finish() {
+    run = false; root.classList.remove('run', 'warn'); root.classList.add('done');
+    st.textContent = 'Done · take a 5-min break';
+    var dots = root.querySelectorAll('.u100-ss i'), n = root.querySelectorAll('.u100-ss i.on').length;
+    if (n >= dots.length) { dots.forEach(function (d) { d.classList.remove('on'); }); n = 0; }
+    dots[n].classList.add('on', 'pop'); setTimeout(function () { dots[n].classList.remove('pop'); }, 700);
+    sessions++; root.querySelector('.u100-sn').textContent = sessions + ' focus sessions today';
+    if (!rm) { clk.classList.remove('shake'); void clk.offsetWidth; clk.classList.add('shake'); }
+    label();
+  }
+  function setTotal(sec) {
+    clearTimeout(timer); run = false; root.classList.remove('run', 'warn', 'done');
+    total = sec; left = sec * 1000;
+    st.textContent = 'Ready';
+    show(left); label();
+  }
+  go.addEventListener('click', function () {
+    if (run) {
+      run = false; clearTimeout(timer); left = Math.max(0, end - performance.now());
+      root.classList.remove('run'); st.textContent = 'Paused'; label();
+      return;
+    }
+    if (root.classList.contains('done')) { root.classList.remove('done'); left = total * 1000; show(left); }
+    run = true; end = performance.now() + left;
+    root.classList.add('run'); st.textContent = 'Focusing';
+    label(); loop();
+  });
+  more.addEventListener('click', function () {
+    if (root.classList.contains('done')) root.classList.remove('done');
+    total += 60;
+    if (run) end += 60000; else left += 60000;
+    if (!run) st.textContent = 'Added 1 min';
+    show(run ? end - performance.now() : left); label();
+    more.animate([{ transform: 'scale(.92)' }, { transform: 'none' }], { duration: 260, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+  });
+  rs.addEventListener('click', function () {
+    var i = pb.findIndex(function (b) { return b.getAttribute('aria-pressed') === 'true'; });
+    setTotal(i >= 0 ? PRE[i][0] : 60);
+  });
+  show(left, true); label();
+})();
+</script>

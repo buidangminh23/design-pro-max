@@ -1,0 +1,126 @@
+<!-- Lucian UX/UI Prompt #315 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#315 -->
+<!--
+Element: Drag-to-trash bin
+ID: 315 · Category: App Screens · Tags: drag, trash, delete, undo, drop
+What it does: Pick up a file and drag it toward the bin: the closer it gets, the more the lid twitches open, and dropping it there sends the file spinning small into the bin as the bin gives a shake. The count stacks up on a badge, and ‘Undo’ pops the last file back out of the bin to its place.
+How to use it: Drag a file onto the bin at the bottom right. With a file focused, Delete works too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#315
+-->
+<style>
+.u315{position:relative;width:340px;height:330px;padding:18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u315-k{margin:0;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u315-f{position:absolute;width:88px;height:96px;border:0;padding:0;border-radius:16px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:grab;touch-action:none;transition:box-shadow .25s,background-color .25s}
+.u315-f.drag{cursor:grabbing;z-index:5;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line-2),0 18px 30px -12px var(--ux-shadow-strong)}
+.u315-f.gone{visibility:hidden}
+.u315-ic{position:relative;width:34px;height:42px;border-radius:6px 12px 6px 6px;background:var(--c);clip-path:polygon(0 0,70% 0,100% 28%,100% 100%,0 100%)}
+.u315-ic::after{content:attr(data-t);position:absolute;left:0;right:0;bottom:6px;text-align:center;font:800 8.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:#fff}
+.u315-f span{font-size:12px;font-weight:700;color:var(--ux-ink-2)}
+.u315-bin{position:absolute;right:20px;bottom:20px;width:72px;height:84px;border:0;padding:0;background:none}
+.u315-bin svg{width:100%;height:100%;overflow:visible}
+.u315-lid{fill:var(--ux-ink-2);transform-box:view-box;transform-origin:58px 22px;transition:transform .25s var(--ux-ease)}
+.u315-can{fill:var(--ux-surface-3);stroke:var(--ux-ink-2);stroke-width:2.5}
+.u315-can-l{stroke:var(--ux-ink-3);stroke-width:2;stroke-linecap:round}
+.u315-bin.hot .u315-can{fill:color-mix(in srgb,var(--ux-danger) 18%,var(--ux-surface-3));stroke:var(--ux-danger)}
+.u315-bin.hot .u315-lid{fill:var(--ux-danger)}
+.u315-n{position:absolute;right:-6px;top:6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:var(--ux-danger);color:#fff;font-size:12px;font-weight:800;line-height:22px;text-align:center;transform:scale(0);transition:transform .45s var(--ux-spring)}
+.u315-n.on{transform:scale(1)}
+.u315-un{position:absolute;left:18px;bottom:20px;height:38px;padding:0 15px;border:0;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);font-size:13px;font-weight:750;transition:transform .35s var(--ux-spring),opacity .3s}
+.u315-un:disabled{opacity:.3}
+.u315-un:active{transform:scale(.93)}
+</style>
+<div class="ux u315">
+  <p class="u315-k">My files</p>
+  <button class="u315-bin" type="button" aria-label="Trash">
+    <svg viewBox="0 0 72 84" aria-hidden="true"><path class="u315-can" d="M12 28h48l-5 50a5 5 0 0 1-5 4H22a5 5 0 0 1-5-4z"/><path class="u315-can-l" d="M29 40v30M43 40v30"/><g class="u315-lid"><rect x="6" y="18" width="60" height="8" rx="4"/><rect x="28" y="12" width="16" height="7" rx="3"/></g></svg>
+    <span class="u315-n" aria-hidden="true">0</span>
+  </button>
+  <button class="u315-un" type="button" disabled>Undo</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bin = root.querySelector('.u315-bin'), lid = root.querySelector('.u315-lid'), badge = root.querySelector('.u315-n'), un = root.querySelector('.u315-un');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var FILES = [['Proposal', 'PDF', '#FF6B6B'], ['Minutes', 'DOC', '#3D8BFF'], ['Budget', 'XLS', '#20C997'], ['Logo draft', 'PNG', '#B197FC']];
+  var SLOT = [[18, 42], [118, 42], [218, 42], [18, 148]];
+  var trash = [];
+  var files = FILES.map(function (f, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u315-f';
+    b.setAttribute('aria-label', f[0] + ', drag to the trash');
+    b.innerHTML = '<i class="u315-ic" style="--c:' + f[2] + '" data-t="' + f[1] + '"></i><span></span>';
+    b.querySelector('span').textContent = f[0];
+    b.style.left = SLOT[i][0] + 'px'; b.style.top = SLOT[i][1] + 'px';
+    root.insertBefore(b, bin);
+    var o = { el: b, i: i, x: 0, y: 0 };
+    drag(o);
+    b.addEventListener('keydown', function (e) { if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); throwAway(o); } });
+    return o;
+  });
+  function binCenter() { return [bin.offsetLeft + 36, bin.offsetTop + 46]; }
+  function dist(o) { var c = binCenter(); return Math.hypot(SLOT[o.i][0] + 44 + o.x - c[0], SLOT[o.i][1] + 48 + o.y - c[1]); }
+  function lidFor(d) {
+    var t = Math.max(0, Math.min(1, (170 - d) / 120));
+    lid.style.transform = 'translateY(' + (-6 * t).toFixed(1) + 'px) rotate(' + (32 * t).toFixed(1) + 'deg)';
+    bin.classList.toggle('hot', d < 70);
+  }
+  function count() {
+    var n = trash.length;
+    badge.textContent = n; badge.classList.toggle('on', n > 0);
+    bin.setAttribute('aria-label', 'Trash, ' + n + ' items');
+    un.disabled = !n;
+  }
+  function shake() { if (!rm && bin.animate) bin.animate([{ transform: 'none' }, { transform: 'rotate(-7deg)' }, { transform: 'rotate(6deg)' }, { transform: 'rotate(-3deg)' }, { transform: 'none' }], { duration: 420 }); }
+  function throwAway(o) {
+    var c = binCenter(), tx = c[0] - SLOT[o.i][0] - 44, ty = c[1] - SLOT[o.i][1] - 60;
+    lidFor(0);
+    var done = function () {
+      o.el.classList.add('gone'); o.el.style.transform = ''; o.x = o.y = 0;
+      trash.push(o); count(); shake();
+      setTimeout(function () { lidFor(999); }, 260);
+    };
+    if (rm || !o.el.animate) { done(); return; }
+    o.el.animate([{ transform: 'translate(' + o.x + 'px,' + o.y + 'px)' }, { transform: 'translate(' + tx + 'px,' + (ty - 30) + 'px) scale(.5) rotate(90deg)', offset: 0.6 }, { transform: 'translate(' + tx + 'px,' + (ty + 10) + 'px) scale(.1) rotate(200deg)', opacity: 0 }], { duration: 480, easing: 'cubic-bezier(.5,0,.5,1)' }).onfinish = done;
+  }
+  function drag(o) {
+    var sx = 0, sy = 0, k = 1, on = false;
+    o.el.addEventListener('pointerdown', function (e) {
+      on = true; var r = root.getBoundingClientRect(); k = root.offsetWidth / (r.width || 1);
+      sx = e.clientX * k; sy = e.clientY * k;
+      o.el.classList.add('drag');
+      try { o.el.setPointerCapture(e.pointerId); } catch (er) {  }
+    });
+    o.el.addEventListener('pointermove', function (e) {
+      if (!on) return;
+      o.x = e.clientX * k - sx; o.y = e.clientY * k - sy;
+      o.el.style.transform = 'translate(' + o.x.toFixed(1) + 'px,' + o.y.toFixed(1) + 'px) rotate(' + Math.max(-8, Math.min(8, o.x * 0.03)).toFixed(1) + 'deg)';
+      lidFor(dist(o));
+    });
+    function up() {
+      if (!on) return;
+      on = false; o.el.classList.remove('drag');
+      if (dist(o) < 70) { throwAway(o); return; }
+      lidFor(999);
+      var fx = o.x, fy = o.y;
+      o.x = o.y = 0;
+      o.el.style.transform = '';
+      if (!rm && o.el.animate) o.el.animate([{ transform: 'translate(' + fx + 'px,' + fy + 'px)' }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+    }
+    o.el.addEventListener('pointerup', up);
+    o.el.addEventListener('pointercancel', up);
+  }
+  un.addEventListener('click', function () {
+    var o = trash.pop();
+    if (!o) return;
+    count(); shake();
+    o.el.classList.remove('gone');
+    var c = binCenter(), tx = c[0] - SLOT[o.i][0] - 44, ty = c[1] - SLOT[o.i][1] - 60;
+    lidFor(0);
+    setTimeout(function () { lidFor(999); }, 380);
+    if (!rm && o.el.animate) o.el.animate([{ transform: 'translate(' + tx + 'px,' + ty + 'px) scale(.2)', opacity: 0 }, { transform: 'translate(' + (tx * 0.5) + 'px,' + (ty * 0.5 - 50) + 'px) scale(.8) rotate(-20deg)', opacity: 1, offset: 0.5 }, { transform: 'none' }], { duration: 620, easing: 'cubic-bezier(.3,1.2,.5,1)' });
+  });
+  count();
+})();
+</script>

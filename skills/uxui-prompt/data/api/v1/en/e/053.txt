@@ -1,0 +1,162 @@
+<!-- Lucian UX/UI Prompt #053 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#053 -->
+<!--
+Element: Swipeable card stack
+ID: 053 · Category: Cards & Content · Tags: swipe, card-stack, drag, gesture, undo
+What it does: Drag the top card and it tilts with your hand while a SAVE or PASS stamp darkens depending on the direction. Throw it far enough and it spins away as the next card rises. Undo brings back the card you just swiped.
+How to use it: Drag the top card left or right and throw it. The buttons below, the left and right arrow keys and Undo work too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#053
+-->
+<style>
+.u053{position:relative;width:330px;height:490px;display:flex;flex-direction:column;align-items:center}
+.u053-deck{position:relative;width:310px;height:390px;outline:none}
+.u053-deck:focus-visible{outline:2px solid var(--ux-accent);outline-offset:6px;border-radius:30px}
+.u053-c{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:var(--g);color:#fff;box-shadow:0 24px 40px -26px rgba(20,10,50,.6);transform:translateY(calc(var(--d) * 14px)) scale(calc(1 - var(--d) * .05));transition:transform .5s var(--ux-spring),opacity .4s;touch-action:none;user-select:none;-webkit-user-select:none}
+.u053-c.top{cursor:grab}
+.u053-c.drag{transition:none;cursor:grabbing}
+.u053-c.hide{opacity:0}
+.u053-c::before{content:"";position:absolute;width:240px;height:240px;right:-70px;top:-60px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 65%)}
+.u053-c::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(10,6,30,.65))}
+.u053-shape{position:absolute;left:50%;top:38%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:42% 58% 52% 48%;background:var(--s);box-shadow:inset -14px -18px 30px rgba(0,0,0,.18),inset 14px 14px 30px rgba(255,255,255,.35)}
+.u053-info{position:absolute;left:20px;right:20px;bottom:20px;z-index:1}
+.u053-info small{font-size:12px;font-weight:700;letter-spacing:.06em;opacity:.8}
+.u053-info b{display:block;margin-top:4px;font-size:24px;font-weight:800;letter-spacing:-.04em}
+.u053-info span{display:flex;gap:6px;margin-top:10px}
+.u053-info em{height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(255,255,255,.2);font-style:normal;font-size:12px;font-weight:700}
+.u053-st{position:absolute;top:26px;z-index:2;padding:6px 12px;border:3px solid;border-radius:12px;font-size:20px;font-weight:900;letter-spacing:.06em;opacity:0}
+.u053-yes{left:22px;color:#7EE8C0;transform:rotate(-14deg)}
+.u053-no{right:22px;color:#FF9BA8;transform:rotate(14deg)}
+.u053-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:28px;background:var(--ux-surface-2);text-align:center;opacity:0;transform:scale(.94);transition:opacity .4s,transform .5s var(--ux-spring)}
+.u053-end.on{opacity:1;transform:none}
+.u053-end b{font-size:18px;font-weight:800;letter-spacing:-.03em}
+.u053-end small{font-size:13px;color:var(--ux-ink-3)}
+.u053-end strong{margin-top:6px;font-size:13px;font-weight:700;color:var(--ux-mint)}
+.u053-sr{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0)}
+.u053-bar{display:flex;align-items:center;gap:18px;margin-top:auto}
+.u053-b{width:60px;height:60px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 12px 22px -14px var(--ux-shadow-strong);transition:transform .35s var(--ux-spring),opacity .3s}
+.u053-b:hover{transform:translateY(-2px)}
+.u053-b:active{transform:scale(.88)}
+.u053-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u053-b[aria-disabled="true"]{opacity:.35}
+.u053-b svg{width:24px;height:24px;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u053-b.no svg{stroke:var(--ux-danger)}
+.u053-b.yes svg{stroke:var(--ux-mint);fill:color-mix(in srgb,var(--ux-mint) 20%,transparent)}
+.u053-b.undo{width:46px;height:46px}
+.u053-b.undo svg{width:19px;height:19px;stroke:var(--ux-ink-2)}
+</style>
+<div class="ux u053">
+  <div class="u053-deck" tabindex="0" role="group" aria-roledescription="card stack" aria-label="Place picks">
+    <div class="u053-end" aria-hidden="true"><b>That’s all for today</b><small>Use Undo to see them again</small><strong></strong></div>
+  </div>
+  <div class="u053-bar">
+    <button class="u053-b no" type="button" aria-label="Pass"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button class="u053-b undo" type="button" aria-label="Undo" aria-disabled="true"><svg viewBox="0 0 24 24"><path d="M9 7H15a5 5 0 0 1 0 10H8M9 7l3-3M9 7l3 3"/></svg></button>
+    <button class="u053-b yes" type="button" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+  </div>
+  <p class="u053-sr" aria-live="polite"></p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var deck = root.querySelector('.u053-deck'), end = root.querySelector('.u053-end'), sr = root.querySelector('.u053-sr');
+  var undoB = root.querySelector('.undo');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [
+    ['Yeonnam · Café', 'Afternoon Greenhouse', ['Quiet', 'Window seats'], 'linear-gradient(160deg,#FFB547,#FF6B8B)', 'linear-gradient(140deg,#FFE2B8,#FF8A65)'],
+    ['Seongsu · Exhibition', 'Garden of Light', ['Booking needed', '2 hours'], 'linear-gradient(160deg,#5B8CFF,#7B61FF)', 'linear-gradient(140deg,#B7A4FF,#3D5BFF)'],
+    ['Mangwon · Bookshop', 'Sea Books', ['Indie press', 'Drinks'], 'linear-gradient(160deg,#22C3A6,#0E7490)', 'linear-gradient(140deg,#A5F2D3,#14B8A6)'],
+    ['Euljiro · Bar', 'Neon House', ['Jazz', 'Till 11 PM'], 'linear-gradient(160deg,#B04FD0,#2B1B6B)', 'linear-gradient(140deg,#FF9BD2,#B04FD0)']
+  ];
+  var cards = D.map(function (d, i) {
+    var c = document.createElement('article');
+    c.className = 'u053-c';
+    c.style.setProperty('--g', d[3]); c.style.setProperty('--s', d[4]);
+    c.setAttribute('aria-label', d[1] + ', ' + d[0]);
+    c.innerHTML = '<span class="u053-st u053-yes" aria-hidden="true">Save</span><span class="u053-st u053-no" aria-hidden="true">Pass</span><span class="u053-shape" aria-hidden="true"></span><div class="u053-info"><small>' + d[0] + '</small><b>' + d[1] + '</b><span>' + d[2].map(function (t) { return '<em>' + t + '</em>'; }).join('') + '</span></div>';
+    deck.appendChild(c);
+    return c;
+  });
+  var idx = 0, hist = [], saved = 0;
+  function layout() {
+    cards.forEach(function (c, i) {
+      var d = i - idx;
+      if (d < 0) return;
+      c.style.setProperty('--d', Math.min(d, 2));
+      c.style.zIndex = 10 - d;
+      c.classList.toggle('hide', d > 2);
+      c.classList.toggle('top', d === 0);
+      c.setAttribute('aria-hidden', String(d !== 0));
+    });
+    var done = idx >= cards.length;
+    end.classList.toggle('on', done);
+    end.setAttribute('aria-hidden', String(!done));
+    end.querySelector('strong').textContent = saved + ' saved';
+    undoB.setAttribute('aria-disabled', String(!hist.length));
+    root.querySelectorAll('.no,.yes').forEach(function (b) { b.setAttribute('aria-disabled', String(done)); });
+  }
+  function stamps(c, x) {
+    c.querySelector('.u053-yes').style.opacity = Math.max(0, Math.min(1, x / 90));
+    c.querySelector('.u053-no').style.opacity = Math.max(0, Math.min(1, -x / 90));
+  }
+  function fling(dir) {
+    var c = cards[idx];
+    if (!c) return;
+    hist.push(dir); if (dir > 0) saved++;
+    idx++;
+    sr.textContent = D[idx - 1][1] + (dir > 0 ? ' saved' : ' passed');
+    stamps(c, dir * 120);
+    c.classList.remove('drag', 'top');
+    c.style.transition = rm ? 'opacity .2s' : 'transform .55s cubic-bezier(.3,.6,.4,1),opacity .55s';
+    c.style.transform = 'translate(' + dir * 420 + 'px,' + (-40) + 'px) rotate(' + dir * 28 + 'deg)';
+    c.style.opacity = '0';
+    layout();
+  }
+  function undo() {
+    if (!hist.length) return;
+    var dir = hist.pop(); if (dir > 0) saved--;
+    idx--;
+    var c = cards[idx];
+    c.style.transition = rm ? 'none' : 'transform .6s var(--ux-spring),opacity .3s';
+    c.style.transform = ''; c.style.opacity = '';
+    stamps(c, 0);
+    sr.textContent = D[idx][1] + ' is back';
+    layout();
+    setTimeout(function () { if (root.isConnected) c.style.transition = ''; }, 650);
+  }
+  var sx = 0, sy = 0, lx = 0, vx = 0, act = null;
+  deck.addEventListener('pointerdown', function (e) {
+    var c = cards[idx];
+    if (!c || !c.contains(e.target) || e.button !== 0) return;
+    act = c; sx = lx = e.clientX; sy = e.clientY; vx = 0;
+    c.classList.add('drag');
+    c.setPointerCapture(e.pointerId);
+  });
+  deck.addEventListener('pointermove', function (e) {
+    if (!act) return;
+    var x = e.clientX - sx, y = e.clientY - sy;
+    vx = e.clientX - lx; lx = e.clientX;
+    act.style.transform = 'translate(' + x + 'px,' + y * 0.4 + 'px) rotate(' + x * 0.07 + 'deg)';
+    stamps(act, x);
+  });
+  function release(e) {
+    if (!act) return;
+    var c = act, x = e.clientX - sx;
+    act = null;
+    c.classList.remove('drag');
+    if (Math.abs(x) > 110 || Math.abs(vx) > 12) fling(x + vx * 6 > 0 ? 1 : -1);
+    else { c.style.transform = ''; stamps(c, 0); }
+  }
+  deck.addEventListener('pointerup', release);
+  deck.addEventListener('pointercancel', release);
+  deck.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); fling(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); fling(-1); }
+    else if (e.key === 'Backspace' || (e.key === 'z' && (e.metaKey || e.ctrlKey))) { e.preventDefault(); undo(); }
+  });
+  root.querySelector('.yes').addEventListener('click', function () { fling(1); });
+  root.querySelector('.no').addEventListener('click', function () { fling(-1); });
+  undoB.addEventListener('click', undo);
+  layout();
+})();
+</script>

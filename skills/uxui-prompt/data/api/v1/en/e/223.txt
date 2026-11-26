@@ -1,0 +1,69 @@
+<!-- Lucian UX/UI Prompt #223 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#223 -->
+<!--
+Element: Shrinking sticky card stack
+ID: 223 · Category: Scroll Motion · Tags: scroll, sticky, stack, cards, features
+What it does: As you scroll, each card comes to rest at the top, and while the next card slides over it, the one underneath shrinks, darkens and recedes. By the last card the stacked cards form steps.
+How to use it: Scroll down inside the card
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#223
+-->
+<style>
+.u223{position:relative;width:300px;height:500px;border-radius:30px;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u223-sc{position:absolute;inset:0;overflow-y:auto;padding:22px 16px 30px;scrollbar-width:none;outline:none}
+.u223-sc::-webkit-scrollbar{display:none}
+.u223-k{margin:0 4px 14px;font-size:22px;font-weight:880;letter-spacing:-.04em}
+.u223-c{position:sticky;height:330px;margin-bottom:24px;padding:20px;border-radius:24px;color:#fff;transform-origin:50% 0;will-change:transform;box-shadow:0 -10px 30px -18px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.u223-c i{font:800 12px/1 ui-monospace,SFMono-Regular,Menlo,monospace;opacity:.7;font-style:normal}
+.u223-c b{display:block;margin-top:auto;font-size:26px;line-height:1.15;font-weight:880;letter-spacing:-.04em}
+.u223-c p{margin:8px 0 0;font-size:14px;line-height:1.5;opacity:.85}
+.u223-art{position:absolute;right:18px;top:18px;width:90px;height:90px;border-radius:26px;background:rgba(255,255,255,.18);transform:rotate(12deg)}
+.u223-art::after{content:"";position:absolute;inset:22px;border-radius:50%;background:rgba(255,255,255,.35)}
+.u223-sh{position:absolute;inset:0;border-radius:inherit;background:#000;opacity:0;pointer-events:none}
+.u223-end{height:120px;display:grid;place-items:center}
+.u223-end button{height:44px;padding:0 22px;border:0;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:800}
+</style>
+<div class="ux u223">
+  <div class="u223-sc" tabindex="0" aria-label="Features, scroll to browse">
+    <p class="u223-k">How it works</p>
+    <div class="u223-list"></div>
+    <div class="u223-end"><button type="button">Get started</button></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u223-sc'), list = root.querySelector('.u223-list');
+  var CARDS = [['01', 'Plan in one place', 'Gather scattered notes and docs onto one board.'], ['02', 'Refine together', 'Comments and versions stay in the same spot.'], ['03', 'Share instantly', 'Show it beyond your team with a single link.'], ['04', 'Check the numbers', 'Get a summary of the response every morning.']];
+  var BG = ['linear-gradient(150deg,#7048E8,#4C6EF5)', 'linear-gradient(150deg,#F76707,#F59F00)', 'linear-gradient(150deg,#0CA678,#15AABF)', 'linear-gradient(150deg,#E64980,#BE4BDB)'];
+  var cards = CARDS.map(function (c, i) {
+    var el = document.createElement('article');
+    el.className = 'u223-c';
+    el.style.top = (14 + i * 12) + 'px';
+    el.style.background = BG[i];
+    el.innerHTML = '<span class="u223-art" aria-hidden="true"></span><i></i><b></b><p></p><span class="u223-sh" aria-hidden="true"></span>';
+    el.querySelector('i').textContent = c[0];
+    el.querySelector('b').textContent = c[1];
+    el.querySelector('p').textContent = c[2];
+    list.appendChild(el);
+    return el;
+  });
+  var raf = 0;
+  function draw() {
+    raf = 0;
+    var top = sc.getBoundingClientRect().top, k = sc.offsetHeight / (sc.getBoundingClientRect().height || 1);
+    var pos = cards.map(function (c) { return (c.getBoundingClientRect().top - top) * k; });
+    cards.forEach(function (c, i) {
+      var depth = 0;
+      for (var j = i + 1; j < cards.length; j++) {
+        var stick = 14 + j * 12, d = (pos[j] - stick) / 330;
+        depth += Math.max(0, Math.min(1, 1 - d));
+      }
+      c.style.transform = 'scale(' + (1 - depth * 0.06).toFixed(3) + ')';
+      c.querySelector('.u223-sh').style.opacity = (depth * 0.18).toFixed(3);
+    });
+  }
+  sc.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(draw); }, { passive: true });
+  requestAnimationFrame(draw);
+})();
+</script>

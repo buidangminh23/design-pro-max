@@ -1,0 +1,93 @@
+<!-- Lucian UX/UI Prompt #331 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#331 -->
+<!--
+Element: Flick-to-spin prize wheel
+ID: 331 · Category: Promos & Rewards · Tags: wheel, spin, flick, game, prize
+What it does: Flick the eight-slice prize wheel with your hand or press Spin and it whirls fast before friction gradually slows it down. The pointer at the top clicks back each time a slice boundary passes, and when it stops the winning slice glows as the result rises. The harder you flick, the longer it spins.
+How to use it: Drag to flick the wheel, or press the Spin button
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#331
+-->
+<style>
+.u331{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 80% at 50% 35%,#5F3DC4,#2B1A6B 75%);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#fff}
+.u331-wh{position:absolute;left:50%;top:40px;width:240px;height:240px;margin-left:-120px;border-radius:50%;cursor:grab;touch-action:none;filter:drop-shadow(0 14px 20px rgba(0,0,0,.45))}
+.u331-wh:active{cursor:grabbing}
+.u331-wh svg{width:100%;height:100%;display:block}
+.u331-pt{position:absolute;left:50%;top:26px;width:26px;height:36px;margin-left:-13px;transform-origin:50% 8px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.4))}
+.u331-ft{position:absolute;left:0;right:0;bottom:16px;display:flex;align-items:center;justify-content:center;gap:12px}
+.u331-go{border:0;padding:9px 20px;border-radius:999px;background:#FCC419;color:#2B1A6B;font:inherit;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 6px 0 #E67700}
+.u331-go:active{transform:translateY(3px);box-shadow:0 3px 0 #E67700}
+.u331-go:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.u331-rs{min-width:96px;font-size:13px;font-weight:800;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .4s cubic-bezier(.3,1.6,.5,1)}
+.u331-rs.is-on{opacity:1;transform:none}
+</style>
+<div class="ux u331">
+  <div class="u331-wh" role="img" aria-label="Prize wheel, drag to flick"><svg viewBox="-120 -120 240 240" aria-hidden="true"><g class="u331-rot"></g></svg></div>
+  <svg class="u331-pt" viewBox="0 0 26 36" aria-hidden="true"><circle cx="13" cy="8" r="7" fill="#F8F9FA"/><path d="M5 10 L13 34 L21 10 Z" fill="#F8F9FA"/><circle cx="13" cy="8" r="3" fill="#FA5252"/></svg>
+  <div class="u331-ft"><button type="button" class="u331-go">Spin</button><div class="u331-rs" aria-live="polite"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var wh = root.querySelector('.u331-wh'), g = wh.querySelector('.u331-rot'), pt = root.querySelector('.u331-pt'), go = root.querySelector('.u331-go'), rs = root.querySelector('.u331-rs');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SEG = ['Coffee', 'Miss', 'Cookie', 'Sticker', 'Miss', '10%', 'Cake', 'Again'];
+  var COL = ['#FF6B6B', '#495057', '#FCC419', '#51CF66', '#868E96', '#4DABF7', '#F783AC', '#9775FA'], N = 8, R = 112;
+  var h = '';
+  SEG.forEach(function (s, i) {
+    var a0 = (i / N) * 2 * Math.PI - Math.PI / 2, a1 = ((i + 1) / N) * 2 * Math.PI - Math.PI / 2, am = (a0 + a1) / 2;
+    h += '<path class="u331-s" d="M0 0 L' + (Math.cos(a0) * R).toFixed(2) + ' ' + (Math.sin(a0) * R).toFixed(2) + ' A' + R + ' ' + R + ' 0 0 1 ' + (Math.cos(a1) * R).toFixed(2) + ' ' + (Math.sin(a1) * R).toFixed(2) + ' Z" fill="' + COL[i] + '" stroke="#fff" stroke-width="2"/>';
+    h += '<text transform="rotate(' + (am * 180 / Math.PI + 90).toFixed(2) + ') translate(0 -74)" text-anchor="middle" font-size="13" font-weight="900" fill="#fff" font-family="system-ui,-apple-system,sans-serif">' + s + '</text>';
+  });
+  for (var k = 0; k < N; k++) { var a = (k / N) * 2 * Math.PI - Math.PI / 2; h += '<circle cx="' + (Math.cos(a) * (R - 6)).toFixed(2) + '" cy="' + (Math.sin(a) * (R - 6)).toFixed(2) + '" r="3" fill="#FFF3BF"/>'; }
+  h += '<circle r="' + (R + 4) + '" fill="none" stroke="#FFD43B" stroke-width="8"/><circle r="22" fill="#fff"/><circle r="12" fill="#FCC419"/>';
+  g.innerHTML = h;
+  var segs = g.querySelectorAll('.u331-s');
+  var ang = 0, vel = 0, flap = 0, raf = 0, last = 0, spinning = false, lastSeg = 0;
+  function apply() { g.setAttribute('transform', 'rotate(' + ang.toFixed(2) + ')'); pt.style.transform = 'rotate(' + flap.toFixed(1) + 'deg)'; }
+  function under() { var a = ((-ang % 360) + 360) % 360; return Math.floor(a / (360 / N)) % N; }
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+    if (!drag) {
+      vel *= Math.pow(0.42, dt); if (Math.abs(vel) < 260) vel -= Math.sign(vel) * 60 * dt;
+      ang += vel * dt;
+    }
+    var seg = Math.floor(ang / (360 / N));
+    if (seg !== lastSeg) { flap = Math.max(-28, Math.min(28, -Math.sign(vel || 1) * Math.min(28, 8 + Math.abs(vel) / 40))); lastSeg = seg; }
+    flap *= Math.pow(0.0005, dt);
+    apply();
+    if (!drag && spinning && Math.abs(vel) < 6) { spinning = false; vel = 0; finish(); }
+    if (drag || spinning || Math.abs(flap) > 0.3) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function finish() {
+    var i = under();
+    [].forEach.call(segs, function (s, j) { s.style.filter = j === i ? 'brightness(1.25) drop-shadow(0 0 6px #fff)' : 'brightness(.75)'; });
+    rs.textContent = 'Result: ' + SEG[i]; rs.classList.add('is-on');
+  }
+  function start(v) {
+    [].forEach.call(segs, function (s) { s.style.filter = ''; }); rs.classList.remove('is-on');
+    if (rm) { ang += Math.sign(v) * (720 + Math.random() * 360); apply(); finish(); return; }
+    vel = v; spinning = true; kick();
+  }
+  go.addEventListener('click', function () { if (spinning) return; start(900 + Math.random() * 500); });
+  var drag = null;
+  function angAt(e) { var r = wh.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI; }
+  wh.addEventListener('pointerdown', function (e) { drag = { la: angAt(e), hist: [[performance.now(), ang]] }; spinning = false; vel = 0; rs.classList.remove('is-on'); [].forEach.call(segs, function (s) { s.style.filter = ''; }); try { wh.setPointerCapture(e.pointerId); } catch (_) {} kick(); });
+  wh.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var a = angAt(e), d = a - drag.la; if (d > 180) d -= 360; if (d < -180) d += 360;
+    drag.la = a; ang += d; drag.hist.push([performance.now(), ang]); if (drag.hist.length > 40) drag.hist.shift(); if (rm) apply();
+  });
+  function end() {
+    if (!drag) return;
+    var h2 = drag.hist, now = performance.now(), j = h2.length - 1; while (j > 0 && now - h2[j][0] < 120) j--;
+    var v = (ang - h2[j][1]) / Math.max(0.05, (now - h2[j][0]) / 1000); drag = null;
+    if (Math.abs(v) > 120) start(Math.max(-1800, Math.min(1800, v * 1.3))); else kick();
+  }
+  wh.addEventListener('pointerup', end); wh.addEventListener('pointercancel', end);
+  apply();
+})();
+</script>

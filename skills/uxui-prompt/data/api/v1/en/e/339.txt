@@ -1,0 +1,78 @@
+<!-- Lucian UX/UI Prompt #339 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#339 -->
+<!--
+Element: Drag-and-snap card carousel
+ID: 339 · Category: Sections & Content · Tags: carousel, slider, drag, snap, cards
+What it does: Popular template cards run sideways, with the next card peeking in on the right. Drag the row and it follows your hand; let go and it glides as far as you flung it before snapping onto the nearest card. The arrows in the top right also move one card at a time, the progress bar below fills to show where you are, and the arrows dim at the start and end.
+How to use it: Drag the card row sideways or press the arrows
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#339
+-->
+<style>
+.u339{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u339-hd{position:absolute;left:20px;right:16px;top:20px;display:flex;align-items:center;gap:6px}
+.u339-hd b{margin-right:auto;font-size:15px;font-weight:900;letter-spacing:-.025em}
+.u339-hd button{width:32px;height:32px;border:0;border-radius:50%;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink);display:grid;place-items:center;cursor:pointer;transition:opacity .2s,transform .15s}
+.u339-hd button:active{transform:scale(.92)}
+.u339-hd button:disabled{opacity:.35;cursor:default}
+.u339-hd button svg{width:14px;height:14px}
+.u339-hd button:focus-visible,.u339-tr:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u339-tr{position:absolute;left:0;right:0;top:66px;height:214px;overflow:hidden;cursor:grab;touch-action:pan-y;user-select:none}
+.u339-tr.is-drag{cursor:grabbing}
+.u339-rw{display:flex;gap:12px;padding:0 20px;will-change:transform}
+.u339-cd{flex:none;width:196px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 12px 24px -16px var(--ux-shadow-strong);overflow:hidden;transition:transform .3s}
+.u339-th{height:132px;position:relative}
+.u339-th::before{content:"";position:absolute;left:14px;right:14px;top:16px;height:14px;border-radius:7px;background:rgba(255,255,255,.65)}
+.u339-th::after{content:"";position:absolute;left:14px;width:58%;top:40px;height:46px;border-radius:9px;background:rgba(255,255,255,.4)}
+.u339-mt{padding:10px 12px}
+.u339-mt b{display:block;font-size:13px;font-weight:850}
+.u339-mt span{display:flex;justify-content:space-between;margin-top:3px;font-size:10.5px;font-weight:650;color:var(--ux-ink-3)}
+.u339-pg{position:absolute;left:20px;right:20px;bottom:24px;height:4px;border-radius:2px;background:var(--ux-line);overflow:hidden}
+.u339-pg i{display:block;height:100%;border-radius:2px;background:var(--ux-ink);transition:width .3s,transform .3s}
+</style>
+<div class="ux u339">
+  <div class="u339-hd"><b>Popular templates this week</b><button type="button" class="u339-pv" aria-label="Previous card"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2.5L4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="u339-nx" aria-label="Next card"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2.5L9.5 7 5 11.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  <div class="u339-tr" tabindex="0" aria-label="Template list, drag sideways to browse"><div class="u339-rw"></div></div>
+  <div class="u339-pg" aria-hidden="true"><i></i></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tr = root.querySelector('.u339-tr'), rw = root.querySelector('.u339-rw'), pv = root.querySelector('.u339-pv'), nx = root.querySelector('.u339-nx'), bar = root.querySelector('.u339-pg i');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var C = [['Startup landing', 'Harin Kim', '2.4k'], ['Portfolio', 'Doyun Lee', '1.9k'], ['Online course', 'Seoyeon Park', '1.6k'], ['Café menu', 'Minjun Choi', '1.2k'], ['Event invite', 'Yuna Jung', '980'], ['Blog', 'Jiho Han', '870']];
+  var G = ['linear-gradient(135deg,#818CF8,#C084FC)', 'linear-gradient(135deg,#FDBA74,#F472B6)', 'linear-gradient(135deg,#5EEAD4,#3B82F6)', 'linear-gradient(135deg,#FCD34D,#F97316)', 'linear-gradient(135deg,#F9A8D4,#A78BFA)', 'linear-gradient(135deg,#86EFAC,#14B8A6)'];
+  C.forEach(function (c, i) { var d = document.createElement('div'); d.className = 'u339-cd'; d.innerHTML = '<div class="u339-th" style="background:' + G[i] + '"></div><div class="u339-mt"><b></b><span><span></span><span>♥ ' + c[2] + '</span></span></div>'; d.querySelector('b').textContent = c[0]; d.querySelector('.u339-mt>span>span').textContent = c[1]; rw.appendChild(d); });
+  var STEP = 208, x = 0, tw = 0, maxX = Math.max(0, C.length * STEP - 12 + 40 - 340);
+  function paint() {
+    rw.style.transform = 'translateX(' + (-x).toFixed(1) + 'px)';
+    var p = maxX ? x / maxX : 0; bar.style.width = (100 / C.length * 2) + '%'; bar.style.transform = 'translateX(' + (p * (C.length / 2 - 1) * 100) + '%)';
+    pv.disabled = x <= 1; nx.disabled = x >= maxX - 1;
+  }
+  function glide(to) {
+    to = Math.max(0, Math.min(maxX, to)); cancelAnimationFrame(tw);
+    if (rm) { x = to; paint(); return; }
+    var from = x, t0 = performance.now(), d = Math.min(650, 260 + Math.abs(to - from) * 0.9);
+    (function f(now) { var k = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - k, 3); x = from + (to - from) * e; paint(); if (k < 1) tw = requestAnimationFrame(f); })(t0);
+  }
+  function snap(v) { var target = x + v * 0.28; return Math.round(target / STEP) * STEP; }
+  var drag = null;
+  tr.addEventListener('pointerdown', function (e) { cancelAnimationFrame(tw); drag = { sx: e.clientX, x0: x, k: 340 / tr.getBoundingClientRect().width, h: [[performance.now(), e.clientX]] }; tr.classList.add('is-drag'); try { tr.setPointerCapture(e.pointerId); } catch (er) {} });
+  tr.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var d = (drag.sx - e.clientX) * drag.k, nxv = drag.x0 + d;
+    if (nxv < 0) nxv = nxv / 3; else if (nxv > maxX) nxv = maxX + (nxv - maxX) / 3;
+    x = nxv; paint(); drag.h.push([performance.now(), e.clientX]); if (drag.h.length > 6) drag.h.shift();
+  });
+  function up() {
+    if (!drag) return;
+    var h = drag.h, a = h[0], b = h[h.length - 1], dt = (b[0] - a[0]) / 1000, v = dt > 0.01 ? -(b[1] - a[1]) * drag.k / dt : 0;
+    drag = null; tr.classList.remove('is-drag'); glide(snap(Math.max(-1800, Math.min(1800, v))));
+  }
+  tr.addEventListener('pointerup', up); tr.addEventListener('pointercancel', up);
+  pv.addEventListener('click', function () { glide(Math.round(x / STEP) * STEP - STEP); });
+  nx.addEventListener('click', function () { glide(Math.round(x / STEP) * STEP + STEP); });
+  tr.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { e.preventDefault(); nx.click(); } if (e.key === 'ArrowLeft') { e.preventDefault(); pv.click(); } });
+  paint();
+})();
+</script>

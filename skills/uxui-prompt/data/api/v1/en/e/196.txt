@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #196 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#196 -->
+<!--
+Element: Shared control handoff
+ID: 196 · Category: Workflow & Systems · Tags: control-handoff, new-century
+What it does: A co-editing screen for passing edit control between people. Press someone’s cursor to hand them control, and the shape follows their edits.
+How to use it: Press Seoyeon’s or Minho’s cursor to hand over control
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#196
+-->
+<style>
+.u196 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u196 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u196 button:active{transform:translateY(1px)}.u196 button:disabled{opacity:.4;cursor:default}.u196 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u196 .muted{color:var(--ux-ink-2);font-size:12px}.u196 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u196 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u196 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u196 input,.u196 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u196 output{font-variant-numeric:tabular-nums}.u196 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u196 *,.u196 *::before,.u196 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u196 .canvas{height:180px;position:relative;border:1px solid var(--ux-line-2);border-radius:11px;background:var(--ux-surface);overflow:hidden;margin:17px 0}.u196 .art{position:absolute;inset:29px 70px;background:#d7dfce;border:1px solid #a1b398;border-radius:3px;display:grid;place-items:center;font:italic 34px Georgia;color:#34513d;transition:transform .5s,background .5s}.u196 .cursor{position:absolute;left:var(--x);top:var(--y);transition:all .6s cubic-bezier(.22,1,.36,1);opacity:.8;color:var(--color);font-size:23px;line-height:1;z-index:2}.u196 .cursor b{display:block;font:10px system-ui;background:var(--color);color:white;padding:4px 8px;border-radius:4px;margin:1px 0 0 15px;white-space:nowrap}.u196 .cursor.active{opacity:1;filter:drop-shadow(0 3px 3px #0002);transform:translate(7px,-9px)}.u196 .owner{font-size:12px;color:var(--ux-ink-2);min-height:36px;margin-top:12px}.u196 .people{display:flex;gap:7px}.u196 .people button{flex:1;font-size:12px;padding:9px 5px}.u196 .people button[aria-pressed=true]{border-color:var(--ux-ink);background:var(--ux-ink);color:var(--ux-page)}.u196 .dot{height:7px;width:7px;border-radius:50%;background:#699065;display:inline-block;margin-right:5px}.u196 .reset{font-size:11px;border:0;background:none;padding:2px 8px;min-height:28px}
+
+/* Focused composition */
+.u196{max-width:320px}.u196 .canvas{height:225px;margin:0;border:1px solid var(--ux-line);border-radius:10px;background:var(--ux-surface)}.u196 .art{inset:44px 56px;font-size:32px}.u196 button.cursor{width:88px;min-height:43px;height:43px;padding:0;border:0;border-radius:0;background:transparent;text-align:left;color:var(--color);opacity:.75}.u196 .cursor b{font-size:10px;width:max-content;max-width:90px;margin-left:11px;padding:4px 7px}.u196 .cursor.active{opacity:1;filter:drop-shadow(0 3px 3px #0001)}.u196 .cursor:focus-visible{outline-offset:3px}</style>
+<div class="ux u196" data-state="initial"><div class="canvas"><div class="art">Shared<br>ideas.</div><button class="cursor active" data-person="0" aria-label="I have control" aria-pressed="true" style="--x:4%;--y:10%;--color:#367a64">➤<b>Me · editing</b></button><button class="cursor" data-person="1" aria-label="Give control to Seoyeon" aria-pressed="false" style="--x:68%;--y:6%;--color:#a5627c">➤<b>Seoyeon</b></button><button class="cursor" data-person="2" aria-label="Give control to Minho" aria-pressed="false" style="--x:52%;--y:68%;--color:#807044">➤<b>Minho</b></button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};const names=['Me','Seoyeon','Minho'];function choose(n){qa('.cursor').forEach((c,i)=>{c.classList.toggle('active',i===n);c.setAttribute('aria-pressed',i===n);c.querySelector('b').textContent=names[i]+(i===n?' · editing':'')});q('.art').style.transform=['rotate(0deg)','rotate(-7deg)','rotate(7deg)'][n];q('.art').style.background=['#d7dfce','#e6d1dd','#e6dfc5'][n];state('owner-'+n)}qa('.cursor').forEach(b=>b.onclick=()=>choose(+b.dataset.person));})();
+</script>

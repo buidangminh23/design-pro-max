@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #112 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#112 -->
+<!--
+Element: Rhythm step sequencer
+ID: 112 · Category: Layout, Schedule & Design · Tags: sequencer, native, spatial
+What it does: An 8-step drum sequencer with kick, snare and hat rows. Press pads to switch them on or off, and press play to watch the current beat sweep from left to right.
+How to use it: Turn on a few pads, then press play
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#112
+-->
+<style>
+.u112{width:100%;max-width:400px;min-width:0;font-size:13px}.u112 button{font:inherit;color:inherit;cursor:pointer}.u112 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u112 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u112{padding:20px 16px;background:#232936;color:#eee9df;border-radius:13px;border-bottom:6px solid #161b25;max-width:390px}.u112 .steps{display:grid;grid-template-columns:35px repeat(8,1fr);gap:8px 5px}.u112 .steps>span{font-size:11px;align-self:center;color:#b7bfc9;letter-spacing:.04em}.u112 .pad{height:33px;min-width:0;padding:0;background:#3e4655;border:0;border-bottom:3px solid #0004;border-radius:3px}.u112 .pad[aria-pressed=true]{background:#d2a16f}.u112 .pad.playhead{outline:2px solid #aed8c7;outline-offset:2px}.u112 .transport{display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-left:35px;color:#b7bfc9;font:11px ui-monospace,monospace}.u112 .play{height:44px;width:44px;border-radius:50%;border:1px solid #616978;background:transparent;color:#eee9df;font-size:17px}
+</style>
+<div class="ux u112"><div class="steps"></div><div class="transport"><span>120 BPM</span><button class="play" aria-label="Play steps" aria-pressed="false">▶</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let active=new Set([0,4,10,14,16,20]),timer=null,step=-1;const rows=['Kick','Snare','Hat'];q('.steps').innerHTML=rows.map((r,j)=>`<span>${r}</span>`+Array.from({length:8},(_,i)=>`<button class="pad" data-i="${j*8+i}" aria-pressed="false" aria-label="${r} step ${i+1}"></button>`).join('')).join('');function paint(){qa('.pad').forEach(b=>{b.setAttribute('aria-pressed',active.has(+b.dataset.i));b.classList.toggle('playhead',+b.dataset.i%8===step)})}function stop(){clearInterval(timer);timer=null;step=-1;q('.play').textContent='▶';q('.play').setAttribute('aria-label','Play steps');q('.play').setAttribute('aria-pressed',false);paint()}qa('.pad').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;active.has(i)?active.delete(i):active.add(i);paint()});q('.play').onclick=()=>{if(timer){stop();return}q('.play').textContent='Ⅱ';q('.play').setAttribute('aria-label','Stop playback');q('.play').setAttribute('aria-pressed',true);step=0;paint();timer=setInterval(()=>{if(!root.isConnected){stop();return}step=(step+1)%8;paint()},250)};root.onkeydown=e=>{if(e.key==='Escape'){stop();active=new Set([0,4,10,14,16,20]);paint()}};document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});paint();})();
+</script>

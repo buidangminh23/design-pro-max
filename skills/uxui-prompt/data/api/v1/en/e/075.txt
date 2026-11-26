@@ -1,0 +1,146 @@
+<!-- Lucian UX/UI Prompt #075 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#075 -->
+<!--
+Element: Upload progress panel
+ID: 075 · Category: Alerts & Feedback · Tags: upload, progress, toast, retry, collapse
+What it does: As files upload, the ring in the panel header fills with overall progress and counts down the time left. Each file’s bar fills and turns into a check when done, while a failed file stops in red and shows a retry button. Clicking the header folds and unfolds the list.
+How to use it: Press “Upload files” to start. When the video fails midway, press retry, and click the panel header to fold and unfold it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#075
+-->
+<style>
+.u075{position:relative;width:350px;height:330px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.u075-add{align-self:flex-start;height:46px;padding:0 18px 0 14px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:8px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:750;transition:transform .3s var(--ux-spring),opacity .3s}
+.u075-add:active{transform:scale(.95)}
+.u075-add:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u075-add svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u075-add[aria-disabled="true"]{opacity:.4}
+.u075-pan{border-radius:22px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 24px 44px -24px var(--ux-shadow-strong);overflow:hidden;transform:translateY(30px);opacity:0;transition:transform .5s var(--ux-spring),opacity .3s}
+.u075.is-on .u075-pan{transform:none;opacity:1}
+.u075-hd{display:flex;align-items:center;gap:12px;width:100%;height:66px;padding:0 14px;border:0;background:none;text-align:left}
+.u075-hd:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-3px;border-radius:22px}
+.u075-ring{position:relative;width:38px;height:38px;flex:none}
+.u075-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.u075-ring circle{fill:none;stroke-width:3.5}
+.u075-ring .t{stroke:var(--ux-surface-3)}
+.u075-ring .p{stroke:var(--ux-accent);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0) * 100);transition:stroke .3s}
+.u075-ring i{position:absolute;inset:0;display:grid;place-items:center;color:var(--ux-mint);opacity:0;transform:scale(.5);transition:opacity .3s,transform .45s var(--ux-spring)}
+.u075-ring i svg{width:18px;height:18px;transform:none;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u075.is-done .u075-ring .p{stroke:var(--ux-mint)}
+.u075.is-done .u075-ring i{opacity:1;transform:none}
+.u075-ht{flex:1;min-width:0}
+.u075-ht b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.02em}
+.u075-ht small{display:block;margin-top:2px;font-size:12px;font-weight:650;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u075-chev{width:18px;height:18px;fill:none;stroke:var(--ux-ink-3);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s var(--ux-spring)}
+.u075.is-fold .u075-chev{transform:rotate(180deg)}
+.u075-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease)}
+.u075.is-fold .u075-body{grid-template-rows:0fr}
+.u075-body>ul{min-height:0;overflow:hidden;margin:0;padding:0 8px;list-style:none}
+.u075-f{display:flex;align-items:center;gap:12px;padding:10px 6px;border-top:1px solid var(--ux-line)}
+.u075-f:last-child{padding-bottom:14px}
+.u075-ic{width:36px;height:36px;flex:none;border-radius:10px;display:grid;place-items:center;background:var(--c);color:#fff;font-size:10px;font-weight:850;letter-spacing:.02em}
+.u075-fx{flex:1;min-width:0}
+.u075-fx>b{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:720}
+.u075-fx b span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.u075-fx b small{flex:none;font-size:11.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u075-bar{display:block;height:5px;margin-top:7px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u075-bar i{display:block;height:100%;width:100%;border-radius:inherit;background:var(--ux-accent);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:background-color .3s}
+.u075-f.ok .u075-bar i{background:var(--ux-mint)}
+.u075-f.bad .u075-bar i{background:var(--ux-danger)}
+.u075-f.bad .u075-fx b small{color:var(--ux-danger)}
+.u075-st{width:30px;height:30px;flex:none;display:grid;place-items:center}
+.u075-st svg{width:18px;height:18px;fill:none;stroke:var(--ux-mint);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.u075-st path{stroke-dasharray:18;stroke-dashoffset:18;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u075-f.ok .u075-st path{stroke-dashoffset:0}
+.u075-retry{width:30px;height:30px;border:0;padding:0;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-danger) 12%,transparent);color:var(--ux-danger);animation:u075-in .4s var(--ux-spring)}
+.u075-retry svg{stroke:currentColor;width:16px;height:16px}
+.u075-retry path{stroke-dasharray:none;stroke-dashoffset:0}
+.u075-retry:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@keyframes u075-in{from{transform:scale(0)}}
+</style>
+<div class="ux u075">
+  <button class="u075-add" type="button"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 12.5V3.5M5 7l4-4 4 4M3 13v1.5h12V13"/></svg>Upload files</button>
+  <section class="u075-pan" aria-label="Uploads" aria-hidden="true">
+    <button class="u075-hd" type="button" aria-expanded="true" tabindex="-1"><span class="u075-ring" aria-hidden="true"><svg viewBox="0 0 38 38"><circle class="t" cx="19" cy="19" r="16"/><circle class="p" cx="19" cy="19" r="16" pathLength="100"/></svg><i><svg viewBox="0 0 18 18"><path d="M4 9.4l3.2 3.2L14 5.6"/></svg></i></span><span class="u075-ht" aria-live="polite"><b></b><small></small></span><svg class="u075-chev" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 7l4 4 4-4"/></svg></button>
+    <div class="u075-body"><ul></ul></div>
+  </section>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var add = root.querySelector('.u075-add'), pan = root.querySelector('.u075-pan'), hd = root.querySelector('.u075-hd'), ul = root.querySelector('.u075-body ul');
+  var hb = hd.querySelector('b'), hs = hd.querySelector('small');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var F = [['Brand guide.pdf', 12.4, 'PDF', 'linear-gradient(140deg,#FF6B8B,#E5484D)', 1.6], ['Main video.mp4', 48, 'MP4', 'linear-gradient(140deg,#7B61FF,#3D8BFF)', 0.9], ['Icon set.zip', 3.2, 'ZIP', 'linear-gradient(140deg,#FFB547,#FF7A45)', 2.4]];
+  var files = [], raf = 0, last = 0, failed = false;
+  function build() {
+    ul.innerHTML = '';
+    files = F.map(function (f) {
+      var li = document.createElement('li');
+      li.className = 'u075-f';
+      li.innerHTML = '<span class="u075-ic" style="--c:' + f[3] + '" aria-hidden="true">' + f[2] + '</span><span class="u075-fx"><b><span></span><small></small></b><span class="u075-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i></i></span></span><span class="u075-st"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.4l3.2 3.2L14 5.6"/></svg></span>';
+      li.querySelector('b span').textContent = f[0];
+      li.querySelector('.u075-bar').setAttribute('aria-label', f[0] + ' progress');
+      ul.appendChild(li);
+      return { li: li, p: 0, size: f[1], speed: f[4], state: 'up' };
+    });
+  }
+  function paint() {
+    var tot = 0, done = 0, remain = 0, active = 0;
+    files.forEach(function (f) {
+      tot += f.size; done += f.size * f.p;
+      f.li.querySelector('.u075-bar').style.setProperty('--p', f.p.toFixed(3));
+      f.li.querySelector('.u075-bar').setAttribute('aria-valuenow', Math.round(f.p * 100));
+      f.li.querySelector('small').textContent = f.state === 'bad' ? 'Failed · ' + Math.round(f.p * 100) + '%' : f.state === 'ok' ? f.size + 'MB' : Math.round(f.p * 100) + '%';
+      if (f.state === 'up') { active++; remain = Math.max(remain, (1 - f.p) / (f.speed * 0.18)); }
+    });
+    var all = done / tot, ok = files.filter(function (f) { return f.state === 'ok'; }).length, bad = files.filter(function (f) { return f.state === 'bad'; }).length;
+    hd.querySelector('.u075-ring').style.setProperty('--p', all.toFixed(3));
+    root.classList.toggle('is-done', ok === files.length);
+    if (ok === files.length) { hb.textContent = 'Uploaded ' + ok + ' files'; hs.textContent = 'Total ' + tot.toFixed(1) + 'MB'; }
+    else if (active) { hb.textContent = 'Uploading ' + active + (active === 1 ? ' file' : ' files'); hs.textContent = Math.round(all * 100) + '% · about ' + Math.max(1, Math.ceil(remain)) + 's left'; }
+    else if (bad) { hb.textContent = bad + (bad === 1 ? ' file failed' : ' files failed'); hs.textContent = 'Press retry to resume'; }
+  }
+  function loop(now) {
+    if (!root.isConnected) return;
+    var dt = Math.min(64, now - last) / 1000; last = now;
+    var running = false;
+    files.forEach(function (f) {
+      if (f.state !== 'up') return;
+      running = true;
+      f.p = Math.min(1, f.p + dt * f.speed * 0.18 * (rm ? 4 : 1));
+      if (!failed && f.size === 48 && f.p >= 0.64) { failed = true; f.state = 'bad'; f.li.classList.add('bad'); retryBtn(f); }
+      else if (f.p >= 1) { f.state = 'ok'; f.li.classList.add('ok'); }
+    });
+    paint();
+    if (running) raf = requestAnimationFrame(loop);
+    else add.setAttribute('aria-disabled', 'false');
+  }
+  function retryBtn(f) {
+    var st = f.li.querySelector('.u075-st'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'u075-retry'; b.setAttribute('aria-label', 'Retry Main video');
+    b.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v2.5h-2.5"/></svg>';
+    st.innerHTML = ''; st.appendChild(b);
+    b.addEventListener('click', function () {
+      f.state = 'up'; f.li.classList.remove('bad');
+      st.innerHTML = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.4l3.2 3.2L14 5.6"/></svg>';
+      cancelAnimationFrame(raf); last = performance.now(); raf = requestAnimationFrame(loop);
+      hd.focus({ preventScroll: true });
+    });
+  }
+  add.addEventListener('click', function () {
+    if (add.getAttribute('aria-disabled') === 'true') return;
+    add.setAttribute('aria-disabled', 'true');
+    failed = false; build();
+    root.classList.add('is-on'); root.classList.remove('is-fold');
+    pan.setAttribute('aria-hidden', 'false'); hd.tabIndex = 0; hd.setAttribute('aria-expanded', 'true');
+    cancelAnimationFrame(raf); last = performance.now(); raf = requestAnimationFrame(loop);
+  });
+  hd.addEventListener('click', function () {
+    var fold = !root.classList.contains('is-fold');
+    root.classList.toggle('is-fold', fold);
+    hd.setAttribute('aria-expanded', String(!fold));
+  });
+  add.click();
+})();
+</script>

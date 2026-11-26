@@ -1,0 +1,204 @@
+<!-- Lucian UX/UI Prompt #088 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#088 -->
+<!--
+Element: Empty folder that swallows paper
+ID: 088 · Category: Empty & Error States · Tags: empty-state, onboarding, folder, template, list
+What it does: With no projects, an empty folder floats slowly; hover a template and the folder opens a little as a sheet of paper peeks out. Pick a template and the paper flies in, the folder gulps it down and the first item becomes a list, and when everything is deleted the folder settles back down.
+How to use it: Hover a template button and then press it to create your first project. Delete them all with the trash icons to bring the empty screen back
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#088
+-->
+<style>
+.u088{position:relative;width:340px;height:420px;display:flex;flex-direction:column;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u088-top{display:flex;align-items:center;gap:8px;height:66px;flex:none;padding:0 14px 0 22px}
+.u088-top b{font-size:19px;font-weight:850;letter-spacing:-.04em}
+.u088-n{min-width:26px;height:22px;padding:0 7px;border-radius:999px;display:inline-grid;place-items:center;background:var(--ux-surface-2);font-size:12px;font-weight:800;color:var(--ux-ink-2);font-variant-numeric:tabular-nums}
+.u088-add{margin-left:auto;width:38px;height:38px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-ink);color:var(--ux-page);transition:transform .4s var(--ux-spring),opacity .3s}
+.u088-add:hover{transform:rotate(90deg)}
+.u088-add:active{transform:rotate(90deg) scale(.88)}
+.u088-add[aria-disabled="true"]{opacity:.3;transform:none}
+.u088-add svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u088-body{position:relative;flex:1}
+.u088-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 22px 34px;text-align:center;transition:opacity .4s .1s,transform .5s var(--ux-ease) .1s}
+.u088.has .u088-empty{opacity:0;transform:scale(.94);visibility:hidden;transition:opacity .25s,transform .4s var(--ux-ease),visibility 0s .4s}
+.u088-art{position:relative;width:168px;height:138px}
+.u088-fl{animation:u088-f 5s ease-in-out infinite}
+@keyframes u088-f{50%{transform:translateY(-7px)}}
+.u088-art svg{display:block;width:168px;height:128px;overflow:visible;transform-origin:50% 92%}
+.u088-sh{position:absolute;left:34px;right:34px;bottom:0;height:10px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--ux-ink) 16%,transparent),transparent);animation:u088-s 5s ease-in-out infinite}
+@keyframes u088-s{50%{transform:scaleX(.8);opacity:.6}}
+.u088-front,.u088-pp{transform-box:fill-box;transform-origin:50% 100%;transition:transform .55s var(--ux-spring)}
+.u088-pp.b{transition-delay:.04s}
+.u088-art:hover .u088-front,.u088-empty:has(.u088-tpl button:hover,.u088-tpl button:focus-visible) .u088-front{transform:skewX(-7deg) scaleY(.86)}
+.u088-art:hover .u088-pp.a,.u088-empty:has(.u088-tpl button:hover,.u088-tpl button:focus-visible) .u088-pp.a{transform:translateY(-10px) rotate(-5deg)}
+.u088-art:hover .u088-pp.b,.u088-empty:has(.u088-tpl button:hover,.u088-tpl button:focus-visible) .u088-pp.b{transform:translateY(-6px) rotate(4deg)}
+.u088 .u088-art.eat .u088-front{transform:skewX(-12deg) scaleY(.74)}
+.u088 .u088-art.eat .u088-pp.a{transform:translateY(-14px) rotate(-7deg)}
+.u088 .u088-art.eat .u088-pp.b{transform:translateY(-10px) rotate(6deg)}
+.u088-art.gulp svg{animation:u088-gulp .6s var(--ux-ease)}
+@keyframes u088-gulp{30%{transform:scale(1.08,.88)}62%{transform:scale(.97,1.05)}}
+.u088-art.drop svg{animation:u088-drop .85s var(--ux-spring) backwards}
+@keyframes u088-drop{from{transform:translateY(-46px) scale(.85);opacity:0}}
+.u088-t{margin:12px 0 0;font-size:18.5px;font-weight:850;letter-spacing:-.04em}
+.u088-s{margin:6px 0 0;font-size:13.5px;font-weight:600;line-height:1.5;color:var(--ux-ink-3)}
+.u088-tpl{display:flex;gap:6px;margin-top:18px}
+.u088-tpl button{height:38px;padding:0 12px 0 8px;border:0;border-radius:13px;display:inline-flex;align-items:center;gap:7px;background:var(--ux-surface-2);font-size:13px;font-weight:750;color:var(--ux-ink-2);transition:transform .35s var(--ux-spring),background-color .2s,color .2s}
+.u088-tpl button:hover{background:var(--ux-surface-3);color:var(--ux-ink);transform:translateY(-2px)}
+.u088-tpl button:active{transform:scale(.94)}
+.u088-tpl i,.u088-ic{display:grid;place-items:center;background:var(--c);color:#fff}
+.u088-tpl i{width:24px;height:24px;border-radius:8px}
+.u088-tpl svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.u088-full{position:absolute;inset:0;padding:0 12px 12px;opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+.u088.has .u088-full{opacity:1;visibility:visible;transition:opacity .3s .2s}
+.u088-list{margin:0;padding:0;list-style:none}
+.u088-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .38s var(--ux-ease),opacity .25s}
+.u088-it.out{grid-template-rows:0fr;opacity:0}
+.u088-clip{min-height:0;overflow:hidden}
+.u088-row{display:flex;align-items:center;gap:12px;padding:8px 6px 8px 10px;border-radius:16px;transition:background-color 1s}
+.u088-row:hover{background:var(--ux-surface-2);transition-duration:.2s}
+.u088-it.new .u088-row{background:color-mix(in srgb,var(--c) 13%,transparent);animation:u088-in .55s var(--ux-spring) backwards}
+@keyframes u088-in{from{opacity:0;transform:translateY(-14px) scale(.97)}}
+.u088-ic{width:40px;height:40px;flex:none;border-radius:13px}
+.u088-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u088-tx{flex:1;min-width:0}
+.u088-tx b{display:block;font-size:14.5px;font-weight:780;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u088-tx small{display:block;margin-top:2px;font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u088-del{width:36px;height:36px;flex:none;border:0;padding:0;border-radius:11px;display:grid;place-items:center;background:transparent;color:var(--ux-ink-3);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}
+.u088-del:hover{background:color-mix(in srgb,var(--ux-danger) 14%,transparent);color:var(--ux-danger)}
+.u088-del:active{transform:scale(.88)}
+.u088-del svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u088-more{display:flex;align-items:center;gap:12px;width:100%;height:56px;margin-top:4px;padding:0 9px;border:1.5px dashed var(--ux-line-2);border-radius:16px;background:transparent;font-size:13.5px;font-weight:750;color:var(--ux-ink-3);text-align:left;transition:color .2s,border-color .2s,opacity .3s}
+.u088-more i{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;background:var(--ux-surface-2)}
+.u088-more svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.u088-more:hover{color:var(--ux-ink);border-color:var(--ux-ink-3)}
+.u088-more[aria-disabled="true"]{opacity:.55;color:var(--ux-ink-3);border-color:var(--ux-line-2)}
+.u088-fly{position:absolute;left:0;top:0;z-index:5;width:26px;height:32px;border-radius:5px;background:linear-gradient(var(--c,#10B981) 0 7px,transparent 7px),repeating-linear-gradient(180deg,transparent 0 12px,#CBD3E1 12px 14px) 5px 0/16px 100% no-repeat,#fff;box-shadow:0 6px 14px -6px rgba(10,12,20,.45);opacity:0;pointer-events:none}
+.u088-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+</style>
+<div class="ux u088">
+  <div class="u088-top"><b>My projects</b><span class="u088-n" aria-hidden="true">0</span><button class="u088-add" type="button" aria-label="Create new project"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M2.5 8h11"/></svg></button></div>
+  <div class="u088-body">
+    <div class="u088-empty">
+      <div class="u088-art" aria-hidden="true">
+        <div class="u088-fl">
+          <svg viewBox="0 0 168 128">
+            <path d="M16 26a10 10 0 0 1 10-10h34a8 8 0 0 1 6 2.6l8 8.4h68a10 10 0 0 1 10 10v66a10 10 0 0 1-10 10H26a10 10 0 0 1-10-10z" fill="#0B9B70"/>
+            <g class="u088-pp a"><rect x="30" y="26" width="92" height="72" rx="6" fill="#EEF1F7"/><path d="M42 40h48M42 50h62M42 60h36" stroke="#C9D1DF" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="u088-pp b"><rect x="50" y="32" width="90" height="68" rx="6" fill="#fff"/><path d="M62 46h52M62 56h64M62 66h30" stroke="#D3DAE6" stroke-width="3" stroke-linecap="round"/></g>
+            <g class="u088-front"><path d="M10 50a10 10 0 0 1 10-10h128a10 10 0 0 1 10 10.8l-5 52a10 10 0 0 1-10 9.2H25a10 10 0 0 1-10-9.2z" fill="#16C08C"/><path d="M22 47h124" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round"/><rect x="66" y="72" width="36" height="8" rx="4" fill="#fff" fill-opacity=".38"/></g>
+          </svg>
+        </div>
+        <span class="u088-sh"></span>
+      </div>
+      <p class="u088-t">No projects yet</p>
+      <p class="u088-s">Pick a template to start your first project</p>
+      <div class="u088-tpl" role="group" aria-label="Create from template"></div>
+    </div>
+    <div class="u088-full">
+      <ul class="u088-list" aria-label="Project list"></ul>
+      <button class="u088-more" type="button"><i aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M7 2v10M2 7h10"/></svg></i><span>New project</span></button>
+    </div>
+  </div>
+  <span class="u088-fly" aria-hidden="true"></span>
+  <span class="u088-sr" role="status"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var art = root.querySelector('.u088-art'), tplBox = root.querySelector('.u088-tpl'), list = root.querySelector('.u088-list');
+  var add = root.querySelector('.u088-add'), more = root.querySelector('.u088-more'), n = root.querySelector('.u088-n'), fly = root.querySelector('.u088-fly'), live = root.querySelector('.u088-sr');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var MAX = 5;
+  var T = [
+    ['Blank', 'Untitled doc', '#3D8BFF', '<path d="M4 1.8h5.4L12.4 5v9.2H4z"/><path d="M9.4 1.8V5h3"/>'],
+    ['Notes', 'October design sync', '#10B981', '<rect x="2.6" y="2.6" width="10.8" height="10.8" rx="2.4"/><path d="M5.4 6.2h5.2M5.4 9.4h3.4"/>'],
+    ['Roadmap', 'Q4 product roadmap', '#FF8A3D', '<path d="M2 4.2l4-1.8 4 1.8 4-1.8v9.4l-4 1.8-4-1.8-4 1.8z"/><path d="M6 2.4v9.4M10 4.2v9.4"/>']
+  ];
+  T.forEach(function (t, k) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<i style="--c:' + t[2] + '" aria-hidden="true"><svg viewBox="0 0 16 16">' + t[3] + '</svg></i>';
+    b.appendChild(document.createTextNode(t[0]));
+    b.addEventListener('click', function () { create(k, b); });
+    tplBox.appendChild(b);
+  });
+  var tpls = tplBox.querySelectorAll('button');
+  var made = [0, 0, 0], count = 0, busy = false, rot = 0, ts = [];
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function setCount(v) {
+    var dir = v > count ? 1 : -1;
+    count = v;
+    n.textContent = v;
+    if (!rm) n.animate([{ transform: 'translateY(' + dir * 8 + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    var full = v >= MAX;
+    add.setAttribute('aria-disabled', String(full));
+    more.setAttribute('aria-disabled', String(full));
+    more.lastChild.textContent = full ? 'You can create up to 5' : 'New project';
+  }
+  function insert(k) {
+    made[k]++;
+    var t = T[k], name = t[1] + (made[k] > 1 ? ' ' + made[k] : '');
+    var li = document.createElement('li');
+    li.className = 'u088-it new';
+    li.style.setProperty('--c', t[2]);
+    li.innerHTML = '<div class="u088-clip"><div class="u088-row"><span class="u088-ic" aria-hidden="true"><svg viewBox="0 0 16 16">' + t[3] + '</svg></span><span class="u088-tx"><b></b><small></small></span><button class="u088-del" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.2h10M6.2 4.2V2.6h3.6v1.6M4.6 4.2l.6 9.2h5.6l.6-9.2"/></svg></button></div></div>';
+    li.querySelector('b').textContent = name;
+    li.querySelector('small').textContent = 'Just created · ' + t[0];
+    li.querySelector('.u088-del').setAttribute('aria-label', 'Delete ' + name);
+    list.insertBefore(li, list.firstChild);
+    var lost = root.querySelector('.u088-empty').contains(document.activeElement);
+    root.classList.add('has');
+    setCount(count + 1);
+    live.textContent = 'Created “' + name + '”';
+    if (lost) more.focus({ preventScroll: true });
+    later(function () { li.classList.remove('new'); }, 1400);
+  }
+  function create(k, from) {
+    if (busy || count >= MAX) return;
+    if (count > 0 || rm) { insert(k); return; }
+    busy = true;
+    var rr = root.getBoundingClientRect(), s = root.offsetWidth / rr.width;
+    var fr = from.getBoundingClientRect(), ar = art.getBoundingClientRect();
+    var x0 = (fr.left + fr.width / 2 - rr.left) * s, y0 = (fr.top + fr.height / 2 - rr.top) * s;
+    var x1 = (ar.left + ar.width / 2 - rr.left) * s, y1 = (ar.top + ar.height * 0.3 - rr.top) * s;
+    var dx = x1 - x0, dy = y1 - y0;
+    fly.style.setProperty('--c', T[k][2]);
+    fly.style.left = (x0 - 13) + 'px'; fly.style.top = (y0 - 16) + 'px';
+    art.classList.add('eat');
+    fly.animate([
+      { transform: 'translate(0,0) rotate(-10deg) scale(.5)', opacity: 0 },
+      { transform: 'translate(' + dx * 0.45 + 'px,' + (dy * 0.45 - 70) + 'px) rotate(12deg) scale(1.1)', opacity: 1, offset: 0.45 },
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(0deg) scale(.8)', opacity: 1, offset: 0.82 },
+      { transform: 'translate(' + dx + 'px,' + (dy + 26) + 'px) rotate(0deg) scale(.6)', opacity: 0 }
+    ], { duration: 760, easing: 'cubic-bezier(.45,0,.25,1)' });
+    later(function () { art.classList.remove('eat'); art.classList.add('gulp'); }, 700);
+    later(function () { art.classList.remove('gulp'); insert(k); busy = false; }, 1180);
+  }
+  add.addEventListener('click', function () { create(rot++ % 3, add); });
+  more.addEventListener('click', function () { create(rot++ % 3, more); });
+  list.addEventListener('click', function (e) {
+    var b = e.target.closest('.u088-del');
+    if (!b) return;
+    var li = b.closest('li');
+    if (li.classList.contains('out')) return;
+    var had = li.contains(document.activeElement);
+    li.classList.add('out');
+    setCount(count - 1);
+    live.textContent = '‘' + li.querySelector('b').textContent + '’ deleted';
+    if (count === 0) later(function () {
+      if (count !== 0) return;
+      root.classList.remove('has');
+      art.classList.remove('drop'); void art.offsetWidth; art.classList.add('drop');
+      later(function () { art.classList.remove('drop'); }, 900);
+      if (had) tpls[0].focus({ preventScroll: true });
+    }, rm ? 0 : 160);
+    later(function () {
+      li.remove();
+      if (had && count > 0) {
+        var left = list.querySelector('.u088-it:not(.out) .u088-del');
+        (left || more).focus({ preventScroll: true });
+      }
+    }, rm ? 0 : 380);
+  });
+})();
+</script>

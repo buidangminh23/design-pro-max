@@ -1,0 +1,71 @@
+<!-- Lucian UX/UI Prompt #343 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#343 -->
+<!--
+Element: Rocket back-to-top button
+ID: 343 · Category: Navigation · Tags: scroll, back-to-top, progress, button, rocket
+What it does: Scroll far enough down and a round button floats up at the bottom right, its ring filling with how much you have read. Press it and the arrow inside becomes a rocket that blasts off with a flame, while the article glides smoothly back to the top.
+How to use it: Scroll the article down, then press the button at the bottom right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#343
+-->
+<style>
+.u343{position:relative;width:340px;height:340px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u343-sc{position:absolute;inset:0;overflow-y:auto;padding:22px 22px 60px;scrollbar-width:none;outline:none}
+.u343-sc::-webkit-scrollbar{display:none}
+.u343-sc h3{margin:0;font-size:22px;font-weight:880;letter-spacing:-.04em}
+.u343-sc small{display:block;margin:4px 0 14px;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u343-sc p{margin:0 0 14px;font-size:14.5px;line-height:1.75;color:var(--ux-ink-2)}
+.u343-sc i{display:block;height:110px;margin:0 0 14px;border-radius:16px;background:linear-gradient(135deg,#FFE3E3,#E5DBFF)}
+.u343-up{position:absolute;right:16px;bottom:16px;width:52px;height:52px;border:0;padding:0;border-radius:50%;background:var(--ux-ink);color:var(--ux-page);box-shadow:0 12px 24px -10px var(--ux-shadow-strong);opacity:0;transform:translateY(20px) scale(.6);pointer-events:none;transition:opacity .3s,transform .5s var(--ux-spring)}
+.u343.show .u343-up{opacity:1;transform:none;pointer-events:auto}
+.u343-up svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.u343-ring{fill:none;stroke:var(--ux-accent);stroke-width:3;stroke-linecap:round;transform:rotate(-90deg);transform-origin:26px 26px}
+.u343-ar{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:opacity .2s}
+.u343-rk{opacity:0}
+.u343-rk .b{fill:currentColor}
+.u343-rk .w{fill:var(--ux-accent)}
+.u343-rk .f{fill:#FF922B;transform-box:fill-box;transform-origin:50% 0}
+.u343.fly .u343-ar{opacity:0}
+.u343.fly .u343-rk{opacity:1}
+.u343.fly .u343-rk .f{animation:u343-fl .12s linear infinite alternate}
+@keyframes u343-fl{to{transform:scaleY(1.6)}}
+</style>
+<div class="ux u343">
+  <article class="u343-sc" tabindex="0" aria-label="Article, scroll to read"><h3>How small habits add up</h3><small>4 min read</small></article>
+  <button class="u343-up" type="button" aria-label="Back to top">
+    <svg viewBox="0 0 52 52" aria-hidden="true"><circle class="u343-ring" cx="26" cy="26" r="24"/><path class="u343-ar" d="M26 34V18M19 25l7-7 7 7"/><g class="u343-rk"><path class="f" d="M23 33h6l-3 7z"/><path class="b" d="M26 13c4 3 5 9 4 16h-8c-1-7 0-13 4-16z"/><circle class="w" cx="26" cy="22" r="2.2"/><path class="b" d="M22 26l-3 6h4zM30 26l3 6h-4z"/></g></svg>
+  </button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u343-sc'), up = root.querySelector('.u343-up'), ring = root.querySelector('.u343-ring'), rk = root.querySelector('.u343-rk');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var P = ['Pick one tiny thing to do at the same time every day. A glass of water, one page of a book, a single stretch is enough.', 'For the first week, focus only on not skipping it rather than on results. Once you keep a log, you will hate leaving a gap.', 'In the second week, grow it just a little. One page becomes two, one glass becomes two.', 'After a month, your body remembers the habit before your willpower does. That is the time to add one more.', 'What matters is not starting big. Start small and it lasts.'];
+  P.forEach(function (t, i) { var p = document.createElement('p'); p.textContent = t; sc.appendChild(p); if (i === 1) { var im = document.createElement('i'); im.setAttribute('aria-hidden', 'true'); sc.appendChild(im); } });
+  var C = 2 * Math.PI * 24, raf = 0, flying = false;
+  ring.style.strokeDasharray = C;
+  function draw() {
+    raf = 0;
+    var max = sc.scrollHeight - sc.clientHeight, p = max ? sc.scrollTop / max : 0;
+    ring.style.strokeDashoffset = (C * (1 - p)).toFixed(1);
+    if (!flying) root.classList.toggle('show', sc.scrollTop > 120);
+  }
+  sc.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(draw); }, { passive: true });
+  up.addEventListener('click', function () {
+    if (flying) return;
+    flying = true;
+    root.classList.add('fly');
+    var from = sc.scrollTop, t0 = performance.now(), D = rm ? 1 : 900;
+    if (!rm && rk.animate) rk.animate([{ transform: 'none' }, { transform: 'translateY(4px)', offset: 0.15 }, { transform: 'translateY(-260px)' }], { duration: 900, easing: 'cubic-bezier(.6,0,.8,.4)' });
+    (function f(now) {
+      if (!root.isConnected) return;
+      var k = Math.min(1, Math.max(0, (now - t0) / D)), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      sc.scrollTop = from * (1 - e);
+      if (k < 1) { requestAnimationFrame(f); return; }
+      setTimeout(function () { flying = false; root.classList.remove('fly'); draw(); }, 200);
+    })(t0);
+  });
+  draw();
+})();
+</script>

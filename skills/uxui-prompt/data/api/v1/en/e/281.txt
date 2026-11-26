@@ -1,0 +1,79 @@
+<!-- Lucian UX/UI Prompt #281 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#281 -->
+<!--
+Element: Sweeping highlighter
+ID: 281 · Category: Text Motion · Tags: text, highlight, marker, emphasis, reading
+What it does: A highlighter sweeps across the key phrases of a paragraph from left to right, one after another. A phrase that wraps is filled to the end of the first line before continuing on the next, and longer phrases take longer. Change the pen and the strokes bleed into the new color; ‘Redraw’ lifts them off and paints again from the start.
+How to use it: Pick a pen color below or press ‘Redraw’
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#281
+-->
+<style>
+@property --u281-m{syntax:"<color>";inherits:true;initial-value:#FFD43B}
+.u281{position:relative;width:340px;height:318px;display:flex;flex-direction:column;padding:22px 22px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;--u281-m:#FFD43B;transition:--u281-m .7s var(--ux-ease)}
+.u281-k{margin:0;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u281-p{margin:12px 0 0;font-size:19.5px;line-height:1.62;font-weight:650;letter-spacing:-.025em;color:var(--ux-ink-2)}
+.u281-p mark{color:var(--ux-ink);border-radius:3px;
+  background-image:linear-gradient(100deg,transparent .15em,color-mix(in srgb,var(--u281-m) 58%,transparent) .3em,color-mix(in srgb,var(--u281-m) 52%,transparent) calc(100% - .3em),transparent calc(100% - .1em));
+  background-repeat:no-repeat;background-position:0 72%;background-size:0% 62%;transition:background-size var(--d,.6s) cubic-bezier(.55,.1,.3,1) var(--w,0s)}
+.u281.is-on .u281-p mark{background-size:100% 62%}
+.u281.is-off .u281-p mark{transition:background-size .35s ease;background-size:0% 62%}
+.u281-ft{margin-top:auto;display:flex;align-items:center;gap:8px}
+.u281-pens{display:flex;gap:6px;flex:1}
+.u281-pen{position:relative;width:36px;height:36px;border:0;border-radius:12px;background:var(--ux-surface-2);display:grid;place-items:center;transition:transform .35s var(--ux-spring),box-shadow .25s}
+.u281-pen i{width:12px;height:22px;border-radius:3px 3px 6px 6px;background:var(--c);transform:rotate(30deg);box-shadow:inset 0 -6px 0 rgba(0,0,0,.18)}
+.u281-pen[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ux-ink)}
+.u281-pen:active{transform:scale(.9)}
+.u281-again{height:38px;padding:0 15px;border:0;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);font-size:13px;font-weight:750;transition:transform .35s var(--ux-spring)}
+.u281-again:active{transform:scale(.93)}
+</style>
+<div class="ux u281">
+  <p class="u281-k">Design notes · ch. 3</p>
+  <p class="u281-p">A good interface <mark>can be used without explanation</mark>, leaves <mark>a quiet way back</mark> when you slip, and above all <mark>moves at a human pace.</mark></p>
+  <div class="u281-ft">
+    <div class="u281-pens" role="group" aria-label="Pen color">
+      <button class="u281-pen" type="button" aria-pressed="true" aria-label="Yellow" style="--c:#FFD43B"><i></i></button>
+      <button class="u281-pen" type="button" aria-pressed="false" aria-label="Mint" style="--c:#38D9A9"><i></i></button>
+      <button class="u281-pen" type="button" aria-pressed="false" aria-label="Pink" style="--c:#FF6B9D"><i></i></button>
+    </div>
+    <button class="u281-again" type="button">Redraw</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var marks = Array.prototype.slice.call(root.querySelectorAll('mark'));
+  var pens = Array.prototype.slice.call(root.querySelectorAll('.u281-pen'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var t = 0;
+  function timing() {
+    var at = 0.25;
+    marks.forEach(function (m) {
+      var d = Math.min(1.4, 0.25 + m.textContent.length * 0.045);
+      m.style.setProperty('--d', d.toFixed(2) + 's');
+      m.style.setProperty('--w', at.toFixed(2) + 's');
+      at += d + 0.12;
+    });
+  }
+  function draw() {
+    clearTimeout(t);
+    root.classList.remove('is-on');
+    root.classList.add('is-off');
+    t = setTimeout(function () {
+      if (!root.isConnected) return;
+      root.classList.remove('is-off');
+      void root.offsetWidth;
+      root.classList.add('is-on');
+    }, rm ? 0 : 380);
+  }
+  pens.forEach(function (p) {
+    p.addEventListener('click', function () {
+      pens.forEach(function (x) { x.setAttribute('aria-pressed', String(x === p)); });
+      root.style.setProperty('--u281-m', p.style.getPropertyValue('--c'));
+    });
+  });
+  root.querySelector('.u281-again').addEventListener('click', draw);
+  timing();
+  requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.add('is-on'); }); });
+})();
+</script>

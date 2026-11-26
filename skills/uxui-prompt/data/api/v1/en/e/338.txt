@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #338 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#338 -->
+<!--
+Element: Rolling word cube
+ID: 338 · Category: Text Motion · Tags: text, 3d, cube, rotate, hero
+What it does: The key word sits on one face of a 3D box, and each change rolls the box downward to show the next face. As it rolls, the top face darkens and the front brightens, and the caption below turns over too. A progress bar fills while it advances on its own, and hovering pauses it.
+How to use it: Roll it up or down with the arrows, or press a dot below to jump to that word
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#338
+-->
+<style>
+.u338{position:relative;width:340px;height:282px;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u338-k{margin:0;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u338-main{display:flex;align-items:center;gap:12px;margin-top:22px}
+.u338-sc{flex:1;height:72px;perspective:520px}
+.u338-cube{position:relative;width:100%;height:72px;transform-style:preserve-3d;transform:translateZ(-36px) rotateX(var(--r,0deg));transition:transform .9s cubic-bezier(.5,-.25,.3,1.3)}
+.u338-f{position:absolute;inset:0;display:flex;align-items:center;padding:0 18px;border-radius:16px;background:var(--ux-ink);color:var(--ux-page);font-size:42px;font-weight:880;letter-spacing:-.05em;backface-visibility:hidden;transition:filter .9s}
+.u338-f:nth-child(1){transform:rotateX(0deg) translateZ(36px)}
+.u338-f:nth-child(2){transform:rotateX(-90deg) translateZ(36px);background:var(--ux-accent);color:var(--ux-accent-ink)}
+.u338-f:nth-child(3){transform:rotateX(-180deg) translateZ(36px)}
+.u338-f:nth-child(4){transform:rotateX(-270deg) translateZ(36px);background:var(--ux-accent);color:var(--ux-accent-ink)}
+.u338-f:not(.on){filter:brightness(.55)}
+.u338-ar{display:flex;flex-direction:column;gap:6px}
+.u338-up,.u338-dn{width:36px;height:33px;border:0;border-radius:11px;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink);transition:transform .35s var(--ux-spring)}
+.u338-up:active,.u338-dn:active{transform:scale(.9)}
+.u338-ar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u338-d{position:relative;height:48px;margin:18px 0 0;overflow:hidden;font-size:16px;line-height:1.5;font-weight:650;color:var(--ux-ink-2)}
+.u338-d span{position:absolute;left:0;right:0;top:0;transition:transform .7s var(--ux-spring),opacity .4s}
+.u338-d span.out{transform:translateY(-100%);opacity:0}
+.u338-d span.in{transform:translateY(100%);opacity:0}
+.u338-ft{margin-top:auto;display:flex;align-items:center;gap:10px}
+.u338-dots{display:flex;gap:6px}
+.u338-dot{width:26px;height:26px;border:0;border-radius:50%;background:transparent;display:grid;place-items:center}
+.u338-dot::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ux-line-2);transition:background-color .3s,transform .4s var(--ux-spring)}
+.u338-dot[aria-pressed="true"]::before{background:var(--ux-ink);transform:scale(1.3)}
+.u338-bar{flex:1;height:3px;border-radius:3px;background:var(--ux-line);overflow:hidden}
+.u338-bar i{display:block;height:100%;width:100%;background:var(--ux-accent);transform-origin:0 50%;transform:scaleX(0)}
+</style>
+<div class="ux u338">
+  <p class="u338-k">What we do</p>
+  <div class="u338-main">
+    <div class="u338-sc"><div class="u338-cube" aria-live="polite"></div></div>
+    <div class="u338-ar">
+      <button class="u338-up" type="button" aria-label="Previous word"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+      <button class="u338-dn" type="button" aria-label="Next word"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+    </div>
+  </div>
+  <p class="u338-d"></p>
+  <div class="u338-ft"><div class="u338-dots" role="group" aria-label="Pick a word"></div><div class="u338-bar" aria-hidden="true"><i></i></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cube = root.querySelector('.u338-cube'), desc = root.querySelector('.u338-d'), dotsEl = root.querySelector('.u338-dots'), bar = root.querySelector('.u338-bar i');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var WORDS = ['Plan', 'Design', 'Build', 'Run'];
+  var DESC = ['We break the problem down and set the order', 'We draw screens you want to touch', 'We build it fast and solid', 'We stay with you after launch'];
+  var faces = WORDS.map(function (w) { var f = document.createElement('span'); f.className = 'u338-f'; f.textContent = w; cube.appendChild(f); return f; });
+  var dots = WORDS.map(function (w, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u338-dot'; b.setAttribute('aria-label', w); b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () { go(i - idx); });
+    dotsEl.appendChild(b);
+    return b;
+  });
+  var idx = 0, turns = 0, hold = false, timer = 0, anim = null;
+  function go(step) {
+    if (!step) return;
+    idx = (idx + step + 4 * 10) % 4;
+    turns += step;
+    cube.style.setProperty('--r', (turns * 90) + 'deg');
+    faces.forEach(function (f, k) { f.classList.toggle('on', k === idx); f.setAttribute('aria-hidden', String(k !== idx)); });
+    dots.forEach(function (d, k) { d.setAttribute('aria-pressed', String(k === idx)); });
+    var old = desc.querySelector('span:not(.out)'), n = document.createElement('span');
+    n.textContent = DESC[idx]; n.className = 'in';
+    desc.appendChild(n);
+    if (old) { old.className = 'out'; setTimeout(function () { old.remove(); }, 700); }
+    requestAnimationFrame(function () { requestAnimationFrame(function () { n.className = ''; }); });
+    restart();
+  }
+  function restart() {
+    clearTimeout(timer);
+    if (anim) anim.cancel();
+    if (rm || !bar.animate) return;
+    anim = bar.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 2600, easing: 'linear', fill: 'forwards' });
+    if (hold) anim.pause();
+    timer = setTimeout(function tick() { if (!root.isConnected) return; if (hold) { timer = setTimeout(tick, 300); return; } go(1); }, 2600);
+  }
+  root.querySelector('.u338-up').addEventListener('click', function () { go(-1); });
+  root.querySelector('.u338-dn').addEventListener('click', function () { go(1); });
+  cube.addEventListener('pointerenter', function () { hold = true; if (anim) anim.pause(); });
+  cube.addEventListener('pointerleave', function () { hold = false; if (anim) anim.play(); });
+  faces[0].classList.add('on');
+  dots[0].setAttribute('aria-pressed', 'true');
+  var first = document.createElement('span'); first.textContent = DESC[0]; desc.appendChild(first);
+  faces.forEach(function (f, k) { if (k) f.setAttribute('aria-hidden', 'true'); });
+  restart();
+})();
+</script>

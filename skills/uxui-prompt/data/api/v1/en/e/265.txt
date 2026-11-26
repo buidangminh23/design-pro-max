@@ -1,0 +1,115 @@
+<!-- Lucian UX/UI Prompt #265 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#265 -->
+<!--
+Element: Delivery promise with order cutoff
+ID: 265 · Category: Commerce & Pricing · Tags: delivery, countdown, shipping, eta, ecommerce
+What it does: A product page's delivery note counts down “Order within 1 h 23 min for delivery tomorrow” by the second, while the bar below shrinks with the time left before today's dispatch cutoff. Change the address to Jeju and the headline flips to the day after tomorrow, a note replaces the countdown, and a ferry step slides into the delivery steps below so the truck goes that much farther.
+How to use it: Press the address button and switch regions
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#265
+-->
+<style>
+.u265{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u265-cd{position:absolute;left:18px;right:18px;top:20px;padding:16px;border-radius:20px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u265-rw{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:750;color:var(--ux-ink-3)}
+.u265-rg{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 8px 0 10px;border:0;border-radius:8px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:11px;font-weight:850;cursor:pointer}
+.u265-rg svg{width:10px;height:10px;transition:transform .25s}
+.u265.is-open .u265-rg svg{transform:rotate(180deg)}
+.u265-dd{position:absolute;left:62px;top:66px;z-index:3;width:170px;padding:5px;border-radius:13px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 30px -14px var(--ux-shadow-strong);transform-origin:20% 0;transform:scale(.92) translateY(-4px);opacity:0;pointer-events:none;transition:transform .22s cubic-bezier(.3,1.5,.5,1),opacity .15s}
+.u265.is-open .u265-dd{transform:none;opacity:1;pointer-events:auto}
+.u265-op{display:flex;align-items:center;justify-content:space-between;width:100%;height:32px;padding:0 9px;border:0;border-radius:8px;background:none;color:var(--ux-ink);font:inherit;font-size:11.5px;font-weight:750;cursor:pointer}
+.u265-op:hover,.u265-op.g-hov{background:var(--ux-surface-2)}
+.u265-op small{font-size:9.5px;font-weight:800;color:#059669}
+.u265-op small.l{color:#D97706}
+.u265-hd{position:relative;height:30px;margin-top:12px;overflow:hidden}
+.u265-hd b{position:absolute;left:0;top:0;display:flex;align-items:center;gap:8px;height:30px;font-size:19px;font-weight:900;letter-spacing:-.03em;transition:transform .45s cubic-bezier(.3,1.3,.5,1),opacity .3s}
+.u265-hd b i{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:#10B981;color:#fff}
+.u265-hd b i svg{width:13px;height:13px}
+.u265-hd b.is-l i{background:#F59E0B}
+.u265-hd b.is-in{transform:translateY(100%);opacity:0;transition:none}
+.u265-hd b.is-out{transform:translateY(-100%);opacity:0}
+.u265-sb{position:relative;height:18px;margin-top:6px;font-size:11.5px;font-weight:700;color:var(--ux-ink-2)}
+.u265-sb>span{position:absolute;left:0;top:0;transition:opacity .3s,transform .3s}
+.u265-sb>span.is-off{opacity:0;transform:translateY(5px)}
+.u265-sb b{font-weight:900;color:#E11D48;font-variant-numeric:tabular-nums}
+.u265-bar{height:6px;margin-top:10px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u265-bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#F43F5E,#FB923C);transform-origin:0 50%;transition:transform 1s linear,background .3s,opacity .3s}
+.u265.is-late .u265-bar i{opacity:.25}
+.u265-tl{position:absolute;left:30px;right:30px;bottom:44px;height:60px}
+.u265-ln{position:absolute;left:0;right:0;top:22px;height:3px;border-radius:2px;background:var(--ux-surface-3)}
+.u265-ln i{display:block;height:100%;border-radius:2px;background:var(--ux-ink);transition:width .7s cubic-bezier(.3,1,.4,1)}
+.u265-nd{position:absolute;top:16px;width:15px;height:15px;margin-left:-7.5px;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 2.5px var(--ux-surface-3);transition:left .6s cubic-bezier(.3,1.2,.5,1),opacity .35s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.u265-nd.is-done{box-shadow:inset 0 0 0 5px var(--ux-ink)}
+.u265-nd.is-off{opacity:0;transform:scale(.3)}
+.u265-nd span{position:absolute;left:50%;top:22px;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u265-nd.is-x{box-shadow:inset 0 0 0 2.5px #F59E0B}
+.u265-nd.is-x span{color:#D97706}
+.u265-tr{position:absolute;top:-6px;width:26px;height:20px;margin-left:-13px;color:var(--ux-ink);transition:left .7s cubic-bezier(.3,1,.4,1);animation:u265-bob .6s ease-in-out infinite alternate}
+@keyframes u265-bob{to{transform:translateY(-2px)}}
+.u265 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+@media (prefers-reduced-motion: reduce){.u265-hd b,.u265-nd,.u265-tr,.u265-ln i,.u265-bar i,.u265-dd{transition:none}.u265-tr{animation:none}}
+</style>
+<div class="ux u265">
+  <div class="u265-cd">
+    <div class="u265-rw">Ship to<button type="button" class="u265-rg" aria-haspopup="listbox" aria-expanded="false" aria-label="Change address"><span></span><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    <div class="u265-hd" aria-live="polite"></div>
+    <div class="u265-sb"><span class="u265-cn"></span><span class="u265-nt is-off"></span></div>
+    <div class="u265-bar" aria-hidden="true"><i></i></div>
+  </div>
+  <div class="u265-dd" role="listbox"></div>
+  <div class="u265-tl" aria-hidden="true"><div class="u265-ln"><i></i></div><svg class="u265-tr" viewBox="0 0 26 20"><path d="M2 4h13v10H2zM15 7h5l4 4v3h-9z" fill="currentColor"/><circle cx="7" cy="15.5" r="2.6" fill="var(--ux-surface)" stroke="currentColor" stroke-width="1.8"/><circle cx="19" cy="15.5" r="2.6" fill="var(--ux-surface)" stroke="currentColor" stroke-width="1.8"/></svg></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var rg = root.querySelector('.u265-rg'), rgl = rg.querySelector('span'), dd = root.querySelector('.u265-dd'), hd = root.querySelector('.u265-hd'), cn = root.querySelector('.u265-cn'), nt = root.querySelector('.u265-nt'), bar = root.querySelector('.u265-bar i'), tl = root.querySelector('.u265-tl'), ln = root.querySelector('.u265-ln i'), tr = root.querySelector('.u265-tr');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var RG = [['Seoul, Gangnam', 1], ['Busan, Haeundae', 1], ['Jeju City', 2]];
+  var DAY = ['', 'Arrives tomorrow (Thu)', 'Arrives Fri (in 2 days)'], SHORT = ['', 'Tomorrow', 'In 2 days'];
+  var ST = [['Order', 0], ['Ships today', 0], ['Ferry', 2], ['Delivered', 0]];
+  var WIN = 6 * 3600, left = 1 * 3600 + 23 * 60 + 45, cur = -1;
+  nt.textContent = 'Island addresses take one more day by ferry';
+  var O = RG.map(function (r, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u265-op'; b.setAttribute('role', 'option');
+    b.innerHTML = '<span></span><small' + (r[1] > 1 ? ' class="l"' : '') + '></small>'; b.firstChild.textContent = r[0]; b.lastChild.textContent = SHORT[r[1]];
+    b.addEventListener('click', function () { pick(i); setOpen(false); rg.focus({ preventScroll: true }); });
+    dd.appendChild(b); return b;
+  });
+  var N = ST.map(function (s) { var d = document.createElement('div'); d.className = 'u265-nd'; d.innerHTML = '<span></span>'; d.firstChild.textContent = s[0]; tl.appendChild(d); return d; });
+  var TRUCK = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 3.5h7v6h-7zM8.5 5.5h2.6l1.9 2v2h-4.5z" fill="currentColor"/></svg>';
+  function head(k) {
+    var old = hd.firstChild, b = document.createElement('b'); b.innerHTML = '<i>' + TRUCK + '</i><span></span>'; b.lastChild.textContent = DAY[k]; if (k > 1) b.classList.add('is-l');
+    if (!old || rm) { hd.innerHTML = ''; hd.appendChild(b); return; }
+    b.classList.add('is-in'); hd.appendChild(b); void b.offsetWidth; b.classList.remove('is-in'); old.classList.add('is-out'); setTimeout(function () { old.remove(); }, 460);
+  }
+  function steps(k) {
+    var vis = ST.filter(function (s) { return !s[1] || k > 1; }), n = vis.length;
+    ST.forEach(function (s, i) {
+      var d = N[i], j = vis.indexOf(s);
+      d.classList.toggle('is-off', j < 0); d.classList.toggle('is-x', !!s[1]);
+      if (j >= 0) d.style.left = (j / (n - 1) * 100) + '%';
+      d.classList.toggle('is-done', j >= 0 && j <= 1);
+    });
+    var at = (1.5 / (n - 1)) * 100; ln.style.width = at + '%'; tr.style.left = at + '%';
+  }
+  function pick(i) {
+    if (i === cur) return;
+    var k = RG[i][1], was = cur < 0 ? -1 : RG[cur][1]; cur = i;
+    rgl.textContent = RG[i][0]; O.forEach(function (o, j) { o.setAttribute('aria-selected', j === i); });
+    root.classList.toggle('is-late', k > 1);
+    cn.classList.toggle('is-off', k > 1); nt.classList.toggle('is-off', k <= 1);
+    if (k !== was) { head(k); steps(k); }
+  }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function draw() {
+    var h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s = left % 60;
+    cn.innerHTML = '<b></b> '; cn.firstChild.textContent = h + ' h ' + pad(m) + ' min ' + pad(s); cn.appendChild(document.createTextNode(' s left to order'));
+    bar.style.transform = 'scaleX(' + (left / WIN).toFixed(4) + ')';
+  }
+  (function tick() { if (!root.isConnected) return; draw(); left = Math.max(0, left - 1); setTimeout(tick, 1000); })();
+  function setOpen(v) { root.classList.toggle('is-open', v); rg.setAttribute('aria-expanded', v); }
+  rg.addEventListener('click', function () { setOpen(!root.classList.contains('is-open')); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+  pick(0);
+})();
+</script>

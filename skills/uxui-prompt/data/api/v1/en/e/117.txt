@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #117 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#117 -->
+<!--
+Element: Spacing ruler
+ID: 117 · Category: Layout, Schedule & Design · Tags: spacing, native, spatial
+What it does: A measuring tool for the gap between two objects. Move the slider and the objects spread apart or close in, with the dimension line and px value following along.
+How to use it: Move the gap slider
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#117
+-->
+<style>
+.u117{width:100%;max-width:400px;min-width:0;font-size:13px}.u117 button{font:inherit;color:inherit;cursor:pointer}.u117 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u117 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u117{padding:20px 4px;max-width:350px}.u117 .work{display:flex;justify-content:center;align-items:center;gap:var(--gap,32px);height:185px;position:relative;border-bottom:1px solid var(--ux-line-2)}.u117 .object{width:64px;height:64px;background:#91a99c;border-radius:8px;box-shadow:0 5px 0 #61776b}.u117 .object+.object{background:#c3d0c7;box-shadow:0 5px 0 #91a298}.u117 .measure{position:absolute;width:var(--gap,32px);height:12px;border:1px solid var(--ux-ink-2);border-bottom:0;top:40px;left:calc(50% - var(--gap,32px)/2);text-align:center}.u117 .measure output{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;top:-20px;background:var(--ux-page);padding:0 5px;font-size:13px}.u117 label{display:flex;align-items:center;gap:14px;padding-top:22px;color:var(--ux-ink-2)}.u117 label input{height:26px;flex:1}
+</style>
+<div class="ux u117"><div class="work"><div class="object"></div><div class="object"></div><div class="measure"><output aria-live="polite">32 px</output></div></div><label>Gap<input class="gap" type="range" min="8" max="96" step="4" value="32" aria-label="Gap between objects"></label></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];function paint(){let v=q('.gap').value;root.style.setProperty('--gap',v+'px');q('output').textContent=v+' px'}q('.gap').oninput=paint;})();
+</script>

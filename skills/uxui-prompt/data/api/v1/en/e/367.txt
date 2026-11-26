@@ -1,0 +1,130 @@
+<!-- Lucian UX/UI Prompt #367 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#367 -->
+<!--
+Element: Year-by-year population pyramid
+ID: 367 · Category: Data Motion · Tags: population-pyramid, demographics, timeline, cohort, data
+What it does: Five-year age bars stack into a population pyramid, men on the left and women on the right, rolling from 1970 to 2070 as the broad-based triangle turns into a jar and then a top-heavy inverted triangle. The 1958 birth cohort is marked in yellow and climbs one row every five years, while the share aged 65+ and the median age above change along with it. Drag the year bar below to any year and hover a bar to see that age group's numbers.
+How to use it: Pause and drag the year bar, then hover a bar
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#367
+-->
+<style>
+.u367{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u367-hd{position:absolute;left:20px;right:20px;top:18px;display:flex;justify-content:space-between;align-items:baseline}
+.u367-hd b{font-size:14px;font-weight:900}
+.u367-hd span{font-size:10px;font-weight:700;color:var(--ux-ink-3)}
+.u367-yr{position:absolute;left:18px;top:40px;font-size:38px;font-weight:900;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.u367-st{position:absolute;right:20px;top:46px;display:flex;gap:14px;text-align:right}
+.u367-st span{display:block;font-size:9.5px;font-weight:750;color:var(--ux-ink-3)}
+.u367-st b{display:block;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.u367-st div:first-child b{color:#F59E0B}
+.u367-ch{position:absolute;left:0;right:0;top:110px;height:290px}
+.u367-sx{position:absolute;top:-16px;font-size:10px;font-weight:850}
+.u367-r{position:absolute;left:0;right:0;height:13.8px;cursor:default}
+.u367-r:hover{background:var(--ux-surface-2)}
+.u367-m,.u367-f{position:absolute;top:1.4px;bottom:1.4px;border-radius:3px;transition:background .3s}
+.u367-m{right:166px;background:#60A5FA;border-radius:3px 0 0 3px}
+.u367-f{left:166px;background:#F472B6;border-radius:0 3px 3px 0}
+.u367-r.is-co .u367-m,.u367-r.is-co .u367-f{background:#FBBF24}
+.u367-a{position:absolute;left:134px;width:32px;top:0;line-height:13.8px;text-align:center;font-size:8.5px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u367-co{position:absolute;left:0;top:0;z-index:2;padding:1px 6px;border-radius:999px;background:#FBBF24;color:#3B2600;font-size:9px;font-weight:900;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+.u367-tip{position:absolute;left:50%;top:0;padding:5px 9px;border-radius:9px;background:var(--ux-ink);color:var(--ux-surface);font-size:10.5px;font-weight:750;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,-110%);transition:opacity .15s;font-variant-numeric:tabular-nums;z-index:3}
+.u367-tip.is-on{opacity:1}
+.u367-ct{position:absolute;left:18px;right:18px;bottom:16px;display:flex;align-items:center;gap:12px}
+.u367-pp{flex:none;width:34px;height:34px;border:0;border-radius:50%;background:var(--ux-ink);color:var(--ux-surface);display:grid;place-items:center;cursor:pointer}
+.u367-pp svg{width:14px;height:14px}
+.u367-pp .u367-pl{display:none}
+.u367-pp.is-paused .u367-pl{display:block}
+.u367-pp.is-paused .u367-pa{display:none}
+.u367-pp:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u367-sl{position:relative;flex:1;height:36px;cursor:pointer;touch-action:none;border-radius:8px}
+.u367-sl::before{content:"";position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:var(--ux-line)}
+.u367-fl{position:absolute;left:0;top:12px;height:4px;border-radius:2px;background:var(--ux-accent)}
+.u367-th{position:absolute;top:6px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--ux-surface);box-shadow:0 0 0 3px var(--ux-accent),0 4px 10px -3px var(--ux-shadow-strong)}
+.u367-sl em{position:absolute;top:22px;font-style:normal;font-size:8.5px;font-weight:750;color:var(--ux-ink-3);transform:translateX(-50%)}
+.u367-sl:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u367">
+  <div class="u367-hd"><b>Population pyramid</b><span>Illustrative estimate</span></div>
+  <div class="u367-yr" aria-live="polite"></div>
+  <div class="u367-st"><div><span>Aged 65+</span><b class="u367-o"></b></div><div><span>Median age</span><b class="u367-md"></b></div></div>
+  <div class="u367-ch"><span class="u367-sx" style="right:172px;color:#3B82F6">Men</span><span class="u367-sx" style="left:172px;color:#EC4899">Women</span><div class="u367-co"></div><div class="u367-tip"></div></div>
+  <div class="u367-ct">
+    <button type="button" class="u367-pp"><svg class="u367-pa" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="8.4" y="1" width="3.6" height="12" rx="1" fill="currentColor"/></svg><svg class="u367-pl" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z" fill="currentColor"/></svg></button>
+    <div class="u367-sl" role="slider" tabindex="0" aria-label="Year" aria-valuemin="1970" aria-valuemax="2070"><div class="u367-fl"></div><div class="u367-th"></div></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ch = root.querySelector('.u367-ch'), yrEl = root.querySelector('.u367-yr'), oEl = root.querySelector('.u367-o'), mdEl = root.querySelector('.u367-md'), co = root.querySelector('.u367-co'), tip = root.querySelector('.u367-tip');
+  var pp = root.querySelector('.u367-pp'), sl = root.querySelector('.u367-sl'), fl = root.querySelector('.u367-fl'), th = root.querySelector('.u367-th');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var Y0 = 1970, Y1 = 2070, NG = 21, RH = 13.8, BW = 120, SPD = 8, COH = 1958;
+  var BP = [[1880, 40], [1920, 50], [1945, 60], [1955, 85], [1960, 100], [1971, 102], [1975, 88], [1984, 68], [1990, 65], [1995, 71], [2002, 50], [2012, 48], [2017, 36], [2020, 27], [2023, 23], [2030, 25], [2070, 22]];
+  function births(y) { if (y <= BP[0][0]) return BP[0][1]; for (var i = 1; i < BP.length; i++) if (y <= BP[i][0]) { var a = BP[i - 1], b = BP[i]; return a[1] + (b[1] - a[1]) * (y - a[0]) / (b[0] - a[0]); } return BP[BP.length - 1][1]; }
+  function surv(a, y, fem) { var M = 42 + (Math.min(y, 2040) - 1970) * 0.42 + (fem ? 5 : 0); return Math.exp(-Math.pow(Math.max(0, a - M) / 18, 2)); }
+  function pop(y) { var m = [], f = []; for (var g = 0; g < NG; g++) { var sm = 0, sf = 0; for (var k = 0; k < 5; k++) { var a = g * 5 + k + 0.5, b = births(y - a) * 0.5; sm += b * surv(a, y, 0); sf += b * surv(a, y, 1); } m.push(sm); f.push(sf); } return [m, f]; }
+  var MAX = 0; for (var y = Y0; y <= Y1; y += 5) { var p = pop(y); MAX = Math.max(MAX, Math.max.apply(null, p[0]), Math.max.apply(null, p[1])); }
+  var R = [];
+  for (var g = 0; g < NG; g++) (function (g) {
+    var r = document.createElement('div'); r.className = 'u367-r'; r.style.top = ((NG - 1 - g) * RH) + 'px';
+    r.innerHTML = '<span class="u367-m"></span><span class="u367-a">' + (g % 2 ? '' : g * 5) + '</span><span class="u367-f"></span>';
+    r.addEventListener('pointerenter', function () { hov = g; tipShow(); });
+    r.addEventListener('pointerleave', function () { if (hov === g) { hov = -1; tipShow(); } });
+    ch.appendChild(r); R.push({ el: r, m: r.firstChild, f: r.lastChild });
+  })(g);
+  var t = rm ? 2024 : Y0, playing = !rm, drag = false, hold = 0, hov = -1, P = null;
+  function tipShow() {
+    if (hov < 0 || !P) { tip.classList.remove('is-on'); return; }
+    var lab = hov === NG - 1 ? '100+' : hov * 5 + '~' + (hov * 5 + 4);
+    tip.textContent = lab + ' · men ' + Math.round(P[0][hov]) + '0k · women ' + Math.round(P[1][hov]) + '0k';
+    tip.style.top = ((NG - 1 - hov) * RH) + 'px'; tip.classList.add('is-on');
+  }
+  function setPlay(p) { playing = p; pp.classList.toggle('is-paused', !p); pp.setAttribute('aria-label', p ? 'Pause' : 'Play'); }
+  function paint() {
+    P = pop(t);
+    var tot = 0, old = 0, cg = Math.floor((t - COH) / 5);
+    R.forEach(function (r, g) {
+      r.m.style.width = (P[0][g] / MAX * BW).toFixed(1) + 'px'; r.f.style.width = (P[1][g] / MAX * BW).toFixed(1) + 'px';
+      r.el.classList.toggle('is-co', g === cg);
+      var s = P[0][g] + P[1][g]; tot += s; if (g >= 13) old += s;
+    });
+    var acc = 0, med = 0; for (var g = 0; g < NG; g++) { var s = P[0][g] + P[1][g]; if (acc + s >= tot / 2) { med = g * 5 + (tot / 2 - acc) / s * 5; break; } acc += s; }
+    var yy = Math.floor(t); if (yrEl.textContent !== String(yy)) yrEl.textContent = yy;
+    oEl.textContent = (old / tot * 100).toFixed(1) + '%'; mdEl.textContent = Math.round(med) + '';
+    if (cg >= 0 && cg < NG) { co.style.opacity = 1; co.textContent = 'Born 1958'; co.style.transform = 'translate(' + Math.min(240, 166 + P[1][cg] / MAX * BW + 6).toFixed(1) + 'px,' + ((NG - 1 - cg) * RH - 0.5).toFixed(1) + 'px)'; }
+    else co.style.opacity = 0;
+    var p = (t - Y0) / (Y1 - Y0) * 100; fl.style.width = p + '%'; th.style.left = p + '%';
+    sl.setAttribute('aria-valuenow', yy);
+    if (hov >= 0) tipShow();
+  }
+  var raf = 0, last = 0, vis = true;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+    if (playing && !drag) {
+      if (t >= Y1) { hold += dt; if (hold > 1.6) { t = Y0; hold = 0; } }
+      else t = Math.min(Y1, t + dt * SPD);
+      paint();
+    }
+    if (playing || drag) raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  [1970, 2020, 2070].forEach(function (y) { var e = document.createElement('em'); e.style.left = ((y - Y0) / (Y1 - Y0) * 100) + '%'; e.textContent = y; sl.appendChild(e); });
+  function seek(x) { var r = sl.getBoundingClientRect(); t = Y0 + Math.max(0, Math.min(1, (x - r.left) / r.width)) * (Y1 - Y0); hold = 0; paint(); }
+  sl.addEventListener('pointerdown', function (e) { drag = true; setPlay(false); try { sl.setPointerCapture(e.pointerId); } catch (er) {} seek(e.clientX); });
+  sl.addEventListener('pointermove', function (e) { if (drag) seek(e.clientX); });
+  function up() { drag = false; }
+  sl.addEventListener('pointerup', up); sl.addEventListener('pointercancel', up);
+  sl.addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0;
+    if (e.key === 'Home') t = Y0; else if (e.key === 'End') t = Y1; else if (d) t = Math.max(Y0, Math.min(Y1, Math.round(t) + d * (e.shiftKey ? 10 : 1))); else return;
+    e.preventDefault(); setPlay(false); paint();
+  });
+  pp.addEventListener('click', function () { if (!playing && t >= Y1) t = Y0; setPlay(!playing); run(); });
+  setPlay(playing); paint(); run();
+})();
+</script>

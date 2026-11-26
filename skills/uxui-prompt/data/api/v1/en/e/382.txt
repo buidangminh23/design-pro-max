@@ -1,0 +1,68 @@
+<!-- Lucian UX/UI Prompt #382 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#382 -->
+<!--
+Element: Text flowing along a wave
+ID: 382 · Category: Text Motion · Tags: text, svg, path, wave, marquee
+What it does: A line of text flows endlessly along a rippling wave. Change the wave height or flow speed and the curve is redrawn at once, with each letter leaning or standing up to match the slope. Whatever you type in the field rides the wave.
+How to use it: Type your own line in the field, then change the wave height and speed with the sliders
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#382
+-->
+<style>
+.u382{position:relative;width:340px;height:320px;display:flex;flex-direction:column;padding:16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u382-sea{position:relative;height:150px;margin:0 -16px;background:linear-gradient(180deg,transparent 40%,color-mix(in srgb,var(--ux-accent-2) 10%,transparent))}
+.u382-sea svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.u382-ln{fill:none;stroke:color-mix(in srgb,var(--ux-accent-2) 45%,transparent);stroke-width:1.5;stroke-dasharray:3 5}
+.u382-fill{fill:color-mix(in srgb,var(--ux-accent-2) 9%,transparent)}
+.u382-tx{font-size:21px;font-weight:850;letter-spacing:-.01em;fill:var(--ux-ink)}
+.u382-in{width:100%;height:42px;margin-top:6px;padding:0 14px;border:0;border-radius:13px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:14.5px;font-weight:650;color:var(--ux-ink);outline:none}
+.u382-in:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u382-ctl{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:8px 12px;margin-top:12px;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u382-ctl input{width:100%;margin:0;accent-color:var(--ux-accent-2)}
+</style>
+<div class="ux u382">
+  <div class="u382-sea"><svg viewBox="0 0 340 150" aria-hidden="true"><path class="u382-fill"/><path class="u382-ln"/><text class="u382-tx"><textPath></textPath></text></svg></div>
+  <input class="u382-in" type="text" maxlength="36" value="drifting along slowly today" aria-label="Text on the wave">
+  <div class="u382-ctl"><span>Height</span><input class="u382-h" type="range" min="0" max="40" value="20" aria-label="Wave height"><span>Speed</span><input class="u382-s" type="range" min="0" max="120" value="40" aria-label="Flow speed"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ln = root.querySelector('.u382-ln'), fill = root.querySelector('.u382-fill'), tp = root.querySelector('textPath'), tx = root.querySelector('.u382-tx');
+  var input = root.querySelector('.u382-in'), hR = root.querySelector('.u382-h'), sR = root.querySelector('.u382-s');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pid = 'u382-p' + Math.random().toString(36).slice(2, 7);
+  ln.id = pid;
+  tp.setAttribute('href', '#' + pid);
+  var amp = 20, ampNow = 20, speed = 40, phase = 0, off = 0, unit = 0, last = 0;
+  function setText() {
+    var s = (input.value.trim() || ' ') + '  ·  ';
+    tp.textContent = s + s + s + s;
+    unit = 0;
+  }
+  function draw(now) {
+    if (!root.isConnected) return;
+    var dt = Math.max(0, Math.min(50, now - (last || now))) / 1000;
+    last = now;
+    ampNow += (amp - ampNow) * 0.08;
+    phase += dt * 1.6;
+    var d = '', pts = [];
+    for (var i = 0; i <= 60; i++) {
+      var x = -60 + i * 8, y = 78 + ampNow * Math.sin(x / 52 + phase) + ampNow * 0.25 * Math.sin(x / 23 - phase * 1.4);
+      pts.push(x.toFixed(1) + ' ' + y.toFixed(1));
+    }
+    d = 'M' + pts.join(' L');
+    ln.setAttribute('d', d);
+    fill.setAttribute('d', d + ' L420 150 L-60 150 Z');
+    if (!unit) { try { unit = tx.getComputedTextLength() / 4; } catch (e) { unit = 300; } }
+    off = (off + dt * speed) % (unit || 300);
+    tp.setAttribute('startOffset', (-off).toFixed(1));
+    if (!rm) requestAnimationFrame(draw);
+  }
+  input.addEventListener('input', setText);
+  hR.addEventListener('input', function () { amp = +hR.value; if (rm) { ampNow = amp; draw(performance.now()); } });
+  sR.addEventListener('input', function () { speed = +sR.value; });
+  setText();
+  requestAnimationFrame(draw);
+})();
+</script>

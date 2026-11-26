@@ -1,0 +1,90 @@
+<!-- Lucian UX/UI Prompt #302 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#302 -->
+<!--
+Element: Feedback pins on the page
+ID: 302 · Category: Site Builder Tools · Tags: feedback, comments, pins, review, builder
+What it does: Turn on comment mode in a site preview and the pointer becomes a crosshair; click anywhere and a numbered pin drops with a bounce as a comment box opens beside it. Post the comment and the box folds into the pin while the comment count in the top right goes up. Click a pin again to open its bubble, and Resolve turns the pin into a green check and fades it.
+How to use it: Turn on comment mode and click anywhere in the preview to leave feedback
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#302
+-->
+<style>
+.u302{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u302-tb{position:absolute;left:12px;right:12px;top:12px;display:flex;align-items:center;gap:8px}
+.u302-md{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border:0;border-radius:11px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:850;cursor:pointer;transition:background .2s,color .2s}
+.u302-md svg{width:14px;height:14px}
+.u302-md[aria-pressed="true"]{background:#F43F5E;color:#fff;box-shadow:none}
+.u302-ct{margin-left:auto;font-size:10.5px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u302-ct.is-bump{animation:u302-bp .4s cubic-bezier(.3,1.7,.5,1)}
+@keyframes u302-bp{40%{transform:scale(1.25);color:#F43F5E}}
+.u302-pg{position:absolute;left:12px;right:12px;top:54px;bottom:12px;border-radius:16px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);overflow:hidden;padding:14px}
+.u302.is-mode .u302-pg{cursor:crosshair;box-shadow:0 0 0 2px #F43F5E}
+.u302-pg nav{display:flex;gap:8px;align-items:center}
+.u302-pg nav i{width:52px;height:8px;border-radius:4px;background:var(--ux-surface-3)}
+.u302-pg nav i:first-child{width:30px;background:var(--ux-ink)}
+.u302-pg nav i:last-child{margin-left:auto;width:40px;height:18px;border-radius:9px;background:var(--ux-surface-2)}
+.u302-pg h4{margin:18px 0 0;font-size:19px;font-weight:900;letter-spacing:-.03em}
+.u302-pg span.bt{display:inline-block;margin-top:10px;padding:7px 12px;border-radius:999px;background:#818CF8;color:#fff;font-size:10.5px;font-weight:850}
+.u302-pg .im{display:flex;gap:8px;margin-top:16px}
+.u302-pg .im i{flex:1;height:86px;border-radius:12px;background:linear-gradient(135deg,#FBCFE8,#C7D2FE)}
+.u302-pg .im i+i{background:linear-gradient(135deg,#A7F3D0,#BAE6FD)}
+.u302-pn{position:absolute;z-index:2;width:26px;height:26px;margin:-26px 0 0 -2px;padding:0;border:0;border-radius:50% 50% 50% 4px;background:#F43F5E;color:#fff;font:inherit;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 6px 12px -4px rgba(244,63,94,.6);animation:u302-dr .5s cubic-bezier(.3,1.6,.5,1);transition:background .3s,opacity .3s}
+@keyframes u302-dr{from{transform:translateY(-20px) scale(.5);opacity:0}}
+.u302-pn.is-done{background:#10B981;box-shadow:none;opacity:.55}
+.u302-pn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u302-bx{position:absolute;z-index:3;width:178px;padding:9px;border-radius:13px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 32px -12px var(--ux-shadow-strong);transform-origin:0 0;animation:u302-op .3s cubic-bezier(.3,1.4,.5,1)}
+@keyframes u302-op{from{transform:scale(.6);opacity:0}}
+.u302-bx.is-shut{transform:scale(.2);opacity:0;transition:transform .3s cubic-bezier(.5,0,.75,0),opacity .25s}
+.u302-ta{display:block;width:100%;height:46px;padding:7px 8px;border:0;border-radius:8px;background:var(--ux-surface-2);color:var(--ux-ink);font:inherit;font-size:11px;line-height:1.4;font-weight:650;resize:none;outline:none;box-sizing:border-box}
+.u302-ok,.u302-rv{display:block;margin:6px 0 0 auto;height:26px;padding:0 11px;border:0;border-radius:8px;background:#F43F5E;color:#fff;font:inherit;font-size:10.5px;font-weight:850;cursor:pointer}
+.u302-rv{background:#10B981}
+.u302-bx header{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:850}
+.u302-bx header i{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#F9A8D4,#A78BFA)}
+.u302-bx header small{font-weight:700;color:var(--ux-ink-3)}
+.u302-bx p{margin:5px 0 0;font-size:11px;line-height:1.45;font-weight:650;color:var(--ux-ink-2)}
+.u302 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u302-pn,.u302-bx{animation:none}.u302-ct.is-bump{animation:none}}
+</style>
+<div class="ux u302">
+  <div class="u302-tb"><button type="button" class="u302-md" aria-pressed="false"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2.5h10v7H6.5L3.5 12V9.5H2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Comment mode</button><span class="u302-ct" aria-live="polite"></span></div>
+  <div class="u302-pg"><nav aria-hidden="true"><i></i><i></i><i></i></nav><h4>Spring collection</h4><span class="bt">Shop now</span><div class="im" aria-hidden="true"><i></i><i></i></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var md = root.querySelector('.u302-md'), pg = root.querySelector('.u302-pg'), ct = root.querySelector('.u302-ct');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pins = [], box = null, mode = false;
+  function count() { ct.textContent = pins.length + ' comments'; ct.classList.remove('is-bump'); void ct.offsetWidth; ct.classList.add('is-bump'); }
+  function local(e) { var r = pg.getBoundingClientRect(), k = pg.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  function shut(fn) { if (!box) { if (fn) fn(); return; } var b = box; box = null; b.classList.add('is-shut'); setTimeout(function () { b.remove(); if (fn) fn(); }, rm ? 0 : 300); }
+  function openBox(x, y) { var b = document.createElement('div'); b.className = 'u302-bx'; var bx = x + 14 + 178 > pg.offsetWidth - 6 ? x - 178 - 6 : x + 14, by = Math.min(y - 10, pg.offsetHeight - 110); b.style.left = Math.max(6, bx) + 'px'; b.style.top = Math.max(6, by) + 'px'; pg.appendChild(b); box = b; return b; }
+  pg.addEventListener('click', function (e) {
+    if (!mode || e.target.closest('.u302-bx') || e.target.closest('.u302-pn')) return;
+    var p = local(e);
+    shut(function () {
+      var n = pins.length + 1, pin = document.createElement('button'); pin.type = 'button'; pin.className = 'u302-pn'; pin.textContent = n; pin.style.left = p.x + 'px'; pin.style.top = p.y + 'px';
+      pg.appendChild(pin);
+      var b = openBox(p.x, p.y); b.innerHTML = '<textarea class="u302-ta" placeholder="Leave a comment" aria-label="Comment"></textarea><button type="button" class="u302-ok">Post</button>';
+      var ta = b.querySelector('textarea'); setTimeout(function () { ta.focus({ preventScroll: true }); }, 50);
+      b.querySelector('.u302-ok').addEventListener('click', function () {
+        var txt = ta.value.trim(); if (!txt) { pin.remove(); shut(); return; }
+        var o = { pin: pin, txt: txt, x: p.x, y: p.y, done: false }; pins.push(o); pin.setAttribute('aria-label', n + ' — view comment');
+        pin.addEventListener('click', function (ev) { ev.stopPropagation(); view(o); });
+        shut(); count();
+      });
+    });
+  });
+  function view(o) {
+    shut(function () {
+      var b = openBox(o.x, o.y); b.innerHTML = '<header><i aria-hidden="true"></i><span></span><small></small></header><p></p>' + (o.done ? '' : '<button type="button" class="u302-rv"></button>');
+      b.querySelector('header span').textContent = 'Minji'; b.querySelector('header small').textContent = 'now'; b.querySelector('p').textContent = o.txt;
+      var rv = b.querySelector('.u302-rv');
+      if (rv) { rv.textContent = 'Resolve'; rv.addEventListener('click', function () { o.done = true; o.pin.classList.add('is-done'); o.pin.innerHTML = '✓'; o.pin.setAttribute('aria-label', 'Resolved'); shut(); }); }
+    });
+  }
+  md.addEventListener('click', function () { mode = !mode; md.setAttribute('aria-pressed', mode); root.classList.toggle('is-mode', mode); if (!mode) shut(); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape') shut(); });
+  ct.textContent = pins.length + ' comments';
+})();
+</script>

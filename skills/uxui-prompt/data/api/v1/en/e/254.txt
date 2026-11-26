@@ -1,0 +1,89 @@
+<!-- Lucian UX/UI Prompt #254 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#254 -->
+<!--
+Element: Share dialog with link access
+ID: 254 · Category: App Screens · Tags: share, permissions, copy-link, dialog, collaboration
+What it does: In a document's share dialog, press the link access button to open a list; choose Anyone with the link and the lock icon spins into a globe as the description and color change with it. Press Copy link and the link field flashes while the button turns into a check, and the Email, Message and Embed buttons below pop in one after another. The people working on it and their permissions are listed too.
+How to use it: Change who has access, then press Copy link
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#254
+-->
+<style>
+.u254{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u254-in{position:absolute;inset:0;padding:18px 18px 16px}
+.u254 h3{margin:0;font-size:15px;font-weight:900;letter-spacing:-.02em}
+.u254 h5{margin:12px 0 6px;font-size:10px;font-weight:850;color:var(--ux-ink-3)}
+.u254-pp{display:flex;align-items:center;gap:9px;height:32px}
+.u254-pp i{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-size:10.5px;font-weight:850}
+.u254-pp b{flex:1;font-size:11.5px;font-weight:800}
+.u254-pp small{font-size:10px;font-weight:750;color:var(--ux-ink-3)}
+.u254-ga{position:relative;display:flex;align-items:center;gap:10px}
+.u254-ic{position:relative;flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-2);transition:background .35s,color .35s}
+.u254.is-pub .u254-ic{background:color-mix(in srgb,#10B981 16%,transparent);color:#059669}
+.u254-ic svg{position:absolute;width:17px;height:17px;transition:transform .45s cubic-bezier(.3,1.5,.5,1),opacity .25s}
+.u254-ic .g{transform:rotate(-120deg) scale(.4);opacity:0}
+.u254.is-pub .u254-ic .l{transform:rotate(120deg) scale(.4);opacity:0}
+.u254.is-pub .u254-ic .g{transform:none;opacity:1}
+.u254-ga div{flex:1;min-width:0}
+.u254-ac{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;margin-left:-6px;border:0;border-radius:7px;background:none;color:var(--ux-ink);font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.u254-ac:hover,.u254-ac.g-hov{background:var(--ux-surface-2)}
+.u254-ac svg{width:9px;height:9px;color:var(--ux-ink-3)}
+.u254-ga small{display:block;font-size:10px;font-weight:650;color:var(--ux-ink-3)}
+.u254-dd{position:absolute;left:38px;top:30px;z-index:3;width:200px;padding:5px;border-radius:13px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 32px -12px var(--ux-shadow-strong);transform-origin:20% 0;transform:scale(.94) translateY(-4px);opacity:0;pointer-events:none;transition:transform .2s cubic-bezier(.3,1.5,.5,1),opacity .15s}
+.u254.is-dd .u254-dd{transform:none;opacity:1;pointer-events:auto}
+.u254-op{display:flex;align-items:center;justify-content:space-between;width:100%;height:32px;padding:0 9px;border:0;border-radius:8px;background:none;color:var(--ux-ink);font:inherit;font-size:11.5px;font-weight:750;cursor:pointer;text-align:left}
+.u254-op:hover,.u254-op.g-hov{background:var(--ux-surface-2)}
+.u254-op svg{width:12px;height:12px;color:var(--ux-accent);opacity:0}
+.u254-op[aria-selected="true"] svg{opacity:1}
+.u254-lk{display:flex;align-items:center;gap:6px;margin-top:14px;padding:5px 5px 5px 12px;border-radius:12px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u254-lk code{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:var(--ux-ink-2)}
+.u254-lk.is-fl{animation:u254-fl .8s ease}
+@keyframes u254-fl{25%{box-shadow:inset 0 0 0 2px var(--ux-accent);background:var(--ux-accent-soft)}}
+.u254-cp{flex:none;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border:0;border-radius:9px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:11px;font-weight:850;cursor:pointer;transition:background .3s}
+.u254-cp.is-ok{background:#059669}
+.u254-cp svg{width:12px;height:12px}
+.u254-tg{display:flex;gap:6px;margin-top:10px}
+.u254-tg button{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;border:0;border-radius:12px;background:var(--ux-surface-2);color:var(--ux-ink-2);font:inherit;font-size:10px;font-weight:800;cursor:pointer;transform:translateY(8px);opacity:0;transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .25s}
+.u254.is-tg .u254-tg button{transform:none;opacity:1}
+.u254-tg svg{width:17px;height:17px}
+.u254 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u254-ic svg,.u254-dd,.u254-tg button{transition:none}.u254-lk.is-fl{animation:none}}
+</style>
+<div class="ux u254">
+  <div class="u254-in">
+    <h3>Share “Spring campaign plan”</h3>
+    <h5>People with access</h5><div class="u254-ps"></div>
+    <h5>General access</h5>
+    <div class="u254-ga"><span class="u254-ic" aria-hidden="true"><svg class="l" viewBox="0 0 17 17"><rect x="3.5" y="7.5" width="10" height="7" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5.8 7.5V5.3a2.7 2.7 0 0 1 5.4 0v2.2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><svg class="g" viewBox="0 0 17 17"><circle cx="8.5" cy="8.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2 8.5h13M8.5 2c2 2 2 11 0 13M8.5 2c-2 2-2 11 0 13" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></span><div><button type="button" class="u254-ac" aria-haspopup="listbox" aria-expanded="false" aria-label="Link access"><span></span><svg viewBox="0 0 9 9" aria-hidden="true"><path d="M1.5 3l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><small></small></div>
+      <div class="u254-dd" role="listbox"></div></div>
+    <div class="u254-lk"><code>https://example.com/d/9f2k-spring</code><button type="button" class="u254-cp"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M5 7l2-2M4.2 5.4L3 6.6a2 2 0 0 0 2.8 2.8L7 8.2M7.8 6.6L9 5.4A2 2 0 0 0 6.2 2.6L5 3.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span></span></button></div>
+    <div class="u254-tg"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ps = root.querySelector('.u254-ps'), ac = root.querySelector('.u254-ac'), acl = ac.querySelector('span'), ds = root.querySelector('.u254-ga small'), dd = root.querySelector('.u254-dd'), lk = root.querySelector('.u254-lk'), cp = root.querySelector('.u254-cp'), cpl = cp.querySelector('span'), cpi = cp.querySelector('svg'), tg = root.querySelector('.u254-tg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PP = [['Seoyeon Kim', 'Owner'], ['Junho Lee', 'Can edit'], ['Haeun Park', 'Can view']], PC = ['#6366F1', '#0EA5E9', '#EC4899'];
+  var AC = [['Restricted', 'Only people added can open'], ['Anyone with the link', 'Anyone who has the link can view']];
+  var TG = ['Email', 'Message', 'Embed'];
+  var TI = ['<rect x="2" y="3.5" width="13" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 4.5l6 4.5 6-4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>', '<path d="M2.5 4h12v8H7l-3.5 2.5V12h-1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>', '<path d="M6 5L2.5 8.5 6 12M11 5l3.5 3.5L11 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'];
+  var LINK = cpi.innerHTML, CHK = '<path d="M2.5 6.3l2.3 2.3L9.5 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  PP.forEach(function (p, i) { var d = document.createElement('div'); d.className = 'u254-pp'; d.innerHTML = '<i style="background:' + PC[i] + '"></i><b></b><small></small>'; d.querySelector('i').textContent = p[0].charAt(0); d.querySelector('b').textContent = p[0]; d.querySelector('small').textContent = p[1]; ps.appendChild(d); });
+  var O = AC.map(function (a, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u254-op'; b.setAttribute('role', 'option'); b.innerHTML = '<span></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3l2.3 2.3L9.5 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'; b.firstChild.textContent = a[0]; b.addEventListener('click', function () { set(i); dd_(false); ac.focus({ preventScroll: true }); }); dd.appendChild(b); return b; });
+  TG.forEach(function (t, i) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<svg viewBox="0 0 17 17" aria-hidden="true">' + TI[i] + '</svg><span></span>'; b.lastChild.textContent = t; b.style.transitionDelay = (0.08 + i * 0.07) + 's'; tg.appendChild(b); });
+  function set(i) { acl.textContent = AC[i][0]; ds.textContent = AC[i][1]; root.classList.toggle('is-pub', i === 1); O.forEach(function (o, k) { o.setAttribute('aria-selected', k === i); }); }
+  function dd_(v) { root.classList.toggle('is-dd', v); ac.setAttribute('aria-expanded', v); }
+  ac.addEventListener('click', function () { dd_(!root.classList.contains('is-dd')); });
+  var T = 0;
+  cp.addEventListener('click', function () {
+    try { navigator.clipboard && navigator.clipboard.writeText(lk.querySelector('code').textContent).catch(function () {}); } catch (e) {}
+    lk.classList.remove('is-fl'); void lk.offsetWidth; lk.classList.add('is-fl');
+    cp.classList.add('is-ok'); cpl.textContent = 'Copied'; cpi.innerHTML = CHK; root.classList.add('is-tg');
+    clearTimeout(T); T = setTimeout(function () { cp.classList.remove('is-ok'); cpl.textContent = 'Copy link'; cpi.innerHTML = LINK; }, 1800);
+  });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape') dd_(false); });
+  cpl.textContent = 'Copy link'; set(0);
+})();
+</script>

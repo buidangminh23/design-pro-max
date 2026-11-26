@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+
+- A fourth skill, `skills/uxui-prompt/`: the MIT `lucian-uxui` skill by Seokwoooo (renamed, its CLI reading bundled data first) with the English catalog, tokens and all 480 elements of `lucian-uxui-prompt` bundled under `data/api/v1/`, so search, `get` and `tokens` work offline. `vendor/uxui-prompt.json` pins the commit and records every file; `scripts/uxui-sync.mjs` syncs, updates and checks it, CI runs `check`, and the Bundle sync workflow runs `update`. THIRD_PARTY_NOTICES.md lists it.
+
 ## [0.2.0] - 2026-11-24
 
 ### Added

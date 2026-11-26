@@ -1,0 +1,64 @@
+<!-- Lucian UX/UI Prompt #364 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#364 -->
+<!--
+Element: One-door-a-day advent calendar
+ID: 364 · Category: Promos & Rewards · Tags: advent, calendar, doors, reward, 3d
+What it does: On a snowy winter calendar, press any of the twelve little doors up to today and it swings wide on its hinge, revealing a hidden treat and a one-line message. Opened doors stay open, while doors for days yet to come shake with a padlock and stay shut. The count of doors left drops with each one you open.
+How to use it: Press the doors up to today to open them, and try a future one too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#364
+-->
+<style>
+.u364{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:linear-gradient(170deg,#1B3A5C,#0E2238);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#F1F7FF}
+.u364-sn{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.7) 1px,transparent 1.5px),radial-gradient(circle,rgba(255,255,255,.45) 1px,transparent 1.5px);background-size:60px 60px,37px 37px;animation:u364-snow 9s linear infinite}
+@keyframes u364-snow{to{background-position:20px 60px,-10px 74px}}
+.u364-hd{position:absolute;left:20px;right:20px;top:16px;display:flex;justify-content:space-between;font-size:12.5px;font-weight:850}
+.u364-hd span{font-size:11px;color:#A5D8FF;font-variant-numeric:tabular-nums}
+.u364-gd{position:absolute;left:18px;right:18px;top:44px;bottom:44px;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:8px;perspective:700px}
+.u364-c{position:relative;border-radius:10px;background:#FFF9DB;box-shadow:inset 0 3px 8px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;overflow:visible}
+.u364-c svg{width:30px;height:30px}
+.u364-c small{font-size:8.5px;font-weight:800;color:#7A4E2D;line-height:1.15;padding:0 3px;word-break:keep-all}
+.u364-d{position:absolute;inset:0;border:0;padding:0;border-radius:10px;cursor:pointer;transform-origin:0 50%;transition:transform .7s cubic-bezier(.3,1.25,.5,1);font:inherit;color:#fff;display:grid;place-items:center;font-size:20px;font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.2);box-shadow:inset 0 0 0 2px rgba(255,255,255,.25);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.u364-d::after{content:"";position:absolute;right:7px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:#FFD43B}
+.u364-d.is-open{transform:rotateY(-112deg)}
+.u364-d.is-lock{cursor:not-allowed}
+.u364-d.is-lock::before{content:"";position:absolute;right:6px;top:6px;width:10px;height:8px;border-radius:2px;background:rgba(255,255,255,.8);box-shadow:0 -5px 0 -2px rgba(255,255,255,.8)}
+.u364-d.is-shake{animation:u364-sh .45s}
+@keyframes u364-sh{20%,60%{transform:rotate(-4deg)}40%,80%{transform:rotate(4deg)}}
+.u364-d:focus-visible{outline:2px solid #FFD43B;outline-offset:2px}
+.u364-msg{position:absolute;left:18px;right:18px;bottom:12px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.1);font-size:11.5px;font-weight:750;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .35s cubic-bezier(.3,1.5,.5,1)}
+.u364-msg.is-on{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.u364-sn{animation:none}.u364-d{transition:none}.u364-d.is-shake{animation:none}}
+</style>
+<div class="ux u364">
+  <div class="u364-sn" aria-hidden="true"></div>
+  <div class="u364-hd"><b>Little doors of December</b><span class="u364-n" aria-live="polite"></span></div>
+  <div class="u364-gd"></div>
+  <div class="u364-msg" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u364-gd'), num = root.querySelector('.u364-n'), msg = root.querySelector('.u364-msg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var GIFT = ['Hot cocoa', 'Glitter stickers', 'Three tangerines', 'Wool mittens', 'A box of cookies', 'Snowman keyring', 'A candle', 'A postcard', 'A pair of socks', 'A candy cane', 'A tiny tree', 'A gift box'];
+  var COL = ['#E03131', '#2B8A3E', '#1971C2', '#C2255C', '#E8590C', '#5F3DC4'];
+  var ICON = ['<path d="M8 12h14v8a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z" fill="#A0522D"/><path d="M22 14h2a3 3 0 0 1 0 6h-2" fill="none" stroke="#A0522D" stroke-width="2"/><path d="M12 9q2-3 0-5M17 9q2-3 0-5" stroke="#ADB5BD" stroke-width="1.6" fill="none"/>', '<path d="M16 3l3.5 8 8.5.8-6.4 5.6 1.9 8.4L16 21.5 8.5 25.8l1.9-8.4L4 11.8l8.5-.8z" fill="#FCC419"/>', '<circle cx="10" cy="20" r="6" fill="#FD7E14"/><circle cx="21" cy="21" r="6" fill="#FF922B"/><circle cx="16" cy="12" r="6" fill="#F76707"/>', '<path d="M9 8h9v14l3 4h-12z" fill="#E03131"/><rect x="8" y="22" width="14" height="4" rx="1" fill="#fff"/>', '<rect x="5" y="10" width="22" height="16" rx="2" fill="#C08552"/><circle cx="11" cy="16" r="3" fill="#7A4E2D"/><circle cx="20" cy="19" r="3" fill="#7A4E2D"/>', '<circle cx="16" cy="21" r="7" fill="#fff" stroke="#ADB5BD"/><circle cx="16" cy="10" r="5" fill="#fff" stroke="#ADB5BD"/><path d="M16 11l3 1-3 1z" fill="#FD7E14"/>', '<rect x="11" y="12" width="10" height="16" rx="2" fill="#F8F0E3"/><path d="M16 4q3 4 0 7q-3-3 0-7" fill="#FCC419"/>', '<rect x="5" y="9" width="22" height="15" rx="2" fill="#fff" stroke="#ADB5BD"/><path d="M5 10l11 8 11-8" fill="none" stroke="#E03131" stroke-width="1.6"/>', '<path d="M10 5h8v13l6 5-3 4-11-7z" fill="#1971C2"/><path d="M10 9h8" stroke="#fff" stroke-width="2"/>', '<path d="M20 28V10a5 5 0 0 0-10 0" stroke="#E03131" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M20 28V10a5 5 0 0 0-10 0" stroke="#fff" stroke-width="5" fill="none" stroke-dasharray="3 3"/>', '<path d="M16 3l7 10h-4l6 9h-18l6-9h-4z" fill="#2B8A3E"/><rect x="14" y="22" width="4" height="5" fill="#7A4E2D"/>', '<rect x="6" y="12" width="20" height="15" rx="2" fill="#C2255C"/><rect x="5" y="9" width="22" height="5" rx="1" fill="#E64980"/><path d="M16 9v18" stroke="#FCC419" stroke-width="3"/>'];
+  var TODAY = 7, left = TODAY, msgT = 0;
+  function info() { num.textContent = left + ' doors left'; }
+  function say(s) { msg.textContent = s; msg.classList.add('is-on'); clearTimeout(msgT); msgT = setTimeout(function () { msg.classList.remove('is-on'); }, 1800); }
+  for (var i = 0; i < 12; i++) (function (i) {
+    var day = i + 1, cell = document.createElement('div'); cell.className = 'u364-c';
+    cell.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true">' + ICON[i] + '</svg><small>' + GIFT[i] + '</small>';
+    var d = document.createElement('button'); d.type = 'button'; d.className = 'u364-d' + (day > TODAY ? ' is-lock' : ''); d.textContent = day; d.style.background = 'linear-gradient(145deg,' + COL[i % COL.length] + ',' + COL[(i + 2) % COL.length] + ')';
+    d.setAttribute('aria-label', day + (day > TODAY ? ' door, still locked' : ' door, open'));
+    d.addEventListener('click', function () {
+      if (day > TODAY) { d.classList.remove('is-shake'); void d.offsetWidth; d.classList.add('is-shake'); say('Not yet · ' + (day - TODAY) + ' days to go'); return; }
+      if (d.classList.contains('is-open')) return;
+      d.classList.add('is-open'); d.setAttribute('aria-expanded', 'true'); left--; info(); say(GIFT[i]);
+    });
+    cell.appendChild(d); gd.appendChild(cell);
+  })(i);
+  info();
+})();
+</script>

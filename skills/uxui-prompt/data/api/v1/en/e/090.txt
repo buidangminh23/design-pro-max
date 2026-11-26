@@ -1,0 +1,193 @@
+<!-- Lucian UX/UI Prompt #090 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#090 -->
+<!--
+Element: Error widget that plugs back in
+ID: 090 · Category: Empty & Error States · Tags: error, retry, backoff, countdown, recovery
+What it does: A widget that failed to load waits with its plug pulled, while the ring around the button shrinks to show the time until it retries on its own. On retry the plug moves in and wobbles; if it fails it bounces back with sparks, and if it works it plugs in, the light turns green and the chart grows.
+How to use it: Wait and it retries on its own, or press “Retry now” to try right away. The first retry fails and the second one connects
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#090
+-->
+<style>
+.u090{position:relative;width:340px;height:410px;display:flex;flex-direction:column;padding:18px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u090-h{display:flex;align-items:center;gap:10px;height:38px}
+.u090-h i{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-2)}
+.u090-h i svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.u090-h b{font-size:16px;font-weight:850;letter-spacing:-.03em}
+.u090-pill{margin-left:auto;height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);font-size:12px;font-weight:800;white-space:nowrap;transition:color .35s,background-color .35s}
+.u090-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.u090-stage{position:relative;flex:1;margin:6px 0 12px}
+.u090-err,.u090-ok{position:absolute;inset:0;display:flex;flex-direction:column;transition:opacity .35s,transform .45s var(--ux-ease),visibility 0s}
+.u090-err{align-items:center;justify-content:center;text-align:center}
+.u090.show .u090-err{opacity:0;transform:scale(.94);visibility:hidden;transition:opacity .25s,transform .35s var(--ux-ease),visibility 0s .35s}
+.u090-ok{opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s,transform .35s,visibility 0s .35s}
+.u090.show .u090-ok{opacity:1;visibility:visible;transform:none;transition:opacity .35s .15s,transform .5s var(--ux-ease) .15s}
+.u090-plug{width:220px;height:70px;overflow:visible}
+.u090-cord{fill:none;stroke:var(--ux-ink-3);stroke-width:4;stroke-linecap:round}
+.u090-pr{stroke:var(--ux-ink-2);stroke-width:4.5;stroke-linecap:round}
+.u090-bd{fill:var(--ux-ink)}
+.u090-hole{stroke:var(--ux-surface);stroke-width:3;stroke-linecap:round}
+.u090-led{fill:var(--ux-danger);transition:fill .3s}
+.u090-L,.u090-R{transition:transform .55s var(--ux-spring)}
+.u090-L{transform:translateX(-10px)}
+.u090-R{transform:translateX(8px)}
+.u090[data-s="try"] .u090-L{transform:translateX(9px);animation:u090-jig .28s .5s ease-in-out infinite}
+.u090[data-s="try"] .u090-R{transform:translateX(-2px)}
+.u090[data-s="try"] .u090-led{fill:var(--ux-warn);animation:u090-blink .5s steps(1) infinite}
+.u090[data-s="ok"] .u090-L{transform:translateX(16px)}
+.u090[data-s="ok"] .u090-R{transform:translateX(-4px)}
+.u090[data-s="ok"] .u090-led{fill:var(--ux-mint)}
+@keyframes u090-jig{50%{transform:translateX(6px)}}
+@keyframes u090-blink{50%{fill:var(--ux-surface-3)}}
+.u090-spark{stroke:var(--ux-warn);stroke-width:2.6;stroke-linecap:round;opacity:0}
+.u090.zap .u090-spark{animation:u090-zap .55s var(--ux-ease)}
+@keyframes u090-zap{0%{opacity:1;transform:scale(.4)}60%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+.u090-spark{transform-box:fill-box;transform-origin:50% 50%}
+.u090-t{margin:16px 0 0;font-size:17px;font-weight:850;letter-spacing:-.035em}
+.u090-s{margin:5px 0 0;font-size:13px;font-weight:600;line-height:1.5;color:var(--ux-ink-3)}
+.u090-at{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;font-weight:750;color:var(--ux-ink-2);font-variant-numeric:tabular-nums}
+.u090-dots{display:flex;gap:4px}
+.u090-dots i{width:18px;height:6px;border-radius:3px;background:var(--ux-surface-3);transition:background-color .3s}
+.u090-dots i.f{background:var(--ux-danger)}
+.u090-dots i.cur{background:var(--ux-warn);animation:u090-cur .7s ease-in-out infinite}
+.u090-dots i.ok{background:var(--ux-mint)}
+@keyframes u090-cur{50%{opacity:.4}}
+.u090-more{display:inline-flex;align-items:center;gap:4px;height:28px;margin-top:10px;padding:0 8px;border:0;border-radius:8px;background:transparent;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u090-more:hover{color:var(--ux-ink);background:var(--ux-surface-2)}
+.u090-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ux-ease)}
+.u090-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.u090-det{display:grid;grid-template-rows:0fr;width:100%;transition:grid-template-rows .35s var(--ux-ease)}
+.u090-more[aria-expanded="true"]+.u090-det{grid-template-rows:1fr}
+.u090-det>div{min-height:0;overflow:hidden}
+.u090-det code{display:block;margin-top:6px;padding:10px 12px;border-radius:12px;background:var(--ux-surface-2);text-align:left;font:600 11.5px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink-2);white-space:pre}
+.u090-sum{display:flex;align-items:baseline;gap:8px;margin-top:6px}
+.u090-sum small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u090-sum b{font-size:30px;font-weight:850;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.u090-sum em{font-style:normal;font-size:12.5px;font-weight:800;color:var(--ux-mint)}
+.u090-bars{flex:1;display:flex;align-items:flex-end;gap:10px;margin-top:14px;padding-bottom:22px}
+.u090-bars span{position:relative;flex:1;height:100%;display:flex;align-items:flex-end}
+.u090-bars i{width:100%;height:calc(var(--h) * 100%);border-radius:8px 8px 4px 4px;background:var(--ux-surface-3);transform-origin:50% 100%;transform:scaleY(0);transition:transform .7s var(--ux-spring),background-color .2s;transition-delay:calc(var(--d) * 60ms + .2s),0s}
+.u090.show .u090-bars i{transform:none}
+.u090-bars span:last-child i{background:var(--ux-grad)}
+.u090-bars span:hover i{background:var(--ux-accent)}
+.u090-bars em{position:absolute;left:0;right:0;bottom:-22px;text-align:center;font-style:normal;font-size:11.5px;font-weight:700;color:var(--ux-ink-3)}
+.u090-go{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;height:50px;border:0;border-radius:16px;background:var(--ux-ink);color:var(--ux-page);font-size:14.5px;font-weight:760;transition:transform .3s var(--ux-spring),opacity .3s}
+.u090-go:active{transform:scale(.97)}
+.u090-go[aria-disabled="true"]{opacity:.55}
+.u090-ring{width:20px;height:20px;transform:rotate(-90deg);transition:width .3s,margin .3s}
+.u090-ring circle{fill:none;stroke-width:2.6;stroke-linecap:round}
+.u090-ring circle:first-child{stroke:color-mix(in srgb,var(--ux-page) 25%,transparent)}
+.u090-ring circle+circle{stroke:var(--ux-page);stroke-dasharray:100}
+.u090[data-s="try"] .u090-ring{animation:u090-spin .8s linear infinite}
+.u090[data-s="try"] .u090-ring circle+circle{stroke-dasharray:28 72;stroke-dashoffset:0!important;transition:none!important}
+.u090[data-s="ok"] .u090-ring{width:0;margin-right:-9px}
+@keyframes u090-spin{to{transform:rotate(270deg)}}
+.u090-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u090" data-s="wait">
+  <div class="u090-h"><i aria-hidden="true"><svg viewBox="0 0 17 17"><path d="M3 14V9M8.5 14V4M14 14v-7"/></svg></i><b>Sales this week</b><span class="u090-pill" role="status" style="--c:var(--ux-danger)">Failed to load</span></div>
+  <div class="u090-stage">
+    <div class="u090-err">
+      <svg class="u090-plug" viewBox="0 0 220 70" aria-hidden="true">
+        <g class="u090-L"><path class="u090-cord" d="M-14 54C24 54 40 35 72 35"/><path class="u090-pr" d="M100 28h14M100 42h14"/><rect class="u090-bd" x="68" y="19" width="34" height="32" rx="8"/></g>
+        <g class="u090-spark"><path d="M121 20l-2-7M129 24l5-5M113 24l-5-5M121 50l-2 7M129 46l5 5M113 46l-5 5"/></g>
+        <g class="u090-R"><rect class="u090-bd" x="124" y="17" width="38" height="36" rx="9"/><path class="u090-hole" d="M124 28h6M124 42h6"/><circle class="u090-led" cx="153" cy="25" r="3"/><path class="u090-cord" d="M162 35C188 35 194 16 236 16"/></g>
+      </svg>
+      <p class="u090-t">Couldn’t load sales data</p>
+      <p class="u090-s">The server isn’t responding right now</p>
+      <div class="u090-at"><span class="u090-dots" aria-hidden="true"><i class="f"></i><i></i><i></i></span><span class="u090-cd" aria-live="polite"></span></div>
+      <button class="u090-more" type="button" aria-expanded="false">Details<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button>
+      <div class="u090-det"><div><code></code></div></div>
+    </div>
+    <div class="u090-ok" aria-hidden="true">
+      <div class="u090-sum"><small>Total</small><b>₩0M</b><em>+12% vs last week</em></div>
+      <div class="u090-bars"></div>
+    </div>
+  </div>
+  <button class="u090-go" type="button"><svg class="u090-ring" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="10" r="8" pathLength="100"/></svg><span>Retry now</span></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var uid = 'u090' + Math.random().toString(36).slice(2, 7);
+  var pill = root.querySelector('.u090-pill'), cd = root.querySelector('.u090-cd'), dots = root.querySelectorAll('.u090-dots i'), err = root.querySelector('.u090-err');
+  var more = root.querySelector('.u090-more'), det = root.querySelector('.u090-det'), code = det.querySelector('code'), okv = root.querySelector('.u090-ok'), sum = root.querySelector('.u090-sum b');
+  var go = root.querySelector('.u090-go'), lab = go.querySelector('span'), ring = root.querySelector('.u090-ring circle+circle'), bars = root.querySelector('.u090-bars');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  det.id = uid + '-det'; more.setAttribute('aria-controls', det.id);
+  [['Mon', .42], ['Tue', .55], ['Wed', .38], ['Thu', .7], ['Fri', .64], ['Sat', .88], ['Sun', .76]].forEach(function (d, i) {
+    var s = document.createElement('span');
+    s.innerHTML = '<i style="--h:' + d[1] + ';--d:' + i + '"></i><em>' + d[0] + '</em>';
+    bars.appendChild(s);
+  });
+  var ts = [], tries = 0, st = 'wait';
+  function clear() { ts.forEach(clearTimeout); ts = []; }
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function setS(s, txt, c) { st = s; root.setAttribute('data-s', s); pill.textContent = txt; pill.style.setProperty('--c', c); go.setAttribute('aria-disabled', String(s === 'try')); }
+  function detail() { code.textContent = 'GET /api/sales/week\n503 Service Unavailable\nRequest ID 7f3a-c21e · attempt ' + (tries + 1) + '/3'; }
+  function countdown(sec) {
+    clear();
+    setS('wait', 'Failed to load', 'var(--ux-danger)');
+    lab.textContent = 'Retry now';
+    ring.style.transition = 'none'; ring.style.strokeDashoffset = 0; ring.getBoundingClientRect();
+    ring.style.transition = 'stroke-dashoffset ' + sec + 's linear'; ring.style.strokeDashoffset = 100;
+    var left = sec;
+    (function t() {
+      if (left <= 0) return attempt();
+      cd.textContent = 'Retrying automatically in ' + left + 's';
+      left--; later(t, 1000);
+    })();
+  }
+  function attempt() {
+    if (st !== 'wait') return;
+    clear(); tries++;
+    setS('try', 'Reconnecting', 'var(--ux-warn)');
+    lab.textContent = 'Connecting';
+    cd.textContent = 'Attempt ' + (tries + 1) + '…';
+    dots[tries].className = 'cur';
+    later(function () {
+      if (tries === 1) {
+        dots[tries].className = 'f';
+        root.classList.remove('zap'); void root.offsetWidth; root.classList.add('zap');
+        if (!rm) err.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-7px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(-3px)' }, { transform: 'none' }], { duration: 420, easing: 'ease-out' });
+        detail();
+        countdown(8);
+      } else {
+        dots[tries].className = 'ok';
+        setS('ok', 'OK', 'var(--ux-mint)');
+        cd.textContent = 'Connected on attempt 3';
+        lab.textContent = 'Replay the error';
+        later(reveal, rm ? 0 : 750);
+      }
+    }, rm ? 400 : 1500);
+  }
+  function reveal() {
+    var hadFocus = err.contains(document.activeElement);
+    root.classList.add('show');
+    okv.removeAttribute('aria-hidden'); err.setAttribute('aria-hidden', 'true');
+    if (hadFocus) go.focus({ preventScroll: true });
+    var t0 = performance.now(), dur = rm ? 1 : 900;
+    (function f(now) {
+      if (!root.isConnected) return;
+      var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      sum.textContent = '₩' + (48.2 * e).toFixed(1) + 'M';
+      if (k < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  function reset() {
+    clear(); tries = 0;
+    root.classList.remove('show', 'zap');
+    okv.setAttribute('aria-hidden', 'true'); err.removeAttribute('aria-hidden');
+    dots.forEach(function (d, i) { d.className = i === 0 ? 'f' : ''; });
+    detail();
+    countdown(5);
+  }
+  go.addEventListener('click', function () {
+    if (st === 'wait') attempt();
+    else if (st === 'ok') reset();
+  });
+  more.addEventListener('click', function () { more.setAttribute('aria-expanded', String(more.getAttribute('aria-expanded') !== 'true')); });
+  detail();
+  countdown(5);
+})();
+</script>

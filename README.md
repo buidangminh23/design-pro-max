@@ -21,11 +21,12 @@
 
 </div>
 
-Three skills, one per design:
+Four skills, one per design:
 
 - **apple**: a router for Apple-platform work that sends each task to one bundled guide, either a third-party part or one of the project's own, and has the agent read that guide in full.
 - **design-spacing-rhythm**: spacing, alignment and vertical rhythm for generated UI and documents, bundled from [buidangminh23/spacing-skill](https://github.com/buidangminh23/spacing-skill).
 - **icons-pro-max**: an icon catalog with the exact brand logos, UI icons and render rules, bundled from [buidangminh23/icons-pro-max](https://github.com/buidangminh23/icons-pro-max).
+- **uxui-prompt**: 480 interactive UI elements from [Lucian UX/UI Prompt](https://lucianlabs.dev/uxui-prompt/) (buttons, toggles, forms, sign-in, menus, cards, loaders, empty states, charts, heroes, pricing, scroll and text motion, app screens), searched and ported into a project's framework and theme. It is the MIT [lucian-uxui](https://github.com/Seokwoooo/lucian-uxui) skill by Seokwoooo with the English catalog bundled, so it works offline; see [UX/UI Prompt](#uxui-prompt).
 
 The two bundled skills are copied byte for byte from the latest release of their own repositories and kept in step by a daily job; see [Bundled skills](#bundled-skills).
 
@@ -42,6 +43,7 @@ The bundled skills install the same way, one `--skill` per skill:
 ```sh
 npx skills add buidangminh23/design-pro-max --skill design-spacing-rhythm -g
 npx skills add buidangminh23/design-pro-max --skill icons-pro-max -g
+npx skills add buidangminh23/design-pro-max --skill uxui-prompt -g
 ```
 
 From v0.1 the same files are on npm as `@minhspark/design-pro-max`. `npm install @minhspark/design-pro-max` puts them under `node_modules/@minhspark/design-pro-max/skills/`; copy the skill folders you want, with `apple`'s hidden `.vendor/` folder, into a skill root.
@@ -211,6 +213,15 @@ Whole skills that the owner releases from their own repositories, shipped here u
 - `node scripts/bundle-sync.mjs sync` fetches each pinned commit, proves that the release tag still points at it, and copies the skill folder with the repository's licence as `LICENSE`. It refuses symlinks, submodules, unsafe names, git metadata, `metadata.json`, a second visible `SKILL.md`, and any image, font, media file or archive except the images `BUNDLED_MEDIA` in `scripts/lib/bundles.mjs` allows: `.svg` and `.png` files under `icons-pro-max`'s `assets/` folder.
 - The history check and the release check accept a bundled image only with the bytes `vendor/bundles.json` records for it at the same commit, so a logo changed by hand fails like any unreviewed image.
 - The **Bundle sync** workflow moves each bundle to its repository's latest release; to move one by hand, run `node scripts/bundle-sync.mjs update --only <name>`, then `gen`, `notices` and the checks.
+
+## UX/UI Prompt
+
+`skills/uxui-prompt/` is third-party work under the MIT License, kept with its `LICENSE` and a `NOTICE.md` that lists every change.
+
+- `SKILL.md`, `references/porting.md` and `scripts/lucian-uxui.mjs` come from [Seokwoooo/lucian-uxui](https://github.com/Seokwoooo/lucian-uxui). The skill is renamed `uxui-prompt`, so it does not clash with `lucian-uxui` installed from its own repository, and the CLI has three marked changes that read the bundled data before the network.
+- `data/api/v1/` holds `index.json` and the English catalog, tokens and all 480 elements of [Seokwoooo/lucian-uxui-prompt](https://github.com/Seokwoooo/lucian-uxui-prompt), byte for byte from the commit pinned in `vendor/uxui-prompt.json`, which records every file's size and hash. Korean copy (`--lang ko`) and `--refresh` still go to the network.
+- Elements keep their first-line licence comment, and the skill tells the agent to keep it at the top of every file it builds from one. The vendor guard accepts the zero-width spaces three elements use in their scripts and the sample addresses in their demo copy only under `data/`.
+- `node scripts/uxui-sync.mjs check` verifies the data offline in CI; `sync` refetches the pinned commit and `update` moves the pin to the repository's head. The **Bundle sync** workflow runs `update` daily.
 
 ## Credits
 

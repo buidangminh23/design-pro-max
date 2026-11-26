@@ -1,0 +1,144 @@
+<!-- Lucian UX/UI Prompt #062 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#062 -->
+<!--
+Element: Sign-in card feedback
+ID: 062 · Category: Sign-in & Sign-up · Tags: login, form, loading, error-shake, success
+What it does: Press Sign in and the button shrinks into a spinning circle. A wrong password shakes the card like a head-shake and tells you how many tries are left; the right one turns the button into a check and the card moves on to a welcome screen. The eye on the show-password button blinks open.
+How to use it: Try any wrong password, then enter lumen2026 to see success. The eye button shows the password
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#062
+-->
+<style>
+.u062{position:relative;width:340px;height:480px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u062.shake{animation:u062-no .5s cubic-bezier(.36,.07,.19,.97)}
+@keyframes u062-no{15%{transform:translateX(-9px) rotate(-.6deg)}30%{transform:translateX(8px) rotate(.5deg)}45%{transform:translateX(-6px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+.u062-pane{position:absolute;inset:0;padding:30px 26px 26px;display:flex;flex-direction:column;transition:transform .6s var(--ux-ease),opacity .4s}
+.u062-logo{width:44px;height:44px;border-radius:14px;background:var(--ux-grad);box-shadow:0 10px 20px -10px rgba(91,72,255,.6)}
+.u062-pane h3{margin:18px 0 4px;font-size:24px;font-weight:850;letter-spacing:-.045em}
+.u062-pane>p{margin:0 0 22px;font-size:13.5px;color:var(--ux-ink-3)}
+.u062-f{position:relative;margin-bottom:12px}
+.u062-f label{display:block;margin-bottom:6px;font-size:12.5px;font-weight:700;color:var(--ux-ink-2)}
+.u062-box{position:relative;display:flex;align-items:center;height:52px;border-radius:15px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .25s,background-color .25s}
+.u062-box:focus-within{background:var(--ux-surface);box-shadow:inset 0 0 0 1.5px var(--ux-accent),0 0 0 4px var(--ux-accent-soft)}
+.u062-f.bad .u062-box{box-shadow:inset 0 0 0 1.5px var(--ux-danger);background:color-mix(in srgb,var(--ux-danger) 6%,var(--ux-surface))}
+.u062-box input{flex:1;min-width:0;height:100%;border:0;padding:0 16px;background:none;font-size:15px;font-weight:600;color:var(--ux-ink);outline:none}
+.u062-box input:focus-visible{outline:none}
+.u062-box input::placeholder{color:var(--ux-ink-3);font-weight:500}
+.u062-eye{width:44px;height:44px;margin-right:4px;border:0;padding:0;border-radius:12px;display:grid;place-items:center;background:none;color:var(--ux-ink-3);transition:color .2s}
+.u062-eye:hover{color:var(--ux-ink)}
+.u062-eye:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-4px}
+.u062-eye svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.u062-lid{transform-origin:12px 12px;transition:transform .35s var(--ux-spring)}
+.u062-eye[aria-pressed="false"] .u062-lid{transform:scaleY(.5)}
+.u062-slash{stroke-dasharray:24;stroke-dashoffset:0;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u062-eye[aria-pressed="true"] .u062-slash{stroke-dashoffset:24}
+.u062-caps{position:absolute;right:0;top:0;font-size:11.5px;font-weight:800;color:var(--ux-warn);opacity:0;transition:opacity .2s}
+.u062-caps.on{opacity:1}
+.u062-err{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ux-ease)}
+.u062-err>span{overflow:hidden;min-height:0;font-size:12.5px;font-weight:650;color:var(--ux-danger)}
+.u062-err>span::before{content:"";display:block;height:7px}
+.u062-f.bad .u062-err{grid-template-rows:1fr}
+.u062-row{display:flex;justify-content:flex-end;margin:-2px 0 0}
+.u062-row a{font-size:12.5px;font-weight:700;color:var(--ux-accent);text-decoration:none}
+.u062-row a:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px;border-radius:4px}
+.u062-go{position:relative;align-self:center;width:100%;height:54px;margin-top:auto;border:0;border-radius:17px;background:var(--ux-ink);color:var(--ux-page);font-size:15.5px;font-weight:760;overflow:hidden;transition:width .45s var(--ux-spring),border-radius .45s var(--ux-spring),background-color .4s,transform .3s var(--ux-spring)}
+.u062-go:active{transform:scale(.97)}
+.u062-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u062-go span{transition:opacity .2s}
+.u062-go i{position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;opacity:0;animation:u062-spin .7s linear infinite}
+.u062-go svg{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u062-go svg path{stroke-dasharray:26;stroke-dashoffset:26;transition:stroke-dashoffset .4s var(--ux-ease) .1s}
+.u062-go.busy,.u062-go.ok{width:54px;border-radius:27px}
+.u062-go.busy span,.u062-go.ok span{opacity:0}
+.u062-go.busy i{opacity:1}
+.u062-go.ok{background:var(--ux-mint);color:var(--ux-accent-ink)}
+.u062-go.ok svg path{stroke-dashoffset:0}
+@keyframes u062-spin{to{transform:rotate(360deg)}}
+.u062-hi{transform:translateX(100%);opacity:0;align-items:center;justify-content:center;text-align:center}
+.u062.is-in .u062-login{transform:translateX(-30%);opacity:0;pointer-events:none}
+.u062.is-in .u062-hi{transform:none;opacity:1}
+.u062-av{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#FFE2C2,#F2A27A 45%,#B5577A);box-shadow:0 0 0 6px var(--ux-surface),0 0 0 8px var(--ux-mint)}
+.u062-hi h3{margin-top:22px}
+.u062-hi button{margin-top:22px;height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--ux-surface-2);color:var(--ux-ink);font-size:13.5px;font-weight:700}
+.u062-hi button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u062">
+  <form class="u062-pane u062-login" novalidate>
+    <span class="u062-logo" aria-hidden="true"></span>
+    <h3>Welcome back</h3>
+    <p>Sign in with your Lumen account</p>
+    <div class="u062-f"><label>Email</label><div class="u062-box"><input type="email" value="seoyeon@example.com" autocomplete="username"></div></div>
+    <div class="u062-f u062-pw"><label>Password</label><span class="u062-caps" aria-live="polite">Caps Lock is on</span><div class="u062-box"><input type="password" placeholder="Enter password" autocomplete="current-password"><button class="u062-eye" type="button" aria-pressed="false" aria-label="Show password"><svg viewBox="0 0 24 24"><g class="u062-lid"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></g><path class="u062-slash" d="M4 4l16 16"/></svg></button></div><div class="u062-err"><span role="alert"></span></div></div>
+    <div class="u062-row"><a href="#">Forgot password?</a></div>
+    <button class="u062-go" type="submit"><span>Sign in</span><i aria-hidden="true"></i><svg viewBox="0 0 26 26" aria-hidden="true"><path d="M6 13.5l4.5 4.5L20 8.5"/></svg></button>
+  </form>
+  <div class="u062-pane u062-hi" aria-hidden="true">
+    <span class="u062-av" aria-hidden="true"></span>
+    <h3>Welcome in, Seoyeon</h3>
+    <p>Last seen · yesterday 9:12 PM</p>
+    <button type="button" tabindex="-1">Use another account</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var form = root.querySelector('.u062-login'), hi = root.querySelector('.u062-hi');
+  var pwF = root.querySelector('.u062-pw'), pw = pwF.querySelector('input'), err = pwF.querySelector('.u062-err span');
+  var eye = root.querySelector('.u062-eye'), caps = root.querySelector('.u062-caps'), go = root.querySelector('.u062-go');
+  var back = hi.querySelector('button');
+  var uid = 'u062' + Math.random().toString(36).slice(2, 7);
+  root.querySelectorAll('.u062-login .u062-f').forEach(function (f, i) {
+    var inp = f.querySelector('input'); inp.id = uid + i; f.querySelector('label').htmlFor = inp.id;
+  });
+  err.id = uid + 'e'; pw.setAttribute('aria-describedby', err.id);
+  var left = 3, busy = false, t = 0;
+  eye.addEventListener('click', function () {
+    var on = eye.getAttribute('aria-pressed') !== 'true';
+    eye.setAttribute('aria-pressed', String(on));
+    eye.setAttribute('aria-label', on ? 'Hide password' : 'Show password');
+    pw.type = on ? 'text' : 'password';
+  });
+  pw.addEventListener('keyup', function (e) { if (e.getModifierState) caps.classList.toggle('on', e.getModifierState('CapsLock')); });
+  pw.addEventListener('input', function () { pwF.classList.remove('bad'); pw.removeAttribute('aria-invalid'); });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    busy = true;
+    go.classList.add('busy');
+    go.setAttribute('aria-label', 'Checking');
+    t = setTimeout(function () {
+      if (!root.isConnected) return;
+      go.classList.remove('busy');
+      if (pw.value === 'lumen2026') {
+        go.classList.add('ok');
+        go.setAttribute('aria-label', 'Signed in');
+        t = setTimeout(function () {
+          if (!root.isConnected) return;
+          root.classList.add('is-in');
+          form.inert = true; hi.setAttribute('aria-hidden', 'false'); back.tabIndex = 0;
+          back.focus({ preventScroll: true });
+        }, 650);
+        return;
+      }
+      busy = false;
+      go.removeAttribute('aria-label');
+      left = Math.max(0, left - 1);
+      err.textContent = left ? 'Wrong password · ' + left + (left === 1 ? ' try left' : ' tries left') : 'Try again later or reset your password';
+      pwF.classList.add('bad');
+      pw.setAttribute('aria-invalid', 'true');
+      root.classList.remove('shake'); void root.offsetWidth; root.classList.add('shake');
+      pw.select();
+    }, 1100);
+  });
+  root.addEventListener('animationend', function (e) { if (e.target === root) root.classList.remove('shake'); });
+  back.addEventListener('click', function () {
+    clearTimeout(t);
+    root.classList.remove('is-in');
+    form.inert = false; hi.setAttribute('aria-hidden', 'true'); back.tabIndex = -1;
+    go.classList.remove('ok'); go.removeAttribute('aria-label');
+    busy = false; left = 3; pw.value = ''; pwF.classList.remove('bad');
+    pw.focus({ preventScroll: true });
+  });
+  root.querySelector('.u062-row a').addEventListener('click', function (e) { e.preventDefault(); });
+})();
+</script>

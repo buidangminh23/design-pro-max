@@ -1,0 +1,123 @@
+<!-- Lucian UX/UI Prompt #375 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#375 -->
+<!--
+Element: Word-by-word kinetic captions
+ID: 375 · Category: Text Motion · Tags: text, captions, kinetic, video, subtitle
+What it does: Press play and the captions pop in one word at a time on the beat of the speech, with key words swelling large before settling in color. When a sentence ends, its caption line folds up and away as the next one begins, and the waveform below rises and falls like a voice.
+How to use it: Tap the screen or the play button to start and stop, and rewind to watch from the start
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#375
+-->
+<style>
+.u375{position:relative;width:340px;height:340px;display:flex;flex-direction:column;padding:12px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u375-scr{position:relative;flex:1;border:0;padding:0;border-radius:18px;overflow:hidden;background:radial-gradient(60% 70% at 30% 30%,#3A2F7A,transparent 70%),radial-gradient(60% 60% at 80% 80%,#0E6B63,transparent 70%),#0B0C12;cursor:pointer;text-align:left}
+.u375-tag{position:absolute;left:12px;top:12px;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.35);font-size:11px;font-weight:700;color:rgba(255,255,255,.8)}
+.u375-person{position:absolute;left:50%;bottom:-30px;width:150px;height:170px;margin-left:-75px;border-radius:75px 75px 30px 30px;background:linear-gradient(#5B4FA8,#2E2867);opacity:.9}
+.u375-person::before{content:"";position:absolute;left:44px;top:-56px;width:62px;height:62px;border-radius:50%;background:linear-gradient(#7C6FD0,#4A3F96)}
+.u375.is-play .u375-person{animation:u375-talk .5s ease-in-out infinite alternate}
+@keyframes u375-talk{to{transform:translateY(-2px) rotate(.6deg)}}
+.u375-cap{position:absolute;left:12px;right:12px;bottom:16px;min-height:70px;display:flex;align-items:flex-end;justify-content:center}
+.u375-line{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:2px 7px;font-size:23px;line-height:1.15;font-weight:900;letter-spacing:-.03em;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 18px rgba(0,0,0,.4);transform-origin:50% 0;transition:transform .45s cubic-bezier(.6,0,.3,1),opacity .35s}
+.u375-line.out{transform:translateY(-26px) rotateX(70deg);opacity:0}
+.u375-w{display:inline-block;opacity:0;transform:translateY(12px) scale(.6)}
+.u375-w.on{opacity:1;transform:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .15s}
+.u375-w.em{color:#FFE066}
+.u375-w.em.on{animation:u375-pop .6s cubic-bezier(.3,1.4,.5,1)}
+@keyframes u375-pop{0%{transform:scale(.4);color:#fff}45%{transform:scale(1.45) rotate(-3deg);color:#fff}100%{transform:none}}
+.u375-ft{display:flex;align-items:center;gap:10px;padding:10px 4px 2px}
+.u375-pl,.u375-rw{flex:none;width:40px;height:40px;border:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-ink);color:var(--ux-page);transition:transform .35s var(--ux-spring)}
+.u375-rw{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u375-pl:active,.u375-rw:active{transform:scale(.9)}
+.u375-ft svg{width:17px;height:17px;fill:currentColor}
+.u375-rw svg{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u375-pl .pa,.u375.is-play .u375-pl .pl{display:none}
+.u375.is-play .u375-pl .pa{display:block}
+.u375-wave{flex:1;height:30px;display:flex;align-items:center;gap:3px}
+.u375-wave i{flex:1;height:calc(var(--v,.1) * 100%);min-height:3px;border-radius:3px;background:var(--ux-accent);opacity:.75;transition:height .09s linear}
+</style>
+<div class="ux u375">
+  <button class="u375-scr" type="button" aria-label="Video, tap to play or pause">
+    <span class="u375-tag">Design retro · 02</span>
+    <span class="u375-person" aria-hidden="true"></span>
+    <span class="u375-cap" aria-live="off"></span>
+  </button>
+  <div class="u375-ft">
+    <button class="u375-pl" type="button" aria-label="Play"><svg class="pl" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg class="pa" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+    <div class="u375-wave" aria-hidden="true"></div>
+    <button class="u375-rw" type="button" aria-label="From the start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/></svg></button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cap = root.querySelector('.u375-cap'), wave = root.querySelector('.u375-wave'), pl = root.querySelector('.u375-pl');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SCRIPT = [['Today', 'we', 'fixed', '*just one*', 'button'], ['And', 'sign-ups', 'went', '*up twice*'], ['Small', 'motion', 'makes', '*a big difference*']];
+  var WORD = 0.36, GAP = 1.0;
+  var timeline = [], t = 0.3;
+  SCRIPT.forEach(function (sent, si) {
+    var start = t;
+    var words = sent.map(function (w) {
+      var em = w.charAt(0) === '*';
+      if (em) t += 0.12;
+      var at = t;
+      t += WORD + (em ? 0.22 : 0) + Math.random() * 0.08;
+      return { text: em ? w.slice(1, -1) : w, em: em, at: at };
+    });
+    timeline.push({ start: start, end: t + GAP * 0.6, words: words });
+    t += GAP;
+  });
+  var TOTAL = t, pos = 0, playing = false, last = 0, raf = 0, shown = -1, lineEl = null, lastW = 0;
+  var bars = [];
+  for (var i = 0; i < 26; i++) { var b = document.createElement('i'); wave.appendChild(b); bars.push(b); }
+  function showSentence(si) {
+    if (lineEl) { var old = lineEl; old.classList.add('out'); setTimeout(function () { old.remove(); }, 500); }
+    lineEl = null;
+    shown = si;
+    if (si < 0) return;
+    lineEl = document.createElement('span');
+    lineEl.className = 'u375-line';
+    timeline[si].words.forEach(function (w) {
+      var s = document.createElement('span');
+      s.className = 'u375-w' + (w.em ? ' em' : '');
+      s.textContent = w.text;
+      lineEl.appendChild(s);
+    });
+    cap.appendChild(lineEl);
+  }
+  function render() {
+    var si = -1;
+    timeline.forEach(function (s, k) { if (pos >= s.start && pos < s.end) si = k; });
+    if (si !== shown) showSentence(si);
+    if (lineEl) {
+      var ws = lineEl.children;
+      timeline[si].words.forEach(function (w, k) { if (pos >= w.at || rm) ws[k].classList.add('on'); });
+    }
+  }
+  function tick(now) {
+    if (!root.isConnected) return;
+    pos += Math.max(0, Math.min(0.05, (now - last) / 1000));
+    last = now;
+    if (pos >= TOTAL) { pos = 0; toggle(false); showSentence(-1); return; }
+    render();
+    if (now - lastW > 90) {
+      lastW = now;
+      var talking = timeline.some(function (s) { return pos >= s.start && pos < s.end - GAP * 0.5; });
+      bars.forEach(function (b, k) { b.style.setProperty('--v', (talking ? 0.25 + Math.random() * 0.75 * Math.sin((k + 2) / 28 * Math.PI) : 0.08 + Math.random() * 0.06).toFixed(2)); });
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  function toggle(on) {
+    playing = on == null ? !playing : on;
+    root.classList.toggle('is-play', playing);
+    pl.setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    cancelAnimationFrame(raf);
+    if (playing) { last = performance.now(); raf = requestAnimationFrame(tick); }
+    else bars.forEach(function (b) { b.style.setProperty('--v', '0.08'); });
+  }
+  pl.addEventListener('click', function () { toggle(); });
+  root.querySelector('.u375-scr').addEventListener('click', function () { toggle(); });
+  root.querySelector('.u375-rw').addEventListener('click', function () { pos = 0; showSentence(-1); toggle(true); });
+  bars.forEach(function (b) { b.style.setProperty('--v', '0.08'); });
+})();
+</script>

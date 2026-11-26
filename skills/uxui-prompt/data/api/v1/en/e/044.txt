@@ -1,0 +1,89 @@
+<!-- Lucian UX/UI Prompt #044 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#044 -->
+<!--
+Element: FAQ accordion
+ID: 044 · Category: Menus & Tabs · Tags: accordion, faq, disclosure, expand, keyboard
+What it does: Press a question and its panel lifts as the answer unfolds smoothly, while one stroke of the plus lies down to become a minus. Only one opens at a time; the rest fold away calmly.
+How to use it: Press questions to open and close them. With a keyboard, move with the up and down arrows and open with Enter
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#044
+-->
+<style>
+.u044{position:relative;width:350px;height:400px;display:flex;flex-direction:column;gap:8px}
+.u044-it{position:relative;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);transition:background-color .4s var(--ux-ease),box-shadow .5s var(--ux-ease),transform .5s var(--ux-spring)}
+.u044-it.open{box-shadow:0 0 0 1px var(--ux-line-2),0 22px 40px -22px var(--ux-shadow-strong);transform:translateY(-2px)}
+.u044-q{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:0 14px 0 16px;border:0;border-radius:20px;background:none;font-size:14.5px;font-weight:680;letter-spacing:-.02em;color:var(--ux-ink);text-align:left}
+.u044-q:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u044-n{font-size:12px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums;transition:color .3s}
+.u044-it.open .u044-n{color:var(--ux-accent)}
+.u044-t{flex:1}
+.u044-pm{position:relative;width:30px;height:30px;flex:none;border-radius:50%;background:var(--ux-surface-2);box-shadow:none;transition:background-color .35s var(--ux-ease),box-shadow .35s,transform .45s var(--ux-spring)}
+.u044-q:hover .u044-pm{transform:scale(1.1)}
+.u044-q:active .u044-pm{transform:scale(.9)}
+.u044-pm::before,.u044-pm::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:2px;margin:-1px 0 0 -5.5px;border-radius:2px;background:var(--ux-ink);transition:transform .5s var(--ux-spring),background-color .3s}
+.u044-pm::after{transform:rotate(90deg)}
+.u044-it.open .u044-pm{background:var(--ux-ink);box-shadow:none}
+.u044-it.open .u044-pm::before,.u044-it.open .u044-pm::after{background:var(--ux-page)}
+.u044-it.open .u044-pm::after{transform:rotate(180deg)}
+.u044-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ux-ease)}
+.u044-it.open .u044-body{grid-template-rows:1fr}
+.u044-body>div{overflow:hidden;min-height:0}
+.u044-a{padding:0 18px 16px 42px;opacity:0;transform:translateY(-8px);transition:opacity .25s var(--ux-ease),transform .45s var(--ux-spring)}
+.u044-it.open .u044-a{opacity:1;transform:none;transition-delay:.12s}
+.u044-a p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ux-ink-2)}
+.u044-a a{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-size:13px;font-weight:700;color:var(--ux-accent);text-decoration:none}
+.u044-a a:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px;border-radius:4px}
+.u044-a a i{font-style:normal;transition:transform .3s var(--ux-spring)}
+.u044-a a:hover i{transform:translateX(3px)}
+</style>
+<div class="ux u044">
+  <div class="u044-it open">
+    <button class="u044-q" type="button" aria-expanded="true"><span class="u044-n">01</span><span class="u044-t">Can I cancel anytime?</span><span class="u044-pm" aria-hidden="true"></span></button>
+    <div class="u044-body" role="region"><div><div class="u044-a"><p>Yes — cancel right from Billing in Settings. You keep access until your next billing date.</p><a href="#">How to cancel <i aria-hidden="true">→</i></a></div></div></div>
+  </div>
+  <div class="u044-it">
+    <button class="u044-q" type="button" aria-expanded="false"><span class="u044-n">02</span><span class="u044-t">How many people can I invite?</span><span class="u044-pm" aria-hidden="true"></span></button>
+    <div class="u044-body" role="region"><div><div class="u044-a"><p>The Team plan allows up to 40 people. Added seats apply from your next bill.</p><a href="#">Compare plans <i aria-hidden="true">→</i></a></div></div></div>
+  </div>
+  <div class="u044-it">
+    <button class="u044-q" type="button" aria-expanded="false"><span class="u044-n">03</span><span class="u044-t">Where are my files saved?</span><span class="u044-pm" aria-hidden="true"></span></button>
+    <div class="u044-body" role="region"><div><div class="u044-a"><p>Everything saves to its project automatically, and you can restore versions for 30 days.</p><a href="#">About version history <i aria-hidden="true">→</i></a></div></div></div>
+  </div>
+  <div class="u044-it">
+    <button class="u044-q" type="button" aria-expanded="false"><span class="u044-n">04</span><span class="u044-t">Is there a student discount?</span><span class="u044-pm" aria-hidden="true"></span></button>
+    <div class="u044-body" role="region"><div><div class="u044-a"><p>Verify with a school email and get Pro free for a year.</p><a href="#">Verify student status <i aria-hidden="true">→</i></a></div></div></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var items = Array.prototype.slice.call(root.querySelectorAll('.u044-it'));
+  var qs = items.map(function (it) { return it.querySelector('.u044-q'); });
+  var uid = 'u044-' + Math.random().toString(36).slice(2, 7);
+  items.forEach(function (it, i) {
+    var q = qs[i], body = it.querySelector('.u044-body');
+    q.id = uid + '-q' + i; body.id = uid + '-a' + i;
+    q.setAttribute('aria-controls', body.id); body.setAttribute('aria-labelledby', q.id);
+  });
+  function set(it, open) {
+    it.classList.toggle('open', open);
+    it.querySelector('.u044-q').setAttribute('aria-expanded', String(open));
+    it.querySelector('.u044-a a').tabIndex = open ? 0 : -1;
+  }
+  items.forEach(function (it, i) {
+    set(it, it.classList.contains('open'));
+    qs[i].addEventListener('click', function () {
+      var willOpen = !it.classList.contains('open');
+      items.forEach(function (o) { if (o !== it) set(o, false); });
+      set(it, willOpen);
+    });
+    qs[i].addEventListener('keydown', function (e) {
+      var n = e.key === 'ArrowDown' ? i + 1 : e.key === 'ArrowUp' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? qs.length - 1 : -2;
+      if (n === -2) return;
+      e.preventDefault();
+      qs[(n + qs.length) % qs.length].focus();
+    });
+    it.querySelector('.u044-a a').addEventListener('click', function (e) { e.preventDefault(); });
+  });
+})();
+</script>

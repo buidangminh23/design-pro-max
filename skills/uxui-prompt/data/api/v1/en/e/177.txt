@@ -1,0 +1,151 @@
+<!-- Lucian UX/UI Prompt #177 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#177 -->
+<!--
+Element: Branching edit history
+ID: 177 · Category: Workflow & Systems · Tags: history, undo-redo, branching, tree, editor
+What it does: Each edit to the shape stacks up as a node in the history graph below. Undo a few steps and make a new edit, and the history that used to follow isn’t thrown away — it stays as a branch on the row below, and pressing any node smoothly returns the shape to that state. The current position wears a ring, and steps you can still redo are shown faded.
+How to use it: Use a few edit tools, undo with ↶, then make a different edit. Press a node to jump to it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#177
+-->
+<style>
+.u177{position:relative;width:340px;height:356px;padding:16px;box-sizing:border-box;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u177-st{position:relative;height:132px;border-radius:16px;background:radial-gradient(var(--ux-line) 1px,transparent 1.5px) 0 0/14px 14px,var(--ux-surface-2);overflow:hidden}
+.u177-sh{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;background:var(--c,#4D78C9);box-shadow:0 14px 22px -12px var(--c,#4D78C9);transition:transform .55s cubic-bezier(.3,1.35,.5,1),border-radius .5s var(--ux-spring),background-color .4s,box-shadow .4s}
+.u177-ch{position:absolute;left:10px;top:10px;padding:4px 9px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);font-size:11px;font-weight:750;color:var(--ux-ink-2)}
+.u177-ch.pop{animation:u177-pop .4s var(--ux-spring)}
+@keyframes u177-pop{from{opacity:0;transform:translateY(-6px) scale(.9)}}
+.u177-tools{display:flex;gap:6px;margin-top:10px}
+.u177-tl{flex:1;height:34px;border:0;border-radius:10px;background:var(--ux-surface-2);color:var(--ux-ink);font-size:12px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:5px;transition:transform .25s var(--ux-spring),background-color .2s}
+.u177-tl:hover{background:color-mix(in srgb,var(--ux-ink) 9%,var(--ux-surface-2))}
+.u177-tl:active{transform:scale(.94)}
+.u177-tl i{font-style:normal;color:#4D78C9}
+.u177-gr{position:relative;height:104px;margin-top:10px;border-radius:14px;box-shadow:inset 0 0 0 1px var(--ux-line);overflow:hidden}
+.u177-cv{position:absolute;left:0;top:0;height:100%;transition:transform .45s var(--ux-ease)}
+.u177-cv svg{position:absolute;left:0;top:0;width:600px;height:104px;overflow:visible}
+.u177-cv path{fill:none;stroke-width:2;transition:stroke .3s,opacity .3s}
+.u177-nd{position:absolute;left:0;top:0;width:24px;height:24px;margin:-12px 0 0 -12px;border:0;padding:0;border-radius:50%;background:#4D78C9;color:#fff;font-size:10px;font-weight:900;line-height:24px;transition:transform .45s cubic-bezier(.3,1.25,.5,1),background-color .3s,opacity .3s,box-shadow .3s}
+.u177-nd.fut{background:var(--ux-surface);color:#4D78C9;box-shadow:inset 0 0 0 2px #4D78C9;opacity:.7}
+.u177-nd.side{background:var(--ux-surface);color:var(--ux-ink-3);box-shadow:inset 0 0 0 1.5px var(--ux-line-2)}
+.u177-nd.cur{box-shadow:0 0 0 3px var(--ux-surface),0 0 0 5.5px #4D78C9}
+.u177-nd.cur::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid #4D78C9;opacity:0;animation:u177-ring 1.6s ease-out infinite}
+@keyframes u177-ring{0%{opacity:.6;transform:scale(.7)}100%{opacity:0;transform:scale(1.35)}}
+.u177-nd.new{animation:u177-in .45s cubic-bezier(.3,1.5,.5,1)}
+@keyframes u177-in{from{scale:0}}
+.u177-nd:focus-visible,.u177-tl:focus-visible,.u177-bt button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u177-bt{display:flex;align-items:center;gap:8px;margin-top:10px}
+.u177-bt button{width:38px;height:32px;border:0;border-radius:10px;background:var(--ux-ink);color:var(--ux-surface);font-size:17px;font-weight:700;transition:opacity .2s,transform .25s var(--ux-spring)}
+.u177-bt button:disabled{opacity:.25}
+.u177-bt button:not(:disabled):active{transform:scale(.92)}
+.u177-bt span{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--ux-ink-3)}
+</style>
+<div class="ux u177">
+  <div class="u177-st"><div class="u177-sh" role="img" aria-label="Shape being edited"></div><span class="u177-ch" aria-live="polite"></span></div>
+  <div class="u177-tools" role="group" aria-label="Edit tools"></div>
+  <div class="u177-gr" role="group" aria-label="Edit history"><div class="u177-cv"><svg aria-hidden="true"></svg></div></div>
+  <div class="u177-bt"><button class="u177-un" type="button" aria-label="Undo">↶</button><button class="u177-rd" type="button" aria-label="Redo">↷</button><span></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sh = root.querySelector('.u177-sh'), chip = root.querySelector('.u177-ch'), tools = root.querySelector('.u177-tools'), cv = root.querySelector('.u177-cv'), svg = cv.querySelector('svg');
+  var un = root.querySelector('.u177-un'), rd = root.querySelector('.u177-rd'), info = root.querySelector('.u177-bt span');
+  var KIND = [['Color', '●'], ['Shape', '◆'], ['Rotate', '↻'], ['Size', '⤢']];
+  var HUE = ['#4D78C9', '#E8590C', '#2B8A3E', '#C2255C', '#7048E8'], RAD = ['16px', '50%', '42px 10px'], SC = [1, 1.3, 0.78];
+  var NS = 'http://www.w3.org/2000/svg', DX = 34, X0 = 22;
+  var nodes = [{ id: 0, p: -1, s: { h: 0, f: 0, r: 0, z: 0 }, k: -1, kids: [], last: -1 }], cur = 0;
+  KIND.forEach(function (kd, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u177-tl';
+    b.innerHTML = '<i aria-hidden="true">' + kd[1] + '</i><span></span>'; b.querySelector('span').textContent = kd[0];
+    b.addEventListener('click', function () { edit(i); });
+    tools.appendChild(b);
+  });
+  function depth(id) { var d = 0; while (nodes[id].p >= 0) { id = nodes[id].p; d++; } return d; }
+  function label(n) { return n.k < 0 ? 'Start' : KIND[n.k][0]; }
+  function say(t) { chip.textContent = t; chip.classList.remove('pop'); void chip.offsetWidth; chip.classList.add('pop'); }
+  function apply() {
+    var s = nodes[cur].s;
+    sh.style.setProperty('--c', HUE[s.h]);
+    sh.style.borderRadius = RAD[s.f];
+    sh.style.transform = 'rotate(' + s.r + 'deg) scale(' + SC[s.z] + ')';
+  }
+  function edit(k) {
+    var n = nodes[cur], s = { h: n.s.h, f: n.s.f, r: n.s.r, z: n.s.z };
+    if (k === 0) s.h = (s.h + 1) % HUE.length;
+    if (k === 1) s.f = (s.f + 1) % RAD.length;
+    if (k === 2) s.r += 45;
+    if (k === 3) s.z = (s.z + 1) % SC.length;
+    var branch = n.kids.length > 0;
+    var m = { id: nodes.length, p: cur, s: s, k: k, kids: [], last: -1 };
+    nodes.push(m); n.kids.push(m.id); n.last = m.id; cur = m.id;
+    say((branch ? 'New branch · ' : '') + KIND[k][0]);
+    render(m.id); apply();
+  }
+  function go(id, why) {
+    cur = id;
+    for (var c = id; nodes[c].p >= 0; c = nodes[c].p) nodes[nodes[c].p].last = c;
+    say(why + label(nodes[id]));
+    render(-1); apply();
+  }
+  un.addEventListener('click', function () { if (nodes[cur].p >= 0) { var l = label(nodes[cur]); cur = nodes[cur].p; say('Undo · ' + l); render(-1); apply(); } });
+  rd.addEventListener('click', function () { var n = nodes[cur]; if (n.last >= 0) go(n.last, 'Redo · '); });
+  root.addEventListener('keydown', function (e) {
+    if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== 'z') return;
+    e.preventDefault(); (e.shiftKey ? rd : un).click();
+  });
+  var btns = [];
+  function render(fresh) {
+    var main = [], c = 0;
+    var path = []; for (var a = cur; a >= 0; a = nodes[a].p) path.unshift(a);
+    main = path.slice();
+    for (c = cur; nodes[c].last >= 0; c = nodes[c].last) main.push(nodes[c].last);
+    var row = {}, rows = 1;
+    main.forEach(function (id) { row[id] = 0; });
+    main.forEach(function (id) {
+      nodes[id].kids.forEach(function (k) {
+        if (row[k] != null) return;
+        var r = Math.min(rows, 2); if (rows < 3) rows++;
+        for (var q = k; q >= 0; q = nodes[q].last) { row[q] = r; nodes[q].kids.forEach(function (z) { if (row[z] == null && z !== nodes[q].last) row[z] = r; }); }
+      });
+    });
+    nodes.forEach(function (n) { if (row[n.id] == null) row[n.id] = 2; });
+    svg.innerHTML = '';
+    var past = {}; path.forEach(function (id) { past[id] = true; });
+    var maxX = 0;
+    nodes.forEach(function (n) {
+      var xx = X0 + depth(n.id) * DX, yy = 22 + row[n.id] * 32;
+      n.x = xx; n.y = yy; maxX = Math.max(maxX, xx);
+      if (n.p >= 0) {
+        var p = nodes[n.p], d = document.createElementNS(NS, 'path');
+        d.setAttribute('d', p.y === yy ? 'M' + p.x + ' ' + p.y + 'H' + xx : 'M' + p.x + ' ' + p.y + 'C' + (p.x + DX * 0.6) + ' ' + p.y + ' ' + (xx - DX * 0.6) + ' ' + yy + ' ' + xx + ' ' + yy);
+        var onMain = row[n.id] === 0;
+        d.setAttribute('stroke', onMain ? '#4D78C9' : 'var(--ux-line-2)');
+        if (!past[n.id]) d.setAttribute('stroke-dasharray', onMain ? '4 4' : '3 4');
+        if (onMain && !past[n.id]) d.setAttribute('opacity', '.55');
+        svg.appendChild(d);
+      }
+      var b = btns[n.id];
+      if (!b) {
+        b = document.createElement('button'); b.type = 'button'; b.className = 'u177-nd';
+        b.addEventListener('click', function () { if (n.id !== cur) go(n.id, 'Jumped to · '); });
+        cv.appendChild(b); btns[n.id] = b;
+        var from = fresh === n.id && n.p >= 0 ? nodes[n.p] : n;
+        b.style.transition = 'none'; b.style.transform = 'translate(' + from.x + 'px,' + from.y + 'px)';
+        void b.offsetWidth; b.style.transition = '';
+        if (fresh === n.id) b.classList.add('new');
+      }
+      b.textContent = n.k < 0 ? '○' : KIND[n.k][1];
+      b.style.transform = 'translate(' + xx + 'px,' + yy + 'px)';
+      b.className = 'u177-nd' + (n.id === cur ? ' cur' : '') + (row[n.id] > 0 ? ' side' : !past[n.id] ? ' fut' : '') + (b.classList.contains('new') && fresh === n.id ? ' new' : '');
+      b.setAttribute('aria-label', depth(n.id) + ': ' + label(n) + ', go to this state');
+      b.setAttribute('aria-current', n.id === cur ? 'step' : 'false');
+    });
+    var shift = Math.max(0, nodes[cur].x - (308 - 60));
+    cv.style.transform = 'translateX(' + (-shift) + 'px)';
+    un.disabled = nodes[cur].p < 0; rd.disabled = nodes[cur].last < 0;
+    var branches = nodes.filter(function (n) { return n.kids.length > 1; }).reduce(function (s, n) { return s + n.kids.length - 1; }, 0);
+    info.textContent = (branches ? 'Branches: ' + (branches + 1) + ' · ' : '') + depth(cur) + ' of ' + (main.length - 1) + ' steps';
+  }
+  say('Start'); render(-1); apply();
+})();
+</script>

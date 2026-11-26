@@ -1,0 +1,95 @@
+<!-- Lucian UX/UI Prompt #255 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#255 -->
+<!--
+Element: Drag-to-move kanban cards
+ID: 255 · Category: App Screens · Tags: kanban, drag-and-drop, board, tasks, productivity
+What it does: A task board with To do, In progress and Done columns. Pick up a card and it tilts slightly and lifts; drag it over another column and a gap opens where it will land as the cards below shift down. Drop it and the card settles into the gap while each column's count updates, and cards dropped in Done get a check and a line through their title.
+How to use it: Pick up a card and drop it in another column
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#255
+-->
+<style>
+.u255{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);touch-action:none;user-select:none}
+.u255-bd{position:absolute;inset:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.u255-col{position:relative;padding:8px 6px;border-radius:16px;background:color-mix(in srgb,var(--ux-surface) 55%,transparent);box-shadow:inset 0 0 0 1px var(--ux-line);transition:background .2s,box-shadow .2s}
+.u255-col.is-over{background:color-mix(in srgb,var(--ux-accent) 9%,var(--ux-surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ux-accent) 45%,transparent)}
+.u255-ch{display:flex;align-items:center;gap:5px;padding:2px 4px 8px;font-size:10.5px;font-weight:850;color:var(--ux-ink-2)}
+.u255-ch i{width:7px;height:7px;border-radius:50%}
+.u255-ch b{margin-left:auto;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--ux-surface);font-size:9.5px;font-weight:850;line-height:16px;text-align:center;font-variant-numeric:tabular-nums;box-sizing:border-box}
+.u255-ch b.is-pop{animation:u255-pop .4s cubic-bezier(.3,1.7,.5,1)}
+@keyframes u255-pop{40%{transform:scale(1.35)}}
+.u255-cd{position:relative;margin-bottom:6px;padding:8px;border-radius:11px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 2px 4px -2px var(--ux-shadow-strong);cursor:grab;transition:box-shadow .2s,transform .2s}
+.u255-cd:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u255-cd b{display:block;font-size:10.5px;line-height:1.35;font-weight:800;text-decoration-thickness:1.5px;text-decoration-color:var(--ux-ink-3)}
+.u255-cd span{display:inline-block;margin-top:6px;padding:1px 6px;border-radius:999px;font-size:8.5px;font-weight:850;color:#fff}
+.u255-cd em{position:absolute;right:7px;bottom:7px;width:16px;height:16px;border-radius:50%;background:#10B981;transform:scale(0);transition:transform .35s cubic-bezier(.3,1.7,.5,1)}
+.u255-cd em::after{content:"";position:absolute;left:5.5px;top:3px;width:3.5px;height:7px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.u255-col[data-c="2"] .u255-cd b{text-decoration-line:line-through;color:var(--ux-ink-3)}
+.u255-col[data-c="2"] .u255-cd em{transform:none}
+.u255-cd.is-lift{position:absolute;z-index:10;margin:0;cursor:grabbing;transform:rotate(3deg) scale(1.04);box-shadow:0 0 0 1px var(--ux-line),0 18px 30px -12px var(--ux-shadow-strong);transition:transform .2s,box-shadow .2s}
+.u255-cd.is-land{position:absolute;z-index:10;margin:0;transition:left .28s cubic-bezier(.3,1.2,.5,1),top .28s cubic-bezier(.3,1.2,.5,1),transform .28s}
+.u255-ph{margin-bottom:6px;border-radius:11px;border:1.5px dashed color-mix(in srgb,var(--ux-accent) 50%,transparent);background:color-mix(in srgb,var(--ux-accent) 6%,transparent);transition:height .2s cubic-bezier(.3,1.2,.5,1)}
+@media (prefers-reduced-motion: reduce){.u255-cd,.u255-cd.is-land,.u255-ph,.u255-cd em{transition:none}.u255-ch b.is-pop{animation:none}}
+</style>
+<div class="ux u255"><div class="u255-bd"></div></div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bd = root.querySelector('.u255-bd');
+  var COL = ['To do', 'In progress', 'Done'], CC = ['#94A3B8', '#6366F1', '#10B981'];
+  var CD = [[0, 'Pricing page draft', 'Design', '#EC4899'], [0, 'Onboarding email copy', 'Marketing', '#F59E0B'], [0, 'Checkout error logs', 'Dev', '#0EA5E9'], [1, 'Landing hero', 'Design', '#EC4899'], [1, 'Speed up the API', 'Dev', '#0EA5E9'], [2, 'Connect domain', 'Dev', '#0EA5E9']];
+  var cols = COL.map(function (n, i) {
+    var c = document.createElement('div'); c.className = 'u255-col'; c.dataset.c = i; c.setAttribute('role', 'list'); c.setAttribute('aria-label', n);
+    c.innerHTML = '<div class="u255-ch"><i style="background:' + CC[i] + '"></i><span></span><b></b></div>'; c.querySelector('span').textContent = n;
+    bd.appendChild(c); return c;
+  });
+  function counts(pop) { cols.forEach(function (c, i) { var b = c.querySelector('b'), n = c.querySelectorAll('.u255-cd:not(.is-lift):not(.is-land)').length + (c.querySelector('.u255-ph') ? 1 : 0); if (b.textContent != n && pop && pop.indexOf(i) >= 0) { b.classList.remove('is-pop'); void b.offsetWidth; b.classList.add('is-pop'); } b.textContent = n; }); }
+  CD.forEach(function (d) {
+    var e = document.createElement('div'); e.className = 'u255-cd'; e.tabIndex = 0; e.setAttribute('role', 'listitem');
+    e.innerHTML = '<b></b><span style="background:' + d[3] + '"></span><em aria-hidden="true"></em>'; e.querySelector('b').textContent = d[1]; e.querySelector('span').textContent = d[2];
+    cols[d[0]].appendChild(e); bind(e);
+  });
+  counts();
+  function k() { return root.offsetWidth / (root.getBoundingClientRect().width || 1); }
+  function local(x, y) { var r = root.getBoundingClientRect(), s = k(); return { x: (x - r.left) * s, y: (y - r.top) * s }; }
+  var drag = null;
+  function bind(e) {
+    e.addEventListener('pointerdown', function (ev) {
+      if (drag) return;
+      var s = k(), r = e.getBoundingClientRect(), p = local(ev.clientX, ev.clientY), at = local(r.left, r.top);
+      var ph = document.createElement('div'); ph.className = 'u255-ph'; ph.style.height = (r.height * s) + 'px';
+      e.parentNode.insertBefore(ph, e);
+      drag = { e: e, ph: ph, dx: p.x - at.x, dy: p.y - at.y, from: +e.parentNode.dataset.c, w: r.width * s };
+      e.style.width = drag.w + 'px'; e.style.left = at.x + 'px'; e.style.top = at.y + 'px'; e.classList.add('is-lift'); root.appendChild(e);
+      try { e.setPointerCapture(ev.pointerId); } catch (er) {}
+      ev.preventDefault();
+    });
+    e.addEventListener('pointermove', function (ev) {
+      if (!drag || drag.e !== e) return;
+      var p = local(ev.clientX, ev.clientY);
+      e.style.left = (p.x - drag.dx) + 'px'; e.style.top = (p.y - drag.dy) + 'px';
+      var col = null; cols.forEach(function (c) { var r = c.getBoundingClientRect(); if (ev.clientX >= r.left && ev.clientX <= r.right) col = c; });
+      cols.forEach(function (c) { c.classList.toggle('is-over', c === col && +c.dataset.c !== drag.from); });
+      if (!col) return;
+      var list = Array.prototype.filter.call(col.querySelectorAll('.u255-cd'), function (c) { return c !== e; }), before = null;
+      for (var i = 0; i < list.length; i++) { var r = list[i].getBoundingClientRect(); if (ev.clientY < r.top + r.height / 2) { before = list[i]; break; } }
+      if (before) { if (drag.ph.nextSibling !== before) col.insertBefore(drag.ph, before); } else if (drag.ph.parentNode !== col || drag.ph.nextSibling) col.appendChild(drag.ph);
+      counts();
+    });
+    function up() {
+      if (!drag || drag.e !== e) return;
+      var d = drag; drag = null;
+      var s = k(), r = d.ph.getBoundingClientRect(), at = local(r.left, r.top);
+      e.classList.remove('is-lift'); e.classList.add('is-land'); e.style.left = at.x + 'px'; e.style.top = at.y + 'px';
+      cols.forEach(function (c) { c.classList.remove('is-over'); });
+      setTimeout(function () { d.ph.parentNode.insertBefore(e, d.ph); d.ph.remove(); e.classList.remove('is-land'); e.style.cssText = ''; counts([d.from, +e.parentNode.dataset.c]); }, 290);
+    }
+    e.addEventListener('pointerup', up); e.addEventListener('pointercancel', up);
+    e.addEventListener('keydown', function (ev) {
+      var dir = ev.key === 'ArrowRight' ? 1 : ev.key === 'ArrowLeft' ? -1 : 0, c = +e.parentNode.dataset.c, to = c + dir;
+      if (!dir || to < 0 || to > 2) return;
+      ev.preventDefault(); var h = cols[to].querySelector('.u255-ch'); cols[to].insertBefore(e, h.nextSibling); e.focus(); counts([c, to]);
+    });
+  }
+})();
+</script>

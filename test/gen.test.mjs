@@ -33,6 +33,7 @@ test('skills.json lists the apple skill and the bundled skills with their folder
     { name: 'apple', path: 'skills/apple' },
     { name: 'design-spacing-rhythm', path: 'skills/design-spacing-rhythm' },
     { name: 'icons-pro-max', path: 'skills/icons-pro-max' },
+    { name: 'uxui-prompt', path: 'skills/uxui-prompt' },
   ]);
 });
 

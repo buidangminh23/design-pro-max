@@ -1,0 +1,134 @@
+<!-- Lucian UX/UI Prompt #064 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#064 -->
+<!--
+Element: Envelope magic-link sign-in
+ID: 064 · Category: Sign-in & Sign-up · Tags: magic-link, passwordless, envelope, countdown, resend
+What it does: Press the button and the letter slides down into the envelope, the flap closes and the envelope flies off. A “Check your inbox” screen opens next, with Resend locked until its ring fills.
+How to use it: Check the email and press “Email me a link”. After sending, try the locked Resend and “Use a different email” to start over
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#064
+-->
+<style>
+.u064{position:relative;width:340px;height:470px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u064-art{position:absolute;left:50%;top:40px;width:180px;height:150px;margin-left:-90px;transition:transform .7s cubic-bezier(.5,-.3,.6,1),opacity .5s}
+.u064.fly .u064-art{transform:translate(170px,-160px) rotate(18deg) scale(.4);opacity:0}
+.u064.sent .u064-art{transform:none;opacity:1;transition:transform .7s var(--ux-spring),opacity .4s}
+.u064-env{position:absolute;left:10px;right:10px;bottom:0;height:104px;perspective:400px}
+.u064-clip{position:absolute;left:0;right:0;top:-90px;bottom:0;overflow:hidden;border-radius:0 0 12px 12px}
+.u064-back{position:absolute;left:0;right:0;bottom:0;height:104px;border-radius:12px;background:#C9BEFF}
+.u064-letter{position:absolute;left:16px;right:16px;bottom:30px;height:118px;border-radius:8px;background:#fff;box-shadow:0 4px 14px rgba(40,20,90,.2);padding:14px;transition:transform .6s var(--ux-ease)}
+.u064-letter i{display:block;height:7px;margin-bottom:8px;border-radius:4px;background:#E8E4F7}
+.u064-letter i:first-child{width:46%;background:#8B6CFF}
+.u064-letter i:nth-child(3){width:70%}
+.u064-front{position:absolute;inset:0;border-radius:12px;background:linear-gradient(160deg,#A795FF,#7B61FF);clip-path:polygon(0 0,50% 58%,100% 0,100% 100%,0 100%)}
+.u064-flap{position:absolute;left:0;right:0;top:0;height:64px;transform-origin:50% 0;transform:rotateX(180deg);transition:transform .5s var(--ux-ease)}
+.u064-flap::before{content:"";position:absolute;inset:0;background:#9580FF;clip-path:polygon(0 0,100% 0,50% 100%);border-radius:12px 12px 0 0}
+.u064.sealed .u064-letter{transform:translateY(70px)}
+.u064.sealed .u064-flap{transform:none;transition-delay:.45s}
+.u064-badge{position:absolute;right:-6px;top:-10px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 4px var(--ux-surface);transform:scale(0);transition:transform .5s var(--ux-spring) .3s}
+.u064-badge svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u064.sent .u064-badge{transform:none}
+.u064-pane{position:absolute;left:0;right:0;bottom:0;top:208px;padding:0 26px 24px;display:flex;flex-direction:column;text-align:center;transition:transform .55s var(--ux-ease),opacity .35s}
+.u064-pane h3{margin:0;font-size:22px;font-weight:850;letter-spacing:-.045em}
+.u064-pane p{margin:6px 0 18px;font-size:13.5px;line-height:1.55;color:var(--ux-ink-3)}
+.u064-pane p b{color:var(--ux-ink)}
+.u064-ask{}
+.u064-done{transform:translateY(30px);opacity:0;pointer-events:none}
+.u064.sent .u064-ask{transform:translateY(-20px);opacity:0;pointer-events:none}
+.u064.sent .u064-done{transform:none;opacity:1;pointer-events:auto;transition-delay:.15s}
+.u064-box{display:flex;align-items:center;height:52px;padding:0 16px;border-radius:15px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .25s,background-color .25s}
+.u064-box:focus-within{background:var(--ux-surface);box-shadow:inset 0 0 0 1.5px var(--ux-accent),0 0 0 4px var(--ux-accent-soft)}
+.u064-box.bad{box-shadow:inset 0 0 0 1.5px var(--ux-danger)}
+.u064-box input{flex:1;min-width:0;height:100%;border:0;padding:0;background:none;font-size:15px;font-weight:600;color:var(--ux-ink);outline:none;text-align:left}
+.u064-box input:focus-visible{outline:none}
+.u064-b{height:52px;margin-top:10px;border:0;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--ux-ink);color:var(--ux-page);font-size:15px;font-weight:760;transition:transform .3s var(--ux-spring),opacity .3s}
+.u064-b:active{transform:scale(.97)}
+.u064-b:focus-visible,.u064-link:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u064-b.ghost{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u064-b[aria-disabled="true"]{opacity:.55}
+.u064-ring{width:20px;height:20px;transform:rotate(-90deg)}
+.u064-ring circle{fill:none;stroke-width:2.5}
+.u064-ring .t{stroke:var(--ux-line-2)}
+.u064-ring .p{stroke:var(--ux-accent);stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0) * 100);stroke-linecap:round}
+.u064-link{align-self:center;margin-top:12px;border:0;padding:4px;background:none;font-size:13px;font-weight:700;color:var(--ux-ink-3);text-decoration:underline;text-underline-offset:3px}
+</style>
+<div class="ux u064">
+  <div class="u064-art" aria-hidden="true"><div class="u064-env"><span class="u064-clip"><span class="u064-back"></span><span class="u064-letter"><i></i><i></i><i></i></span></span><span class="u064-front"></span><span class="u064-flap"></span><span class="u064-badge"><svg viewBox="0 0 20 20"><path d="M5 10.5l3.5 3.5L15 7"/></svg></span></div></div>
+  <form class="u064-pane u064-ask" novalidate>
+    <h3>Sign in without a password</h3>
+    <p>We’ll email you a one-time sign-in link</p>
+    <label class="u064-box"><input type="email" value="seoyeon@example.com" aria-label="Email" autocomplete="email"></label>
+    <button class="u064-b" type="submit">Email me a link</button>
+  </form>
+  <div class="u064-pane u064-done" aria-hidden="true" aria-live="polite">
+    <h3>Check your inbox</h3>
+    <p>Open the link we sent to <b class="u064-to"></b> to sign in. It works for 10 minutes.</p>
+    <button class="u064-b" type="button" tabindex="-1">Open mail app</button>
+    <button class="u064-b ghost u064-re" type="button" tabindex="-1" aria-disabled="true"><svg class="u064-ring" viewBox="0 0 20 20" aria-hidden="true"><circle class="t" cx="10" cy="10" r="8"/><circle class="p" cx="10" cy="10" r="8" pathLength="100"/></svg><span>Resend · 30s</span></button>
+    <button class="u064-link" type="button" tabindex="-1">Use a different email</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ask = root.querySelector('.u064-ask'), done = root.querySelector('.u064-done'), inp = ask.querySelector('input'), box = ask.querySelector('.u064-box');
+  var re = root.querySelector('.u064-re'), reLab = re.querySelector('span'), to = root.querySelector('.u064-to'), other = root.querySelector('.u064-link');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var WAIT = 30, raf = 0, ts = [];
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, rm ? 0 : ms)); }
+  function clear() { ts.forEach(clearTimeout); ts = []; cancelAnimationFrame(raf); }
+  function countdown() {
+    var t0 = performance.now();
+    re.setAttribute('aria-disabled', 'true');
+    (function step(now) {
+      if (!root.isConnected) return;
+      var el = (now - t0) / 1000, left = Math.max(0, Math.ceil(WAIT - el));
+      re.style.setProperty('--p', Math.min(1, el / WAIT).toFixed(3));
+      reLab.textContent = left ? 'Resend · ' + left + 's' : 'Resend';
+      if (left) raf = requestAnimationFrame(step); else re.setAttribute('aria-disabled', 'false');
+    })(t0);
+  }
+  function setPane(sent) {
+    ask.inert = sent; done.inert = !sent;
+    done.setAttribute('aria-hidden', String(!sent));
+    done.querySelectorAll('button').forEach(function (b) { b.tabIndex = sent ? 0 : -1; });
+  }
+  function send() {
+    clear();
+    to.textContent = inp.value.trim();
+    root.classList.remove('sent');
+    root.classList.add('sealed');
+    later(function () { root.classList.add('fly'); }, 950);
+    later(function () {
+      root.classList.remove('fly');
+      root.classList.add('sent');
+      setPane(true);
+      re.focus({ preventScroll: true });
+      countdown();
+    }, 1650);
+  }
+  ask.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(inp.value.trim())) {
+      box.classList.add('bad'); inp.setAttribute('aria-invalid', 'true');
+      box.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(5px)' }, { transform: 'none' }], { duration: 300 });
+      return;
+    }
+    box.classList.remove('bad'); inp.removeAttribute('aria-invalid');
+    send();
+  });
+  inp.addEventListener('input', function () { box.classList.remove('bad'); });
+  re.addEventListener('click', function () {
+    if (re.getAttribute('aria-disabled') === 'true') return;
+    root.classList.remove('sent'); setPane(false);
+    send();
+  });
+  other.addEventListener('click', function () {
+    clear();
+    root.classList.remove('sent', 'sealed', 'fly');
+    setPane(false);
+    inp.focus({ preventScroll: true }); inp.select();
+  });
+  setPane(false);
+})();
+</script>

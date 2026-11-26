@@ -1,0 +1,112 @@
+<!-- Lucian UX/UI Prompt #006 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#006 -->
+<!--
+Element: Ink ripple subscribe button
+ID: 006 · Category: Buttons · Tags: button, ripple, subscribe, toggle, counter
+What it does: Ink spreads from the exact spot you press and the button switches to subscribed. The bell shakes and the subscriber count rolls up by one. Press again to reverse it.
+How to use it: Press anywhere on the button — the ripple starts where you press
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#006
+-->
+<style>
+.u006{position:relative;width:320px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.u006-ch{display:flex;align-items:center;gap:14px;width:270px}
+.u006-av{position:relative;width:58px;height:58px;border-radius:50%;flex:none;padding:3px;background:conic-gradient(from 200deg,#FF6B8B,#FFB26B,#8B6CFF,#FF6B8B)}
+.u006-av span{display:block;width:100%;height:100%;border-radius:50%;border:3px solid var(--ux-page);background:radial-gradient(circle at 35% 30%,#FFD3A8,#FF7A93 55%,#7B61FF)}
+.u006-ch b{display:block;font-size:17px;font-weight:720;letter-spacing:-.025em}
+.u006-cnt{display:flex;align-items:center;white-space:pre;margin-top:3px;font-size:13.5px;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u006-roll{position:relative;display:inline-block;height:1.3em;overflow:hidden;vertical-align:bottom}
+.u006-roll span{display:block;line-height:1.3em;transition:transform .55s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u006-roll span+span{position:absolute;left:0;top:0}
+.u006-btn{position:relative;width:270px;height:60px;border:0;padding:0;border-radius:18px;overflow:hidden;isolation:isolate;background:var(--ux-danger);color:var(--ux-accent-ink);
+  box-shadow:0 18px 32px -18px color-mix(in srgb,var(--ux-danger) 80%,transparent);transition:background-color .55s var(--ux-ease),color .45s var(--ux-ease),box-shadow .5s var(--ux-ease),transform .45s var(--ux-spring)}
+.u006-btn:hover{transform:translateY(-2px)}
+.u006-btn:active{transform:scale(.97)}
+.u006-btn:focus-visible{outline:2px solid var(--ux-danger);outline-offset:4px}
+.u006-lab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16.5px;font-weight:720;letter-spacing:-.02em}
+.u006-bell{width:20px;height:20px;transform-origin:50% 8%}
+.u006-bell svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u006-bell .u006-solid{fill:currentColor;opacity:0;transition:opacity .3s var(--ux-ease)}
+.u006-ink{position:absolute;z-index:0;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--c);pointer-events:none;animation:u006-ink .75s var(--ux-ease) forwards}
+@keyframes u006-ink{from{transform:scale(0);opacity:.9}to{transform:scale(var(--s));opacity:1}}
+.u006.is-on .u006-btn{background:var(--ux-surface);color:var(--ux-ink);box-shadow:inset 0 0 0 1px var(--ux-line-2),0 14px 26px -20px var(--ux-shadow-strong)}
+.u006.is-on .u006-bell{animation:u006-ring .9s var(--ux-ease)}
+.u006.is-on .u006-bell .u006-solid{opacity:1}
+@keyframes u006-ring{0%{transform:rotate(0)}15%{transform:rotate(18deg)}30%{transform:rotate(-15deg)}45%{transform:rotate(11deg)}60%{transform:rotate(-7deg)}75%{transform:rotate(3deg)}100%{transform:rotate(0)}}
+.u006-txt{position:relative;display:inline-grid;justify-items:center;height:22px;overflow:hidden}
+.u006-txt span{grid-area:1/1;display:block;line-height:22px;white-space:nowrap;transition:transform .5s var(--ux-spring)}
+.u006-txt span+span{transform:translateY(100%)}
+.u006.is-on .u006-txt span:first-child{transform:translateY(-100%)}
+.u006.is-on .u006-txt span+span{transform:none}
+.u006-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+<div class="ux u006">
+  <div class="u006-ch">
+    <span class="u006-av" aria-hidden="true"><span></span></span>
+    <div>
+      <b>Motion Studio</b>
+      <span class="u006-cnt"><span class="u006-roll" aria-hidden="true"><span>1,284</span><span></span></span> subscribers<span class="u006-sr" aria-live="polite"></span></span>
+    </div>
+  </div>
+  <button class="u006-btn" type="button" aria-pressed="false">
+    <span class="u006-lab">
+      <span class="u006-bell" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="u006-solid" d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z"/><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span>
+      <span class="u006-txt"><span>Subscribe</span><span aria-hidden="true">Subscribed</span></span>
+    </span>
+  </button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u006-btn');
+  var roll = root.querySelector('.u006-roll');
+  var sr = root.querySelector('.u006-sr');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var count = 1284;
+  var on = false;
+  var fmt = function (n) { return n.toLocaleString('en-US'); };
+
+  var curIdx = 0;
+  function rollTo(n, up) {
+    var cur = roll.children[curIdx], nxt = roll.children[1 - curIdx];
+    nxt.style.transition = 'none';
+    nxt.textContent = fmt(n);
+    nxt.style.transform = 'translateY(' + (up ? 100 : -100) + '%)';
+    nxt.style.opacity = '0';
+    void nxt.offsetWidth;
+    nxt.style.transition = '';
+    nxt.style.transform = 'none';
+    nxt.style.opacity = '1';
+    cur.style.transform = 'translateY(' + (up ? -100 : 100) + '%)';
+    cur.style.opacity = '0';
+    curIdx = 1 - curIdx;
+  }
+  function ripple(x, y) {
+    if (rm) return;
+    var r = btn.getBoundingClientRect();
+    var k = r.width / btn.offsetWidth || 1;
+    var px = (x - r.left) / k, py = (y - r.top) / k;
+    var w = btn.offsetWidth, h = btn.offsetHeight;
+    var far = Math.hypot(Math.max(px, w - px), Math.max(py, h - py));
+    var ink = document.createElement('span');
+    ink.className = 'u006-ink';
+    ink.style.left = px + 'px';
+    ink.style.top = py + 'px';
+    ink.style.setProperty('--s', (far / 10 + 0.4).toFixed(2));
+    ink.style.setProperty('--c', on ? 'var(--ux-danger)' : 'var(--ux-surface)');
+    btn.appendChild(ink);
+    setTimeout(function () { ink.remove(); }, 900);
+  }
+  btn.addEventListener('click', function (e) {
+    var x = e.clientX, y = e.clientY;
+    if (!e.detail) { var r = btn.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top + r.height / 2; }
+    ripple(x, y);
+    on = !on;
+    count += on ? 1 : -1;
+    root.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    rollTo(count, on);
+    sr.textContent = on ? 'Subscribed. ' + fmt(count) + ' subscribers' : 'Unsubscribed';
+  });
+})();
+</script>

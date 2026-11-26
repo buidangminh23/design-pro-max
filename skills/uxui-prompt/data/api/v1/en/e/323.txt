@@ -1,0 +1,57 @@
+<!-- Lucian UX/UI Prompt #323 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#323 -->
+<!--
+Element: Cursor-dropped photo trail
+ID: 323 · Category: Cursor & Hover · Tags: cursor-trail, images, hover, editorial, stack
+What it does: Move the cursor and a photo drops at every spot it passes, piling up at slight tilts before shrinking away a moment later. The faster you move, the denser the photos fall, while the large headline in the middle shows through between them. Press and a handful of photos fan out at that spot at once.
+How to use it: Sweep the cursor around widely, and press anywhere
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#323
+-->
+<style>
+.u323{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#F4F1EA;background:light-dark(#F4F1EA,#1D1A16);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#1E1B16;color:light-dark(#1E1B16,#F2ECE1)}
+.u323-hd{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none;text-align:center}
+.u323-hd b{font-size:38px;line-height:1.05;font-weight:900;letter-spacing:-.04em;max-width:260px;word-break:keep-all}
+.u323-hd span{font-size:11.5px;font-weight:700;color:#8A8274;color:light-dark(#8A8274,#958C7D);letter-spacing:.04em}
+.u323-hit{position:absolute;inset:0;border:0;padding:0;background:transparent;cursor:crosshair;border-radius:inherit}
+.u323-hit:focus-visible{outline:2px solid #1E1B16;outline-color:light-dark(#1E1B16,#F2ECE1);outline-offset:-6px}
+.u323-p{position:absolute;left:0;top:0;width:78px;height:96px;margin:-48px 0 0 -39px;padding:5px 5px 14px;background:#fff;background:light-dark(#fff,#2C2924);border-radius:3px;box-shadow:0 10px 20px -8px rgba(30,27,22,.45);box-shadow:0 10px 20px -8px light-dark(rgba(30,27,22,.45),rgba(0,0,0,.7)),inset 0 0 0 1px light-dark(transparent,rgba(255,255,255,.06));pointer-events:none;animation:u323-in .32s cubic-bezier(.3,1.6,.5,1) both}
+.u323-p i{display:block;width:100%;height:100%;border-radius:1px}
+.u323-p.is-out{animation:u323-out .45s ease-in forwards}
+@keyframes u323-in{from{transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(.3);opacity:0}to{transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(1);opacity:1}}
+@keyframes u323-out{from{transform:translate(var(--x),var(--y)) rotate(var(--r)) scale(1);opacity:1}to{transform:translate(var(--x),calc(var(--y) + 14px)) rotate(var(--r)) scale(.4);opacity:0}}
+@media (prefers-reduced-motion: reduce){.u323-p,.u323-p.is-out{animation-duration:.01s}}
+</style>
+<div class="ux u323">
+  <div class="u323-hd" aria-hidden="true"><b>Seasons in photos</b><span>Move to drop photos</span></div>
+  <button type="button" class="u323-hit" aria-label="Photo trail stage, move or press"></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var hit = root.querySelector('.u323-hit');
+  var ART = ['linear-gradient(#FFB4A2 0 45%,#5C7CFA 45%)', 'linear-gradient(160deg,#2B8A3E,#8CE99A)', 'linear-gradient(#1B1F3B 0 60%,#FCC419 60% 64%,#1B1F3B 64%)', 'linear-gradient(170deg,#FFD8A8 0 40%,#E8590C 40%)', 'linear-gradient(150deg,#E7F5FF 0 50%,#748FFC 50%)', 'linear-gradient(#D0BFFF 0 50%,#7048E8 50%)', 'linear-gradient(#A5D8FF 0 55%,#1864AB 55%)', 'radial-gradient(circle at 70% 30%,#FFF3BF 0 10%,#1A1B4B 11%)', 'linear-gradient(170deg,#FFA94D,#C92A2A)', 'linear-gradient(#E3FAFC 0 50%,#66D9E8 50%)'];
+  var ai = 0, last = null, live = [];
+  function drop(x, y, r, life) {
+    var p = document.createElement('span'); p.className = 'u323-p';
+    p.style.setProperty('--x', x.toFixed(1) + 'px'); p.style.setProperty('--y', y.toFixed(1) + 'px'); p.style.setProperty('--r', r.toFixed(1) + 'deg');
+    p.innerHTML = '<i style="background:' + ART[ai++ % ART.length] + '"></i>';
+    root.insertBefore(p, hit); live.push(p);
+    if (live.length > 14) kill(live.shift());
+    setTimeout(function () { kill(p); }, life || 900);
+  }
+  function kill(p) { if (!p.parentNode || p.classList.contains('is-out')) return; p.classList.add('is-out'); setTimeout(function () { p.remove(); var i = live.indexOf(p); if (i >= 0) live.splice(i, 1); }, 460); }
+  function loc(e) { var r = root.getBoundingClientRect(), k = root.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  root.addEventListener('pointermove', function (e) {
+    var q = loc(e);
+    if (!last) { last = q; return; }
+    var d = Math.hypot(q.x - last.x, q.y - last.y);
+    if (d > 46) { drop(q.x, q.y, (Math.random() - 0.5) * 24 + (q.x - last.x) * 0.06); last = q; }
+  });
+  root.addEventListener('pointerleave', function () { last = null; });
+  hit.addEventListener('click', function (e) {
+    var q = e.detail === 0 ? { x: 170, y: 170 } : loc(e);
+    for (var i = 0; i < 5; i++) (function (i) { setTimeout(function () { drop(q.x + (i - 2) * 16, q.y + Math.abs(i - 2) * 4, (i - 2) * 12, 1400); }, i * 60); })(i);
+  });
+})();
+</script>

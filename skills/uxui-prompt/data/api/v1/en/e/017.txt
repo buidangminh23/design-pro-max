@@ -1,0 +1,104 @@
+<!-- Lucian UX/UI Prompt #017 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#017 -->
+<!--
+Element: Tilting value bubble slider
+ID: 017 · Category: Toggles & Pickers · Tags: slider, range, bubble, physics, drag
+What it does: The value bubble above leans away from the direction you drag, as far as your speed, then springs upright when you stop. The fill bar and the tick labels respond to the value too.
+How to use it: Drag the handle quickly left and right. Arrow keys and PageUp/PageDown work too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#017
+-->
+<style>
+.u017{position:relative;width:330px;height:210px;display:flex;flex-direction:column;justify-content:center;padding:0 24px}
+.u017-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:58px}
+.u017-head b{font-size:16px;font-weight:720;letter-spacing:-.02em}
+.u017-head span{font-size:13px;color:var(--ux-ink-3)}
+.u017-track{position:relative;height:12px;border-radius:999px;background:var(--ux-surface-3);box-shadow:inset 0 1px 2px rgba(0,0,0,.08);cursor:pointer;touch-action:none}
+.u017-fill{position:absolute;left:0;top:0;bottom:0;width:calc(var(--v) * 100%);border-radius:inherit;background:linear-gradient(90deg,#8B6CFF,#4F8DFF)}
+.u017-fill::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.35),transparent 60%)}
+.u017-thumb{position:absolute;left:calc(var(--v) * 100%);top:50%;width:32px;height:32px;margin:-16px 0 0 -16px;border-radius:50%;background:#fff;cursor:grab;
+  box-shadow:0 0 0 3px #4F8DFF,0 8px 18px -6px rgba(40,60,160,.5);transition:transform .35s var(--ux-spring),box-shadow .3s var(--ux-ease)}
+.u017-thumb:hover{transform:scale(1.08)}
+.u017.is-drag .u017-thumb{cursor:grabbing;transform:scale(1.15);box-shadow:0 0 0 3px #4F8DFF,0 0 0 10px color-mix(in srgb,#4F8DFF 18%,transparent),0 8px 18px -6px rgba(40,60,160,.5)}
+.u017-thumb:focus-visible{outline:none;box-shadow:0 0 0 3px #4F8DFF,0 0 0 8px color-mix(in srgb,var(--ux-accent) 35%,transparent)}
+
+.u017-bub{position:absolute;left:calc(var(--v) * 100%);bottom:28px;transform-origin:50% 100%;transform:translateX(-50%) rotate(var(--tilt,0deg)) scale(var(--bs,1));transition:transform .55s var(--ux-spring);pointer-events:none}
+.u017.is-drag .u017-bub{--bs:1.1;transition:transform .12s linear}
+.u017-bub span{display:block;padding:9px 14px;border-radius:14px;background:var(--ux-ink);color:var(--ux-page);font-size:16px;font-weight:760;letter-spacing:-.02em;white-space:nowrap;font-variant-numeric:tabular-nums;box-shadow:0 12px 24px -12px var(--ux-shadow-strong)}
+.u017-bub::after{content:"";position:absolute;left:50%;bottom:-5px;width:12px;height:12px;margin-left:-6px;border-radius:2px;background:var(--ux-ink);transform:rotate(45deg)}
+.u017-ticks{display:flex;justify-content:space-between;margin-top:18px;font-size:12px;font-weight:600;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u017-ticks span{position:relative;transition:color .3s var(--ux-ease)}
+.u017-ticks span.on{color:var(--ux-ink)}
+.u017-ticks span::before{content:"";position:absolute;left:50%;top:-10px;width:2px;height:5px;margin-left:-1px;border-radius:1px;background:currentColor;opacity:.6}
+</style>
+<div class="ux u017" style="--v:.45">
+  <div class="u017-head"><b>Monthly ad budget</b><span>Up to $1,000</span></div>
+  <div class="u017-track">
+    <span class="u017-fill" aria-hidden="true"></span>
+    <span class="u017-bub" aria-hidden="true"><span class="u017-val">$450</span></span>
+    <span class="u017-thumb" role="slider" tabindex="0" aria-label="Monthly ad budget" aria-valuemin="0" aria-valuemax="1000000" aria-valuenow="450000" aria-valuetext="$450"></span>
+  </div>
+  <div class="u017-ticks" aria-hidden="true"><span>$0</span><span>$250</span><span>$500</span><span>$750</span><span>$1K</span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var track = root.querySelector('.u017-track');
+  var thumb = root.querySelector('.u017-thumb');
+  var bub = root.querySelector('.u017-bub');
+  var out = root.querySelector('.u017-val');
+  var ticks = Array.prototype.slice.call(root.querySelectorAll('.u017-ticks span'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var MAX = 1000000, STEP = 10000;
+  var v = 450000, lastX = 0, lastT = 0, still = 0;
+  function render() {
+    var p = v / MAX;
+    root.style.setProperty('--v', p.toFixed(4));
+    out.textContent = '$' + (v / 1000).toLocaleString('en-US');
+    thumb.setAttribute('aria-valuenow', String(v));
+    thumb.setAttribute('aria-valuetext', '$' + (v / 1000));
+    ticks.forEach(function (t, i) { t.classList.toggle('on', i / 4 <= p + 0.001); });
+  }
+  function tilt(deg) {
+    if (rm) return;
+    bub.style.setProperty('--tilt', Math.max(-22, Math.min(22, deg)).toFixed(1) + 'deg');
+    clearTimeout(still);
+    still = setTimeout(function () { bub.style.setProperty('--tilt', '0deg'); }, 90);
+  }
+  function fromX(x) {
+    var r = track.getBoundingClientRect();
+    var p = Math.max(0, Math.min(1, (x - r.left) / r.width));
+    v = Math.round(p * MAX / STEP) * STEP;
+    render();
+  }
+  track.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    track.setPointerCapture(e.pointerId);
+    root.classList.add('is-drag');
+    lastX = e.clientX; lastT = performance.now();
+    fromX(e.clientX);
+    thumb.focus({ preventScroll: true });
+  });
+  track.addEventListener('pointermove', function (e) {
+    if (!track.hasPointerCapture(e.pointerId)) return;
+    var now = performance.now();
+    var vel = (e.clientX - lastX) / Math.max(8, now - lastT);
+    lastX = e.clientX; lastT = now;
+    tilt(-vel * 14);
+    fromX(e.clientX);
+  });
+  function end() { root.classList.remove('is-drag'); bub.style.setProperty('--tilt', '0deg'); }
+  track.addEventListener('pointerup', end);
+  track.addEventListener('pointercancel', end);
+  thumb.addEventListener('keydown', function (e) {
+    var d = { ArrowRight: STEP, ArrowUp: STEP, ArrowLeft: -STEP, ArrowDown: -STEP, PageUp: 100000, PageDown: -100000 }[e.key];
+    if (e.key === 'Home') d = -MAX; if (e.key === 'End') d = MAX;
+    if (!d) return;
+    e.preventDefault();
+    v = Math.max(0, Math.min(MAX, v + d));
+    tilt(d > 0 ? -9 : 9);
+    render();
+  });
+  render();
+})();
+</script>

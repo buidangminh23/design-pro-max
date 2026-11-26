@@ -1,0 +1,187 @@
+{
+  "name": "Lucian UX/UI Prompt",
+  "api": 1,
+  "version": "5cf2f84413",
+  "updated": "2026-11-23T07:25:06.732Z",
+  "count": 480,
+  "languages": [
+    "en",
+    "ko"
+  ],
+  "license": "MIT (c) 2026 Seokwoooo",
+  "gallery": "https://lucianlabs.dev/uxui-prompt/",
+  "skill": "https://github.com/Seokwoooo/lucian-uxui",
+  "paths": {
+    "catalog": "{lang}/catalog.tsv",
+    "element": "{lang}/e/{id}.txt",
+    "tokens": "{lang}/tokens.css"
+  },
+  "catalogs": {
+    "en": "b3be7826ba",
+    "ko": "bd97f6318b"
+  },
+  "categories": [
+    {
+      "slug": "buttons",
+      "en": "Buttons",
+      "ko": "버튼",
+      "count": 18
+    },
+    {
+      "slug": "toggles-pickers",
+      "en": "Toggles & Pickers",
+      "ko": "토글·선택",
+      "count": 19
+    },
+    {
+      "slug": "inputs-search",
+      "en": "Inputs & Search",
+      "ko": "입력·검색",
+      "count": 20
+    },
+    {
+      "slug": "menus-tabs",
+      "en": "Menus & Tabs",
+      "ko": "메뉴·탭",
+      "count": 16
+    },
+    {
+      "slug": "cards-content",
+      "en": "Cards & Content",
+      "ko": "카드·콘텐츠",
+      "count": 17
+    },
+    {
+      "slug": "sign-in-sign-up",
+      "en": "Sign-in & Sign-up",
+      "ko": "로그인·가입",
+      "count": 17
+    },
+    {
+      "slug": "alerts-feedback",
+      "en": "Alerts & Feedback",
+      "ko": "알림·피드백",
+      "count": 14
+    },
+    {
+      "slug": "loading-progress",
+      "en": "Loading & Progress",
+      "ko": "로딩·진행",
+      "count": 14
+    },
+    {
+      "slug": "empty-error-states",
+      "en": "Empty & Error States",
+      "ko": "빈·오류 상태",
+      "count": 7
+    },
+    {
+      "slug": "widgets-charts",
+      "en": "Widgets & Charts",
+      "ko": "위젯·차트",
+      "count": 8
+    },
+    {
+      "slug": "layout-schedule-design",
+      "en": "Layout, Schedule & Design",
+      "ko": "공간·일정·디자인 도구",
+      "count": 25
+    },
+    {
+      "slug": "document-data-editing",
+      "en": "Document & Data Editing",
+      "ko": "문서·데이터 편집",
+      "count": 25
+    },
+    {
+      "slug": "analytics-data",
+      "en": "Analytics & Data",
+      "ko": "분석·데이터",
+      "count": 25
+    },
+    {
+      "slug": "workflow-systems",
+      "en": "Workflow & Systems",
+      "ko": "작업·시스템",
+      "count": 25
+    },
+    {
+      "slug": "sections-content",
+      "en": "Sections & Content",
+      "ko": "섹션·콘텐츠",
+      "count": 24
+    },
+    {
+      "slug": "data-motion",
+      "en": "Data Motion",
+      "ko": "데이터 모션",
+      "count": 18
+    },
+    {
+      "slug": "commerce-pricing",
+      "en": "Commerce & Pricing",
+      "ko": "커머스·가격",
+      "count": 24
+    },
+    {
+      "slug": "text-motion",
+      "en": "Text Motion",
+      "ko": "텍스트 모션",
+      "count": 18
+    },
+    {
+      "slug": "social-proof",
+      "en": "Social Proof",
+      "ko": "소셜 증명",
+      "count": 10
+    },
+    {
+      "slug": "navigation",
+      "en": "Navigation",
+      "ko": "내비게이션",
+      "count": 23
+    },
+    {
+      "slug": "forms-input",
+      "en": "Forms & Input",
+      "ko": "폼·입력",
+      "count": 23
+    },
+    {
+      "slug": "hero-backgrounds",
+      "en": "Hero & Backgrounds",
+      "ko": "히어로·배경",
+      "count": 20
+    },
+    {
+      "slug": "app-screens",
+      "en": "App Screens",
+      "ko": "앱 화면",
+      "count": 20
+    },
+    {
+      "slug": "scroll-motion",
+      "en": "Scroll Motion",
+      "ko": "스크롤 모션",
+      "count": 17
+    },
+    {
+      "slug": "cursor-hover",
+      "en": "Cursor & Hover",
+      "ko": "커서·호버",
+      "count": 8
+    },
+    {
+      "slug": "site-builder-tools",
+      "en": "Site Builder Tools",
+      "ko": "빌더 도구",
+      "count": 16
+    },
+    {
+      "slug": "promos-rewards",
+      "en": "Promos & Rewards",
+      "ko": "프로모션·보상",
+      "count": 9
+    }
+  ]
+}

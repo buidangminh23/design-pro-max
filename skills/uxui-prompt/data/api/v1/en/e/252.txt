@@ -1,0 +1,79 @@
+<!-- Lucian UX/UI Prompt #252 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#252 -->
+<!--
+Element: Shining expandable announcement pill
+ID: 252 · Category: Hero & Backgrounds · Tags: announcement, badge, hero, shine, changelog
+What it does: Every few seconds a streak of light sweeps across the announcement pill above the hero headline, and its message rolls up to the next piece of news. Hover it and the border brightens as the arrow nudges forward; press it and the pill unfolds downward as the three latest updates drop in one by one. Press again to fold it back into a pill.
+How to use it: Hover the announcement pill, then press it to expand
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#252
+-->
+<style>
+.u252{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(100% 60% at 50% 0%,var(--ux-accent-soft),transparent 65%),var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u252-wr{position:absolute;left:50%;top:46px;transform:translateX(-50%);width:252px;z-index:2}
+.u252-pl{position:relative;display:flex;align-items:center;gap:8px;width:100%;height:34px;padding:0 10px 0 4px;border:0;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line),0 6px 16px -10px var(--ux-shadow-strong);font:inherit;color:var(--ux-ink);cursor:pointer;overflow:hidden;transition:box-shadow .25s,border-radius .35s}
+.u252-pl:hover,.u252-pl.g-hov{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ux-accent) 60%,transparent),0 8px 22px -10px var(--ux-accent)}
+.u252-pl:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u252-pl::after{content:"";position:absolute;top:0;bottom:0;width:60px;left:-80px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);pointer-events:none}
+.u252.is-shine .u252-pl::after{animation:u252-sh .9s ease-in-out}
+@keyframes u252-sh{to{left:120%}}
+.u252-tg{flex:none;height:26px;padding:0 9px;border-radius:999px;background:var(--ux-grad);color:var(--ux-accent-ink);font-size:10.5px;font-weight:900;display:grid;place-items:center}
+.u252-rl{flex:1;height:18px;overflow:hidden;text-align:left}
+.u252-rs{display:block;transition:transform .5s cubic-bezier(.3,1.2,.5,1)}
+.u252-rs span{display:block;height:18px;line-height:18px;font-size:11.5px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u252-ar{flex:none;width:14px;height:14px;color:var(--ux-ink-3);transition:transform .3s cubic-bezier(.3,1.6,.5,1),color .25s}
+.u252-pl:hover .u252-ar,.u252-pl.g-hov .u252-ar{transform:translateX(3px);color:var(--ux-accent)}
+.u252.is-open .u252-ar{transform:rotate(90deg);color:var(--ux-accent)}
+.u252-pn{margin-top:6px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 40px -18px var(--ux-shadow-strong);padding:0 14px;max-height:0;opacity:0;overflow:hidden;transition:max-height .45s cubic-bezier(.2,.9,.3,1),opacity .25s,padding .35s}
+.u252.is-open .u252-pn{max-height:220px;opacity:1;padding:12px 14px}
+.u252-pn h4{margin:0 0 6px;display:flex;justify-content:space-between;font-size:10.5px;font-weight:850;color:var(--ux-ink-3)}
+.u252-pn h4 a{color:var(--ux-accent);text-decoration:none}
+.u252-it{display:grid;grid-template-columns:36px 1fr;gap:8px;padding:7px 0;border-top:1px solid var(--ux-line);opacity:0;transform:translateY(-6px);transition:opacity .3s,transform .4s cubic-bezier(.3,1.3,.5,1)}
+.u252.is-open .u252-it{opacity:1;transform:none}
+.u252-it time{font-size:9.5px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums;padding-top:1px}
+.u252-it b{display:block;font-size:11.5px;font-weight:850}
+.u252-it span{font-size:10px;font-weight:600;color:var(--ux-ink-2)}
+.u252-hr{position:absolute;left:0;right:0;top:108px;text-align:center;transition:opacity .3s,filter .3s}
+.u252.is-open .u252-hr{opacity:.25;filter:blur(1.5px)}
+.u252-hr h3{margin:0;font-size:28px;line-height:1.12;font-weight:900;letter-spacing:-.045em}
+.u252-hr p{margin:12px 34px 0;font-size:11.5px;line-height:1.5;font-weight:600;color:var(--ux-ink-2)}
+.u252-dc{position:absolute;left:0;right:0;bottom:46px;display:flex;justify-content:center;gap:8px;transition:opacity .3s}
+.u252-dc span{height:34px;padding:0 16px;border-radius:999px;display:inline-flex;align-items:center;font-size:12px;font-weight:800}
+.u252-dc span:first-child{background:var(--ux-ink);color:var(--ux-surface)}
+.u252-dc span:last-child{background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u252.is-open .u252-dc{opacity:.25}
+@media (prefers-reduced-motion: reduce){.u252.is-shine .u252-pl::after{animation:none}.u252-rs,.u252-pn,.u252-it{transition:none}}
+</style>
+<div class="ux u252">
+  <div class="u252-wr">
+    <button type="button" class="u252-pl" aria-expanded="false"><span class="u252-tg">New</span><span class="u252-rl"><span class="u252-rs"></span></span><svg class="u252-ar" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M7.5 3.5 11 7l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="u252-pn"><h4><span>Latest updates</span><a href="#" tabindex="-1">View all</a></h4></div>
+  </div>
+  <div class="u252-hr"><h3>Faster,<br>and lighter</h3><p>Same way of working, just less time spent.</p></div>
+  <div class="u252-dc" aria-hidden="true"><span>Start free</span><span>Learn more</span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var pl = root.querySelector('.u252-pl'), rs = root.querySelector('.u252-rs'), pn = root.querySelector('.u252-pn');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NEWS = ['AI summaries are here', 'Team plan 20% off', 'Mobile app 2.0 is out'];
+  var LOG = [['10.14', 'AI summaries', 'Shrinks long docs to three lines'], ['10.02', 'Share links', 'Create view-only links'], ['09.21', 'Dark mode', 'Follows your system setting']];
+  NEWS.concat(NEWS[0]).forEach(function (n) { var s = document.createElement('span'); s.textContent = n; rs.appendChild(s); });
+  LOG.forEach(function (l, i) { var d = document.createElement('div'); d.className = 'u252-it'; d.style.transitionDelay = (0.08 + i * 0.07) + 's'; d.innerHTML = '<time>' + l[0] + '</time><div><b>' + l[1] + '</b><span>' + l[2] + '</span></div>'; pn.appendChild(d); });
+  pn.querySelector('a').addEventListener('click', function (e) { e.preventDefault(); });
+  var k = 0, open = false, vis = true, t = 0;
+  function label() { pl.setAttribute('aria-label', NEWS[k % NEWS.length] + ' · expand'); }
+  function tick() {
+    if (!root.isConnected) return;
+    clearTimeout(t); t = setTimeout(tick, 4000);
+    if (open || !vis || rm) return;
+    root.classList.remove('is-shine'); void root.offsetWidth; root.classList.add('is-shine');
+    k += 1; rs.style.transition = ''; rs.style.transform = 'translateY(' + (-18 * k) + 'px)'; label();
+    if (k === NEWS.length) setTimeout(function () { rs.style.transition = 'none'; k = 0; rs.style.transform = 'translateY(0)'; label(); }, 560);
+  }
+  pl.addEventListener('click', function () { open = !open; root.classList.toggle('is-open', open); pl.setAttribute('aria-expanded', open); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; }).observe(root);
+  label(); t = setTimeout(tick, 1600);
+})();
+</script>

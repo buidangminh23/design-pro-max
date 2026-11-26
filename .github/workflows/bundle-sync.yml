@@ -40,9 +40,10 @@ jobs:
         id: update
         run: |
           node scripts/bundle-sync.mjs update --report "$RUNNER_TEMP/bundles.json"
-          names=$(jq -r '[.bundles[] | "\(.name) \(.to)"] | join(", ")' "$RUNNER_TEMP/bundles.json")
+          node scripts/uxui-sync.mjs update --report "$RUNNER_TEMP/uxui.json"
+          names=$(jq -rs '[(.[0].bundles[] | "\(.name) \(.to)"), (.[1] | select(.changed) | "uxui-prompt data \(.to[0:7])")] | join(", ")' "$RUNNER_TEMP/bundles.json" "$RUNNER_TEMP/uxui.json")
           {
-            echo "changed=$(jq -r '.changed' "$RUNNER_TEMP/bundles.json")"
+            echo "changed=$(jq -rs '.[0].changed or .[1].changed' "$RUNNER_TEMP/bundles.json" "$RUNNER_TEMP/uxui.json")"
             echo "title=chore(bundles): update ${names}"
             echo "base=$(git rev-parse HEAD)"
           } >> "$GITHUB_OUTPUT"
@@ -53,6 +54,7 @@ jobs:
           node scripts/vendor-sync.mjs notices
           npm test
           node scripts/bundle-sync.mjs check
+          node scripts/uxui-sync.mjs check
           node scripts/vendor-sync.mjs check
           node scripts/vendor-guard.mjs
           node scripts/vendor-sync.mjs notices --check
@@ -64,7 +66,7 @@ jobs:
         env:
           TITLE: ${{ steps.update.outputs.title }}
         run: |
-          unexpected=$(git status --porcelain=v1 --untracked-files=all | cut -c4- | grep -Ev '^(vendor/bundles\.json|skills/(design-spacing-rhythm|icons-pro-max)/.+|skills\.json|README\.md|THIRD_PARTY_NOTICES\.md|skills/apple/NOTICE\.md)$' || true)
+          unexpected=$(git status --porcelain=v1 --untracked-files=all | cut -c4- | grep -Ev '^(vendor/bundles\.json|vendor/uxui-prompt\.json|skills/(design-spacing-rhythm|icons-pro-max)/.+|skills/uxui-prompt/data/.+|skills\.json|README\.md|THIRD_PARTY_NOTICES\.md|skills/apple/NOTICE\.md)$' || true)
           if [ -n "$unexpected" ]; then
             echo "The update changed files outside the bundled skills and their generated files:"
             printf '%s\n' "$unexpected"
@@ -79,11 +81,12 @@ jobs:
           git config user.name "$BOT_NAME"
           git config user.email "$BOT_EMAIL"
           git checkout -q -B "$BRANCH"
-          git add --all -- vendor/bundles.json skills skills.json README.md THIRD_PARTY_NOTICES.md
+          git add --all -- vendor/bundles.json vendor/uxui-prompt.json skills skills.json README.md THIRD_PARTY_NOTICES.md
           git commit -q -m "$TITLE"
           node scripts/check-history.mjs
           git worktree add -q --detach "$RUNNER_TEMP/committed" HEAD
           node scripts/bundle-sync.mjs check --root "$RUNNER_TEMP/committed"
+          node scripts/uxui-sync.mjs check --root "$RUNNER_TEMP/committed"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: Push the bundle-sync branch
         id: push
@@ -117,6 +120,7 @@ jobs:
             echo "The bundled skills moved to newer releases of their repositories:"
             echo
             jq -r '.bundles[] | "- `\(.name)`: [\(.repo)](https://github.com/\(.repo)/releases/tag/\(.to)) \(.from) to \(.to)"' "$RUNNER_TEMP/bundles.json"
+            jq -r 'select(.changed) | "- `uxui-prompt` data: [Seokwoooo/lucian-uxui-prompt](https://github.com/Seokwoooo/lucian-uxui-prompt/compare/\(.from)...\(.to)) \(.from[0:7]) to \(.to[0:7])"' "$RUNNER_TEMP/uxui.json"
             echo
             echo "Each file was copied byte for byte from the commit of the release tag; vendor/bundles.json records its hash. This pull request merges itself once CI passes on its head commit and main has not moved."
           } > "$RUNNER_TEMP/body.md"

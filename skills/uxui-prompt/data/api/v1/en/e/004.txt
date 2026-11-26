@@ -1,0 +1,120 @@
+<!-- Lucian UX/UI Prompt #004 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#004 -->
+<!--
+Element: Progress download button
+ID: 004 · Category: Buttons · Tags: button, download, progress, success, cancel
+What it does: Press it and the arrow drops while the button itself turns into a progress bar. When the download finishes it folds into a circle, draws a check and opens up again as saved.
+How to use it: Press Download. Press again while it is downloading to cancel
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#004
+-->
+<style>
+.u004{--bar:linear-gradient(90deg,#6A57F2,#3D8BFF 60%,#22C3A6);position:relative;width:310px;height:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.u004-file{margin:0;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:620;color:var(--ux-ink-2)}
+.u004-pdf{width:26px;height:32px;border-radius:6px;background:#E5484D;position:relative;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.u004-pdf::after{content:"PDF";position:absolute;left:0;right:0;bottom:5px;text-align:center;font-size:7.5px;font-weight:800;color:#fff;letter-spacing:.04em}
+.u004-file small{font-weight:500;color:var(--ux-ink-3)}
+.u004-btn{--p:0;position:relative;width:268px;height:66px;border:0;padding:0;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);overflow:hidden;isolation:isolate;
+  box-shadow:0 22px 36px -22px var(--ux-shadow-strong);transition:width .6s var(--ux-ease),transform .5s var(--ux-spring),background-color .5s var(--ux-ease)}
+.u004-btn:hover{transform:translateY(-2px)}
+.u004-btn:active{transform:scale(.97)}
+.u004-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u004-idle,.u004-run,.u004-ok{position:absolute;inset:0;display:flex;align-items:center;transition:opacity .35s var(--ux-ease),transform .5s var(--ux-ease)}
+.u004-idle{gap:14px;padding:0 24px 0 9px}
+.u004-arw{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-page) 14%,transparent);overflow:hidden}
+.u004-arw svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.u004-arw .u004-a{transition:transform .5s var(--ux-ease)}
+.u004-btn:hover .u004-arw .u004-a{animation:u004-bob 1s var(--ux-ease) infinite}
+@keyframes u004-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(3px)}}
+.u004-idle b{font-size:17px;font-weight:700;letter-spacing:-.02em}
+.u004-idle small{margin-left:auto;font-size:13px;font-weight:600;opacity:.55}
+
+.u004-track{position:absolute;inset:0;background:color-mix(in srgb,var(--ux-ink) 88%,var(--ux-page));opacity:0;transition:opacity .4s var(--ux-ease)}
+.u004-bar{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--bar);transform-origin:0 50%;transform:scaleX(var(--p));border-radius:inherit}
+.u004-bar::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);background-size:220% 100%;animation:u004-shine 1.3s linear infinite}
+@keyframes u004-shine{from{background-position:120% 0}to{background-position:-100% 0}}
+.u004-run{justify-content:space-between;padding:0 26px;opacity:0;transform:translateY(12px);color:#fff}
+.u004-run b{font-size:19px;font-weight:760;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.u004-run small{font-size:13px;font-weight:600;opacity:.82}
+.u004-ok{justify-content:center;gap:10px;opacity:0;transform:scale(.6);color:var(--ux-accent-ink)}
+.u004-ok i{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,currentColor 18%,transparent)}
+.u004-ok svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.u004-ok path{stroke-dasharray:18;stroke-dashoffset:18;transition:stroke-dashoffset .45s var(--ux-ease) .25s}
+.u004-ok span{font-size:16px;font-weight:700;white-space:nowrap;max-width:0;overflow:hidden;opacity:0;transition:max-width .6s var(--ux-ease),opacity .4s var(--ux-ease)}
+.u004[data-state="run"] .u004-idle{opacity:0;transform:translateY(-12px)}
+.u004[data-state="run"] .u004-arw .u004-a{transform:translateY(26px)}
+.u004[data-state="run"] .u004-track{opacity:1}
+.u004[data-state="run"] .u004-run{opacity:1;transform:none}
+.u004[data-state="fold"] .u004-idle,.u004[data-state="done"] .u004-idle{opacity:0}
+.u004[data-state="fold"] .u004-btn{width:66px;background:var(--ux-mint)}
+.u004[data-state="fold"] .u004-bar{opacity:0}
+.u004[data-state="fold"] .u004-ok,.u004[data-state="done"] .u004-ok{opacity:1;transform:none}
+.u004[data-state="fold"] .u004-ok path,.u004[data-state="done"] .u004-ok path{stroke-dashoffset:0}
+.u004[data-state="done"] .u004-btn{background:var(--ux-mint);transition-timing-function:var(--ux-spring)}
+.u004[data-state="done"] .u004-ok span{max-width:200px;opacity:1}
+.u004-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+<div class="ux u004" data-state="idle">
+  <p class="u004-file"><span class="u004-pdf" aria-hidden="true"></span>2026 quarterly report.pdf <small>24.6 MB</small></p>
+  <button class="u004-btn" type="button" aria-label="Download the 2026 quarterly report">
+    <span class="u004-track" aria-hidden="true"><span class="u004-bar"></span></span>
+    <span class="u004-idle" aria-hidden="true">
+      <span class="u004-arw"><svg viewBox="0 0 24 24"><g class="u004-a"><path d="M12 4.5v11M7 11l5 5 5-5"/></g><path d="M5 19.5h14"/></svg></span>
+      <b>Download</b><small>24.6 MB</small>
+    </span>
+    <span class="u004-run" aria-hidden="true"><b class="u004-pct">0%</b><small class="u004-eta">Estimating time left</small></span>
+    <span class="u004-ok" aria-hidden="true"><i><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></i><span>Saved to Downloads</span></span>
+  </button>
+  <span class="u004-live" aria-live="polite"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u004-btn');
+  var pct = root.querySelector('.u004-pct');
+  var eta = root.querySelector('.u004-eta');
+  var live = root.querySelector('.u004-live');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var raf = 0, timers = [], p = 0, t0 = 0, DUR = rm ? 600 : 3200;
+  function later(fn, ms) { timers.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function clear() { timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf); raf = 0; }
+  function set(v) {
+    p = v;
+    btn.style.setProperty('--p', v.toFixed(4));
+    pct.textContent = Math.round(v * 100) + '%';
+  }
+  function curve(x) { return Math.min(1, x + Math.sin(x * Math.PI * 3) * 0.045 * (1 - x)); }
+  function step(now) {
+    if (!root.isConnected) return;
+    var x = Math.min(1, (now - t0) / DUR);
+    set(curve(x));
+    var left = Math.max(0, Math.ceil((1 - x) * DUR / 1000 * 2.2));
+    eta.textContent = left > 0 ? left + 's left' : 'Finishing up';
+    if (x < 1) raf = requestAnimationFrame(step);
+    else finish();
+  }
+  function finish() {
+    root.dataset.state = 'fold';
+    live.textContent = 'Download complete';
+    later(function () { root.dataset.state = 'done'; }, rm ? 100 : 650);
+    later(reset, rm ? 1600 : 3400);
+  }
+  function reset() { clear(); root.dataset.state = 'idle'; set(0); live.textContent = ''; }
+  btn.addEventListener('click', function () {
+    var s = root.dataset.state;
+    if (s === 'run') {
+      clear();
+      root.dataset.state = 'idle';
+      set(0);
+      live.textContent = 'Download canceled';
+      return;
+    }
+    if (s !== 'idle') { reset(); return; }
+    clear();
+    set(0);
+    root.dataset.state = 'run';
+    live.textContent = 'Download started';
+    later(function () { t0 = performance.now(); raf = requestAnimationFrame(step); }, rm ? 0 : 260);
+  });
+})();
+</script>

@@ -1,0 +1,127 @@
+<!-- Lucian UX/UI Prompt #023 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#023 -->
+<!--
+Element: Expanding notification settings
+ID: 023 · Category: Toggles & Pickers · Tags: settings, switch, list, expand, disclosure
+What it does: Turn a switch on and its detailed options unfold below it. “Turn all off” switches everything off one by one from the top, and the icons of switched-off items fade to gray.
+How to use it: Turn on the email digest and pick a frequency, then try Turn all off
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#023
+-->
+<style>
+.u023{position:relative;display:flex;flex-direction:column;width:340px;height:420px;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u023-top{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}
+.u023-top b{font-size:20px;font-weight:760;letter-spacing:-.035em}
+.u023-badge{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--ux-accent-soft);color:var(--ux-accent);font-variant-numeric:tabular-nums;transition:background-color .3s,color .3s}
+.u023-item{border-top:1px solid var(--ux-line)}
+.u023-head{display:flex;align-items:center;gap:14px;padding:14px 4px}
+.u023-ic{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--g);transition:filter .5s var(--ux-ease),opacity .5s var(--ux-ease)}
+.u023-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u023-item.is-off .u023-ic{filter:grayscale(1);opacity:.45}
+.u023-t{flex:1;min-width:0}
+.u023-t b{display:block;font-size:15.5px;font-weight:680;letter-spacing:-.02em}
+.u023-t small{display:block;margin-top:2px;font-size:13px;color:var(--ux-ink-3)}
+.u023-sw{position:relative;width:52px;height:32px;flex:none;border:0;padding:0;border-radius:999px;background:var(--ux-surface-3);transition:background-color .4s var(--ux-ease)}
+.u023-sw::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px -1px rgba(0,0,0,.3);transition:transform .5s var(--ux-spring),width .25s var(--ux-ease)}
+.u023-sw:active::after{width:32px}
+.u023-sw[aria-checked="true"]{background:var(--ux-mint)}
+.u023-sw[aria-checked="true"]::after{transform:translateX(20px)}
+.u023-sw[aria-checked="true"]:active::after{transform:translateX(14px)}
+.u023-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u023-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ux-ease)}
+.u023-more.is-open{grid-template-rows:1fr}
+.u023-more>div{overflow:hidden;min-height:0}
+.u023-opts{position:relative;display:flex;margin:0 4px 16px 58px;padding:4px;border-radius:12px;background:var(--ux-surface-2);opacity:0;transform:translateY(-8px);transition:opacity .3s var(--ux-ease),transform .5s var(--ux-spring)}
+.u023-more.is-open .u023-opts{opacity:1;transform:none;transition-delay:.12s}
+.u023-pill{position:absolute;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / 3);border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 0 var(--ux-line),0 4px 10px -6px var(--ux-shadow-strong);transform:translateX(calc(var(--i,1) * 100%));transition:transform .5s var(--ux-spring)}
+.u023-opt{position:relative;flex:1;height:34px;border:0;background:none;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}
+.u023-opt[aria-checked="true"]{color:var(--ux-ink)}
+.u023-opt:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u023-all{margin-top:auto;height:48px;border:0;border-radius:15px;background:var(--ux-surface-2);font-size:14.5px;font-weight:680;color:var(--ux-ink-2);transition:background-color .3s var(--ux-ease),color .3s var(--ux-ease),transform .4s var(--ux-spring)}
+.u023-all:hover{color:var(--ux-danger);background:color-mix(in srgb,var(--ux-danger) 10%,var(--ux-surface-2))}
+.u023-all:active{transform:scale(.98)}
+.u023-all:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u023">
+  <div class="u023-top"><b>Notifications</b><span class="u023-badge" aria-live="polite">2 on</span></div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#FF8A65,#FF5A6E)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span>
+      <div class="u023-t"><b>Push notifications</b><small>Only mentions and replies</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="Push notifications"></button>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#5B8CFF,#3D6BFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg></span>
+      <div class="u023-t"><b>Email digest</b><small class="u023-mail">Off</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="false" aria-label="Email digest" data-more></button>
+    </div>
+    <div class="u023-more">
+      <div>
+        <div class="u023-opts" role="radiogroup" aria-label="Digest frequency">
+          <span class="u023-pill" aria-hidden="true"></span>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">Daily</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="true">Weekly</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">Monthly</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#22C3A6,#119C72)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4.5h11l3 3V19a.5.5 0 0 1-.5.5h-13A.5.5 0 0 1 5 19z"/><path d="M8 4.5V9h7V4.5M8 19.5v-5h8v5"/></svg></span>
+      <div class="u023-t"><b>Autosave</b><small>Saves every 30 seconds</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="Autosave"></button>
+    </div>
+  </div>
+  <button class="u023-all" type="button">Turn all off</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sws = Array.prototype.slice.call(root.querySelectorAll('.u023-sw'));
+  var more = root.querySelector('.u023-more');
+  var mail = root.querySelector('.u023-mail');
+  var opts = Array.prototype.slice.call(root.querySelectorAll('.u023-opt'));
+  var pill = root.querySelector('.u023-pill');
+  var badge = root.querySelector('.u023-badge');
+  var all = root.querySelector('.u023-all');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var freq = 1;
+  function setSw(sw, on) {
+    sw.setAttribute('aria-checked', String(on));
+    sw.closest('.u023-item').classList.toggle('is-off', !on);
+    if (sw.hasAttribute('data-more')) {
+      more.classList.toggle('is-open', on);
+      mail.textContent = on ? opts[freq].textContent + ' at 8 AM' : 'Off';
+      opts.forEach(function (o) { o.tabIndex = on && o.getAttribute('aria-checked') === 'true' ? 0 : -1; });
+    }
+    var n = sws.filter(function (s) { return s.getAttribute('aria-checked') === 'true'; }).length;
+    badge.textContent = n ? n + ' on' : 'All off';
+  }
+  sws.forEach(function (sw) {
+    setSw(sw, sw.getAttribute('aria-checked') === 'true');
+    sw.addEventListener('click', function () { setSw(sw, sw.getAttribute('aria-checked') !== 'true'); });
+  });
+  function pick(i, focus) {
+    freq = i;
+    opts.forEach(function (o, k) { o.setAttribute('aria-checked', String(k === i)); o.tabIndex = k === i ? 0 : -1; });
+    pill.style.setProperty('--i', i);
+    mail.textContent = opts[i].textContent + ' at 8 AM';
+    if (focus) opts[i].focus();
+  }
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () { pick(i); });
+    o.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); pick((i + d + 3) % 3, true); }
+    });
+  });
+  all.addEventListener('click', function () {
+    sws.forEach(function (sw, i) {
+      setTimeout(function () { if (root.isConnected) setSw(sw, false); }, rm ? 0 : i * 120);
+    });
+  });
+})();
+</script>

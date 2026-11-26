@@ -1,0 +1,106 @@
+<!-- Lucian UX/UI Prompt #320 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#320 -->
+<!--
+Element: Coin-scratch instant ticket
+ID: 320 · Category: Promos & Rewards · Tags: scratch-card, reveal, canvas, game, reward
+What it does: Rub the silver coating of a lottery ticket with the cursor and it peels away wherever you scratch, gradually revealing the prize beneath while silver flakes fly from the spot. Scratch more than half and the rest lifts away at once as the result pops out, with confetti bursting for a win. Press New ticket to cover it again with a different result.
+How to use it: Rub the silver area with the cursor to scratch it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#320
+-->
+<style>
+.u320{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 80% at 50% 30%,#FFF3BF,#FFD8A8);background:radial-gradient(90% 80% at 50% 30%,light-dark(#FFF3BF,#3A2B12),light-dark(#FFD8A8,#1E1408));box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#3B2A12;color:light-dark(#3B2A12,#FFE6C2)}
+.u320-tk{position:absolute;left:30px;top:44px;width:280px;height:230px;border-radius:20px;background:#fff;background:light-dark(#fff,#2A2016);box-shadow:0 18px 34px -16px rgba(120,70,10,.55);box-shadow:0 18px 34px -16px light-dark(rgba(120,70,10,.55),rgba(0,0,0,.7)),inset 0 0 0 1px light-dark(transparent,rgba(255,230,194,.07));overflow:hidden}
+.u320-tk::before{content:"";position:absolute;left:0;right:0;top:0;height:44px;background:repeating-linear-gradient(45deg,#FF922B 0 10px,#FD7E14 10px 20px);background:repeating-linear-gradient(45deg,light-dark(#FF922B,#DE6E1E) 0 10px,light-dark(#FD7E14,#C85E10) 10px 20px)}
+.u320-tt{position:absolute;left:0;right:0;top:12px;text-align:center;color:#fff;font-size:14px;font-weight:900;letter-spacing:.08em}
+.u320-pz{position:absolute;left:20px;right:20px;top:60px;bottom:20px;border-radius:14px;background:#FFF9DB;background:light-dark(#FFF9DB,#3A2C17);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.u320-pz b{font-size:34px;font-weight:900;letter-spacing:-.03em;color:#E8590C;color:light-dark(#E8590C,#FF9A45)}
+.u320-pz span{font-size:14px;font-weight:750}
+.u320-pz.is-pop b{animation:u320-pop .6s cubic-bezier(.3,1.8,.5,1)}
+@keyframes u320-pop{from{transform:scale(.4)}}
+.u320-cv{position:absolute;left:20px;top:60px;width:240px;height:150px;border-radius:14px;cursor:grab;touch-action:none;transition:opacity .5s,color 1ms;
+  
+  color:#868E96;color:light-dark(#868E96,#C2C8CF);text-decoration-color:rgba(255,255,255,.35);text-decoration-color:light-dark(rgba(255,255,255,.35),rgba(255,255,255,.13));border-color:#CED4DA #F1F3F5 #ADB5BD #DEE2E6;border-color:light-dark(#CED4DA,#4E555D) light-dark(#F1F3F5,#868D96) light-dark(#ADB5BD,#40464D) light-dark(#DEE2E6,#5D646C)}
+.u320-cv.is-gone{opacity:0;pointer-events:none}
+.u320-ft{position:absolute;left:30px;right:30px;bottom:22px;display:flex;align-items:center;justify-content:space-between;font-size:11.5px;font-weight:750;color:#8A5A1E;color:light-dark(#8A5A1E,#D6A566)}
+.u320-new{border:0;padding:7px 14px;border-radius:999px;background:#3B2A12;background:light-dark(#3B2A12,#FFE3B0);color:#FFF3BF;color:light-dark(#FFF3BF,#2E1F08);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.u320-new:focus-visible,.u320-cv:focus-visible{outline:2px solid #3B2A12;outline-color:light-dark(#3B2A12,#FFE6C2);outline-offset:2px}
+
+.u320-tk>i{background:#ADB5BD;background:light-dark(#ADB5BD,#6E757D)}
+.u320-cf{position:absolute;left:170px;top:150px;width:8px;height:12px;border-radius:2px;pointer-events:none;animation:u320-cf 1.2s ease-out forwards}
+@keyframes u320-cf{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+</style>
+<div class="ux u320">
+  <div class="u320-tk"><div class="u320-tt">Lucky ticket</div><div class="u320-pz" aria-live="polite"><b></b><span></span></div><canvas class="u320-cv" tabindex="0" role="button" aria-label="Scratch area, press Enter to reveal at once"></canvas></div>
+  <div class="u320-ft"><span class="u320-pc"></span><button type="button" class="u320-new">New ticket</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u320-cv'), cx = cv.getContext('2d'), pz = root.querySelector('.u320-pz'), pc = root.querySelector('.u320-pc'), nb = root.querySelector('.u320-new');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PRIZES = [['1st', 'A cup of coffee', true], ['No luck', 'Next time', false], ['2nd', 'Cookie set', true], ['Lucky', '10% off', true]];
+  var W = 240, H = 150, dpr = Math.min(2, window.devicePixelRatio || 1), pi = 0, done = false, last = null, flakes = [];
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  function cover() {
+    done = false; cv.classList.remove('is-gone'); pz.classList.remove('is-pop');
+    var p = PRIZES[pi % PRIZES.length]; pz.querySelector('b').textContent = p[0]; pz.querySelector('span').textContent = p[1];
+    cx.globalCompositeOperation = 'source-over';
+    foil();
+    pc.textContent = 0 + '% scratched';
+  }
+  function foil() {
+    var s = getComputedStyle(cv);
+    var g = cx.createLinearGradient(0, 0, W, H); g.addColorStop(0, s.borderTopColor); g.addColorStop(0.45, s.borderRightColor); g.addColorStop(0.55, s.borderBottomColor); g.addColorStop(1, s.borderLeftColor);
+    cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    cx.fillStyle = s.textDecorationColor; for (var i = 0; i < 260; i++) cx.fillRect(Math.random() * W, Math.random() * H, 1.2, 1.2);
+    cx.strokeStyle = 'rgba(134,142,150,.35)'; cx.lineWidth = 1; for (var k = -H; k < W; k += 9) { cx.beginPath(); cx.moveTo(k, 0); cx.lineTo(k + H, H); cx.stroke(); }
+    cx.fillStyle = s.color; cx.font = '800 15px system-ui,-apple-system,"Apple SD Gothic Neo",sans-serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.fillText('Scratch here', W / 2, H / 2);
+  }
+  cv.addEventListener('transitionend', function (e) {
+    if (e.propertyName !== 'color' || done) return;
+    cx.globalCompositeOperation = 'source-atop'; foil(); cx.globalCompositeOperation = 'source-over';
+  });
+  function scratch(x0, y0, x1, y1) {
+    cx.globalCompositeOperation = 'destination-out'; cx.lineCap = 'round'; cx.lineJoin = 'round';
+    cx.lineWidth = 26; cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x1, y1); cx.stroke();
+    for (var i = 0; i < 4; i++) { var t = Math.random(), r = 2 + Math.random() * 5; cx.beginPath(); cx.arc(x0 + (x1 - x0) * t + (Math.random() - 0.5) * 30, y0 + (y1 - y0) * t + (Math.random() - 0.5) * 30, r, 0, 6.2832); cx.fill(); }
+    if (!rm) for (var f = 0; f < 3; f++) flake(x1, y1);
+  }
+  function flake(x, y) {
+    var el = document.createElement('i'), tk = root.querySelector('.u320-tk');
+    el.style.cssText = 'position:absolute;left:' + (x + 20) + 'px;top:' + (y + 60) + 'px;width:3px;height:3px;border-radius:1px;pointer-events:none;transition:transform .7s ease-in,opacity .7s';
+    tk.appendChild(el);
+    requestAnimationFrame(function () { el.style.transform = 'translate(' + ((Math.random() - 0.5) * 40).toFixed(0) + 'px,' + (30 + Math.random() * 40).toFixed(0) + 'px) rotate(200deg)'; el.style.opacity = '0'; });
+    setTimeout(function () { el.remove(); }, 750);
+  }
+  function ratio() {
+    var d = cx.getImageData(0, 0, cv.width, cv.height).data, step = 8 * dpr, n = 0, clear = 0;
+    for (var y = 0; y < cv.height; y += step) for (var x = 0; x < cv.width; x += step) { n++; if (d[(y * cv.width + x) * 4 + 3] < 40) clear++; }
+    return clear / n;
+  }
+  function reveal() {
+    done = true; cv.classList.add('is-gone'); pz.classList.add('is-pop'); pc.textContent = 100 + '% scratched';
+    if (PRIZES[pi % PRIZES.length][2] && !rm) for (var i = 0; i < 26; i++) {
+      var c = document.createElement('span'); c.className = 'u320-cf'; var a = Math.random() * 6.28, d = 60 + Math.random() * 110;
+      c.style.background = ['#FF6B6B', '#FCC419', '#51CF66', '#4DABF7', '#CC5DE8'][i % 5];
+      c.style.setProperty('--dx', (Math.cos(a) * d).toFixed(0) + 'px'); c.style.setProperty('--dy', (Math.sin(a) * d - 40).toFixed(0) + 'px'); c.style.setProperty('--r', (Math.random() * 720).toFixed(0) + 'deg');
+      root.appendChild(c); setTimeout(function (n) { n.remove(); }.bind(null, c), 1300);
+    }
+  }
+  function loc(e) { var r = cv.getBoundingClientRect(), k = cv.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  var down = false, chk = 0;
+  cv.addEventListener('pointerdown', function (e) { if (done) return; down = true; last = loc(e); scratch(last.x, last.y, last.x + 0.1, last.y); try { cv.setPointerCapture(e.pointerId); } catch (_) {} });
+  cv.addEventListener('pointermove', function (e) {
+    if (!down || done) return;
+    var q = loc(e); scratch(last.x, last.y, q.x, q.y); last = q;
+    if (++chk % 4 === 0) { var r = ratio(); pc.textContent = Math.round(r * 100) + '% scratched'; if (r > 0.55) reveal(); }
+  });
+  function up() { if (!down) return; down = false; if (!done) { var r = ratio(); pc.textContent = Math.round(r * 100) + '% scratched'; if (r > 0.55) reveal(); } }
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  nb.addEventListener('click', function () { pi++; cover(); });
+  cv.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!done) reveal(); } });
+  cover();
+})();
+</script>

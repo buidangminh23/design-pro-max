@@ -1,0 +1,110 @@
+<!-- Lucian UX/UI Prompt #067 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#067 -->
+<!--
+Element: Lockout countdown
+ID: 067 · Category: Sign-in & Sign-up · Tags: lockout, countdown, ring, unlock, reset
+What it does: An account locked after too many failed sign-ins. The ring around the padlock shrinks with the time left as the digits tick over; when time is up the shackle springs open and “Sign in again” lights up. You can also send a reset email instead of waiting.
+How to use it: Wait 15 seconds for the lock to open. Press “Email a reset link”, or use “Sign in again” after it opens to watch from the start
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#067
+-->
+<style>
+.u067{position:relative;width:340px;height:460px;display:flex;flex-direction:column;align-items:center;padding:32px 24px 24px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;text-align:center}
+.u067-dial{position:relative;width:168px;height:168px;flex:none}
+.u067-dial>svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.u067-dial circle{fill:none;stroke-width:8}
+.u067-dial .t{stroke:var(--ux-surface-3)}
+.u067-dial .p{stroke:var(--ux-warn);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,1) * 100);transition:stroke .4s}
+.u067.is-open .u067-dial .p{stroke:var(--ux-mint)}
+.u067-ticks{position:absolute;inset:16px;border-radius:50%;background:repeating-conic-gradient(var(--ux-line-2) 0 1deg,transparent 1deg 15deg);-webkit-mask:radial-gradient(circle,transparent 62%,#000 63%,#000 68%,transparent 69%);mask:radial-gradient(circle,transparent 62%,#000 63%,#000 68%,transparent 69%)}
+.u067-lock{position:absolute;left:50%;top:50%;width:62px;height:70px;margin:-40px 0 0 -31px}
+.u067-lock svg{width:100%;height:100%;overflow:visible}
+.u067-sh{fill:none;stroke:var(--ux-ink);stroke-width:6;stroke-linecap:round;transform-origin:46px 30px;transition:transform .7s var(--ux-spring)}
+.u067.is-open .u067-sh{transform:translateY(-8px) rotate(28deg)}
+.u067-bd{fill:var(--ux-ink);transition:fill .4s}
+.u067.is-open .u067-bd{fill:var(--ux-mint)}
+.u067-kh{fill:var(--ux-surface)}
+.u067-time{position:absolute;left:0;right:0;bottom:30px;display:flex;justify-content:center;font-size:15px;font-weight:850;font-variant-numeric:tabular-nums;color:var(--ux-ink-2)}
+.u067-time span,.u067-time b{display:flex;flex-direction:column;height:20px;overflow:hidden;font-weight:inherit}
+.u067-time i{display:block;font-style:normal;line-height:20px;transform:translateY(calc(var(--d) * -20px));transition:transform .45s var(--ux-spring)}
+.u067-time b{line-height:20px}
+.u067 h3{margin:22px 0 6px;font-size:22px;font-weight:850;letter-spacing:-.045em}
+.u067 p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ux-ink-3)}
+.u067-t{position:relative;height:30px;width:100%;margin:22px 0 6px}
+.u067-t h3{margin:0}
+.u067-t>*{position:absolute;left:0;right:0;transition:opacity .35s,transform .5s var(--ux-spring)}
+.u067-t .b{opacity:0;transform:translateY(10px)}
+.u067.is-open .u067-t .a{opacity:0;transform:translateY(-10px)}
+.u067.is-open .u067-t .b{opacity:1;transform:none}
+.u067-acts{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:auto}
+.u067-b{height:52px;border:0;border-radius:16px;font-size:15px;font-weight:760;transition:transform .3s var(--ux-spring),background-color .4s,color .4s,opacity .3s}
+.u067-b:active{transform:scale(.97)}
+.u067-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u067-in{background:var(--ux-surface-2);color:var(--ux-ink-3)}
+.u067-in[aria-disabled="false"]{background:var(--ux-ink);color:var(--ux-page)}
+.u067-mail{background:none;box-shadow:inset 0 0 0 1.5px var(--ux-line-2);color:var(--ux-ink)}
+.u067-mail.sent{color:var(--ux-mint);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ux-mint) 50%,transparent)}
+</style>
+<div class="ux u067">
+  <div class="u067-dial" role="timer" aria-live="off">
+    <svg viewBox="0 0 168 168" aria-hidden="true"><circle class="t" cx="84" cy="84" r="78"/><circle class="p" cx="84" cy="84" r="78" pathLength="100"/></svg>
+    <span class="u067-ticks" aria-hidden="true"></span>
+    <span class="u067-lock" aria-hidden="true"><svg viewBox="0 0 62 70"><path class="u067-sh" d="M16 32V22a15 15 0 0 1 30 0v10"/><rect class="u067-bd" x="6" y="30" width="50" height="38" rx="10"/><circle class="u067-kh" cx="31" cy="47" r="5"/><rect class="u067-kh" x="29" y="49" width="4" height="9" rx="2"/></svg></span>
+    <span class="u067-time" aria-hidden="true"></span>
+  </div>
+  <div class="u067-t" aria-live="polite"><h3 class="a">Temporarily locked</h3><h3 class="b">You can try again</h3></div>
+  <p class="u067-p">Locked after 5 wrong passwords.<br>You can sign in again when time is up.</p>
+  <div class="u067-acts">
+    <button class="u067-b u067-in" type="button" aria-disabled="true">Sign in again</button>
+    <button class="u067-b u067-mail" type="button">Email a reset link</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var dial = root.querySelector('.u067-dial'), time = root.querySelector('.u067-time'), p = root.querySelector('.u067-p');
+  var inB = root.querySelector('.u067-in'), mail = root.querySelector('.u067-mail');
+  var LOCK = 15, t0 = 0, raf = 0, shown = '';
+  function digits(str) {
+    if (str === shown) return;
+    if (time.children.length !== str.length) {
+      time.innerHTML = str.split('').map(function (c) {
+        if (c < '0' || c > '9') return '<b>' + c + '</b>';
+        var h = ''; for (var n = 0; n < 10; n++) h += '<i>' + n + '</i>';
+        return '<span style="--d:' + c + '">' + h + '</span>';
+      }).join('');
+    } else str.split('').forEach(function (c, k) { if (c >= '0' && c <= '9') time.children[k].style.setProperty('--d', c); });
+    shown = str;
+  }
+  function tick(now) {
+    if (!root.isConnected) return;
+    var left = Math.max(0, LOCK - (now - t0) / 1000), s = Math.ceil(left);
+    dial.style.setProperty('--p', (left / LOCK).toFixed(4));
+    digits('0:' + ('0' + s).slice(-2));
+    dial.setAttribute('aria-label', s + ' seconds left');
+    if (left <= 0) { unlock(); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function unlock() {
+    root.classList.add('is-open');
+    inB.setAttribute('aria-disabled', 'false');
+    p.innerHTML = 'For your security, take a moment<br>to check your password this time.';
+  }
+  function lock() {
+    cancelAnimationFrame(raf);
+    root.classList.remove('is-open');
+    inB.setAttribute('aria-disabled', 'true');
+    mail.classList.remove('sent'); mail.textContent = 'Email a reset link';
+    p.innerHTML = 'Locked after 5 wrong passwords.<br>You can sign in again when time is up.';
+    t0 = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+  inB.addEventListener('click', function () { if (inB.getAttribute('aria-disabled') === 'false') lock(); });
+  mail.addEventListener('click', function () {
+    mail.classList.add('sent');
+    mail.textContent = 'Sent to seoyeon@example.com';
+  });
+  digits('0:15');
+  lock();
+})();
+</script>

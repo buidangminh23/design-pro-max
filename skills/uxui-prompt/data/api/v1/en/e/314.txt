@@ -1,0 +1,87 @@
+<!-- Lucian UX/UI Prompt #314 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#314 -->
+<!--
+Element: Target-shaped morphing cursor
+ID: 314 · Category: Cursor & Hover · Tags: cursor, morph, hover, pointer, spring
+What it does: A small round cursor follows across the screen like a spring, stretching to wrap a button's shape over buttons and thinning into a vertical bar over text. Over a photo it swells into a large circle that says View, and over a link it becomes a dot holding an arrow. While wrapping a button it is pulled slightly toward your fingertip so it feels stuck to your hand.
+How to use it: Move the cursor over the buttons, text, photo and link
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#314
+-->
+<style>
+.u314{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#F7F5F0;background:light-dark(#F7F5F0,#0F1015);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#22201C;color:light-dark(#22201C,#F2EFE8);cursor:none;padding:22px;display:flex;flex-direction:column;gap:16px}
+.u314 *{cursor:none}
+.u314-tb{display:flex;gap:8px;align-items:center}
+.u314-ib{width:42px;height:42px;border:0;border-radius:14px;background:var(--ux-surface);box-shadow:0 0 0 1px rgba(34,32,28,.08);box-shadow:0 0 0 1px light-dark(rgba(34,32,28,.08),rgba(255,255,255,.1));display:grid;place-items:center;color:#22201C;color:light-dark(#22201C,#F2EFE8);padding:0}
+.u314-ib svg{width:18px;height:18px}
+.u314-fb{margin-left:auto;height:38px;padding:0 18px;border:0;border-radius:999px;background:#22201C;background:light-dark(#22201C,#F2EFE8);color:#F7F5F0;color:light-dark(#F7F5F0,#16151B);font:inherit;font-size:13px;font-weight:750}
+.u314-tx{margin:0;font-size:14px;line-height:1.6;font-weight:550;color:#3B3832;color:light-dark(#3B3832,#C8C4BB);word-break:keep-all}
+.u314-row{display:flex;gap:14px;align-items:flex-end;margin-top:auto}
+.u314-ph{width:150px;height:104px;border-radius:16px;background:linear-gradient(140deg,#FFB86B,#F06595 60%,#845EF7)}
+.u314-ln{font-size:14px;font-weight:800;color:#22201C;color:light-dark(#22201C,#F2EFE8);text-decoration:underline;text-underline-offset:4px;padding:6px 0}
+.u314-ib:focus-visible,.u314-fb:focus-visible,.u314-ln:focus-visible{outline:2px solid #845EF7;outline-offset:3px}
+.u314-cur{position:absolute;left:0;top:0;width:16px;height:16px;margin:0;border-radius:999px;background:rgba(34,32,28,.85);background:light-dark(rgba(34,32,28,.85),rgba(244,240,232,.85));pointer-events:none;z-index:5;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:800;opacity:0;transition:width .28s cubic-bezier(.3,1.4,.5,1),height .28s cubic-bezier(.3,1.4,.5,1),border-radius .28s,background .2s,opacity .2s;mix-blend-mode:normal}
+.u314-cur.is-on{opacity:1}
+.u314-cur.is-btn{background:rgba(34,32,28,.1);background:light-dark(rgba(34,32,28,.1),rgba(255,255,255,.12))}
+.u314-cur.is-text{background:#845EF7}
+.u314-cur.is-img{background:rgba(255,255,255,.92);color:#22201C;box-shadow:0 10px 24px -8px rgba(0,0,0,.4)}
+.u314-cur.is-link{background:#845EF7}
+.u314-cur span{opacity:0;transition:opacity .2s;white-space:nowrap}
+.u314-cur.is-img span,.u314-cur.is-link span{opacity:1}
+@media (prefers-reduced-motion: reduce){.u314-cur{transition:opacity .2s}}
+</style>
+<div class="ux u314">
+  <div class="u314-tb">
+    <button type="button" class="u314-ib" data-k="btn" aria-label="Like"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+    <button type="button" class="u314-ib" data-k="btn" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V4M7 9l5-5 5 5M5 14v5h14v-5"/></svg></button>
+    <button type="button" class="u314-ib" data-k="btn" aria-label="Save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4h12v16l-6-4-6 4z"/></svg></button>
+    <button type="button" class="u314-fb" data-k="btn">Follow</button>
+  </div>
+  <p class="u314-tx" data-k="text">Motion adds story to a screen. When the cursor takes on the shape of what it points at, your fingertip knows what it can do before you click.</p>
+  <div class="u314-row"><div class="u314-ph" data-k="img" aria-hidden="true"></div><a class="u314-ln" href="#" data-k="link">Learn more</a></div>
+  <div class="u314-cur" aria-hidden="true"><span class="u314-cl"></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cur = root.querySelector('.u314-cur'), cl = root.querySelector('.u314-cl');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pos = { x: 170, y: 300 }, sp = { x: 170, y: 300 }, vel = { x: 0, y: 0 }, mode = '', box = null, raf = 0, last = 0;
+  root.querySelector('.u314-ln').addEventListener('click', function (e) { e.preventDefault(); });
+  function rel(e) { var r = root.getBoundingClientRect(), k = root.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k, k: k, r: r }; }
+  function set(m, el, p) {
+    mode = m; cur.className = 'u314-cur is-on' + (m ? ' is-' + m : '');
+    box = null;
+    if (m === 'btn') { var b = el.getBoundingClientRect(); box = { x: (b.left - p.r.left) * p.k, y: (b.top - p.r.top) * p.k, w: b.width * p.k, h: b.height * p.k, rad: getComputedStyle(el).borderRadius }; }
+    cl.textContent = m === 'img' ? 'View' : m === 'link' ? '→' : '';
+  }
+  function target() {
+    if (mode === 'btn' && box) { var cxp = box.x + box.w / 2, cyp = box.y + box.h / 2; return { x: cxp + (pos.x - cxp) * 0.15, y: cyp + (pos.y - cyp) * 0.15, w: box.w + 8, h: box.h + 8, r: box.rad }; }
+    if (mode === 'text') return { x: pos.x, y: pos.y, w: 3, h: 24, r: '2px' };
+    if (mode === 'img') return { x: pos.x, y: pos.y, w: 64, h: 64, r: '999px' };
+    if (mode === 'link') return { x: pos.x, y: pos.y, w: 30, h: 30, r: '999px' };
+    return { x: pos.x, y: pos.y, w: 16, h: 16, r: '999px' };
+  }
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+    var t = target();
+    if (rm) { sp.x = t.x; sp.y = t.y; }
+    else { vel.x += ((t.x - sp.x) * 420 - vel.x * 30) * dt; vel.y += ((t.y - sp.y) * 420 - vel.y * 30) * dt; sp.x += vel.x * dt; sp.y += vel.y * dt; }
+    cur.style.width = t.w + 'px'; cur.style.height = t.h + 'px'; cur.style.borderRadius = t.r;
+    cur.style.transform = 'translate(' + (sp.x - t.w / 2).toFixed(1) + 'px,' + (sp.y - t.h / 2).toFixed(1) + 'px)';
+    if (Math.abs(t.x - sp.x) + Math.abs(t.y - sp.y) > 0.2 || Math.abs(vel.x) + Math.abs(vel.y) > 1) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  root.addEventListener('pointermove', function (e) {
+    var p = rel(e); pos.x = p.x; pos.y = p.y;
+    var hitEl = document.elementFromPoint(e.clientX, e.clientY) || e.target, el = hitEl.closest && hitEl.closest('[data-k]');
+    var m = el && root.contains(el) ? el.getAttribute('data-k') : '';
+    if (m !== mode || (m === 'btn' && (!box || el !== set.last))) { set(m, el, p); set.last = el; }
+    if (!cur.classList.contains('is-on')) { sp.x = p.x; sp.y = p.y; cur.classList.add('is-on'); }
+    kick();
+  });
+  root.addEventListener('pointerleave', function () { cur.classList.remove('is-on'); mode = ''; set.last = null; });
+})();
+</script>

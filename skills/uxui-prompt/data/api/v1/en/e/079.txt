@@ -1,0 +1,83 @@
+<!-- Lucian UX/UI Prompt #079 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#079 -->
+<!--
+Element: Skeleton that blooms into a post
+ID: 079 · Category: Loading & Progress · Tags: skeleton, shimmer, loading, blur-up, stagger
+What it does: A single streak of light sweeps the whole grey skeleton in one beat. When loading finishes, the profile, photo and text turn into their real selves from the top down, and the photo starts blurred before coming into focus.
+How to use it: Watch the first load, then reload with the refresh button in the top right
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#079
+-->
+<style>
+.u079{position:relative;width:340px;height:470px;padding:16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u079-re{position:absolute;right:12px;top:12px;z-index:2;width:38px;height:38px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-2);transition:transform .3s var(--ux-spring)}
+.u079-re:active{transform:scale(.88)}
+.u079-re:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u079-re svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u079.is-loading .u079-re svg{animation:u079-spin .9s linear infinite}
+@keyframes u079-spin{to{transform:rotate(360deg)}}
+.u079-s{position:relative}
+.u079-sk{position:absolute;inset:0;border-radius:inherit;animation:u079-shine 1.6s linear infinite;transition:opacity .45s var(--ux-ease);background:linear-gradient(100deg,transparent 28%,color-mix(in srgb,var(--ux-surface-3),var(--ux-ink) 7%) 45%,transparent 62%) var(--sx,0) 0/var(--sw,700px) 100% no-repeat,var(--ux-surface-2)}
+@keyframes u079-shine{from{background-position:calc(var(--sx,0px) - 700px) 0,0 0}to{background-position:calc(var(--sx,0px) + 700px) 0,0 0}}
+.u079-r{opacity:0;transform:translateY(6px);transition:opacity .5s var(--ux-ease),transform .6s var(--ux-spring)}
+.u079.is-done .u079-sk{opacity:0;transition-delay:var(--d)}
+.u079.is-done .u079-r{opacity:1;transform:none;transition-delay:var(--d)}
+.u079-head{display:flex;align-items:center;gap:10px}
+.u079-av{width:42px;height:42px;flex:none;border-radius:50%}
+.u079-av .u079-r{display:block;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 38% 32%,#FFE2C2,#F2A27A 45%,#B5577A)}
+.u079-nm{flex:1}
+.u079-nm .u079-s{height:13px;width:110px;border-radius:7px;margin-bottom:6px}
+.u079-nm .u079-s+.u079-s{width:70px;height:11px;margin:0}
+.u079-nm .u079-r{position:absolute;inset:-4px 0 auto;white-space:nowrap;font-size:14px;font-weight:800}
+.u079-nm .u079-s+.u079-s .u079-r{font-size:12px;font-weight:600;color:var(--ux-ink-3);top:-3px}
+.u079-img{height:256px;margin-top:14px;border-radius:20px;overflow:hidden}
+.u079-img .u079-r{position:absolute;inset:0;background:radial-gradient(60% 50% at 70% 30%,#FFE2B8,transparent 60%),linear-gradient(160deg,#5B8CFF,#7B61FF 45%,#FF6B8B);filter:blur(16px);transform:scale(1.08)}
+.u079.is-done .u079-img .u079-r{filter:none;transform:none;transition:opacity .5s var(--ux-ease) var(--d),filter .9s var(--ux-ease) calc(var(--d) + .1s),transform .9s var(--ux-ease) calc(var(--d) + .1s)}
+.u079-img .u079-r::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-30%;height:60%;border-radius:50%;background:rgba(30,15,70,.35)}
+.u079-acts{display:flex;gap:8px;margin-top:12px}
+.u079-acts .u079-s{width:58px;height:30px;border-radius:15px}
+.u079-acts .u079-r{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:15px;background:var(--ux-surface-2);font-size:12.5px;font-weight:750;color:var(--ux-ink-2)}
+.u079-tx{margin-top:12px}
+.u079-tx .u079-s{height:12px;border-radius:6px;margin-bottom:9px}
+.u079-tx .u079-s:nth-child(2){width:86%}
+.u079-tx .u079-s:nth-child(3){width:58%}
+.u079-tx .u079-r{position:absolute;left:0;right:-40px;top:-5px;font-size:13.5px;line-height:22px;color:var(--ux-ink-2);white-space:nowrap;overflow:hidden}
+.u079-tx .u079-s:first-child .u079-r b{color:var(--ux-ink)}
+</style>
+<div class="ux u079 is-loading" aria-busy="true">
+  <button class="u079-re" type="button" aria-label="Reload"><svg viewBox="0 0 17 17" aria-hidden="true"><path d="M14 8.5a5.5 5.5 0 1 1-1.6-3.9M14 2.5v3h-3"/></svg></button>
+  <div class="u079-head">
+    <div class="u079-av u079-s" style="--d:0s"><span class="u079-sk"></span><span class="u079-r"></span></div>
+    <div class="u079-nm"><div class="u079-s" style="--d:.06s"><span class="u079-sk"></span><span class="u079-r">Jiwoo Han</span></div><div class="u079-s" style="--d:.1s"><span class="u079-sk"></span><span class="u079-r">Jeju · 2 hours ago</span></div></div>
+  </div>
+  <div class="u079-img u079-s" style="--d:.16s"><span class="u079-sk"></span><span class="u079-r" role="img" aria-label="Photo of the sea at sunset"></span></div>
+  <div class="u079-acts"><div class="u079-s" style="--d:.28s"><span class="u079-sk"></span><span class="u079-r">♥ 248</span></div><div class="u079-s" style="--d:.32s"><span class="u079-sk"></span><span class="u079-r">💬 31</span></div><div class="u079-s" style="--d:.36s"><span class="u079-sk"></span><span class="u079-r">↗ Share</span></div></div>
+  <div class="u079-tx"><div class="u079-s" style="--d:.42s"><span class="u079-sk"></span><span class="u079-r"><b>Jiwoo Han</b> The sea turns three colors at sunset.</span></div><div class="u079-s" style="--d:.48s"><span class="u079-sk"></span><span class="u079-r">Orange, then pink, then purple.</span></div><div class="u079-s" style="--d:.54s"><span class="u079-sk"></span><span class="u079-r">#jeju #sunset #walk</span></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var re = root.querySelector('.u079-re'), sks = root.querySelectorAll('.u079-sk');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var t = 0;
+  function align() {
+    sks.forEach(function (s) {
+      var x = 0, el = s.parentNode;
+      while (el && el !== root) { x += el.offsetLeft; el = el.offsetParent; }
+      s.style.setProperty('--sx', -x + 'px');
+    });
+  }
+  function load() {
+    clearTimeout(t);
+    root.classList.remove('is-done'); root.classList.add('is-loading'); root.setAttribute('aria-busy', 'true');
+    re.setAttribute('aria-label', 'Loading');
+    t = setTimeout(function () {
+      if (!root.isConnected) return;
+      root.classList.remove('is-loading'); root.classList.add('is-done'); root.setAttribute('aria-busy', 'false');
+      re.setAttribute('aria-label', 'Reload');
+    }, rm ? 400 : 1800);
+  }
+  re.addEventListener('click', load);
+  align(); load();
+})();
+</script>

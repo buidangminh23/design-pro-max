@@ -1,0 +1,114 @@
+<!-- Lucian UX/UI Prompt #244 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#244 -->
+<!--
+Element: Form validation that takes you to errors
+ID: 244 · Category: Forms & Input · Tags: validation, form, error-summary, accessibility, signup
+What it does: Press Sign up at the bottom of a sign-up form and a summary such as “4 fields need attention” drops in at the top, while the wrong fields shake with red outlines and their hints unfold. The form glides up to the first wrong field and puts the cursor there, and pressing an item in the summary jumps straight to that field. Fixed fields fold their hint and gain a check as the summary count drops, and once everything is fixed the sign-up completes.
+How to use it: Press Sign up at the bottom, then fix the wrong fields one by one
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#244
+-->
+<style>
+.u244{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u244-sc{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:24px 20px 26px}
+.u244-sc::-webkit-scrollbar{display:none}
+.u244 h3{margin:0;font-size:20px;font-weight:900;letter-spacing:-.035em}
+.u244-sc>p{margin:3px 0 0;font-size:11px;font-weight:650;color:var(--ux-ink-3)}
+.u244-sm{display:grid;grid-template-rows:0fr;margin-top:0;transition:grid-template-rows .4s cubic-bezier(.3,1,.4,1),margin .4s}
+.u244-sm>div{min-height:0;overflow:hidden}
+.u244.is-err .u244-sm{grid-template-rows:1fr;margin-top:14px}
+.u244-sb{padding:11px 13px;border-radius:13px;background:color-mix(in srgb,#E11D48 10%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,#E11D48 30%,transparent)}
+.u244-sb b{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:850;color:#BE123C}
+.u244-sb b i{width:16px;height:16px;border-radius:50%;background:#E11D48;color:#fff;font-style:normal;font-size:10px;font-weight:900;display:grid;place-items:center}
+.u244-sb ul{margin:6px 0 0;padding:0 0 0 22px;font-size:11px;font-weight:700}
+.u244-sb li{margin-top:2px;transition:opacity .25s}
+.u244-sb li.is-fixed{opacity:.4;text-decoration:line-through}
+.u244-sb a{color:#BE123C;text-underline-offset:2px;cursor:pointer}
+.u244-fd{margin-top:14px}
+.u244-fd label{display:block;font-size:11px;font-weight:800;color:var(--ux-ink-2)}
+.u244-bx{position:relative;margin-top:6px}
+.u244-in{width:100%;height:44px;padding:0 38px 0 13px;border:0;border-radius:12px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:13px;font-weight:700;outline:none;box-sizing:border-box;transition:box-shadow .2s}
+.u244-in:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u244-fd.is-bad .u244-in{box-shadow:inset 0 0 0 2px #E11D48}
+.u244-fd.is-good .u244-in{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,#10B981 60%,transparent)}
+.u244-fd.is-shake .u244-bx{animation:u244-sh .4s}
+@keyframes u244-sh{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+.u244-ok{position:absolute;right:12px;top:12px;width:20px;height:20px;border-radius:50%;background:#10B981;transform:scale(0);transition:transform .35s cubic-bezier(.3,1.7,.5,1)}
+.u244-ok::after{content:"";position:absolute;left:7px;top:4px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.u244-fd.is-good .u244-ok{transform:none}
+.u244-ms{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.3,1,.4,1)}
+.u244-ms>div{min-height:0;overflow:hidden;font-size:10.5px;font-weight:750;color:#BE123C}
+.u244-ms>div>span{display:block;padding-top:5px}
+.u244-fd.is-bad .u244-ms{grid-template-rows:1fr}
+.u244-ag{display:flex;align-items:center;gap:9px;margin-top:16px;padding:0;border:0;background:none;color:var(--ux-ink);font:inherit;font-size:11.5px;font-weight:700;cursor:pointer;text-align:left}
+.u244-ag i{flex:none;width:20px;height:20px;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--ux-line);display:grid;place-items:center;transition:background .2s,box-shadow .2s}
+.u244-ag[aria-checked="true"] i{background:var(--ux-accent);box-shadow:none}
+.u244-ag[aria-checked="true"] i::after{content:"";width:4px;height:8px;margin-top:-2px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+.u244-ag.is-bad i{box-shadow:inset 0 0 0 2px #E11D48}
+.u244-ag.is-shake{animation:u244-sh .4s}
+.u244-go{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:48px;margin-top:20px;border:0;border-radius:13px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:13px;font-weight:850;cursor:pointer;transition:background .3s}
+.u244-go.is-done{background:#059669}
+.u244 button:focus-visible,.u244 a:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u244-sm,.u244-ms,.u244-ok{transition:none}.u244-fd.is-shake .u244-bx,.u244-ag.is-shake{animation:none}}
+</style>
+<div class="ux u244">
+  <form class="u244-sc" novalidate aria-label="Sign-up form">
+    <h3>Sign up</h3><p>Takes about a minute</p>
+    <div class="u244-sm" role="alert"><div><div class="u244-sb"><b><i>!</i><span class="u244-ct"></span></b><ul></ul></div></div></div>
+    <div class="u244-fs"></div>
+    <button type="button" class="u244-ag" role="checkbox" aria-checked="false"><i aria-hidden="true"></i>I agree to the terms and privacy policy</button>
+    <button type="submit" class="u244-go">Sign up</button>
+  </form>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u244-sc'), fs = root.querySelector('.u244-fs'), ul = root.querySelector('.u244-sb ul'), ct = root.querySelector('.u244-ct'), ag = root.querySelector('.u244-ag'), go = root.querySelector('.u244-go');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var uid = 'u244' + Math.random().toString(36).slice(2, 7);
+  var F = [['Name', 'text', '', 'Please enter your name'], ['Email', 'email', 'minji@', 'That doesn’t look like an email (e.g. name@site.com)'], ['Password', 'password', 'abc', 'Use 8+ characters with at least one number'], ['Phone (optional)', 'tel', '', '']];
+  var RULE = [function (v) { return v.trim().length > 0; }, function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }, function (v) { return v.length >= 8 && /\d/.test(v); }, function () { return true; }];
+  var tried = false;
+  var fields = F.map(function (f, i) {
+    var d = document.createElement('div'); d.className = 'u244-fd';
+    d.innerHTML = '<label></label><div class="u244-bx"><input class="u244-in" autocomplete="off"><span class="u244-ok" aria-hidden="true"></span></div><div class="u244-ms"><div><span></span></div></div>';
+    var inp = d.querySelector('input'); inp.type = f[1]; inp.value = f[2]; inp.id = uid + i;
+    var lb = d.querySelector('label'); lb.textContent = f[0]; lb.htmlFor = inp.id;
+    var ms = d.querySelector('.u244-ms span'); ms.textContent = f[3]; ms.id = uid + 'm' + i; inp.setAttribute('aria-describedby', ms.id);
+    inp.addEventListener('input', function () { if (tried) state(); });
+    fs.appendChild(d); return { el: d, inp: inp };
+  });
+  function bad() { var b = []; fields.forEach(function (f, i) { if (!RULE[i](f.inp.value)) b.push(i); }); if (ag.getAttribute('aria-checked') !== 'true') b.push(4); return b; }
+  function goTo(el, fn) {
+    var y = Math.max(0, el.offsetTop - 70), y0 = sc.scrollTop, t0 = performance.now(), ms = rm ? 0 : 520;
+    (function f(now) { var k = ms ? Math.min(1, (now - t0) / ms) : 1, e = 1 - Math.pow(1 - k, 3); sc.scrollTop = y0 + (y - y0) * e; if (k < 1) requestAnimationFrame(f); else if (fn) fn(); })(t0);
+  }
+  var listed = [];
+  function state() {
+    var b = bad();
+    fields.forEach(function (f, i) { var wrong = b.indexOf(i) >= 0; f.el.classList.toggle('is-bad', wrong); f.el.classList.toggle('is-good', !wrong && f.inp.value.length > 0); f.inp.setAttribute('aria-invalid', wrong); });
+    ag.classList.toggle('is-bad', b.indexOf(4) >= 0);
+    Array.prototype.forEach.call(ul.children, function (li) { li.classList.toggle('is-fixed', b.indexOf(+li.dataset.i) < 0); });
+    ct.textContent = b.length + ' fields need attention';
+    root.classList.toggle('is-err', b.length > 0);
+    return b;
+  }
+  function shake(el) { el.classList.remove('is-shake'); void el.offsetWidth; el.classList.add('is-shake'); }
+  sc.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (go.classList.contains('is-done')) return;
+    tried = true; var b = state();
+    if (!b.length) { go.classList.add('is-done'); go.textContent = 'You’re in! Welcome'; return; }
+    ul.innerHTML = '';
+    b.forEach(function (i) {
+      var li = document.createElement('li'); li.dataset.i = i; var a = document.createElement('a'); a.href = '#'; a.textContent = i < 4 ? F[i][0].replace(/ \(.*\)/, '') : 'Terms';
+      a.addEventListener('click', function (ev) { ev.preventDefault(); var t = i < 4 ? fields[i] : null; goTo(t ? t.el : ag, function () { (t ? t.inp : ag).focus({ preventScroll: true }); }); });
+      li.appendChild(a); ul.appendChild(li);
+    });
+    b.forEach(function (i) { shake(i < 4 ? fields[i].el : ag); });
+    var first = b[0];
+    setTimeout(function () { goTo(first < 4 ? fields[first].el : ag, function () { (first < 4 ? fields[first].inp : ag).focus({ preventScroll: true }); }); }, rm ? 0 : 200);
+  });
+  ag.addEventListener('click', function () { ag.setAttribute('aria-checked', ag.getAttribute('aria-checked') !== 'true'); if (tried) state(); });
+})();
+</script>

@@ -1,0 +1,90 @@
+<!-- Lucian UX/UI Prompt #301 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#301 -->
+<!--
+Element: Image optimizer with shrinking size
+ID: 301 · Category: Site Builder Tools · Tags: image, optimization, compression, webp, builder
+What it does: A tool for optimizing photos before they go on your site. Switch the format to WebP or AVIF or move the quality bar, and the original and result size bars shrink right away while the savings percentage rolls. Drag the divider in the middle to compare the original and optimized photo side by side; push quality too low and the result side turns mushy with a warning.
+How to use it: Switch formats, then drag the quality bar and the divider in the middle
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#301
+-->
+<style>
+.u301{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u301-cp{position:absolute;left:12px;right:12px;top:12px;height:150px;border-radius:16px;overflow:hidden;touch-action:none}
+.u301-cp svg{position:absolute;inset:0;width:100%;height:100%}
+.u301-rs{position:absolute;inset:0;clip-path:inset(0 0 0 var(--x,50%))}
+.u301-rs svg{filter:blur(var(--bl,0px))}
+.u301-rs::after{content:"";position:absolute;inset:0;background:repeating-conic-gradient(rgba(0,0,0,.06) 0 25%,transparent 0 50%) 0 0/var(--px,1px) var(--px,1px);opacity:var(--po,0)}
+.u301-lb{position:absolute;top:8px;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.5);color:#fff;font-size:9.5px;font-weight:850}
+.u301-lb.l{left:8px}.u301-lb.r{right:8px}
+.u301-dv{position:absolute;top:0;bottom:0;left:var(--x,50%);width:24px;margin-left:-12px;cursor:ew-resize;touch-action:none}
+.u301-dv::before{content:"";position:absolute;left:11px;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 6px rgba(0,0,0,.3)}
+.u301-dv::after{content:"";position:absolute;left:3px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.u301-dv:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.u301-wn{position:absolute;right:8px;bottom:8px;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:7px;background:#F59E0B;color:#fff;font-size:9.5px;font-weight:850;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .3s}
+.u301.is-low .u301-wn{opacity:1;transform:none}
+.u301-op{position:absolute;left:14px;right:14px;top:172px;display:flex;align-items:center;gap:10px}
+.u301-fs{display:flex;padding:3px;border-radius:10px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u301-fm{height:26px;padding:0 9px;border:0;border-radius:7px;background:none;color:var(--ux-ink-3);font:inherit;font-size:10.5px;font-weight:850;cursor:pointer;transition:background .2s,color .2s}
+.u301-fm[aria-checked="true"]{background:var(--ux-ink);color:var(--ux-surface)}
+.u301-ql{flex:1;display:flex;align-items:center;gap:7px;font-size:10px;font-weight:800;color:var(--ux-ink-2)}
+.u301-qt{position:relative;flex:1;height:22px;touch-action:none;cursor:pointer}
+.u301-qt::before{content:"";position:absolute;left:0;right:0;top:9px;height:4px;border-radius:2px;background:var(--ux-surface-3)}
+.u301-qf{position:absolute;left:0;top:9px;height:4px;border-radius:2px;background:var(--ux-accent)}
+.u301-qk{position:absolute;top:3px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 2px 5px rgba(0,0,0,.25)}
+.u301-ql em{min-width:22px;font-style:normal;font-weight:900;color:var(--ux-ink);font-variant-numeric:tabular-nums;text-align:right}
+.u301-sz{position:absolute;left:14px;right:14px;top:212px}
+.u301-rw{display:grid;grid-template-columns:42px 1fr 56px;align-items:center;gap:8px;height:24px;font-size:10px;font-weight:800;color:var(--ux-ink-2)}
+.u301-rw div{height:10px;border-radius:5px;background:var(--ux-surface-2);overflow:hidden}
+.u301-rw div i{display:block;height:100%;border-radius:5px;background:var(--ux-ink-3);transition:width .5s cubic-bezier(.3,1.1,.4,1)}
+.u301-rw.r div i{background:linear-gradient(90deg,#10B981,#34D399)}
+.u301-rw b{text-align:right;font-weight:900;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u301-sv{position:absolute;left:14px;right:14px;bottom:16px;display:flex;align-items:baseline;gap:6px;padding:10px 12px;border-radius:13px;background:color-mix(in srgb,#10B981 12%,transparent);color:#047857;font-size:11px;font-weight:800}
+.u301-sv b{font-size:22px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.u301 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u301-rw div i,.u301-wn{transition:none}}
+</style>
+<div class="ux u301">
+  <div class="u301-cp"><div class="u301-or"></div><div class="u301-rs"></div><span class="u301-lb l"></span><span class="u301-lb r"></span><span class="u301-dv" role="slider" tabindex="0" aria-label="Compare divider" aria-valuemin="0" aria-valuemax="100"></span><span class="u301-wn" role="status"></span></div>
+  <div class="u301-op"><div class="u301-fs" role="radiogroup" aria-label="Format"></div><div class="u301-ql">Quality<div class="u301-qt"><span class="u301-qf"></span><span class="u301-qk" role="slider" tabindex="0" aria-label="Quality" aria-valuemin="10" aria-valuemax="100"></span></div><em class="u301-qv"></em></div></div>
+  <div class="u301-sz"><div class="u301-rw"><span class="u301-l0"></span><div><i style="width:100%"></i></div><b>2.4MB</b></div><div class="u301-rw r"><span class="u301-l1"></span><div><i class="u301-rf"></i></div><b class="u301-rb"></b></div></div>
+  <div class="u301-sv"><b class="u301-pc"></b><span class="u301-pt"></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cp = root.querySelector('.u301-cp'), or = root.querySelector('.u301-or'), rs = root.querySelector('.u301-rs'), dv = root.querySelector('.u301-dv'), wn = root.querySelector('.u301-wn'), fs = root.querySelector('.u301-fs'), qt = root.querySelector('.u301-qt'), qf = root.querySelector('.u301-qf'), qk = root.querySelector('.u301-qk'), qv = root.querySelector('.u301-qv'), rf = root.querySelector('.u301-rf'), rb = root.querySelector('.u301-rb'), pc = root.querySelector('.u301-pc');
+  var uid = 'u301' + Math.random().toString(36).slice(2, 7);
+  root.querySelector('.u301-lb.l').textContent = 'Original'; root.querySelector('.u301-lb.r').textContent = 'Optimized';
+  root.querySelector('.u301-l0').textContent = 'Original'; root.querySelector('.u301-l1').textContent = 'Optimized';
+  root.querySelector('.u301-pt').textContent = ' smaller'; wn.textContent = 'Visible quality loss';
+  function pic(id) { return '<svg viewBox="0 0 316 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FDBA74"/><stop offset=".55" stop-color="#F472B6"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><rect width="316" height="150" fill="url(#' + id + ')"/><circle cx="210" cy="64" r="26" fill="#FEF3C7"/><path d="M0 110 L60 70 L110 96 L170 58 L240 100 L316 74 V150 H0Z" fill="#4C1D95" opacity=".75"/><path d="M0 128 Q80 110 160 126 T316 120 V150 H0Z" fill="#2E1065"/><g fill="#FDE68A"><circle cx="40" cy="30" r="1.6"/><circle cx="90" cy="18" r="1.2"/><circle cx="140" cy="36" r="1.4"/><circle cx="280" cy="24" r="1.2"/></g></svg>'; }
+  or.innerHTML = pic(uid + 'a'); rs.innerHTML = pic(uid + 'b');
+  var FM = [['JPEG', .62], ['WebP', .38], ['AVIF', .27]], ORIG = 2400, fmt = 0, q = 82, x = 50;
+  var B = FM.map(function (f, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u301-fm'; b.setAttribute('role', 'radio'); b.textContent = f[0]; b.addEventListener('click', function () { fmt = i; sync(); }); fs.appendChild(b); return b; });
+  function kb(v) { return v >= 1000 ? (v / 1000).toFixed(1) + 'MB' : Math.round(v) + 'KB'; }
+  var shown = 0;
+  function sync() {
+    var size = ORIG * FM[fmt][1] * (0.18 + 0.82 * Math.pow(q / 100, 2.2)), save = Math.round((1 - size / ORIG) * 100);
+    B.forEach(function (b, i) { b.setAttribute('aria-checked', i === fmt); });
+    qf.style.width = ((q - 10) / 90 * 100) + '%'; qk.style.left = ((q - 10) / 90 * 100) + '%'; qv.textContent = q; qk.setAttribute('aria-valuenow', q);
+    rf.style.width = (size / ORIG * 100) + '%'; rb.textContent = kb(size);
+    var low = q < 35; rs.style.setProperty('--bl', (Math.max(0, 60 - q) / 22).toFixed(2) + 'px'); rs.style.setProperty('--po', low ? .9 : 0); rs.style.setProperty('--px', Math.round(4 + (40 - q) / 4) + 'px');
+    root.classList.toggle('is-low', low);
+    var from = shown, t0 = performance.now();
+    (function f(now) { var k = Math.min(1, (now - t0) / 400); shown = Math.round(from + (save - from) * k); pc.textContent = '−' + shown + '%'; if (k < 1) requestAnimationFrame(f); })(t0);
+  }
+  function drag(el, fn) {
+    var on = false;
+    el.addEventListener('pointerdown', function (e) { on = true; try { el.setPointerCapture(e.pointerId); } catch (er) {} fn(e); });
+    el.addEventListener('pointermove', function (e) { if (on) fn(e); });
+    el.addEventListener('pointerup', function () { on = false; }); el.addEventListener('pointercancel', function () { on = false; });
+  }
+  drag(qk, function (e) { var r = qt.getBoundingClientRect(); q = Math.round(10 + Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 90); sync(); });
+  drag(qt, function (e) { var r = qt.getBoundingClientRect(); q = Math.round(10 + Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 90); sync(); });
+  drag(dv, function (e) { var r = cp.getBoundingClientRect(); x = Math.max(4, Math.min(96, (e.clientX - r.left) / r.width * 100)); cp.style.setProperty('--x', x + '%'); dv.setAttribute('aria-valuenow', Math.round(x)); });
+  qk.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0; if (d) { e.preventDefault(); q = Math.max(10, Math.min(100, q + d)); sync(); } });
+  dv.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 5 : e.key === 'ArrowLeft' ? -5 : 0; if (d) { e.preventDefault(); x = Math.max(4, Math.min(96, x + d)); cp.style.setProperty('--x', x + '%'); } });
+  sync();
+})();
+</script>

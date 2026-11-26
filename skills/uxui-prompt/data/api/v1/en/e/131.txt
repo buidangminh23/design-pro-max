@@ -1,0 +1,18 @@
+<!-- Lucian UX/UI Prompt #131 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#131 -->
+<!--
+Element: Companion entries
+ID: 131 · Category: Document & Data Editing · Tags: repeat-form, editing, interactive
+What it does: A repeating group that takes the same details for each person in your party. Add creates a new numbered row, and each row can be removed on its own.
+How to use it: Press “＋ Companion” to add rows and × to remove them
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#131
+-->
+<style>
+.u131{width:min(100%,370px);font-size:14px;line-height:1.6;color:var(--ux-ink)}.u131 button,.u131 input,.u131 textarea,.u131 select{font:inherit;color:inherit;max-width:100%;min-width:0}.u131 button{cursor:pointer;min-height:44px;border:1px solid var(--ux-line-2);border-radius:8px;background:var(--ux-surface);padding:8px 12px}.u131 input,.u131 textarea,.u131 select{border:1px solid var(--ux-line-2);border-radius:6px;background:var(--ux-surface);padding:8px 10px}.u131 .quiet{color:var(--ux-ink-2)}.u131 .primary{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:transparent}.u131 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u131 [hidden]{display:none!important}.u131 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.u131 *{animation:none!important;transition:none!important}}
+.u131{border-left:3px solid var(--ux-accent);padding-left:19px}.u131 .person{display:flex;align-items:center;gap:12px;padding:8px 0}.u131 .person b{font:16px ui-monospace,monospace;color:var(--ux-accent);font-weight:600}.u131 input{flex:1;width:100%;background:transparent;border-width:0 0 1px;border-radius:0;padding-left:0}.u131 .remove{width:44px;border:0;background:transparent;color:var(--ux-ink-2);font-size:20px}.u131 [data-add]{margin-top:13px;background:transparent;border-style:dashed;color:var(--ux-accent)}
+</style>
+<div class="ux u131"><div class="people"></div><button data-add>＋ Companion</button></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,$=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)],esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const motion=(node,frames,opts={})=>{if(node?.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.8,.2,1)',...opts})};let people=['Seoyun'];function render(focus=false){$('.people').innerHTML=people.map((name,i)=>'<div class="person"><b>'+String(i+1).padStart(2,'0')+'</b><input aria-label="Companion '+(i+1)+' name" value="'+esc(name)+'" data-person="'+i+'"><button class="remove" data-remove="'+i+'" aria-label="Remove companion '+(i+1)+'">×</button></div>').join('');$$('[data-person]').forEach(i=>i.oninput=()=>people[+i.dataset.person]=i.value);$$('[data-remove]').forEach(b=>b.onclick=()=>{people.splice(+b.dataset.remove,1);render();$('[data-add]').focus()});$('[data-add]').disabled=people.length>=4;root.dataset.count=people.length;if(focus)$$('input').at(-1)?.focus()}$('[data-add]').onclick=()=>{people.push('');render(true);motion($('.person:last-child'),[{transform:'translateY(-7px)',opacity:0},{transform:'none',opacity:1}])};render();})();
+</script>

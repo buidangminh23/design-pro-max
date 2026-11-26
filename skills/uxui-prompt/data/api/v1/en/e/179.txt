@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #179 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#179 -->
+<!--
+Element: Clipboard shelf
+ID: 179 · Category: Workflow & Systems · Tags: clipboard-shelf, new-century
+What it does: A clipboard that keeps copied snippets on a shelf so you can pick and paste them. Snippets join the sentence below in the order you press them, and clear starts over.
+How to use it: Press the notes on the shelf in turn to build a sentence
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#179
+-->
+<style>
+.u179 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u179 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u179 button:active{transform:translateY(1px)}.u179 button:disabled{opacity:.4;cursor:default}.u179 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u179 .muted{color:var(--ux-ink-2);font-size:12px}.u179 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u179 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u179 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u179 input,.u179 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u179 output{font-variant-numeric:tabular-nums}.u179 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u179 *,.u179 *::before,.u179 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u179 .shelf{position:relative;display:flex;gap:9px;padding:20px 3px 16px;border-bottom:8px solid #b68a5a;box-shadow:0 8px 9px -9px #5b3c1e;margin-top:8px}.u179 .clip{flex:1;min-width:0;height:116px;border:0;border-radius:2px;transform:rotate(var(--tilt));background:var(--paper);color:#332f25;padding:14px 9px;font-size:14px;box-shadow:0 6px 12px -8px #3e3024;transition:transform .35s}.u179 .clip[aria-pressed=true]{transform:translateY(-12px) rotate(0);box-shadow:0 0 0 2px #ae6244,0 6px 12px -8px #3e3024}.u179 .clip small{display:block;font:9px ui-monospace,monospace;margin-bottom:18px;opacity:.7}.u179 .assembly{border:1px dashed var(--ux-line-2);min-height:67px;padding:14px;margin-top:24px;border-radius:9px;font-size:16px;line-height:1.6}.u179 .clear{border:0;background:none;font-size:12px}.u179 .count{font:11px ui-monospace,monospace}
+
+/* Focused composition */
+.u179{max-width:320px}.u179 .shelf{margin:0;padding-top:18px;border-bottom-width:5px;gap:14px}.u179 .clip{height:116px;font-size:16px;line-height:1.5;text-align:left;padding:18px 13px}.u179 .joined{display:flex;align-items:center;margin-top:23px;gap:8px}.u179 .joined[hidden]{display:none}.u179 .assembly{border:0;border-radius:0;margin:0;padding:0;min-height:0;font-size:14px;flex:1}.u179 .clear{font-size:19px;padding:0 4px;min-width:30px}</style>
+<div class="ux u179" data-state="initial"><div class="shelf"><button class="clip" style="--paper:#f4e5bb;--tilt:-4deg" aria-pressed="false" data-text="Small ideas">Small<br>ideas</button><button class="clip" style="--paper:#d9e5da;--tilt:3deg" aria-pressed="false" data-text="link together">link<br>together</button><button class="clip" style="--paper:#e5dbec;--tilt:-2deg" aria-pressed="false" data-text="grow bigger.">grow<br>bigger.</button></div><div class="joined" hidden><div class="assembly" aria-live="polite"></div><button class="clear" aria-label="Clear sentence">×</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let picked=[];function render(){qa('.clip').forEach(b=>b.setAttribute('aria-pressed',picked.includes(b.dataset.text)));q('.assembly').textContent=picked.join(' ');q('.joined').hidden=!picked.length;state('clips-'+picked.length);pulse(q('.assembly'),[{transform:'translateY(5px)',opacity:.5},{transform:'none',opacity:1}])}qa('.clip').forEach(b=>b.onclick=()=>{const t=b.dataset.text;picked=picked.includes(t)?picked.filter(x=>x!==t):[...picked,t];render()});q('.clear').onclick=()=>{picked=[];render()};})();
+</script>

@@ -1,0 +1,33 @@
+<!-- Lucian UX/UI Prompt #176 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#176 -->
+<!--
+Element: Version filmstrip
+ID: 176 · Category: Workflow & Systems · Tags: revision-filmstrip, new-century
+What it does: A filmstrip of a document’s earlier versions. Pick one and the large preview switches to it; press restore to make it the current version.
+How to use it: Press v1 or v2 below, then press “Restore this version”
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#176
+-->
+<style>
+.u176 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u176 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u176 button:active{transform:translateY(1px)}.u176 button:disabled{opacity:.4;cursor:default}.u176 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u176 .muted{color:var(--ux-ink-2);font-size:12px}.u176 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u176 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u176 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u176 input,.u176 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u176 output{font-variant-numeric:tabular-nums}.u176 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u176 *,.u176 *::before,.u176 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u176 .poster{height:205px;background:#e8ddc8;background:light-dark(#e8ddc8,#2A251E);border-radius:3px;position:relative;padding:22px;overflow:hidden;box-shadow:0 12px 24px -16px var(--ux-shadow-strong);color:#302b25;color:light-dark(#302b25,#F1E9DA);transition:background .55s}
+.u176 .poster strong{position:relative;z-index:2;font:italic 54px/.94 Georgia,serif;letter-spacing:-3px;display:block;max-width:170px;transition:transform .55s}
+.u176 .orb{width:125px;height:125px;position:absolute;right:22px;bottom:20px;background:#bb614b;background:light-dark(#bb614b,#CF6E55);border-radius:50%;transition:all .55s cubic-bezier(.2,.8,.2,1)}
+.u176 .poster[data-ver="0"]{background:#dadfd6;background:light-dark(#dadfd6,#1F2620)}.u176 .poster[data-ver="0"] .orb{background:#416252;background:light-dark(#416252,#6E9C82)}
+.u176 .poster[data-ver="1"]{background:#e9d1c8;background:light-dark(#e9d1c8,#2C2021)}.u176 .poster[data-ver="1"] .orb{background:#a45464;background:light-dark(#a45464,#C66B7C)}
+.u176 .poster small{position:absolute;bottom:17px;left:22px;font:10px ui-monospace,monospace;letter-spacing:2px}
+.u176 .film{display:flex;gap:10px;margin-top:20px;position:relative}.u176 .v{flex:1;border-top:3px solid transparent;border-radius:0;padding:9px 3px;background:none;text-align:left}.u176 .v[aria-pressed=true]{border-color:var(--a);color:var(--a)}.u176 .v span{display:block;font-size:11px;color:var(--ux-ink-2)}.u176 .live{font-size:11px;color:light-dark(#167349,#9ddab4)}
+
+/* Focused composition */
+.u176{max-width:320px}.u176 .poster{height:202px}.u176 .poster strong{font-size:46px;max-width:140px}.u176 .orb{width:106px;height:106px;right:18px}.u176 .version-rail{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:20px}.u176 .film{margin:0;gap:2px;flex:1;max-width:145px}.u176 .v{padding:5px 10px;border:0;min-height:34px;font:12px ui-monospace;text-align:center;border-radius:5px}.u176 .v[aria-pressed=true]{background:var(--ux-surface-3);color:var(--ux-ink)}.u176 .restore{font-size:11px;border:0;background:none;min-height:32px;padding:5px 0}</style>
+<div class="ux u176" data-state="initial"><div class="poster"><strong>Quiet<br>forms.</strong><i class="orb"></i></div><div class="version-rail"><div class="film"><button class="v" data-v="0" aria-pressed="false">v1</button><button class="v" data-v="1" aria-pressed="false">v2</button><button class="v" data-v="2" aria-pressed="true">v3</button></div><button class="restore" disabled>Current version</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let selected=2,live=2;const versions=[['rotate(-12deg)','22%'],['rotate(8deg)','50%'],['rotate(0deg)','50%']];function render(){const v=versions[selected];q('.poster').dataset.ver=selected;q('.orb').style.borderRadius=v[1];q('.poster strong').style.transform=v[0];qa('.v').forEach((b,i)=>b.setAttribute('aria-pressed',i===selected));q('.restore').disabled=selected===live;q('.restore').textContent=selected===live?'Current version':'Restore this version';state('preview-'+selected+'-live-'+live)}qa('.v').forEach(b=>b.onclick=()=>{selected=+b.dataset.v;render()});q('.restore').onclick=()=>{live=selected;render();pulse(q('.poster'),[{transform:'translateY(-5px)'},{transform:'none'}])};})();
+</script>

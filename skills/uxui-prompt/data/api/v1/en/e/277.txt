@@ -1,0 +1,122 @@
+<!-- Lucian UX/UI Prompt #277 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#277 -->
+<!--
+Element: Jittery-needle speed test
+ID: 277 · Category: Data Motion · Tags: speed-test, gauge, needle, network, data
+What it does: Press Start in the middle and the number flickers while ping is measured, then the needle sweeps up for the download, trembling as the arc fills with color. After the needle drops back to zero the upload climbs again in another color, while the tiles below sketch the live speed as a small line before settling on the average. The scale stretches section by section so 0–1000 Mbps reads evenly.
+How to use it: Press Start in the middle to run a speed test
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#277
+-->
+<style>
+.u277{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(120% 80% at 50% 0%,#1E2450,#0D1024 70%);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#EEF0FF}
+.u277-sv{position:absolute;left:40px;top:14px;width:260px;height:210px;overflow:visible}
+.u277-tl{font-size:9px;font-weight:800;fill:#7C82B8;text-anchor:middle;font-variant-numeric:tabular-nums}
+.u277-nd{transition:opacity .4s}
+.u277.is-idle .u277-nd{opacity:0}
+.u277-ro{position:absolute;left:0;right:0;top:160px;text-align:center;pointer-events:none;transition:opacity .3s}
+.u277.is-idle .u277-ro{opacity:0}
+.u277-num{font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.u277-ph{margin-top:3px;font-size:10px;font-weight:800;letter-spacing:.06em;color:#9AA0D6}
+.u277-go{position:absolute;left:50%;top:144px;width:94px;height:94px;margin:-47px 0 0 -47px;border:0;border-radius:50%;background:radial-gradient(circle at 50% 35%,#4F46E5,#312E81);color:#fff;font:inherit;font-size:18px;font-weight:900;letter-spacing:.04em;cursor:pointer;box-shadow:0 0 0 2px #22D3EE,0 0 30px -4px rgba(34,211,238,.7);transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .3s,top .45s,width .45s,height .45s,margin .45s,border-radius .45s,font-size .3s}
+.u277.is-idle .u277-go{animation:u277-pu 1.8s ease-in-out infinite}
+@keyframes u277-pu{50%{box-shadow:0 0 0 2px #22D3EE,0 0 0 12px rgba(34,211,238,0),0 0 40px -2px rgba(34,211,238,.8)}}
+.u277.is-run .u277-go{transform:scale(.2);opacity:0;pointer-events:none}
+.u277.is-done .u277-go{top:224px;width:96px;height:28px;margin:-14px 0 0 -48px;border-radius:999px;font-size:11.5px;letter-spacing:0;box-shadow:0 0 0 1px rgba(34,211,238,.6)}
+.u277-go:focus-visible{outline:2px solid #fff;outline-offset:4px}
+.u277-ts{position:absolute;left:18px;right:18px;bottom:16px;display:grid;grid-template-columns:.8fr 1fr 1fr;gap:8px}
+.u277-t{height:66px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);transition:box-shadow .3s}
+.u277-t.is-act{box-shadow:inset 0 0 0 1.5px var(--c)}
+.u277-t span{display:flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;color:#9AA0D6;letter-spacing:.04em}
+.u277-t span i{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.u277-t b{display:block;margin-top:2px;font-size:17px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.u277-t b small{font-size:9px;font-weight:800;color:#9AA0D6;margin-left:2px}
+.u277-t svg{display:block;width:100%;height:14px;margin-top:2px}
+@media (prefers-reduced-motion: reduce){.u277.is-idle .u277-go{animation:none}}
+</style>
+<div class="ux u277 is-idle">
+  <svg class="u277-sv" viewBox="0 0 260 210" aria-hidden="true">
+    <defs><linearGradient class="u277-gd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#6366F1"/></linearGradient><linearGradient class="u277-gu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C084FC"/><stop offset="1" stop-color="#EC4899"/></linearGradient></defs>
+    <path class="u277-tr" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="14" stroke-linecap="round"/>
+    <path class="u277-pg" fill="none" stroke-width="14" stroke-linecap="round" pathLength="100" stroke-dasharray="100 200" stroke-dashoffset="100" stroke-opacity="0"/>
+    <g class="u277-tks"></g>
+    <g class="u277-nd"><g class="u277-nr"><path d="M-3.4 0 L0 -88 L3.4 0 Z" fill="#fff"/><circle r="9" fill="#fff"/><circle r="4" fill="#1E2450"/></g></g>
+  </svg>
+  <div class="u277-ro" aria-live="polite"><div class="u277-num">0.0</div><div class="u277-ph"></div></div>
+  <button type="button" class="u277-go" aria-label="Start speed test">GO</button>
+  <div class="u277-ts">
+    <div class="u277-t" style="--c:#FACC15"><span><i></i>Ping</span><b class="u277-vp">–<small>ms</small></b></div>
+    <div class="u277-t" style="--c:#22D3EE"><span><i></i>Download</span><b class="u277-vd">–<small>Mbps</small></b><svg viewBox="0 0 80 14" preserveAspectRatio="none"><polyline class="u277-sd" fill="none" stroke="#22D3EE" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+    <div class="u277-t" style="--c:#EC4899"><span><i></i>Upload</span><b class="u277-vu">–<small>Mbps</small></b><svg viewBox="0 0 80 14" preserveAspectRatio="none"><polyline class="u277-su" fill="none" stroke="#EC4899" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var q = function (s) { return root.querySelector(s); };
+  var pg = q('.u277-pg'), nr = q('.u277-nr'), num = q('.u277-num'), ph = q('.u277-ph'), go = q('.u277-go'), tiles = root.querySelectorAll('.u277-t');
+  var vp = q('.u277-vp'), vd = q('.u277-vd'), vu = q('.u277-vu'), sd = q('.u277-sd'), su = q('.u277-su');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CX = 130, CY = 130, R = 100, VALS = [0, 5, 10, 50, 100, 250, 500, 1000];
+  var uid = 'u277' + Math.random().toString(36).slice(2, 7);
+  q('.u277-gd').id = uid + 'd'; q('.u277-gu').id = uid + 'u';
+  function pt(f, r) { var a = (-120 + 240 * f) * Math.PI / 180; return [CX + r * Math.sin(a), CY - r * Math.cos(a)]; }
+  var p0 = pt(0, R), p1 = pt(1, R), arc = 'M' + p0[0].toFixed(1) + ' ' + p0[1].toFixed(1) + ' A' + R + ' ' + R + ' 0 1 1 ' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1);
+  q('.u277-tr').setAttribute('d', arc); pg.setAttribute('d', arc);
+  q('.u277-tks').innerHTML = VALS.map(function (v, i) { var p = pt(i / 7, 76), m = pt(i / 7, 88), n = pt(i / 7, 93); return '<line x1="' + m[0].toFixed(1) + '" y1="' + m[1].toFixed(1) + '" x2="' + n[0].toFixed(1) + '" y2="' + n[1].toFixed(1) + '" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><text class="u277-tl" x="' + p[0].toFixed(1) + '" y="' + (p[1] + 3).toFixed(1) + '">' + v + '</text>'; }).join('');
+  function frac(v) { for (var i = 0; i < 7; i++) if (v < VALS[i + 1]) return (i + Math.max(0, v - VALS[i]) / (VALS[i + 1] - VALS[i])) / 7; return 1; }
+  var st = 'idle', t = 0, f = 0, v = 0, TD = 0, TU = 0, SD = [], SU = [], acc = 0, ping = 0;
+  function fmt(x) { return x.toFixed(1); }
+  function spark(el, s) { var mx = Math.max.apply(null, s.concat([1])); el.setAttribute('points', s.map(function (x, i) { return (i / Math.max(1, s.length - 1) * 80).toFixed(1) + ',' + (13 - x / mx * 12).toFixed(1); }).join(' ')); }
+  function avg(s) { var h = s.slice(Math.floor(s.length / 3)), a = 0; h.forEach(function (x) { a += x; }); return h.length ? a / h.length : 0; }
+  function setCls(n) { root.classList.toggle('is-idle', n === 'idle'); root.classList.toggle('is-run', n === 'run'); root.classList.toggle('is-done', n === 'done'); }
+  function act(k) { tiles.forEach(function (el, i) { el.classList.toggle('is-act', i === k); }); }
+  function noise(x) { return Math.sin(x * 7.3) * 0.5 + Math.sin(x * 13.1 + 1) * 0.3 + Math.sin(x * 29.7 + 2) * 0.2; }
+  function render(dt) {
+    var ft = frac(v);
+    f += (ft - f) * Math.min(1, dt * 12);
+    nr.setAttribute('transform', 'translate(' + CX + ' ' + CY + ') rotate(' + (-120 + 240 * f).toFixed(2) + ')');
+    pg.setAttribute('stroke-dashoffset', (100 - f * 100).toFixed(2)); pg.setAttribute('stroke-opacity', f > 0.004 ? 1 : 0);
+  }
+  var raf = 0, last = 0, vis = true;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now; t += dt; acc += dt;
+    if (st === 'ping') {
+      v = 0; num.textContent = Math.round(8 + Math.random() * 22) + ' ms';
+      if (t > 1.1) { ping = 12; vp.innerHTML = ping + '<small>ms</small>'; st = 'down'; t = 0; acc = 0; ph.textContent = 'Download'; pg.setAttribute('stroke', 'url(#' + uid + 'd)'); act(1); }
+    } else if (st === 'down' || st === 'up') {
+      var T = st === 'down' ? TD : TU, dur = st === 'down' ? 4.2 : 3.6;
+      v = T * (1 - Math.exp(-t * 1.9)) * (1 + noise(t) * 0.06);
+      num.textContent = fmt(v);
+      if (acc > 0.09) { acc = 0; (st === 'down' ? SD : SU).push(v); spark(st === 'down' ? sd : su, st === 'down' ? SD : SU); }
+      if (t > dur) {
+        if (st === 'down') { vd.innerHTML = fmt(avg(SD)) + '<small>Mbps</small>'; st = 'gap'; t = 0; ph.textContent = 'Preparing upload'; num.textContent = fmt(avg(SD)); act(-1); }
+        else { vu.innerHTML = fmt(avg(SU)) + '<small>Mbps</small>'; st = 'end'; t = 0; num.textContent = fmt(avg(SD)); ph.textContent = 'Test complete'; act(-1); }
+      }
+    } else if (st === 'gap') {
+      v = 0;
+      if (t > 0.7) { st = 'up'; t = 0; acc = 0; ph.textContent = 'Upload'; pg.setAttribute('stroke', 'url(#' + uid + 'u)'); act(2); }
+    } else if (st === 'end') {
+      v = 0;
+      if (t > 0.6) { st = 'done'; setCls('done'); go.textContent = 'Run again'; }
+    }
+    render(dt);
+    if (st !== 'idle' && !(st === 'done' && f < 0.002)) raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; if (vis && st !== 'idle') run(); }).observe(root);
+  go.addEventListener('click', function () {
+    TD = 440 + Math.random() * 80; TU = 84 + Math.random() * 14; SD = []; SU = []; sd.setAttribute('points', ''); su.setAttribute('points', '');
+    vp.innerHTML = '–<small>ms</small>'; vd.innerHTML = '–<small>Mbps</small>'; vu.innerHTML = '–<small>Mbps</small>';
+    if (rm) {
+      for (var i = 0; i < 24; i++) { SD.push(TD * (1 + noise(i) * 0.05)); SU.push(TU * (1 + noise(i + 9) * 0.05)); }
+      spark(sd, SD); spark(su, SU); vp.innerHTML = '12<small>ms</small>'; vd.innerHTML = fmt(avg(SD)) + '<small>Mbps</small>'; vu.innerHTML = fmt(avg(SU)) + '<small>Mbps</small>';
+      num.textContent = fmt(avg(SD)); ph.textContent = 'Test complete'; st = 'done'; setCls('done'); go.textContent = 'Run again'; return;
+    }
+    st = 'ping'; t = 0; f = 0; v = 0; setCls('run'); ph.textContent = 'Measuring ping'; act(0); run();
+  });
+  render(1);
+})();
+</script>

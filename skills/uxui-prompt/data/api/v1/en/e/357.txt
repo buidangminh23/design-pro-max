@@ -1,0 +1,70 @@
+<!-- Lucian UX/UI Prompt #357 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#357 -->
+<!--
+Element: Proximity-weighted letters
+ID: 357 · Category: Cursor & Hover · Tags: variable-font, typography, proximity, hover, weight
+What it does: Each letter of the headline changes weight and size with its distance from the cursor, so a bulge of bolder type rolls across the words around the cursor. Letter cells keep a fixed width so lines never wobble as letters thicken, and a press flips to the opposite mode where only the letters near the cursor thin out. When the cursor leaves, every letter eases back to regular weight.
+How to use it: Move the cursor slowly over the headline, and press to flip the mode
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#357
+-->
+<style>
+.u357{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#101014;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#F4F1EA}
+.u357-tx{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:0;pointer-events:none;font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+.u357-ln{display:flex;justify-content:center}
+.u357-c{display:inline-block;text-align:center;font-size:40px;line-height:1.18;letter-spacing:-.02em;font-weight:var(--w,400);transform:scale(var(--s,1));color:hsl(40 30% calc(60% + var(--k,0) * 36%))}
+.u357-hit{position:absolute;inset:0;border:0;padding:0;background:transparent;cursor:crosshair;border-radius:inherit}
+.u357-hit:focus-visible{outline:2px solid #F4F1EA;outline-offset:-6px}
+.u357-md{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);padding:4px 11px;border-radius:999px;background:rgba(244,241,234,.1);font-size:11px;font-weight:750;color:rgba(244,241,234,.75);pointer-events:none}
+</style>
+<div class="ux u357">
+  <div class="u357-tx" aria-hidden="true"></div>
+  <button type="button" class="u357-hit" aria-label="Headline that thickens near the cursor, press to flip the mode"></button>
+  <div class="u357-md" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tx = root.querySelector('.u357-tx'), hit = root.querySelector('.u357-hit'), md = root.querySelector('.u357-md');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LINES = ['Come closer', 'and letters', 'breathe deep'];
+  var C = [];
+  LINES.forEach(function (l) {
+    var ln = document.createElement('div'); ln.className = 'u357-ln'; tx.appendChild(ln);
+    l.split('').forEach(function (ch) { var s = document.createElement('span'); s.className = 'u357-c'; s.textContent = ch === ' ' ? ' ' : ch; ln.appendChild(s); C.push({ el: s, w: 400, tw: 400, k: 0, x: 0, y: 0 }); });
+  });
+  hit.setAttribute('aria-description', LINES.join(' '));
+  function measure() {
+    var rb = root.getBoundingClientRect(), k = root.offsetWidth / (rb.width || 1);
+    C.forEach(function (c) { c.el.style.width = ''; c.el.style.setProperty('--w', 900); });
+    C.forEach(function (c) { c.el.style.width = Math.ceil(c.el.getBoundingClientRect().width * k * 0.94) + 'px'; });
+    C.forEach(function (c) { c.el.style.setProperty('--w', Math.round(c.w)); var r = c.el.getBoundingClientRect(); c.x = (r.left + r.width / 2 - rb.left) * k; c.y = (r.top + r.height / 2 - rb.top) * k; });
+  }
+  var ptr = null, inv = false, raf = 0, last = 0;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)), busy = false; last = now;
+    C.forEach(function (c) {
+      var f = 0;
+      if (ptr) { var d = Math.hypot(c.x - ptr.x, (c.y - ptr.y) * 1.3); f = d < 110 ? 0.5 + 0.5 * Math.cos(d / 110 * Math.PI) : 0; }
+      var tw = inv ? 800 - f * 700 : 300 + f * 600, tk = inv ? 1 - f : f;
+      var a = rm ? 1 : Math.min(1, dt * (ptr ? 14 : 4));
+      c.w += (tw - c.w) * a; c.k += (tk - c.k) * a;
+      if (Math.abs(tw - c.w) > 1) busy = true;
+      c.el.style.setProperty('--w', Math.round(c.w / 10) * 10);
+      c.el.style.setProperty('--s', (1 + (inv ? (1 - f) : f) * 0.12).toFixed(3));
+      c.el.style.setProperty('--k', c.k.toFixed(3));
+    });
+    if (busy) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  root.addEventListener('pointermove', function (e) { var b = root.getBoundingClientRect(), k = root.offsetWidth / (b.width || 1); ptr = { x: (e.clientX - b.left) * k, y: (e.clientY - b.top) * k }; kick(); });
+  root.addEventListener('pointerleave', function () { ptr = null; kick(); });
+  hit.addEventListener('click', function () { inv = !inv; md.textContent = inv ? 'Lighter near' : 'Bolder near'; C.forEach(function (c) { if (!ptr) c.w = inv ? 800 : 300; }); kick(); });
+  md.textContent = 'Bolder near';
+  C.forEach(function (c) { c.w = 300; });
+  measure(); kick();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (root.isConnected) measure(); });
+})();
+</script>

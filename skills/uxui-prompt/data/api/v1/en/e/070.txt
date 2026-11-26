@@ -1,0 +1,146 @@
+<!-- Lucian UX/UI Prompt #070 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#070 -->
+<!--
+Element: Stacking toasts
+ID: 070 · Category: Alerts & Feedback · Tags: toast, stack, swipe-dismiss, promise, notification
+What it does: A new toast rises from the bottom to the front while earlier ones tuck behind it, shrinking. Hover and the stack fans out into a list and stops auto-dismissing; swipe a toast sideways to remove just that one. The “Saving” toast spins and then turns into done.
+How to use it: Fire a few toasts with the buttons above, then hover the stack to fan it out. Swipe a toast sideways or close it with ×
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#070
+-->
+<style>
+.u070{position:relative;width:350px;height:370px}
+.u070-btns{display:flex;flex-wrap:wrap;gap:6px}
+.u070-btns button{height:38px;padding:0 14px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);font-size:13px;font-weight:720;color:var(--ux-ink);transition:transform .3s var(--ux-spring),box-shadow .3s}
+.u070-btns button:hover{box-shadow:0 0 0 1px var(--ux-line-2),0 8px 16px -10px var(--ux-shadow-strong)}
+.u070-btns button:active{transform:scale(.94)}
+.u070-btns button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u070-btns i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.u070-zone{position:absolute;left:0;right:0;bottom:0;height:300px;outline:none}
+.u070-t{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;min-height:68px;padding:12px 12px 12px 14px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 30px -18px var(--ux-shadow-strong);transform-origin:50% 100%;transform:translate(var(--dx,0px),var(--y,0px)) scale(var(--s,1));opacity:var(--o,1);transition:transform .5s var(--ux-spring),opacity .35s;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.u070-t.drag{transition:none}
+.u070-t.enter{transform:translateY(90px) scale(.9);opacity:0}
+.u070-t.leave{transform:translate(var(--dx,0px),var(--y,0px)) scale(var(--s,1));opacity:0;pointer-events:none}
+.u070-t.leave.side{transform:translate(calc(var(--dir,1) * 420px),var(--y,0px)) rotate(calc(var(--dir,1) * 8deg))}
+.u070-t>*{transition:opacity .25s}
+.u070-t.back>*{opacity:0}
+.u070-ic{width:36px;height:36px;flex:none;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 15%,transparent);color:var(--c)}
+.u070-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u070-ic i{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:u070-spin .7s linear infinite}
+@keyframes u070-spin{to{transform:rotate(360deg)}}
+.u070-tx{flex:1;min-width:0}
+.u070-tx b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}
+.u070-tx small{display:block;margin-top:2px;font-size:12.5px;font-weight:600;color:var(--ux-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u070-act{height:32px;padding:0 11px;border:0;border-radius:10px;background:var(--ux-surface-2);font-size:12.5px;font-weight:750;color:var(--ux-ink)}
+.u070-x{width:30px;height:30px;flex:none;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3)}
+.u070-x:hover{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u070-x svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u070-act:focus-visible,.u070-x:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u070-bar{position:absolute;left:16px;right:16px;bottom:0;height:2px;border-radius:2px;background:var(--c);opacity:.5;transform-origin:0 50%;transform:scaleX(var(--left,1))}
+.u070-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.u070-empty{position:absolute;left:0;right:0;bottom:24px;text-align:center;font-size:13px;font-weight:650;color:var(--ux-ink-3);transition:opacity .3s}
+</style>
+<div class="ux u070">
+  <div class="u070-btns">
+    <button type="button" data-k="ok" style="--c:var(--ux-mint)"><i aria-hidden="true"></i>Saved</button>
+    <button type="button" data-k="err" style="--c:var(--ux-danger)"><i aria-hidden="true"></i>Error</button>
+    <button type="button" data-k="info" style="--c:var(--ux-accent)"><i aria-hidden="true"></i>New comment</button>
+    <button type="button" data-k="wait" style="--c:var(--ux-warn)"><i aria-hidden="true"></i>Saving…</button>
+  </div>
+  <div class="u070-zone" role="region" aria-label="Notifications" tabindex="-1">
+    <p class="u070-empty">Notifications stack up here</p>
+    <div class="u070-live" aria-live="polite"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var zone = root.querySelector('.u070-zone'), empty = root.querySelector('.u070-empty'), live = root.querySelector('.u070-live');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ICON = { ok: '<svg viewBox="0 0 18 18"><path d="M4 9.4l3.2 3.2L14 5.6"/></svg>', err: '<svg viewBox="0 0 18 18"><path d="M9 5v5M9 13h.01"/></svg>', info: '<svg viewBox="0 0 18 18"><path d="M3.5 4.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg>', wait: '<i></i>' };
+  var K = {
+    ok: ['var(--ux-mint)', 'Changes saved', 'Spring campaign landing · just now'],
+    err: ['var(--ux-danger)', 'Upload failed', 'Check your connection', 'Retry'],
+    info: ['var(--ux-accent)', 'Doyun Han left a comment', '“Love this transition!”', 'View'],
+    wait: ['var(--ux-warn)', 'Saving…', '3 files · 12.4 MB']
+  };
+  var list = [], open = false, DUR = 4500, seq = 0;
+  function layout() {
+    var acc = 0;
+    list.forEach(function (t, i) {
+      var el = t.el;
+      el.classList.toggle('back', !open && i > 0);
+      if (open) { el.style.setProperty('--y', -acc + 'px'); el.style.setProperty('--s', 1); el.style.setProperty('--o', 1); acc += el.offsetHeight + 8; }
+      else { el.style.setProperty('--y', -(i * 14) + 'px'); el.style.setProperty('--s', (1 - i * 0.06).toFixed(2)); el.style.setProperty('--o', i > 2 ? 0 : 1); }
+      el.style.zIndex = 50 - i;
+      el.inert = !open && i > 0;
+    });
+    empty.style.opacity = list.length ? '0' : '1';
+  }
+  function remove(t, dir) {
+    var i = list.indexOf(t);
+    if (i < 0) return;
+    list.splice(i, 1);
+    t.el.classList.add('leave');
+    if (dir) { t.el.style.setProperty('--dir', dir); t.el.classList.add('side'); }
+    setTimeout(function () { t.el.remove(); }, 450);
+    layout();
+  }
+  function push(k) {
+    var d = K[k], el = document.createElement('div');
+    el.className = 'u070-t enter';
+    el.style.setProperty('--c', d[0]);
+    el.setAttribute('role', k === 'err' ? 'alert' : 'status');
+    el.innerHTML = '<span class="u070-ic" aria-hidden="true">' + ICON[k] + '</span><span class="u070-tx"><b></b><small></small></span>' + (d[3] ? '<button class="u070-act" type="button"></button>' : '') + '<button class="u070-x" type="button" aria-label="Dismiss"><svg viewBox="0 0 14 14"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7"/></svg></button><span class="u070-bar" aria-hidden="true"></span>';
+    el.querySelector('b').textContent = d[1]; el.querySelector('small').textContent = d[2];
+    if (d[3]) el.querySelector('.u070-act').textContent = d[3];
+    var t = { el: el, left: DUR, id: ++seq, k: k };
+    zone.appendChild(el);
+    list.unshift(t);
+    void el.offsetWidth;
+    el.classList.remove('enter');
+    layout();
+    live.textContent = d[1];
+    el.querySelector('.u070-x').addEventListener('click', function () { remove(t); });
+    if (d[3]) el.querySelector('.u070-act').addEventListener('click', function () { remove(t); if (k === 'err') push('wait'); });
+    if (k === 'wait') {
+      t.left = Infinity;
+      setTimeout(function () {
+        if (!root.isConnected || list.indexOf(t) < 0) return;
+        el.style.setProperty('--c', K.ok[0]);
+        el.querySelector('.u070-ic').innerHTML = ICON.ok;
+        el.querySelector('b').textContent = 'All saved';
+        el.querySelector('small').textContent = 'All 3 files uploaded';
+        live.textContent = 'All saved';
+        t.left = DUR;
+      }, rm ? 300 : 1800);
+    }
+    var sx = 0, dx = 0, down = false;
+    el.addEventListener('pointerdown', function (e) { if (e.target.closest('button')) return; down = true; sx = e.clientX; dx = 0; el.setPointerCapture(e.pointerId); el.classList.add('drag'); });
+    el.addEventListener('pointermove', function (e) { if (!down) return; dx = e.clientX - sx; el.style.setProperty('--dx', dx + 'px'); el.style.setProperty('--o', Math.max(0.2, 1 - Math.abs(dx) / 260)); });
+    var end = function () { if (!down) return; down = false; el.classList.remove('drag'); if (Math.abs(dx) > 90) remove(t, dx > 0 ? 1 : -1); else { el.style.setProperty('--dx', '0px'); layout(); } };
+    el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+  }
+  var last = performance.now();
+  (function loop(now) {
+    if (!root.isConnected) return;
+    var dt = now - last; last = now;
+    if (!open) list.slice().forEach(function (t, i) {
+      if (i > 0 || t.left === Infinity) return;
+      t.left -= dt;
+      t.el.style.setProperty('--left', Math.max(0, t.left / DUR).toFixed(3));
+      if (t.left <= 0) remove(t);
+    });
+    requestAnimationFrame(loop);
+  })(last);
+  function setOpen(v) { if (open === v) return; open = v; layout(); }
+  zone.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') setOpen(true); });
+  zone.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !zone.contains(document.activeElement)) setOpen(false); });
+  zone.addEventListener('focusin', function () { setOpen(true); });
+  zone.addEventListener('focusout', function (e) { if (!zone.contains(e.relatedTarget)) setOpen(false); });
+  zone.addEventListener('click', function (e) { if (!e.target.closest('button') && list.length > 1) setOpen(!open); });
+  root.querySelectorAll('.u070-btns button').forEach(function (b) { b.addEventListener('click', function () { push(b.getAttribute('data-k')); }); });
+  push('info'); push('ok');
+  list.forEach(function (t) { t.left = Infinity; t.el.style.setProperty('--left', 1); });
+})();
+</script>

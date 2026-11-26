@@ -1,0 +1,154 @@
+<!-- Lucian UX/UI Prompt #089 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#089 -->
+<!--
+Element: 404 that fixes the typo
+ID: 089 · Category: Empty & Error States · Tags: 404, not-found, compass, spring, typo
+What it does: The middle 0 of 404 is a compass whose needle springs after the cursor, and the digits on either side lean toward it. Pick a similar address and the typo in the address bar is erased and retyped, the digits roll to 200 and the needle spins once before settling on north.
+How to use it: Move the mouse over the card to turn the compass. Press a similar address below to fix the typo in the address bar
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#089
+-->
+<style>
+.u089{position:relative;width:340px;height:420px;display:flex;flex-direction:column;padding:18px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;text-align:center}
+.u089-url{display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:14px;background:var(--ux-surface-2);font-size:13.5px;font-weight:650;color:var(--ux-ink-3);text-align:left}
+.u089-url svg{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.u089-url b{font-weight:750;color:var(--ux-ink);text-decoration:underline wavy var(--ux-danger);text-decoration-thickness:1.5px;text-underline-offset:4px;text-decoration-skip-ink:none;transition:color .3s}
+.u089.fixing .u089-url b{text-decoration-color:transparent}
+.u089.found .u089-url b{color:var(--ux-mint);text-decoration-color:transparent}
+.u089-url b::after{content:"";display:inline-block;width:1.5px;height:15px;margin-left:1px;vertical-align:-2px;background:var(--ux-accent);opacity:0}
+.u089.fixing .u089-url b::after{opacity:1;animation:u089-c .8s steps(1) infinite}
+@keyframes u089-c{50%{opacity:0}}
+.u089-num{display:flex;justify-content:center;align-items:center;gap:4px;height:96px;margin-top:20px;font-size:86px;font-weight:850;letter-spacing:-.05em;line-height:96px;font-variant-numeric:tabular-nums}
+.u089-d{height:96px;overflow:hidden;transition:transform .5s var(--ux-spring)}
+.u089-d:first-child{transform:rotate(calc(var(--r,0) * -7deg))}
+.u089-d:last-child{transform:rotate(calc(var(--r,0) * 7deg))}
+.u089-col{display:flex;flex-direction:column;transform:translateY(calc(var(--v) * -96px));transition:transform 1s cubic-bezier(.6,-.15,.25,1.2)}
+.u089-d:last-child .u089-col{transition-delay:.12s}
+.u089-col span{height:96px}
+.u089-cp{width:72px;height:72px;margin:0 2px}
+.u089-cp svg{display:block;width:72px;height:72px;overflow:visible}
+.u089-ring{fill:none;stroke:var(--ux-ink);stroke-width:11;transition:stroke .5s}
+.u089.found .u089-ring{stroke:var(--ux-mint)}
+.u089-tk{stroke:var(--ux-ink-3);stroke-width:2;stroke-linecap:round}
+.u089-wob{transform-origin:36px 36px}
+.u089:not(.trk):not(.found) .u089-wob{animation:u089-w 3.4s ease-in-out infinite}
+@keyframes u089-w{0%,100%{transform:rotate(-16deg)}50%{transform:rotate(18deg)}}
+.u089-nd{transform-origin:36px 36px}
+.u089-hub{fill:var(--ux-surface);stroke:var(--ux-ink);stroke-width:2}
+.u089-t{margin:16px 0 0;font-size:19px;font-weight:850;letter-spacing:-.04em}
+.u089-s{margin:4px 0 0;font-size:13px;font-weight:600;color:var(--ux-ink-3)}
+.u089-t,.u089-s{transition:opacity .25s,transform .35s var(--ux-ease)}
+.u089.swap .u089-t,.u089.swap .u089-s{opacity:0;transform:translateY(6px)}
+.u089-lab{display:flex;align-items:center;justify-content:space-between;height:28px;margin-top:auto;padding:0 4px;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u089-re{height:28px;padding:0 10px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:12px;font-weight:750;color:var(--ux-ink-2);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+.u089.found .u089-re{opacity:1;visibility:visible;transition:opacity .3s}
+.u089-re:hover{color:var(--ux-ink);background:var(--ux-surface-3)}
+.u089-sug{margin:4px 0 0;padding:0;list-style:none}
+.u089-row{display:flex;align-items:center;gap:10px;width:100%;height:44px;padding:0 12px;border:0;border-radius:14px;background:transparent;text-align:left;transition:background-color .2s,opacity .3s}
+.u089-row:hover{background:var(--ux-surface-2)}
+.u089-row:active{transform:scale(.98)}
+.u089-row code{font:750 13.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink)}
+.u089-row small{flex:1;font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u089-m{width:44px;height:4px;border-radius:2px;background:var(--ux-surface-3);overflow:hidden}
+.u089-m i{display:block;height:100%;width:calc(var(--m) * 100%);border-radius:inherit;background:var(--ux-accent)}
+.u089-row svg{width:16px;height:16px;flex:none;fill:none;stroke:var(--ux-ink-3);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ux-spring)}
+.u089-row:hover svg{transform:translateX(3px)}
+.u089-row:disabled{opacity:.35;cursor:default}
+.u089-row:disabled:hover{background:transparent}
+.u089-row.on{background:color-mix(in srgb,var(--ux-mint) 16%,transparent);opacity:1}
+.u089-row.on .u089-m i{background:var(--ux-mint)}
+.u089-row.on svg{stroke:var(--ux-mint);transform:none}
+</style>
+<div class="ux u089">
+  <div class="u089-url"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.6"/><path d="M1.6 7h10.8M7 1.4c1.8 1.6 1.8 9.6 0 11.2M7 1.4c-1.8 1.6-1.8 9.6 0 11.2"/></svg><span>lumen.app<b>/projcts</b></span></div>
+  <div class="u089-num" role="img" aria-label="404 error">
+    <span class="u089-d" aria-hidden="true"><span class="u089-col" style="--v:4"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></span></span>
+    <span class="u089-cp" aria-hidden="true"><svg viewBox="0 0 72 72"><circle class="u089-ring" cx="36" cy="36" r="30.5"/><path class="u089-tk" d="M36 14v3M36 55v3M14 36h3M55 36h3"/><g class="u089-wob"><g class="u089-nd"><path d="M36 15.5l5.5 20.5h-11z" fill="#E5484D"/><path d="M36 56.5l-5.5-20.5h11z" fill="var(--ux-ink-3)"/></g></g><circle class="u089-hub" cx="36" cy="36" r="3.4"/></svg></span>
+    <span class="u089-d" aria-hidden="true"><span class="u089-col" style="--v:4"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></span></span>
+  </div>
+  <p class="u089-t" aria-live="polite">Looks like you’re lost</p>
+  <p class="u089-s">The address has a typo or the page moved</p>
+  <div class="u089-lab"><span>Closest matches</span><button class="u089-re" type="button">Undo</button></div>
+  <ul class="u089-sug"></ul>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var num = root.querySelector('.u089-num'), cols = root.querySelectorAll('.u089-col'), cp = root.querySelector('.u089-cp'), nd = root.querySelector('.u089-nd');
+  var path = root.querySelector('.u089-url b'), title = root.querySelector('.u089-t'), sub = root.querySelector('.u089-s'), sug = root.querySelector('.u089-sug'), re = root.querySelector('.u089-re');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var P = [['/projects', 'Projects', 0.92], ['/profile', 'My profile', 0.58], ['/pricing', 'Pricing', 0.41]];
+  var ARROW = '<path d="M3 8h10M9 4l4 4-4 4"/>', CHECK = '<path d="M3.2 8.4l3 3L12.8 4.8"/>';
+  var rows = P.map(function (p, i) {
+    var li = document.createElement('li');
+    li.innerHTML = '<button class="u089-row" type="button"><code></code><small></small><span class="u089-m" aria-hidden="true"><i style="--m:' + p[2] + '"></i></span><svg viewBox="0 0 16 16" aria-hidden="true">' + ARROW + '</svg></button>';
+    var b = li.firstChild;
+    b.querySelector('code').textContent = p[0]; b.querySelector('small').textContent = p[1];
+    b.setAttribute('aria-label', 'Go to ' + p[0] + ' ' + p[1] + ', ' + Math.round(p[2] * 100) + '% match');
+    b.addEventListener('click', function () { go(i); });
+    b.addEventListener('focus', function () { aimAt(b); });
+    sug.appendChild(li);
+    return b;
+  });
+  var a = 0, v = 0, tgt = 0, raf = 0, last = 0, ts = [], busy = false;
+  function step(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var dt = Math.min(0.032, (now - last) / 1000); last = now;
+    if (rm) { a = tgt; v = 0; } else { v += (220 * (tgt - a) - 17 * v) * dt; a += v * dt; }
+    nd.style.transform = 'rotate(' + a.toFixed(2) + 'deg)';
+    if (Math.abs(v) > 0.05 || Math.abs(tgt - a) > 0.05) raf = requestAnimationFrame(step);
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(step); } }
+  function aim(deg) { tgt = a + ((((deg - a) % 360) + 540) % 360) - 180; kick(); }
+  function toward(x, y) {
+    var r = cp.getBoundingClientRect(), dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
+    aim(Math.atan2(dx, -dy) * 180 / Math.PI);
+    num.style.setProperty('--r', Math.max(-1, Math.min(1, dx / (root.getBoundingClientRect().width / 2))).toFixed(3));
+  }
+  function aimAt(el) { if (busy || root.classList.contains('found')) return; root.classList.add('trk'); var r = el.getBoundingClientRect(); toward(r.left + r.width / 2, r.top + r.height / 2); }
+  root.addEventListener('pointermove', function (e) { if (busy || root.classList.contains('found')) return; root.classList.add('trk'); toward(e.clientX, e.clientY); });
+  root.addEventListener('pointerleave', function () { if (root.contains(document.activeElement)) return; root.classList.remove('trk'); num.style.setProperty('--r', 0); aim(0); });
+  root.addEventListener('focusout', function (e) { if (!root.contains(e.relatedTarget) && !root.matches(':hover')) { root.classList.remove('trk'); num.style.setProperty('--r', 0); aim(0); } });
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function swapText(t, s) {
+    root.classList.add('swap');
+    later(function () { title.textContent = t; sub.textContent = s; root.classList.remove('swap'); }, rm ? 0 : 250);
+  }
+  function digits(x, y, label) { cols[0].style.setProperty('--v', x); cols[1].style.setProperty('--v', y); num.setAttribute('aria-label', label); }
+  function go(i) {
+    if (busy || root.classList.contains('found')) return;
+    busy = true;
+    rows.forEach(function (b, k) { b.disabled = k !== i; });
+    rows[i].classList.add('on');
+    root.classList.add('fixing');
+    var from = path.textContent, to = P[i][0], k = from.length;
+    (function del() {
+      if (k > 1) { path.textContent = from.slice(0, --k); return later(del, rm ? 0 : 34); }
+      var j = 1;
+      (function type() {
+        path.textContent = to.slice(0, ++j);
+        if (j < to.length) return later(type, rm ? 0 : 55);
+        root.classList.remove('fixing', 'trk');
+        root.classList.add('found');
+        num.style.setProperty('--r', 0);
+        digits(2, 0, '200 OK');
+        tgt = a - (((a % 360) + 360) % 360) + 720; kick();
+        rows[i].querySelector('svg').innerHTML = CHECK;
+        rows[i].disabled = false;
+        swapText('Found it', 'Opened ‘' + P[i][1] + '’');
+        busy = false;
+      })();
+    })();
+  }
+  re.addEventListener('click', function () {
+    ts.forEach(clearTimeout); ts = [];
+    root.classList.remove('found', 'fixing');
+    path.textContent = '/projcts';
+    digits(4, 4, '404 error');
+    rows.forEach(function (b) { b.disabled = false; b.classList.remove('on'); b.querySelector('svg').innerHTML = ARROW; });
+    swapText('Looks like you’re lost', 'The address has a typo or the page moved');
+    rows[0].focus({ preventScroll: true });
+  });
+})();
+</script>

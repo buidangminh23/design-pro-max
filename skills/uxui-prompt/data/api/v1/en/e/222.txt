@@ -1,0 +1,133 @@
+<!-- Lucian UX/UI Prompt #222 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#222 -->
+<!--
+Element: Open-source star button with star history
+ID: 222 · Category: Social Proof · Tags: github, star, open-source, social-proof, counter
+What it does: When an open-source project card scrolls into view, a line of the past year's star history draws in from the left, its end point breathing, and the star count rolls up digit by digit whenever someone else stars it. Press Star and the star icon spins as it fills yellow and the count goes up by one, while a ring spreads from the chart's end point and a “Today +1” bubble pops up. Press again to empty the star and bring the count back down.
+How to use it: Press the Star button below
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#222
+-->
+<style>
+.u222{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u222-hd{position:absolute;left:18px;right:16px;top:20px;display:flex;align-items:center;gap:7px;font-size:13px}
+.u222-hd svg{flex:none;width:15px;height:15px;color:var(--ux-ink-3)}
+.u222-hd span{color:var(--ux-ink-2);font-weight:600}
+.u222-hd b{font-weight:900;letter-spacing:-.01em}
+.u222-hd em{margin-left:auto;padding:2px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--ux-line);font-style:normal;font-size:9.5px;font-weight:800;color:var(--ux-ink-3)}
+.u222-ds{position:absolute;left:18px;right:18px;top:44px;margin:0;font-size:11px;font-weight:650;color:var(--ux-ink-2)}
+.u222-bg{position:absolute;left:18px;top:66px;display:flex;gap:5px}
+.u222-bg span{display:inline-flex;height:18px;border-radius:4px;overflow:hidden;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;font-weight:700;line-height:18px;color:#fff}
+.u222-bg i{font-style:normal;padding:0 5px;background:#555}
+.u222-bg u{text-decoration:none;padding:0 5px;background:var(--c)}
+.u222-ch{position:absolute;left:14px;right:14px;top:96px;height:156px;padding:10px 12px 0;border-radius:18px;background:var(--ux-surface-2);box-sizing:border-box}
+.u222-ct{display:flex;justify-content:space-between;align-items:baseline;font-size:10.5px;font-weight:850;color:var(--ux-ink-3)}
+.u222-ct span:last-child{color:var(--ux-ink-2)}
+.u222-ct b{color:#16A34A;font-variant-numeric:tabular-nums}
+.u222-pl{position:relative;height:104px;margin-top:6px}
+.u222-pl svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.u222-ln{fill:none;stroke:var(--ux-accent);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u222-ar{opacity:0;transition:opacity .8s .5s}
+.u222.is-drawn .u222-ar{opacity:1}
+.u222-gl{stroke:var(--ux-line);stroke-width:1;stroke-dasharray:2 4}
+.u222-dt{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--ux-accent);box-shadow:0 0 0 3px var(--ux-surface-2);opacity:0;transition:opacity .3s}
+.u222.is-drawn .u222-dt{opacity:1}
+.u222-dt::before{content:"";position:absolute;inset:-5px;border-radius:50%;background:var(--ux-accent);opacity:.25;animation:u222-br 2s ease-in-out infinite}
+@keyframes u222-br{50%{transform:scale(1.6);opacity:0}}
+.u222-dt::after{content:"";position:absolute;inset:-2px;border-radius:50%;border:2px solid #E3B341;opacity:0}
+.u222-dt.is-pop::after{animation:u222-rg .9s ease-out}
+@keyframes u222-rg{from{transform:scale(1);opacity:1}to{transform:scale(4);opacity:0}}
+.u222-tp{position:absolute;padding:4px 8px;border-radius:8px;background:var(--ux-ink);color:var(--ux-surface);font-size:9.5px;font-weight:850;white-space:nowrap;transform:translate(calc(-100% - 14px),-50%) scale(.7);transform-origin:100% 50%;opacity:0;transition:opacity .2s,transform .35s cubic-bezier(.3,1.6,.5,1);pointer-events:none}
+.u222-tp.is-on{opacity:1;transform:translate(calc(-100% - 14px),-50%)}
+.u222-xl{display:flex;justify-content:space-between;margin-top:3px;font-size:9px;font-weight:750;color:var(--ux-ink-3)}
+.u222-ft{position:absolute;left:14px;right:14px;bottom:16px;display:flex;gap:8px}
+.u222-bt{display:flex;height:38px;border-radius:11px;box-shadow:inset 0 0 0 1px var(--ux-line);background:var(--ux-surface);overflow:hidden}
+.u222-bt>*{display:inline-flex;align-items:center;gap:6px;padding:0 12px;font-size:12px;font-weight:850}
+.u222-bt>:last-child{box-shadow:inset 1px 0 0 var(--ux-line);background:var(--ux-surface-2);font-variant-numeric:tabular-nums}
+.u222-st{flex:1;padding:0;border:0;font:inherit;color:inherit;cursor:pointer;transition:box-shadow .2s}
+.u222-st:hover,.u222-st.g-hov{box-shadow:inset 0 0 0 1px var(--ux-ink-3)}
+.u222-st:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u222-st>span:first-child{flex:1;justify-content:center}
+.u222-st svg{width:15px;height:15px}
+.u222-st path{fill:transparent;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;transition:fill .25s,stroke .25s}
+.u222-st[aria-pressed="true"] path{fill:#E3B341;stroke:#E3B341}
+.u222-st.is-spin svg{animation:u222-sp .6s cubic-bezier(.3,1.4,.5,1)}
+@keyframes u222-sp{0%{transform:scale(.6) rotate(-72deg)}100%{transform:none}}
+.u222-fk{flex:none;color:var(--ux-ink-2)}
+.u222-fk svg{width:14px;height:14px}
+.u222-bt>.u222-nm{display:inline-flex;gap:0}
+.u222-dg{display:inline-block;height:1.2em;overflow:hidden;line-height:1.2}
+.u222-dg span{display:block;transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+@media (prefers-reduced-motion: reduce){.u222-dg span,.u222-ar,.u222-tp{transition:none}.u222-dt::before,.u222-dt.is-pop::after,.u222-st.is-spin svg{animation:none}}
+</style>
+<div class="ux u222">
+  <div class="u222-hd"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5A1.5 1.5 0 0 1 4.5 1H13v11H4.5a1.5 1.5 0 0 0 0 3H13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 2.5v11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>lucian-labs /</span><b>motion-kit</b><em>Public</em></div>
+  <p class="u222-ds">Animated UI pieces you can drop into any website</p>
+  <div class="u222-bg" aria-hidden="true"><span style="--c:#16A34A"><i>build</i><u>passing</u></span><span style="--c:#2563EB"><i>npm</i><u>v2.4.0</u></span><span style="--c:#8B5CF6"><i>license</i><u>MIT</u></span></div>
+  <div class="u222-ch">
+    <div class="u222-ct"><span>Star history</span><span>Last 30 days <b class="u222-mo"></b></span></div>
+    <div class="u222-pl" role="img" aria-label="Star history chart"><svg viewBox="0 0 288 104" preserveAspectRatio="none" aria-hidden="true"><line class="u222-gl" x1="0" y1="34" x2="288" y2="34"/><line class="u222-gl" x1="0" y1="69" x2="288" y2="69"/><path class="u222-ar"/><path class="u222-ln"/></svg><span class="u222-dt"></span><span class="u222-tp"></span></div>
+    <div class="u222-xl"><span>1 year ago</span><span>Today</span></div>
+  </div>
+  <div class="u222-ft">
+    <button type="button" class="u222-bt u222-st" aria-pressed="false"><span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.95 4 4.4.62-3.2 3.1.76 4.38L8 11.63l-3.91 2.07.76-4.38-3.2-3.1 4.4-.62z"/></svg><span class="u222-sl">Star</span></span><span class="u222-nm"></span></button>
+    <div class="u222-bt u222-fk"><span><svg viewBox="0 0 16 16" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="4.5" cy="3.5" r="1.6"/><circle cx="11.5" cy="3.5" r="1.6"/><circle cx="8" cy="12.5" r="1.6"/><path d="M4.5 5.1v1.4c0 .9.7 1.5 1.5 1.5h4c.8 0 1.5-.6 1.5-1.5V5.1M8 8v2.9"/></g></svg>Fork</span><span>342</span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ln = root.querySelector('.u222-ln'), ar = root.querySelector('.u222-ar'), dt = root.querySelector('.u222-dt'), tp = root.querySelector('.u222-tp'), st = root.querySelector('.u222-st'), sl = root.querySelector('.u222-sl'), nm = root.querySelector('.u222-nm'), mo = root.querySelector('.u222-mo');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var uid = 'u222' + Math.random().toString(36).slice(2, 7);
+  var H = [180, 420, 760, 1300, 2100, 2900, 3900, 5200, 6800, 8600, 10400, 12480], W = 288, HT = 104, TOP = 12480 * 1.12;
+  var count = H[H.length - 1], month = 1284, starred = false, drawn = false, vis = true;
+  var pts = H.map(function (v, i) { return [i / (H.length - 1) * W, HT - v / TOP * HT]; });
+  var d = 'M' + pts[0][0] + ' ' + pts[0][1].toFixed(1);
+  for (var i = 1; i < pts.length; i++) { var p = pts[i - 1], q = pts[i], cx = (p[0] + q[0]) / 2; d += ' C' + cx.toFixed(1) + ' ' + p[1].toFixed(1) + ' ' + cx.toFixed(1) + ' ' + q[1].toFixed(1) + ' ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }
+  ln.setAttribute('d', d);
+  var svg = root.querySelector('.u222-pl svg'), defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  defs.innerHTML = '<linearGradient id="' + uid + 'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--ux-accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--ux-accent)" stop-opacity="0"/></linearGradient>';
+  svg.insertBefore(defs, svg.firstChild);
+  ar.setAttribute('d', d + ' L' + W + ' ' + HT + ' L0 ' + HT + 'Z'); ar.setAttribute('fill', 'url(#' + uid + 'g)');
+  var end = pts[pts.length - 1]; dt.style.left = (end[0] / W * 100) + '%'; dt.style.top = (end[1] / HT * 100) + '%'; tp.style.left = dt.style.left; tp.style.top = dt.style.top;
+  var cells = [];
+  function draw() {
+    var s = count.toLocaleString('en-US');
+    while (cells.length > s.length) cells.pop().el.remove();
+    while (cells.length < s.length) { var g = document.createElement('span'); g.className = 'u222-dg'; g.innerHTML = '<span></span>'; nm.appendChild(g); cells.push({ el: g, ch: '' }); }
+    s.split('').forEach(function (ch, k) {
+      var c = cells[k]; if (c.ch === ch) return; var inner = c.el.firstChild;
+      if (/\d/.test(ch)) { if (!/\d/.test(c.ch)) inner.innerHTML = '0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9'; inner.style.transform = 'translateY(' + (-+ch * 1.2) + 'em)'; } else { inner.textContent = ch; inner.style.transform = 'none'; }
+      c.ch = ch;
+    });
+    nm.setAttribute('aria-label', s); mo.textContent = '+' + month.toLocaleString('en-US');
+  }
+  function reveal() {
+    if (drawn) return; drawn = true;
+    var L = ln.getTotalLength();
+    if (rm) { root.classList.add('is-drawn'); return; }
+    ln.style.strokeDasharray = L; ln.style.strokeDashoffset = L; void ln.getBoundingClientRect();
+    ln.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.5,0,.2,1)'; ln.style.strokeDashoffset = 0;
+    setTimeout(function () { root.classList.add('is-drawn'); }, 1300);
+  }
+  function pop() { dt.classList.remove('is-pop'); void dt.offsetWidth; dt.classList.add('is-pop'); }
+  var T = 0;
+  st.addEventListener('click', function () {
+    starred = !starred; count += starred ? 1 : -1; month += starred ? 1 : -1;
+    st.setAttribute('aria-pressed', starred); sl.textContent = starred ? 'Starred' : 'Star'; draw();
+    st.classList.remove('is-spin');
+    if (starred) {
+      void st.offsetWidth; st.classList.add('is-spin'); pop();
+      tp.textContent = 'Today +1 · Thank you!'; tp.classList.add('is-on'); clearTimeout(T); T = setTimeout(function () { tp.classList.remove('is-on'); }, 1900);
+    } else { tp.classList.remove('is-on'); }
+  });
+  (function loop() {
+    if (!root.isConnected) return;
+    if (vis && drawn && !rm) { var n = 1 + Math.floor(Math.random() * 2); count += n; month += n; draw(); }
+    setTimeout(loop, 2600 + Math.random() * 1800);
+  })();
+  draw();
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; if (vis) reveal(); }, { threshold: .3 }).observe(root); else reveal();
+})();
+</script>

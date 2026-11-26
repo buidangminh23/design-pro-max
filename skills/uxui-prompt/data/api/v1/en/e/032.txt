@@ -1,0 +1,120 @@
+<!-- Lucian UX/UI Prompt #032 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#032 -->
+<!--
+Element: Drag-and-drop upload
+ID: 032 · Category: Inputs & Search · Tags: upload, dropzone, drag-drop, progress, file
+What it does: Drag files in and the dashed border starts marching as the area grows; each dropped file fills its own progress bar in the list below. Finished files draw a check, and failed ones can be retried.
+How to use it: Drop files in or press the area to choose them. Try Retry on the failed file too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#032
+-->
+<style>
+.u032{position:relative;width:340px;height:420px}
+.u032-zone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:196px;border:0;padding:0;border-radius:26px;background:var(--ux-surface);color:var(--ux-ink);cursor:pointer;
+  transition:transform .5s var(--ux-spring),background-color .3s var(--ux-ease)}
+.u032-zone:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u032-zone svg.u032-dash{position:absolute;left:1px;top:1px;width:calc(100% - 2px);height:calc(100% - 2px);overflow:visible;pointer-events:none}
+.u032-dash rect{fill:none;stroke:var(--ux-line-2);stroke-width:2;stroke-dasharray:8 7;transition:stroke .3s var(--ux-ease)}
+.u032-zone:hover .u032-dash rect,.u032.is-over .u032-dash rect{stroke:var(--ux-accent);animation:u032-march .9s linear infinite}
+@keyframes u032-march{to{stroke-dashoffset:-30}}
+.u032.is-over .u032-zone{transform:scale(1.03);background:color-mix(in srgb,var(--ux-accent) 7%,var(--ux-surface))}
+.u032-orb{width:60px;height:60px;border-radius:20px;display:grid;place-items:center;color:#fff;background:linear-gradient(140deg,#5B8CFF,#8B6CFF);box-shadow:0 16px 28px -14px rgba(91,108,255,.8);transition:transform .5s var(--ux-spring)}
+.u032-orb svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u032-zone:hover .u032-orb{transform:translateY(-4px)}
+.u032.is-over .u032-orb{transform:translateY(-8px) scale(1.1) rotate(-6deg)}
+.u032-zone b{margin-top:14px;font-size:15.5px;font-weight:720;letter-spacing:-.02em}
+.u032-zone b em{font-style:normal;color:var(--ux-accent)}
+.u032-zone small{margin-top:4px;font-size:12.5px;color:var(--ux-ink-3)}
+.u032-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.u032-list{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.u032-row{position:relative;display:flex;align-items:center;gap:12px;height:62px;padding:0 12px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);overflow:hidden;animation:u032-in .5s var(--ux-spring)}
+@keyframes u032-in{from{transform:translateY(-10px) scale(.96);opacity:0}}
+.u032-row.out{transition:transform .35s var(--ux-ease),opacity .3s;transform:translateX(30px);opacity:0}
+.u032-ic{width:36px;height:40px;flex:none;border-radius:9px;display:grid;place-items:end center;padding-bottom:5px;font-size:8.5px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--c)}
+.u032-meta{flex:1;min-width:0}
+.u032-meta b{display:block;font-size:14px;font-weight:660;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u032-meta small{display:block;margin-top:3px;font-size:12px;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u032-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--ux-accent);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .2s linear,background-color .3s,opacity .5s .4s}
+.u032-row.done .u032-bar{background:var(--ux-mint);opacity:0}
+.u032-row.fail .u032-bar{background:var(--ux-danger)}
+.u032-st{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center}
+.u032-st svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u032-row.done .u032-st{background:var(--ux-mint);color:var(--ux-accent-ink);animation:u032-pop .45s var(--ux-spring)}
+@keyframes u032-pop{from{transform:scale(.3)}}
+.u032-row.done .u032-st path{stroke-dasharray:16;stroke-dashoffset:16;animation:u032-draw .4s var(--ux-ease) .15s forwards}
+@keyframes u032-draw{to{stroke-dashoffset:0}}
+.u032-row.fail .u032-meta small{color:var(--ux-danger)}
+.u032-retry{height:32px;padding:0 12px;border:0;border-radius:10px;background:color-mix(in srgb,var(--ux-danger) 12%,transparent);color:var(--ux-danger);font-size:12.5px;font-weight:700;white-space:nowrap}
+.u032-retry:focus-visible{outline:2px solid var(--ux-danger);outline-offset:2px}
+.u032-spin{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--ux-surface-3);border-top-color:var(--ux-accent);animation:u032-rot .8s linear infinite}
+@keyframes u032-rot{to{transform:rotate(360deg)}}
+</style>
+<div class="ux u032">
+  <button class="u032-zone" type="button">
+    <svg class="u032-dash" aria-hidden="true"><rect width="100%" height="100%" rx="25"/></svg>
+    <span class="u032-orb" aria-hidden="true"><svg viewBox="0 0 28 28"><path d="M8.5 20.5H7a5 5 0 0 1-.6-10 7 7 0 0 1 13.4-1.6A5.5 5.5 0 0 1 21 20.5h-1.5M14 13v10M10.5 16.5L14 13l3.5 3.5"/></svg></span>
+    <b>Drag files here or <em>browse</em></b>
+    <small>PNG, JPG, PDF, FIG · up to 50 MB each</small>
+  </button>
+  <input class="u032-file" type="file" multiple tabindex="-1" aria-hidden="true">
+  <ul class="u032-list" aria-live="polite"></ul>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var zone = root.querySelector('.u032-zone');
+  var pick = root.querySelector('.u032-file');
+  var list = root.querySelector('.u032-list');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TYPE = { pdf: '#E5484D', png: '#3D8BFF', jpg: '#22A06B', jpeg: '#22A06B', fig: '#8B6CFF' };
+  function size(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function run(row, bytes, fail) {
+    row.className = 'u032-row';
+    var st = row.querySelector('.u032-st');
+    var sm = row.querySelector('small');
+    st.innerHTML = '<span class="u032-spin" aria-hidden="true"></span>';
+    var p = 0, t0 = performance.now(), D = rm ? 300 : 1800 + Math.random() * 900;
+    (function f(now) {
+      if (!root.isConnected) return;
+      p = Math.min(1, (now - t0) / D);
+      var shown = fail ? Math.min(p, 0.62) : p;
+      row.style.setProperty('--p', shown.toFixed(3));
+      sm.textContent = size(bytes * shown) + ' / ' + size(bytes) + ' · ' + Math.round(shown * 100) + '%';
+      if (fail && p >= 0.62) {
+        row.classList.add('fail');
+        sm.textContent = 'Connection lost · stopped at ' + Math.round(shown * 100) + '%';
+        st.outerHTML = '<button class="u032-retry" type="button">Retry</button>';
+        row.querySelector('.u032-retry').addEventListener('click', function () { var r = row.querySelector('.u032-retry'); r.outerHTML = '<span class="u032-st"></span>'; run(row, bytes, false); });
+        return;
+      }
+      if (p < 1) requestAnimationFrame(f);
+      else { row.classList.add('done'); sm.textContent = size(bytes) + ' · Uploaded'; st.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4l3 3 6-6.4"/></svg>'; }
+    })(t0);
+  }
+  function add(name, bytes, fail) {
+    var ext = (name.split('.').pop() || '').toLowerCase();
+    var li = document.createElement('li');
+    li.className = 'u032-row';
+    li.innerHTML = '<span class="u032-ic" style="--c:' + (TYPE[ext] || '#8E8A97') + '" aria-hidden="true">' + (ext.slice(0, 3).toUpperCase() || 'FILE') + '</span><span class="u032-meta"><b></b><small></small></span><span class="u032-st"></span><span class="u032-bar" aria-hidden="true"></span>';
+    li.querySelector('b').textContent = name;
+    list.insertBefore(li, list.firstChild);
+    while (list.children.length > 3) list.lastElementChild.remove();
+    run(li, bytes, fail);
+  }
+  zone.addEventListener('click', function () { pick.click(); });
+  pick.addEventListener('change', function () {
+    Array.prototype.forEach.call(pick.files, function (f) { add(f.name, f.size, false); });
+    pick.value = '';
+  });
+  var depth = 0;
+  zone.addEventListener('dragenter', function (e) { e.preventDefault(); depth++; root.classList.add('is-over'); });
+  zone.addEventListener('dragover', function (e) { e.preventDefault(); });
+  zone.addEventListener('dragleave', function () { if (--depth <= 0) { depth = 0; root.classList.remove('is-over'); } });
+  zone.addEventListener('drop', function (e) {
+    e.preventDefault(); depth = 0; root.classList.remove('is-over');
+    Array.prototype.forEach.call(e.dataTransfer.files, function (f) { add(f.name, f.size, false); });
+  });
+  add('brand-guide.pdf', 18.4 * 1048576, true);
+  add('main-banner@2x.png', 4.2 * 1048576, false);
+})();
+</script>

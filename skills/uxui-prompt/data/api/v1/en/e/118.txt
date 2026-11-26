@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #118 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#118 -->
+<!--
+Element: Type specimen
+ID: 118 · Category: Layout, Schedule & Design · Tags: typography, native, spatial
+What it does: A specimen for comparing font weights at a glance. Move the weight slider and both sample lines switch to that weight, with its value shown.
+How to use it: Move the weight slider
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#118
+-->
+<style>
+.u118{width:100%;max-width:400px;min-width:0;font-size:13px}.u118 button{font:inherit;color:inherit;cursor:pointer}.u118 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u118 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u118{padding:15px 4px;max-width:340px;border-top:2px solid var(--ux-ink)}.u118 .specimen{height:195px;display:flex;flex-direction:column;justify-content:center;padding:0 14px;border-bottom:1px solid var(--ux-line-2);font-weight:var(--weight,650)}.u118 .latin{font-family:Georgia,serif;font-size:78px;line-height:1.05;letter-spacing:-.06em}.u118 .korean{font-size:30px;margin-top:14px;letter-spacing:-.05em}.u118 label{display:flex;align-items:center;gap:15px;padding:21px 12px 0;color:var(--ux-ink-2)}.u118 input{flex:1;height:26px}.u118 output{width:28px;font-size:13px;font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u118"><div class="specimen"><div class="latin">Aa</div><div class="korean">Morning light</div></div><label>Weight<input class="weight" type="range" min="400" max="900" step="50" value="650" aria-label="Font weight"><output aria-live="polite">650</output></label></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];q('.weight').oninput=()=>{root.style.setProperty('--weight',q('.weight').value);q('output').textContent=q('.weight').value};})();
+</script>

@@ -1,0 +1,73 @@
+<!-- Lucian UX/UI Prompt #021 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#021 -->
+<!--
+Element: Day–night sky switch
+ID: 021 · Category: Toggles & Pickers · Tags: toggle, switch, day-night, theme, sky
+What it does: The sun knob rolls across and turns into a cratered moon. The sky deepens to night, the clouds sink away and the stars start to twinkle.
+How to use it: Press the switch to flip between day and night
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#021
+-->
+<style>
+.u021{position:relative;width:300px;height:210px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.u021-sw{position:relative;width:224px;height:94px;border:0;padding:0;border-radius:999px;overflow:hidden;isolation:isolate;
+  background:linear-gradient(180deg,#5DB7FF,#9ED8FF);box-shadow:inset 0 4px 10px rgba(0,30,80,.28),inset 0 -2px 4px rgba(255,255,255,.4),0 18px 34px -18px rgba(40,110,200,.7);transition:box-shadow .8s var(--ux-ease)}
+.u021-sw::before{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#141A3A,#232C5C);opacity:0;transition:opacity .8s var(--ux-ease)}
+.u021-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:5px}
+.u021.is-night .u021-sw::before{opacity:1}
+.u021.is-night .u021-sw{box-shadow:inset 0 4px 10px rgba(0,0,0,.5),inset 0 -2px 4px rgba(255,255,255,.08),0 18px 34px -18px rgba(20,24,70,.9)}
+
+.u021-halo{position:absolute;z-index:1;left:47px;top:47px;width:0;height:0;transition:transform .9s var(--ux-spring)}
+.u021-halo i{position:absolute;border-radius:50%;background:rgba(255,255,255,.12)}
+.u021-halo i:nth-child(1){width:130px;height:130px;margin:-65px}
+.u021-halo i:nth-child(2){width:176px;height:176px;margin:-88px}
+.u021-halo i:nth-child(3){width:222px;height:222px;margin:-111px}
+.u021.is-night .u021-halo{transform:translateX(130px)}
+.u021-knob{position:absolute;z-index:3;left:8px;top:8px;width:78px;height:78px;border-radius:50%;overflow:hidden;
+  background:radial-gradient(circle at 35% 30%,#FFF1A8,#FFD23F 45%,#F8A91E);box-shadow:0 6px 14px -4px rgba(140,80,0,.5),inset -4px -6px 10px rgba(200,110,0,.35),inset 4px 4px 8px rgba(255,255,255,.5);
+  transition:transform .9s var(--ux-spring)}
+.u021-moon{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F4F6FB,#C9CFDD 60%,#A9B0C2);opacity:0;transform:translateX(100%);transition:transform .8s var(--ux-ease),opacity .4s var(--ux-ease)}
+.u021-moon i{position:absolute;border-radius:50%;background:#A3AABC;box-shadow:inset 1px 2px 2px rgba(0,0,0,.18)}
+.u021-moon i:nth-child(1){left:20px;top:16px;width:20px;height:20px}
+.u021-moon i:nth-child(2){left:46px;top:40px;width:14px;height:14px}
+.u021-moon i:nth-child(3){left:24px;top:48px;width:9px;height:9px}
+.u021.is-night .u021-knob{transform:translateX(130px) rotate(200deg)}
+.u021.is-night .u021-moon{opacity:1;transform:none}
+.u021-clouds{position:absolute;z-index:2;inset:0;transition:transform .8s var(--ux-ease),opacity .6s var(--ux-ease)}
+.u021-clouds i{position:absolute;border-radius:999px;background:#fff}
+.u021-clouds i:nth-child(1){right:-10px;bottom:-18px;width:120px;height:56px;box-shadow:-46px 8px 0 -6px #fff,-80px 18px 0 -10px #fff}
+.u021-clouds i:nth-child(2){right:20px;bottom:-30px;width:96px;height:52px;background:#E3F1FF;box-shadow:-44px 6px 0 -8px #E3F1FF;z-index:-1}
+.u021.is-night .u021-clouds{transform:translateY(80px);opacity:0}
+.u021-stars{position:absolute;z-index:1;inset:0;opacity:0;transform:translateY(-30px);transition:transform .8s var(--ux-ease),opacity .6s var(--ux-ease)}
+.u021-stars i{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff;animation:u021-tw 2.4s ease-in-out infinite}
+.u021.is-night .u021-stars{opacity:1;transform:none}
+@keyframes u021-tw{50%{opacity:.3;transform:scale(.6)}}
+.u021-lab{margin:0;position:relative;width:200px;height:24px;overflow:hidden;text-align:center;font-size:16px;font-weight:720;letter-spacing:-.02em}
+.u021-lab span{position:absolute;left:0;right:0;top:0;line-height:24px;transition:transform .55s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u021-lab small{font-weight:550;color:var(--ux-ink-3);margin-left:6px}
+.u021-lab span+span{transform:translateY(100%);opacity:0}
+.u021.is-night .u021-lab span:first-child{transform:translateY(-100%);opacity:0}
+.u021.is-night .u021-lab span+span{transform:none;opacity:1}
+</style>
+<div class="ux u021">
+  <button class="u021-sw" type="button" role="switch" aria-checked="false" aria-label="Night sky mode">
+    <span class="u021-halo" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="u021-stars" aria-hidden="true">
+      <i style="left:30px;top:20px"></i><i style="left:58px;top:56px;animation-delay:-.6s;width:3px;height:3px"></i><i style="left:86px;top:26px;animation-delay:-1.2s"></i><i style="left:44px;top:72px;animation-delay:-1.8s;width:3px;height:3px"></i><i style="left:110px;top:60px;animation-delay:-.9s;width:2px;height:2px"></i><i style="left:20px;top:46px;animation-delay:-1.5s;width:2px;height:2px"></i>
+    </span>
+    <span class="u021-clouds" aria-hidden="true"><i></i><i></i></span>
+    <span class="u021-knob" aria-hidden="true"><span class="u021-moon"><i></i><i></i><i></i></span></span>
+  </button>
+  <p class="u021-lab" aria-hidden="true"><span>Clear day<small>2:30 PM</small></span><span>Quiet night<small>9:30 PM</small></span></p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sw = root.querySelector('.u021-sw');
+  sw.addEventListener('click', function () {
+    var night = !root.classList.contains('is-night');
+    root.classList.toggle('is-night', night);
+    sw.setAttribute('aria-checked', String(night));
+  });
+})();
+</script>

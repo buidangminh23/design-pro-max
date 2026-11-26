@@ -1,0 +1,140 @@
+<!-- Lucian UX/UI Prompt #029 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#029 -->
+<!--
+Element: Colored tag input
+ID: 029 · Category: Inputs & Search · Tags: tags, chips, input, keyboard, suggestions
+What it does: Press Enter and the text pops out as a colored tag; press a suggestion chip and it jumps into the field. In an empty field, Backspace once highlights the last tag for removal and a second press removes it.
+How to use it: Type a word in the field and press Enter. Try the suggestion chips below too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#029
+-->
+<style>
+.u029{position:relative;width:350px}
+.u029-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 10px}
+.u029-head b{font-size:16px;font-weight:720;letter-spacing:-.02em}
+.u029-n{font-size:13px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums;transition:color .3s}
+.u029-n.full{color:var(--ux-warn)}
+.u029-field{display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px;height:142px;padding:12px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1.5px var(--ux-line-2);cursor:text;transition:box-shadow .3s var(--ux-ease)}
+.u029-field:focus-within{box-shadow:0 0 0 2px var(--ux-accent),0 0 0 6px var(--ux-accent-soft)}
+.u029-field.shake{animation:u029-shake .42s var(--ux-ease)}
+@keyframes u029-shake{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}}
+.u029-tag{display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 6px 0 12px;border-radius:11px;background:color-mix(in srgb,var(--c) 16%,transparent);color:color-mix(in srgb,var(--c) 72%,var(--ux-ink));font-size:14px;font-weight:700;
+  animation:u029-pop .45s var(--ux-spring);transition:transform .3s var(--ux-ease),opacity .3s var(--ux-ease),box-shadow .2s}
+@keyframes u029-pop{from{transform:scale(.4);opacity:0}}
+.u029-tag.out{transform:scale(.4);opacity:0}
+.u029-tag.armed{box-shadow:0 0 0 2px var(--c);animation:u029-arm .3s var(--ux-ease)}
+@keyframes u029-arm{50%{transform:scale(1.08)}}
+.u029-x{width:22px;height:22px;border:0;padding:0;border-radius:7px;background:none;color:inherit;display:grid;place-items:center;opacity:.7}
+.u029-x:hover{opacity:1;background:color-mix(in srgb,currentColor 15%,transparent)}
+.u029-x:focus-visible{outline:2px solid currentColor;outline-offset:1px}
+.u029-x svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.u029-in{flex:1;min-width:90px;height:34px;border:0;outline:0;background:none;font-size:14.5px;color:var(--ux-ink)}
+.u029-in::placeholder{color:var(--ux-ink-3)}
+.u029-msg{height:18px;margin:8px 4px 10px;font-size:12.5px;color:var(--ux-ink-3);transition:color .3s}
+.u029-msg.warn{color:var(--ux-danger)}
+.u029-sg-row{display:flex;flex-wrap:wrap;gap:6px}
+.u029-sg{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 12px 0 9px;border:0;border-radius:999px;background:none;box-shadow:inset 0 0 0 1px var(--ux-line-2);font-size:13px;font-weight:620;color:var(--ux-ink-2);transition:transform .35s var(--ux-spring),opacity .3s,box-shadow .2s}
+.u029-sg:hover{box-shadow:inset 0 0 0 1px var(--ux-ink-3);color:var(--ux-ink)}
+.u029-sg:active{transform:scale(.92)}
+.u029-sg:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u029-sg svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.u029-sg.used{opacity:.3;pointer-events:none}
+.u029-in:focus-visible{outline:none}
+</style>
+<div class="ux u029">
+  <div class="u029-head"><b>Project tags</b><span class="u029-n">3 / 6</span></div>
+  <div class="u029-field">
+    <input class="u029-in" type="text" placeholder="Type a tag, press Enter" aria-label="Add tag" autocomplete="off">
+  </div>
+  <p class="u029-msg" aria-live="polite"></p>
+  <div class="u029-sg-row" role="group" aria-label="Suggested tags"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var field = root.querySelector('.u029-field');
+  var input = root.querySelector('.u029-in');
+  var count = root.querySelector('.u029-n');
+  var msg = root.querySelector('.u029-msg');
+  var sgRow = root.querySelector('.u029-sg-row');
+  var MAX = 6, t = 0;
+  var PALETTE = ['#7B61FF', '#E0457B', '#0E9F8E', '#D6731E', '#2F7FE0', '#B04FD0'];
+  function colorOf(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return PALETTE[h % PALETTE.length]; }
+  function tags() { return Array.prototype.slice.call(field.querySelectorAll('.u029-tag:not(.out)')); }
+  function say(text, warn) {
+    msg.textContent = text;
+    msg.classList.toggle('warn', !!warn);
+    clearTimeout(t);
+    t = setTimeout(function () { if (root.isConnected) { msg.textContent = ''; msg.classList.remove('warn'); } }, 1800);
+  }
+  function refresh() {
+    var n = tags().length;
+    count.textContent = n + ' / ' + MAX;
+    count.classList.toggle('full', n >= MAX);
+    var have = tags().map(function (x) { return x.dataset.v; });
+    Array.prototype.forEach.call(sgRow.children, function (b) { b.classList.toggle('used', have.indexOf(b.dataset.v) >= 0); });
+  }
+  function make(v) {
+    var tag = document.createElement('span');
+    tag.className = 'u029-tag';
+    tag.dataset.v = v;
+    tag.style.setProperty('--c', colorOf(v));
+    var s = document.createElement('span');
+    s.textContent = '#' + v;
+    var x = document.createElement('button');
+    x.type = 'button';
+    x.className = 'u029-x';
+    x.setAttribute('aria-label', 'Remove tag ' + v);
+    x.innerHTML = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 2l6 6M8 2L2 8"/></svg>';
+    x.addEventListener('click', function () { remove(tag); input.focus(); });
+    tag.appendChild(s); tag.appendChild(x);
+    return tag;
+  }
+  function add(raw) {
+    var v = raw.trim().replace(/^#/, '');
+    if (!v) return false;
+    if (tags().length >= MAX) {
+      say('You can add up to six tags', true);
+      field.classList.remove('shake'); void field.offsetWidth; field.classList.add('shake');
+      return false;
+    }
+    if (tags().some(function (x) { return x.dataset.v === v; })) { say('That tag already exists', true); return false; }
+    disarm();
+    field.insertBefore(make(v), input);
+    refresh();
+    say('Added #' + v);
+    return true;
+  }
+  function remove(tag) {
+    if (tag.classList.contains('out')) return;
+    tag.classList.add('out');
+    say('Removed #' + tag.dataset.v);
+    setTimeout(function () { if (root.isConnected) { tag.remove(); refresh(); } }, 280);
+  }
+  function disarm() { tags().forEach(function (x) { x.classList.remove('armed'); }); }
+  input.addEventListener('keydown', function (e) {
+    if (e.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); if (add(input.value)) input.value = ''; }
+    else if (e.key === 'Backspace' && !input.value) {
+      var all = tags(), last = all[all.length - 1];
+      if (!last) return;
+      if (last.classList.contains('armed')) remove(last); else { disarm(); last.classList.add('armed'); }
+    } else disarm();
+  });
+  input.addEventListener('blur', disarm);
+  field.addEventListener('click', function (e) { if (e.target === field) input.focus(); });
+  ['designsystem', 'motion', 'darkmode'].forEach(function (v) { field.insertBefore(make(v), input); });
+  ['a11y', 'onboarding', 'microinteraction', 'dashboard'].forEach(function (v) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'u029-sg';
+    b.dataset.v = v;
+    b.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2v8M2 6h8"/></svg>';
+    b.appendChild(document.createTextNode(v));
+    b.setAttribute('aria-label', 'Add tag ' + v);
+    b.addEventListener('click', function () { add(v); });
+    sgRow.appendChild(b);
+  });
+  refresh();
+})();
+</script>

@@ -1,0 +1,113 @@
+<!-- Lucian UX/UI Prompt #259 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#259 -->
+<!--
+Element: Mid-article membership paywall
+ID: 259 · Category: Commerce & Pricing · Tags: paywall, membership, blog, unlock, subscription
+What it does: Read down a blog post and from the third paragraph the text fades and cuts off, with a membership card below letting you know you've used this month's free articles. Choose monthly or yearly to change the price, and press Start free: the button spins briefly, the card folds away, and the hidden paragraphs clear up and unfold down the page.
+How to use it: Scroll down and press Start free on the membership card
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#259
+-->
+<style>
+.u259{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u259-sc{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:26px 20px 30px}
+.u259-sc::-webkit-scrollbar{display:none}
+.u259-sc:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-4px;border-radius:32px}
+.u259-sc>small{font-size:10px;font-weight:850;color:var(--ux-accent)}
+.u259-sc h3{margin:6px 0 0;font-size:19px;line-height:1.3;font-weight:900;letter-spacing:-.035em}
+.u259-by{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:10.5px;font-weight:700;color:var(--ux-ink-3)}
+.u259-by i{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#F9A8D4,#A78BFA)}
+.u259-hi{height:110px;margin-top:14px;border-radius:14px;background:linear-gradient(135deg,#C7D2FE,#FBCFE8)}
+.u259-sc p{margin:12px 0 0;font-size:12px;line-height:1.7;font-weight:550;color:var(--ux-ink-2)}
+.u259-sc h4{margin:16px 0 0;font-size:13.5px;font-weight:850}
+.u259-lk{position:relative;max-height:96px;overflow:hidden;transition:max-height .9s cubic-bezier(.3,.8,.3,1)}
+.u259-lk>div{filter:blur(2.5px);transition:filter .7s}
+.u259-lk::after{content:"";position:absolute;left:0;right:0;bottom:0;height:96px;background:linear-gradient(transparent,var(--ux-surface) 92%);transition:opacity .5s}
+.u259.is-open .u259-lk{max-height:520px}
+.u259.is-open .u259-lk>div{filter:none}
+.u259.is-open .u259-lk::after{opacity:0}
+.u259-pw{display:grid;grid-template-rows:1fr;transition:grid-template-rows .55s cubic-bezier(.3,.8,.3,1),opacity .35s,transform .45s;margin-top:4px}
+.u259-pw>div{min-height:0;overflow:hidden}
+.u259.is-open .u259-pw{grid-template-rows:0fr;opacity:0;transform:scale(.96)}
+.u259-cd{padding:16px;border-radius:18px;background:var(--ux-ink);color:var(--ux-surface);text-align:center}
+.u259-mt{display:flex;justify-content:center;gap:4px}
+.u259-mt i{width:20px;height:4px;border-radius:2px;background:#F472B6}
+.u259-cd small{display:block;margin-top:8px;font-size:10px;font-weight:700;opacity:.7}
+.u259-cd b{display:block;margin-top:4px;font-size:15px;font-weight:900}
+.u259-sg{position:relative;display:flex;margin:12px auto 0;width:170px;padding:3px;border-radius:999px;background:color-mix(in srgb,var(--ux-surface) 14%,transparent)}
+.u259-sg::before{content:"";position:absolute;left:3px;top:3px;bottom:3px;width:calc(50% - 3px);border-radius:999px;background:var(--ux-surface);transition:transform .35s cubic-bezier(.3,1.3,.5,1)}
+.u259.is-yr .u259-sg::before{transform:translateX(100%)}
+.u259-pp{position:relative;flex:1;height:26px;border:0;border-radius:999px;background:none;color:color-mix(in srgb,var(--ux-surface) 70%,transparent);font:inherit;font-size:11px;font-weight:850;cursor:pointer;transition:color .2s}
+.u259-pp[aria-checked="true"]{color:var(--ux-ink)}
+.u259-pr{position:relative;height:30px;margin-top:10px;overflow:hidden}
+.u259-pr>span{position:absolute;left:0;right:0;top:0;display:flex;align-items:baseline;justify-content:center;gap:3px;font-size:22px;font-weight:900;letter-spacing:-.02em;transition:transform .4s cubic-bezier(.3,1.3,.5,1),opacity .3s}
+.u259-pr>span small{margin:0;display:inline;font-size:10.5px;font-weight:750;opacity:.7;letter-spacing:0}
+.u259-pr>span.is-in{transform:translateY(100%);opacity:0;transition:none}
+.u259-pr>span.is-out{transform:translateY(-100%);opacity:0}
+.u259-go{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;height:44px;margin-top:10px;border:0;border-radius:12px;background:linear-gradient(135deg,#F472B6,#8B5CF6);color:#fff;font:inherit;font-size:13px;font-weight:850;cursor:pointer}
+.u259-go i{display:none;width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;animation:u259-sp .7s linear infinite}
+.u259-go.is-busy i{display:block}
+.u259-go.is-busy span{display:none}
+@keyframes u259-sp{to{transform:rotate(360deg)}}
+.u259-cd p{margin:9px 0 0;font-size:10px;font-weight:700;color:inherit;opacity:.6}
+.u259-ok{position:absolute;left:14px;right:14px;top:14px;z-index:2;display:flex;align-items:center;gap:8px;padding:11px 13px;border-radius:14px;background:#059669;color:#fff;font-size:11px;font-weight:800;transform:translateY(-140%);transition:transform .5s cubic-bezier(.3,1.4,.5,1)}
+.u259-ok.is-on{transform:none}
+.u259 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u259-lk,.u259-lk>div,.u259-pw,.u259-sg::before,.u259-pr>span,.u259-ok{transition:none}.u259-go i{animation:none}}
+</style>
+<div class="ux u259">
+  <div class="u259-sc" tabindex="0" aria-label="Article">
+    <small>Insights</small>
+    <h3>Five habits of small teams that ship faster</h3>
+    <div class="u259-by"><i aria-hidden="true"></i>Harin Kim · 6 min read</div>
+    <div class="u259-hi" aria-hidden="true"></div>
+    <p>Teams that ship fast do less. More precisely, they spend more time choosing what to do.</p>
+    <h4>1. Set the launch date first</h4>
+    <p>Cut scope to fit the date. Do it the other way round and the date always slips.</p>
+    <div class="u259-lk"><div>
+      <h4>2. Write short notes instead of meetings</h4>
+      <p>A three-line decision log outlives a 30-minute meeting. Anyone can read it later and know why.</p>
+      <h4>3. Break failures into small pieces</h4>
+      <p>Instead of big changes, ship often in pieces small enough to roll back.</p>
+      <h4>4. Hear from customers every week</h4>
+    </div></div>
+    <div class="u259-pw"><div><div class="u259-cd">
+      <div class="u259-mt" aria-hidden="true"><i></i><i></i><i></i></div>
+      <small>You’ve read all your free articles this month</small><b>Keep reading with membership</b>
+      <div class="u259-sg" role="radiogroup" aria-label="Billing period"><button type="button" class="u259-pp" role="radio" aria-checked="true">Monthly</button><button type="button" class="u259-pp" role="radio" aria-checked="false">Yearly</button></div>
+      <div class="u259-pr"></div>
+      <button type="button" class="u259-go"><i aria-hidden="true"></i><span>Start 7 days free</span></button>
+      <p>Already a member? Sign in</p>
+    </div></div></div>
+  </div>
+  <div class="u259-ok" role="status">Welcome! Every article is now open to you</div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var PP = root.querySelectorAll('.u259-pp'), pr = root.querySelector('.u259-pr'), go = root.querySelector('.u259-go'), ok = root.querySelector('.u259-ok'), lk = root.querySelector('.u259-lk');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PRICE = [['$4.90', '/mo'], ['$49', '/yr · 2 months free']];
+  var cur = -1;
+  lk.setAttribute('aria-hidden', 'true');
+  function pick(i) {
+    if (i === cur) return;
+    var first = cur < 0; cur = i;
+    root.classList.toggle('is-yr', i === 1);
+    Array.prototype.forEach.call(PP, function (b, k) { b.setAttribute('aria-checked', k === i); });
+    var old = pr.firstElementChild, nw = document.createElement('span'); nw.innerHTML = '<b></b><small></small>'; nw.firstChild.textContent = PRICE[i][0]; nw.lastChild.textContent = PRICE[i][1];
+    if (first || rm) { pr.innerHTML = ''; pr.appendChild(nw); return; }
+    nw.className = 'is-in'; pr.appendChild(nw); void nw.offsetWidth; nw.className = ''; if (old) { old.className = 'is-out'; setTimeout(function () { old.remove(); }, 420); }
+  }
+  Array.prototype.forEach.call(PP, function (b, i) { b.addEventListener('click', function () { pick(i); }); });
+  go.addEventListener('click', function () {
+    if (go.classList.contains('is-busy') || root.classList.contains('is-open')) return;
+    go.classList.add('is-busy');
+    setTimeout(function () {
+      go.classList.remove('is-busy'); root.classList.add('is-open'); lk.removeAttribute('aria-hidden');
+      ok.classList.add('is-on'); setTimeout(function () { ok.classList.remove('is-on'); }, 2400);
+    }, rm ? 0 : 700);
+  });
+  pick(0);
+})();
+</script>

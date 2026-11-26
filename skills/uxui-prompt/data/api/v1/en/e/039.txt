@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #039 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#039 -->
+<!--
+Element: Sliding pill tabs
+ID: 039 · Category: Menus & Tabs · Tags: tabs, segmented, pill, slide, stagger
+What it does: Press a tab and the black pill stretches and glides over to it, while the list below slides in row by row from the direction you moved.
+How to use it: Press the tabs back and forth. With a keyboard, use the left and right arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#039
+-->
+<style>
+.u039{position:relative;width:340px;height:380px}
+.u039-tabs{position:relative;display:flex;padding:5px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line)}
+.u039-pill{position:absolute;left:0;top:5px;bottom:5px;width:var(--w,80px);border-radius:999px;background:var(--ux-ink);transform:translateX(var(--x,5px));box-shadow:0 8px 16px -10px var(--ux-shadow-strong);transition:transform .5s var(--ux-spring),width .5s var(--ux-spring)}
+.u039-tab{position:relative;flex:1;height:42px;border:0;padding:0;border-radius:999px;background:none;font-size:14px;font-weight:680;color:var(--ux-ink-2);white-space:nowrap;transition:color .35s var(--ux-ease)}
+.u039-tab[aria-selected="true"]{color:var(--ux-page)}
+.u039-tab:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u039-panel{position:relative;height:312px;margin-top:14px;overflow:hidden;border-radius:22px}
+.u039-list{position:absolute;inset:0;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.u039-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);transition:transform .55s var(--ux-spring),opacity .35s var(--ux-ease)}
+.u039-art{position:relative;width:52px;height:52px;flex:none;border-radius:14px;background:var(--g);overflow:hidden}
+.u039-art::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.45),transparent 55%)}
+.u039-row b{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em}
+.u039-row small{display:block;margin-top:3px;font-size:12.5px;color:var(--ux-ink-3)}
+.u039-row em{margin-left:auto;font-style:normal;font-size:12.5px;font-weight:650;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u039-badge{margin-left:6px;padding:2px 6px;border-radius:6px;font-size:10.5px;font-weight:800;background:var(--ux-accent-soft);color:var(--ux-accent);vertical-align:2px}
+</style>
+<div class="ux u039">
+  <div class="u039-tabs" role="tablist" aria-label="Library">
+    <span class="u039-pill" aria-hidden="true"></span>
+    <button class="u039-tab" type="button" role="tab" aria-selected="true">All</button>
+    <button class="u039-tab" type="button" role="tab" aria-selected="false">Music</button>
+    <button class="u039-tab" type="button" role="tab" aria-selected="false">Podcasts</button>
+    <button class="u039-tab" type="button" role="tab" aria-selected="false">Audiobooks</button>
+  </div>
+  <div class="u039-panel" role="tabpanel"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.u039-tab'));
+  var pill = root.querySelector('.u039-pill');
+  var panel = root.querySelector('.u039-panel');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DATA = [
+    [['Midnight Drive', 'Lumen · Album', '3:40', 'linear-gradient(140deg,#8B6CFF,#FF6B8B)'], ['Design Talk #42', 'Motion Lab · Podcast', '48m', 'linear-gradient(140deg,#22C3A6,#3D8BFF)'], ['Walking Slowly', 'Audiobook · Chapter 2', '1h 12m', 'linear-gradient(140deg,#FFB547,#FF7A45)'], ['Neon Garden', 'Kiri · Single', '2:58', 'linear-gradient(140deg,#3D8BFF,#B04FD0)']],
+    [['Midnight Drive', 'Lumen · Album', '3:40', 'linear-gradient(140deg,#8B6CFF,#FF6B8B)'], ['Neon Garden', 'Kiri · Single', '2:58', 'linear-gradient(140deg,#3D8BFF,#B04FD0)'], ['Paper Moon', 'Haru · EP', '4:12', 'linear-gradient(140deg,#FF8A65,#FFC24B)'], ['Blue Hour', 'Sola · Album', '3:05', 'linear-gradient(140deg,#0EA5E9,#22C3A6)']],
+    [['Design Talk #42', 'Motion Lab · New episode', '48m', 'linear-gradient(140deg,#22C3A6,#3D8BFF)'], ['People at Work', 'Studio F · Ep. 18', '36m', 'linear-gradient(140deg,#FF7A93,#8B6CFF)'], ['Code Review Radio', 'Devcast · Ep. 7', '52m', 'linear-gradient(140deg,#5B8CFF,#22C3A6)'], ['Morning Briefing', 'Daily · Today', '12m', 'linear-gradient(140deg,#FFB547,#E5484D)']],
+    [['Walking Slowly', 'Audiobook · On chapter 2', '1h 12m', 'linear-gradient(140deg,#FFB547,#FF7A45)'], ['Small Habits', 'Audiobook · Not started', '6h', 'linear-gradient(140deg,#8B6CFF,#3D8BFF)'], ['Ocean Hours', 'Audiobook · Finished', '4h 30m', 'linear-gradient(140deg,#0EA5E9,#5B8CFF)'], ['Night Library', 'Audiobook · New', '8h', 'linear-gradient(140deg,#B04FD0,#FF6B8B)']]
+  ];
+  var cur = 0, list = null;
+  function movePill(animate) {
+    var t = tabs[cur];
+    if (!animate) pill.style.transition = 'none';
+    pill.style.setProperty('--x', t.offsetLeft + 'px');
+    pill.style.setProperty('--w', t.offsetWidth + 'px');
+    if (!animate) { void pill.offsetWidth; pill.style.transition = ''; }
+  }
+  function make(i) {
+    var ul = document.createElement('ul');
+    ul.className = 'u039-list';
+    ul.innerHTML = DATA[i].map(function (r, k) {
+      return '<li class="u039-row" style="transition-delay:' + (k * 45) + 'ms"><span class="u039-art" style="--g:' + r[3] + '" aria-hidden="true"></span><span><b>' + r[0] + (i === 0 && k === 0 ? '<span class="u039-badge">Playing</span>' : '') + '</b><small>' + r[1] + '</small></span><em>' + r[2] + '</em></li>';
+    }).join('');
+    return ul;
+  }
+  function select(i, focus) {
+    if (i === cur && list) return;
+    var dir = i > cur ? 1 : -1;
+    cur = i;
+    tabs.forEach(function (t, k) { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    if (focus) tabs[i].focus();
+    movePill(true);
+    var next = make(i), old = list;
+    list = next;
+    if (!old || rm) { if (old) old.remove(); panel.appendChild(next); return; }
+    Array.prototype.forEach.call(next.children, function (r) { r.style.transform = 'translateX(' + (dir * 70) + '%)'; r.style.opacity = '0'; });
+    panel.appendChild(next);
+    void next.offsetWidth;
+    Array.prototype.forEach.call(next.children, function (r) { r.style.transform = ''; r.style.opacity = ''; });
+    Array.prototype.forEach.call(old.children, function (r) { r.style.transform = 'translateX(' + (-dir * 60) + '%)'; r.style.opacity = '0'; });
+    setTimeout(function () { old.remove(); }, 700);
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(i); });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); select((i + d + tabs.length) % tabs.length, true); }
+    });
+  });
+  var uid = 'u039-' + Math.random().toString(36).slice(2, 7);
+  panel.id = uid;
+  tabs.forEach(function (t) { t.setAttribute('aria-controls', uid); });
+  list = make(0);
+  panel.appendChild(list);
+  tabs.forEach(function (t, k) { t.tabIndex = k === 0 ? 0 : -1; });
+  movePill(false);
+})();
+</script>

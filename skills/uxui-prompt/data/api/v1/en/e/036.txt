@@ -1,0 +1,97 @@
+<!-- Lucian UX/UI Prompt #036 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#036 -->
+<!--
+Element: Password strength meter
+ID: 036 · Category: Inputs & Search · Tags: password, strength, meter, validation, form
+What it does: With every keystroke the four-part bar fills and shifts from red to green, and each rule you satisfy pops its circle into a check. Press the eye icon and its lid opens to reveal the password.
+How to use it: Add or remove symbols in the password field. The eye icon toggles visibility
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#036
+-->
+<style>
+.u036{--lv:var(--ux-line-2);position:relative;width:340px;height:262px;display:flex;flex-direction:column;justify-content:center}
+.u036-lab{display:block;margin:0 4px 8px;font-size:13px;font-weight:700;color:var(--ux-ink-3)}
+.u036-box{position:relative;display:flex;align-items:center;height:60px;padding:0 8px 0 18px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1.5px var(--ux-line-2);transition:box-shadow .25s}
+.u036-box:focus-within{box-shadow:0 0 0 2px var(--lv),0 0 0 6px color-mix(in srgb,var(--lv) 18%,transparent)}
+.u036-in{flex:1;min-width:0;height:100%;border:0;outline:0;background:none;font-size:18px;font-weight:650;letter-spacing:.04em;color:var(--ux-ink)}
+.u036-in:focus-visible{outline:none}
+.u036-eye{width:44px;height:44px;flex:none;border:0;padding:0;border-radius:13px;background:none;color:var(--ux-ink-2);display:grid;place-items:center;transition:background-color .2s}
+.u036-eye:hover{background:var(--ux-surface-2)}
+.u036-eye:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u036-eye svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.u036-lid{transform-origin:12px 12px;transition:transform .4s var(--ux-spring)}
+.u036-pupil{transform-origin:12px 12px;transition:transform .35s var(--ux-spring) .05s}
+.u036-slash{stroke-dasharray:24;stroke-dashoffset:0;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u036.is-show .u036-slash{stroke-dashoffset:24}
+.u036:not(.is-show) .u036-pupil{transform:scale(0)}
+.u036:not(.is-show) .u036-lid{transform:scaleY(.15)}
+.u036-meter{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:16px 4px 0}
+.u036-meter i{height:7px;border-radius:4px;background:var(--ux-surface-3);overflow:hidden;position:relative}
+.u036-meter i::after{content:"";position:absolute;inset:0;background:var(--lv);transform:scaleX(0);transform-origin:0 50%;transition:transform .45s var(--ux-ease),background-color .4s}
+.u036-meter i.on::after{transform:none}
+.u036-meter i:nth-child(2)::after{transition-delay:.05s}
+.u036-meter i:nth-child(3)::after{transition-delay:.1s}
+.u036-meter i:nth-child(4)::after{transition-delay:.15s}
+.u036-lv{display:flex;justify-content:space-between;margin:9px 4px 0;font-size:13px;font-weight:650;color:var(--ux-ink-3)}
+.u036-lv b{color:var(--lv);transition:color .4s}
+.u036-rules{margin:18px 0 0;padding:16px;list-style:none;border-radius:18px;background:var(--ux-surface-2);display:grid;grid-template-columns:1fr 1fr;gap:12px 10px}
+.u036-r{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--ux-ink-3);transition:color .3s}
+.u036-r i{position:relative;width:20px;height:20px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 1.8px var(--ux-line-2);transition:box-shadow .3s,background-color .3s}
+.u036-r svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:var(--ux-accent-ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u036-r path{stroke-dasharray:14;stroke-dashoffset:14;transition:stroke-dashoffset .3s var(--ux-ease) .1s}
+.u036-r.ok{color:var(--ux-ink)}
+.u036-r.ok i{background:var(--ux-mint);box-shadow:none;animation:u036-pop .4s var(--ux-spring)}
+.u036-r.ok path{stroke-dashoffset:0}
+@keyframes u036-pop{from{transform:scale(.4)}}
+</style>
+<div class="ux u036">
+  <label class="u036-lab">New password</label>
+  <div class="u036-box">
+    <input class="u036-in" type="password" value="Lucian2026" autocomplete="new-password">
+    <button class="u036-eye" type="button" aria-label="Show password" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g class="u036-lid"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/></g><circle class="u036-pupil" cx="12" cy="12" r="3"/><path class="u036-slash" d="M4 4l16 16"/></svg>
+    </button>
+  </div>
+  <div class="u036-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <p class="u036-lv"><span>Strength</span><b class="u036-word" aria-live="polite"></b></p>
+  <ul class="u036-rules">
+    <li class="u036-r" data-r="len"><i aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></i>10+ characters</li>
+    <li class="u036-r" data-r="up"><i aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></i>An uppercase letter</li>
+    <li class="u036-r" data-r="num"><i aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></i>A number</li>
+    <li class="u036-r" data-r="sym"><i aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-6.5"/></svg></i>A symbol</li>
+  </ul>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var input = root.querySelector('.u036-in');
+  var eye = root.querySelector('.u036-eye');
+  var segs = root.querySelectorAll('.u036-meter i');
+  var word = root.querySelector('.u036-word');
+  var rules = Array.prototype.slice.call(root.querySelectorAll('.u036-r'));
+  var lab = root.querySelector('.u036-lab');
+  var uid = 'u036-' + Math.random().toString(36).slice(2, 7);
+  input.id = uid; lab.htmlFor = uid;
+  root.querySelector('.u036-rules').id = uid + '-r';
+  input.setAttribute('aria-describedby', uid + '-r');
+  var TEST = { len: function (v) { return v.length >= 10; }, up: function (v) { return /[A-Z]/.test(v); }, num: function (v) { return /\d/.test(v); }, sym: function (v) { return /[^A-Za-z0-9]/.test(v); } };
+  var LV = [['Type a password', 'var(--ux-line-2)'], ['Weak', '#E5484D'], ['Fair', '#F07A3E'], ['Good', '#E8B417'], ['Strong', 'var(--ux-mint)']];
+  function update() {
+    var v = input.value, n = 0;
+    rules.forEach(function (r) { var ok = TEST[r.dataset.r](v); r.classList.toggle('ok', ok); if (ok) n++; });
+    var lv = v ? Math.max(1, n) : 0;
+    root.style.setProperty('--lv', LV[lv][1]);
+    Array.prototype.forEach.call(segs, function (s, i) { s.classList.toggle('on', i < lv); });
+    word.textContent = LV[lv][0];
+  }
+  input.addEventListener('input', update);
+  eye.addEventListener('click', function () {
+    var show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    root.classList.toggle('is-show', show);
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+  update();
+})();
+</script>

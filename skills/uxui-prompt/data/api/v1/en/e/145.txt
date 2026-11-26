@@ -1,0 +1,18 @@
+<!-- Lucian UX/UI Prompt #145 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#145 -->
+<!--
+Element: Word-level transcript fix
+ID: 145 · Category: Document & Data Editing · Tags: transcript-correction, editing, interactive
+What it does: An editor for correcting a transcript one word at a time. Every word carries its timestamp, so you can fix just the one that’s wrong.
+How to use it: Click a word in the sentence under the waveform and correct it
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#145
+-->
+<style>
+.u145{width:min(100%,370px);font-size:14px;line-height:1.6;color:var(--ux-ink)}.u145 button,.u145 input,.u145 textarea,.u145 select{font:inherit;color:inherit;max-width:100%;min-width:0}.u145 button{cursor:pointer;min-height:44px;border:1px solid var(--ux-line-2);border-radius:8px;background:var(--ux-surface);padding:8px 12px}.u145 input,.u145 textarea,.u145 select{border:1px solid var(--ux-line-2);border-radius:6px;background:var(--ux-surface);padding:8px 10px}.u145 .quiet{color:var(--ux-ink-2)}.u145 .primary{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:transparent}.u145 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u145 [hidden]{display:none!important}.u145 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.u145 *{animation:none!important;transition:none!important}}
+.u145{padding:16px 0}.u145 .audio{display:flex;align-items:center;gap:17px;margin-bottom:28px}.u145 .wave{height:34px;display:flex;align-items:center;gap:4px;flex:1}.u145 .wave i{display:block;flex:1;background:var(--ux-accent);opacity:.55;border-radius:3px}.u145 time{font:12px ui-monospace,monospace;color:var(--ux-ink-2)}.u145 .words{display:flex;align-items:center;flex-wrap:wrap;gap:4px}.u145 input{width:auto;max-width:100%;border:0;border-bottom:1px solid transparent;border-radius:0;background:transparent;padding:7px 3px;font:20px/1.8 Georgia,'Apple SD Gothic Neo',serif;min-height:49px}.u145 input:focus{border-bottom-color:var(--ux-accent);outline:none}.u145 input:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+</style>
+<div class="ux u145"><div class="audio"><time>00:01</time><div class="wave" aria-hidden="true"></div></div><div class="words"><input data-word="0" value="Small" size="2" aria-label="00:00 word"><input data-word="1" value="gardens" size="3" aria-label="00:01 word"><input data-word="2" value="catch" size="2" aria-label="00:02 word"><input data-word="3" value="light." size="4" aria-label="00:03 word"></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,$=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)],esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const motion=(node,frames,opts={})=>{if(node?.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.8,.2,1)',...opts})};$('.wave').innerHTML=Array.from({length:28},(_,i)=>'<i style="height:'+(8+(i*17%26))+'px"></i>').join('');function size(i){i.style.width=Math.max(2,Math.min(14,[...i.value].length*1.12))+'em'}$$('input').forEach(i=>{size(i);i.onfocus=()=>{$('time').textContent='00:0'+i.dataset.word};i.oninput=()=>{size(i);root.dataset.transcript=$$('input').map(x=>x.value).join(' ');motion(i,[{transform:'translateY(-2px)'},{transform:'none'}])}});})();
+</script>

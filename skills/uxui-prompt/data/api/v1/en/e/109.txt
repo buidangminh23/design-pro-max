@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #109 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#109 -->
+<!--
+Element: Weekly availability painter
+ID: 109 · Category: Layout, Schedule & Design · Tags: availability, native, spatial
+What it does: A grid for painting the hours you’re free this week. Press a cell or drag across several to fill them at once, and the total updates right away.
+How to use it: Press or drag across the hour cells to paint them. Esc clears them all
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#109
+-->
+<style>
+.u109{width:100%;max-width:400px;min-width:0;font-size:13px}.u109 button{font:inherit;color:inherit;cursor:pointer}.u109 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u109 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u109{padding:12px 4px}.u109 .week{display:grid;grid-template-columns:38px repeat(5,1fr);gap:6px;touch-action:none}.u109 .week>span{font-size:12px;color:var(--ux-ink-2);text-align:center;align-self:center;min-height:28px}.u109 .slot{height:36px;padding:0;border:1px solid var(--ux-line-2);border-radius:3px;background:var(--ux-surface-2);color:var(--ux-accent-ink)}.u109 .slot[aria-pressed=true]{background:var(--ux-accent);border-color:var(--ux-accent)}.u109 .slot[aria-pressed=true]:after{content:"✓"}.u109 output{display:block;text-align:right;margin-top:15px;font-size:13px;color:var(--ux-ink-2)}
+</style>
+<div class="ux u109"><div class="week"></div><output aria-live="polite">0h</output></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const days=['Mon','Tue','Wed','Thu','Fri'];q('.week').innerHTML='<span></span>'+days.map(d=>`<span>${d}</span>`).join('')+Array.from({length:5},(_,r)=>`<span>${9+r}:00</span>`+days.map((d,c)=>`<button class="slot" data-i="${r*5+c}" aria-label="${d} ${9+r}:00" aria-pressed="false"></button>`).join('')).join('');let set=new Set(),paintMode=true,drag=false;function paint(){qa('.slot').forEach(b=>b.setAttribute('aria-pressed',set.has(+b.dataset.i)));q('output').textContent=set.size+'h'}function apply(b){if(!b)return;const i=+b.dataset.i;paintMode?set.add(i):set.delete(i);paint()}qa('.slot').forEach(b=>{b.onpointerdown=e=>{drag=true;paintMode=!set.has(+b.dataset.i);b.setPointerCapture(e.pointerId);apply(b)};b.onpointermove=e=>{if(drag&&b.hasPointerCapture(e.pointerId)){const el=document.elementFromPoint(e.clientX,e.clientY);if(el?.classList.contains('slot'))apply(el)}};b.onpointerup=()=>drag=false;b.onpointercancel=()=>drag=false;b.onclick=e=>{if(e.detail===0){paintMode=!set.has(+b.dataset.i);apply(b)}}});root.onkeydown=e=>{if(e.key==='Escape'){set.clear();drag=false;paint()}};})();
+</script>

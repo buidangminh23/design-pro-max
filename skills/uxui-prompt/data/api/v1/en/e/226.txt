@@ -1,0 +1,73 @@
+<!-- Lucian UX/UI Prompt #226 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#226 -->
+<!--
+Element: Grid-beam hero background
+ID: 226 · Category: Hero & Backgrounds · Tags: hero, background, grid, beams, spotlight
+What it does: A faint grid lies behind a dark hero, and beams of light glide along its lines horizontally and vertically, leaving a tail before fading out. Move the cursor and only the grid around it softly lights up, while the headline and button in the middle sit crisply on top. With reduced motion, only the grid and headline are shown, without beams.
+How to use it: Move the cursor over the card to light up the grid around it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#226
+-->
+<style>
+.u226{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#07080F;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#F2F4FF;--mx:-200px;--my:-200px}
+.u226-gd,.u226-gl{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);background-size:34px 34px;background-position:-1px -1px}
+.u226-gd{-webkit-mask-image:radial-gradient(75% 70% at 50% 45%,#000,transparent);mask-image:radial-gradient(75% 70% at 50% 45%,#000,transparent)}
+.u226-gl{background-image:linear-gradient(rgba(129,140,248,.55) 1px,transparent 1px),linear-gradient(90deg,rgba(129,140,248,.55) 1px,transparent 1px);-webkit-mask-image:radial-gradient(90px 90px at var(--mx) var(--my),#000,transparent);mask-image:radial-gradient(90px 90px at var(--mx) var(--my),#000,transparent);transition:opacity .4s}
+.u226-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.u226-glow{position:absolute;left:50%;top:44%;width:260px;height:180px;margin:-90px 0 0 -130px;border-radius:50%;background:radial-gradient(closest-side,rgba(99,102,241,.35),transparent);filter:blur(10px);pointer-events:none}
+.u226-c{position:absolute;left:0;right:0;top:86px;text-align:center}
+.u226-c small{display:inline-block;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);font-size:10px;font-weight:800;color:#A5B4FC;letter-spacing:.06em}
+.u226-c h3{margin:12px 0 0;font-size:27px;line-height:1.14;font-weight:900;letter-spacing:-.04em;background:linear-gradient(180deg,#fff,#AEB4D6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.u226-c p{margin:10px 0 0;font-size:11.5px;font-weight:600;color:#9AA0C3}
+.u226-bt{display:flex;justify-content:center;gap:8px;margin-top:18px}
+.u226-bt span{height:30px;padding:0 14px;border-radius:999px;display:inline-flex;align-items:center;font-size:11px;font-weight:800}
+.u226-bt span:first-child{background:#fff;color:#07080F}
+.u226-bt span:last-child{background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+</style>
+<div class="ux u226">
+  <div class="u226-gd" aria-hidden="true"></div>
+  <div class="u226-gl" aria-hidden="true"></div>
+  <canvas class="u226-cv" aria-hidden="true"></canvas>
+  <div class="u226-glow" aria-hidden="true"></div>
+  <div class="u226-c"><small>Infrastructure</small><h3>Ship in a tenth<br>of the time</h3><p>Push, and it's live worldwide in seconds.</p><div class="u226-bt"><span>Deploy now</span><span>Read docs</span></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u226-cv'), cx = cv.getContext('2d');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 340, H = 340, C = 34, dpr = Math.min(2, window.devicePixelRatio || 1), B = [], acc = 0;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var COL = ['129,140,248', '45,212,191', '244,114,182'];
+  function spawn() {
+    var v = Math.random() < 0.5, line = (1 + Math.floor(Math.random() * ((v ? W : H) / C - 1))) * C - 1, dir = Math.random() < 0.5 ? 1 : -1;
+    B.push({ v: v, l: line, p: dir > 0 ? -60 : (v ? H : W) + 60, d: dir, sp: 110 + Math.random() * 90, len: 50 + Math.random() * 40, c: COL[Math.floor(Math.random() * 3)] });
+  }
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    B.forEach(function (b) {
+      var x0 = b.v ? b.l : b.p - b.d * b.len, y0 = b.v ? b.p - b.d * b.len : b.l, x1 = b.v ? b.l : b.p, y1 = b.v ? b.p : b.l;
+      var g = cx.createLinearGradient(x0, y0, x1, y1); g.addColorStop(0, 'rgba(' + b.c + ',0)'); g.addColorStop(1, 'rgba(' + b.c + ',.95)');
+      cx.strokeStyle = g; cx.lineWidth = 1.6; cx.beginPath(); cx.moveTo(x0 + 0.5, y0 + 0.5); cx.lineTo(x1 + 0.5, y1 + 0.5); cx.stroke();
+      cx.fillStyle = 'rgba(' + b.c + ',1)'; cx.shadowColor = 'rgba(' + b.c + ',1)'; cx.shadowBlur = 8; cx.beginPath(); cx.arc(x1 + 0.5, y1 + 0.5, 1.8, 0, 6.2832); cx.fill(); cx.shadowBlur = 0;
+    });
+  }
+  var raf = 0, last = 0, vis = true;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+    acc += dt; if (acc > 0.42 && B.length < 9) { acc = 0; spawn(); }
+    B.forEach(function (b) { b.p += b.d * b.sp * dt; });
+    B = B.filter(function (b) { var lim = (b.v ? H : W) + 70; return b.d > 0 ? b.p < lim : b.p > -70; });
+    draw();
+    raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf && vis && !rm) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  root.addEventListener('pointermove', function (e) { var r = root.getBoundingClientRect(), k = W / r.width; root.style.setProperty('--mx', ((e.clientX - r.left) * k).toFixed(0) + 'px'); root.style.setProperty('--my', ((e.clientY - r.top) * k).toFixed(0) + 'px'); });
+  root.addEventListener('pointerleave', function () { root.style.setProperty('--mx', '-200px'); root.style.setProperty('--my', '-200px'); });
+  for (var i = 0; i < 4; i++) { spawn(); B[i].p = (B[i].v ? H : W) * (0.2 + i * 0.18); }
+  draw(); run();
+})();
+</script>

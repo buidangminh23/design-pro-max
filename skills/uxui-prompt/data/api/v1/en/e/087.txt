@@ -1,0 +1,101 @@
+<!-- Lucian UX/UI Prompt #087 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#087 -->
+<!--
+Element: Delivery steps with a truck
+ID: 087 · Category: Loading & Progress · Tags: steps, tracking, delivery, timeline, progress
+What it does: Each time the delivery stage changes, a small truck drives along the line to the next dot and the road behind it fills with color. New stages push in at the top of the log below, and on arrival the truck stops and turns into a check flag.
+How to use it: Press “Next step” to watch the truck drive. After it arrives you can watch again from the start
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#087
+-->
+<style>
+.u087{position:relative;width:340px;height:470px;display:flex;flex-direction:column;padding:22px 20px 20px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u087-h small{display:block;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u087-h b{display:block;margin-top:3px;font-size:21px;font-weight:850;letter-spacing:-.045em}
+.u087-h em{font-style:normal;color:var(--ux-accent)}
+.u087-trk{position:relative;height:64px;margin:16px 4px 0}
+.u087-line{position:absolute;left:8px;right:8px;top:42px;height:4px;border-radius:2px;background:var(--ux-surface-3)}
+.u087-line i{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#06B6D4,#22C3A6);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform 1s cubic-bezier(.5,0,.2,1)}
+.u087-dots{position:absolute;left:0;right:0;top:36px;display:flex;justify-content:space-between}
+.u087-dots span{width:16px;height:16px;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 3px var(--ux-surface-3);transition:box-shadow .4s .6s}
+.u087-dots span.on{box-shadow:inset 0 0 0 5px #22C3A6}
+.u087-truck{position:absolute;left:0;top:0;width:44px;height:34px;margin-left:-22px;transform:translateX(var(--x,0px));transition:transform 1s cubic-bezier(.5,0,.2,1)}
+.u087-truck svg{width:44px;height:34px}
+.u087.is-moving .u087-truck svg{animation:u087-bump .25s ease-in-out infinite}
+@keyframes u087-bump{50%{transform:translateY(-2px) rotate(-1deg)}}
+.u087-flag{position:absolute;left:12px;top:-2px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);transform:scale(0);transition:transform .5s var(--ux-spring) .2s}
+.u087-flag svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u087.is-done .u087-flag{transform:none}
+.u087.is-done .u087-truck svg{opacity:.25;transition:opacity .4s}
+.u087-labs{display:flex;justify-content:space-between;margin:6px 0 0;font-size:11px;font-weight:700;color:var(--ux-ink-3)}
+.u087-labs span{width:56px;text-align:center;transition:color .4s}
+.u087-labs span:first-child{text-align:left}
+.u087-labs span:last-child{text-align:right}
+.u087-labs span.on{color:var(--ux-ink)}
+.u087-log{flex:1;margin:16px 0 0;padding:0;list-style:none;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 44px),transparent)}
+.u087-log li{position:relative;display:flex;gap:12px;padding:0 0 12px 22px}
+.u087-log li::before{content:"";position:absolute;left:4px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--ux-line-2)}
+.u087-log li::after{content:"";position:absolute;left:7.5px;top:17px;bottom:2px;width:1px;background:var(--ux-line-2)}
+.u087-log li:first-child::before{background:#22C3A6;box-shadow:0 0 0 4px color-mix(in srgb,#22C3A6 22%,transparent)}
+.u087-log li.new{animation:u087-in .55s var(--ux-spring)}
+@keyframes u087-in{from{opacity:0;transform:translateY(-14px)}}
+.u087-log b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}
+.u087-log li:not(:first-child) b{color:var(--ux-ink-2);font-weight:700}
+.u087-log small{display:block;margin-top:2px;font-size:12px;font-weight:600;color:var(--ux-ink-3)}
+.u087-go{height:50px;border:0;border-radius:16px;background:var(--ux-ink);color:var(--ux-page);font-size:14.5px;font-weight:760;transition:transform .3s var(--ux-spring),opacity .3s}
+.u087-go:active{transform:scale(.97)}
+.u087-go[aria-disabled="true"]{opacity:.4}
+.u087-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u087">
+  <div class="u087-h"><small>Order LM-0428 · Daily Bottle 500</small><b aria-live="polite"></b></div>
+  <div class="u087-trk" role="progressbar" aria-label="Delivery stage" aria-valuemin="1" aria-valuemax="5">
+    <span class="u087-line" aria-hidden="true"><i></i></span>
+    <span class="u087-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+    <span class="u087-truck" aria-hidden="true"><svg viewBox="0 0 44 34"><rect x="2" y="6" width="24" height="18" rx="3" fill="#06B6D4"/><path d="M26 11h8l6 7v6H26z" fill="#22C3A6"/><path d="M29 13.5h4l3.5 4H29z" fill="#E6FBF7"/><circle cx="10" cy="26" r="4" fill="#16151B" stroke="#fff" stroke-width="2"/><circle cx="33" cy="26" r="4" fill="#16151B" stroke="#fff" stroke-width="2"/><rect x="6" y="10" width="10" height="3" rx="1.5" fill="#fff" opacity=".7"/></svg><span class="u087-flag"><svg viewBox="0 0 14 14"><path d="M3 7.4l2.6 2.6L11 4.6"/></svg></span></span>
+  </div>
+  <div class="u087-labs" aria-hidden="true"><span>Placed</span><span>Packing</span><span>Shipped</span><span>En route</span><span>Arrived</span></div>
+  <ol class="u087-log" aria-label="Delivery log"></ol>
+  <button class="u087-go" type="button">Next step</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var head = root.querySelector('.u087-h b'), trk = root.querySelector('.u087-trk'), line = root.querySelector('.u087-line'), truck = root.querySelector('.u087-truck');
+  var dots = root.querySelectorAll('.u087-dots span'), labs = root.querySelectorAll('.u087-labs span'), log = root.querySelector('.u087-log'), go = root.querySelector('.u087-go');
+  var S = [
+    ['Order <em>placed</em>', 'Order placed', 'Oct 8, 2:14 PM · Paid'],
+    ['We’re <em>packing</em> your order', 'Packing', 'Oct 9, 9:30 AM · Seongsu warehouse'],
+    ['Your parcel has <em>shipped</em>', 'Shipped', 'Oct 10, 7:02 AM · East hub'],
+    ['<em>Arriving</em> today', 'Out for delivery', 'Oct 10, 1:40 PM · Courier on the way'],
+    ['<em>Delivered</em> to your door', 'Delivered', 'Oct 10, 5:58 PM · Left at the door']
+  ];
+  var cur = -1, t = 0;
+  function to(i, first) {
+    cur = i;
+    var w = line.offsetWidth, x = 8 + w * (i / 4);
+    root.classList.toggle('is-moving', !first);
+    clearTimeout(t);
+    t = setTimeout(function () { if (root.isConnected) root.classList.remove('is-moving'); }, 1000);
+    truck.style.setProperty('--x', x + 'px');
+    line.querySelector('i').style.setProperty('--p', (i / 4).toFixed(3));
+    dots.forEach(function (d, k) { d.classList.toggle('on', k <= i); });
+    labs.forEach(function (l, k) { l.classList.toggle('on', k === i); });
+    head.innerHTML = S[i][0];
+    trk.setAttribute('aria-valuenow', i + 1); trk.setAttribute('aria-valuetext', S[i][1]);
+    var li = document.createElement('li');
+    li.className = first ? '' : 'new';
+    li.innerHTML = '<div><b></b><small></small></div>';
+    li.querySelector('b').textContent = S[i][1]; li.querySelector('small').textContent = S[i][2];
+    log.insertBefore(li, log.firstChild);
+    root.classList.toggle('is-done', i === 4);
+    go.textContent = i === 4 ? 'Watch again' : 'Next step';
+  }
+  go.addEventListener('click', function () {
+    if (cur === 4) { log.innerHTML = ''; truck.style.transition = 'none'; line.querySelector('i').style.transition = 'none'; to(0, true); void truck.offsetWidth; truck.style.transition = ''; line.querySelector('i').style.transition = ''; return; }
+    to(cur + 1);
+  });
+  [0, 1, 2].forEach(function (i) { to(i, true); });
+  root.classList.remove('is-moving');
+})();
+</script>

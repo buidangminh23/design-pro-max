@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #015 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#015 -->
+<!--
+Element: Plan radio cards
+ID: 015 · Category: Toggles & Pickers · Tags: radio, card, select, plan, pricing
+What it does: The frame slides over to the plan you choose, and the dot inside the circle pops in. The price only comes to full strength on the selected plan.
+How to use it: Press a plan, or focus one and use the up and down arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#015
+-->
+<style>
+.u015{position:relative;width:330px}
+.u015-grp{position:relative;display:flex;flex-direction:column;gap:10px}
+.u015-frame{position:absolute;left:0;right:0;top:0;height:0;border-radius:22px;pointer-events:none;
+  box-shadow:0 0 0 2px var(--ux-accent),0 18px 36px -20px color-mix(in srgb,var(--ux-accent) 70%,transparent);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--ux-accent) 9%,transparent),transparent 70%);
+  transition:top .55s var(--ux-spring),height .55s var(--ux-spring)}
+.u015-opt{position:relative;display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border:0;border-radius:22px;background:var(--ux-surface);color:var(--ux-ink);text-align:left;
+  box-shadow:0 0 0 1px var(--ux-line);transition:transform .4s var(--ux-spring),box-shadow .3s var(--ux-ease)}
+.u015-opt:hover{box-shadow:0 0 0 1px var(--ux-line-2)}
+.u015-opt:active{transform:scale(.98)}
+.u015-opt:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u015-dot{position:relative;width:24px;height:24px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ux-line-2);transition:box-shadow .3s var(--ux-ease)}
+.u015-dot::after{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--ux-accent);transform:scale(0);transition:transform .45s var(--ux-spring)}
+.u015-opt[aria-checked="true"] .u015-dot{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u015-opt[aria-checked="true"] .u015-dot::after{transform:scale(1)}
+.u015-ic{width:42px;height:42px;flex:none;border-radius:13px;display:grid;place-items:center;color:#fff;background:var(--g)}
+.u015-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u015-txt{flex:1;min-width:0}
+.u015-txt b{display:flex;align-items:center;gap:7px;font-size:16px;font-weight:720;letter-spacing:-.02em}
+.u015-txt em{font-style:normal;font-size:11px;font-weight:750;padding:3px 7px;border-radius:999px;background:var(--ux-accent-soft);color:var(--ux-accent)}
+.u015-txt small{display:block;margin-top:3px;font-size:13px;color:var(--ux-ink-3)}
+.u015-price{text-align:right;font-variant-numeric:tabular-nums;color:var(--ux-ink-3);transition:color .35s var(--ux-ease)}
+.u015-price b{display:block;font-size:17px;font-weight:760;letter-spacing:-.02em}
+.u015-price small{font-size:11.5px}
+.u015-opt[aria-checked="true"] .u015-price{color:var(--ux-ink)}
+.u015-cta{display:flex;align-items:center;justify-content:space-between;margin:16px 0 0;padding:0 6px;font-size:14px;color:var(--ux-ink-2)}
+.u015-cta b{color:var(--ux-ink);font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u015">
+  <div class="u015-grp" role="radiogroup" aria-label="Plans">
+    <span class="u015-frame" aria-hidden="true"></span>
+    <button class="u015-opt" type="button" role="radio" aria-checked="false" data-p="0">
+      <span class="u015-dot" aria-hidden="true"></span>
+      <span class="u015-ic" style="--g:linear-gradient(140deg,#B5B2BD,#8E8A97)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5"/></svg></span>
+      <span class="u015-txt"><b>Personal</b><small>Up to 3 projects</small></span>
+      <span class="u015-price"><b>Free</b><small>&nbsp;</small></span>
+    </button>
+    <button class="u015-opt" type="button" role="radio" aria-checked="true" data-p="12000">
+      <span class="u015-dot" aria-hidden="true"></span>
+      <span class="u015-ic" style="--g:linear-gradient(140deg,#8B6CFF,#5B8CFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></svg></span>
+      <span class="u015-txt"><b>Pro <em>Popular</em></b><small>Unlimited · Version history</small></span>
+      <span class="u015-price"><b>$12</b><small>/ month</small></span>
+    </button>
+    <button class="u015-opt" type="button" role="radio" aria-checked="false" data-p="29000">
+      <span class="u015-dot" aria-hidden="true"></span>
+      <span class="u015-ic" style="--g:linear-gradient(140deg,#22C3A6,#0EA5E9)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M14.5 15c2.6-.3 5 .9 6 4"/></svg></span>
+      <span class="u015-txt"><b>Team</b><small>10 members · Roles</small></span>
+      <span class="u015-price"><b>$29</b><small>/ month</small></span>
+    </button>
+  </div>
+  <p class="u015-cta" aria-live="polite"><span class="u015-sel">Pro plan</span><b class="u015-sum">$12 / month</b></p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var opts = Array.prototype.slice.call(root.querySelectorAll('.u015-opt'));
+  var frame = root.querySelector('.u015-frame');
+  var sel = root.querySelector('.u015-sel');
+  var sum = root.querySelector('.u015-sum');
+  function place(o) {
+    frame.style.top = o.offsetTop + 'px';
+    frame.style.height = o.offsetHeight + 'px';
+  }
+  function choose(o, focus) {
+    opts.forEach(function (x) {
+      var on = x === o;
+      x.setAttribute('aria-checked', String(on));
+      x.tabIndex = on ? 0 : -1;
+    });
+    place(o);
+    var name = o.querySelector('.u015-txt b').firstChild.textContent.trim();
+    var p = +o.dataset.p;
+    sel.textContent = name + ' plan';
+    sum.textContent = p ? '$' + (p / 1000) + ' / month' : 'Free';
+    if (focus) o.focus();
+  }
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () { choose(o); });
+    o.addEventListener('keydown', function (e) {
+      var d = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1 : (e.key === 'ArrowUp' || e.key === 'ArrowLeft') ? -1 : 0;
+      if (d) { e.preventDefault(); choose(opts[(i + d + opts.length) % opts.length], true); }
+    });
+  });
+  frame.style.transition = 'none';
+  choose(opts[1]);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { frame.style.transition = ''; }); });
+})();
+</script>

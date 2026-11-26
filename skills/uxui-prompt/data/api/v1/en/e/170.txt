@@ -1,0 +1,147 @@
+<!-- Lucian UX/UI Prompt #170 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#170 -->
+<!--
+Element: Timeline that zooms into an incident
+ID: 170 · Category: Analytics & Data · Tags: incident-timeline, zoom, analytics, chart, svg
+What it does: A timeline that lays the window from detection to recovery, and its events, over an error-rate chart. In the full view, clustered events show as a single bundle; zoom in and the axis stretches smoothly so only the incident fills the width and the events spread apart one by one. Press an event to see its time and details below, while the minimap shows the range you are looking at.
+How to use it: Press ‘Zoom to incident’ or the bundle, then pick an event. ←/→ move between events
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#170
+-->
+<style>
+.u170{position:relative;width:340px;height:356px;padding:16px;box-sizing:border-box;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u170-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.u170-hd b{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:850;letter-spacing:-.02em}
+.u170-hd b::before{content:"";width:8px;height:8px;border-radius:50%;background:#E03131;box-shadow:0 0 0 3px color-mix(in srgb,#E03131 22%,transparent)}
+.u170-hd em{margin-left:2px;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,#2B8A3E 14%,transparent);color:#2B8A3E;font-size:10.5px;font-style:normal;font-weight:800}
+.u170-hd small{display:block;margin-top:3px;font-size:11.5px;color:var(--ux-ink-3)}
+.u170-zm{flex:none;height:30px;padding:0 11px;border:0;border-radius:9px;background:var(--ux-ink);color:var(--ux-surface);font-size:11.5px;font-weight:800;transition:transform .3s var(--ux-spring)}
+.u170-zm:active{transform:scale(.95)}
+.u170-ch{position:relative;height:192px;margin-top:10px}
+.u170-ch svg{position:absolute;left:0;top:0;width:308px;height:140px;overflow:hidden}
+.u170-ev,.u170-cl{position:absolute;top:144px;width:22px;height:22px;margin-left:-11px;border:0;padding:0;border-radius:50%;background:var(--c);color:#fff;font-size:10px;font-weight:900;box-shadow:0 0 0 2.5px var(--ux-surface),0 3px 6px -2px rgba(0,0,0,.3);transition:opacity .25s,transform .35s var(--ux-spring)}
+.u170-ev::after{content:attr(data-l);position:absolute;left:50%;top:26px;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:750;color:var(--ux-ink-2);opacity:var(--lo,1);transition:opacity .2s}
+.u170-ev.on{transform:scale(1.25);box-shadow:0 0 0 2.5px var(--ux-surface),0 0 0 5px var(--c)}
+.u170-ev.hid{opacity:0;transform:scale(.4);pointer-events:none}
+.u170-ev:focus-visible,.u170-cl:focus-visible,.u170-zm:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u170-cl{--c:#E03131;width:30px;height:30px;margin-left:-15px;top:140px;font-size:12px;opacity:0;transform:scale(.4);pointer-events:none;background:radial-gradient(circle,#E03131 55%,color-mix(in srgb,#E03131 30%,var(--ux-surface)) 56%)}
+.u170-cl.show{opacity:1;transform:none;pointer-events:auto}
+.u170-mm{position:absolute;left:0;right:0;bottom:2px;height:8px;border-radius:4px;background:var(--ux-surface-2);overflow:hidden}
+.u170-mm i{position:absolute;top:0;bottom:0;background:color-mix(in srgb,#E03131 35%,transparent)}
+.u170-mm b{position:absolute;top:0;bottom:0;border-radius:4px;box-shadow:inset 0 0 0 1.5px var(--ux-ink-2);background:color-mix(in srgb,var(--ux-ink) 8%,transparent)}
+.u170-dt{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--ux-surface-2);min-height:42px}
+.u170-dt time{flex:none;font:800 13px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--c,var(--ux-ink))}
+.u170-dt span{font-size:12.5px;line-height:1.4;color:var(--ux-ink-2)}
+.u170-dt span b{display:block;color:var(--ux-ink);font-size:13px}
+.u170-dt.fresh{animation:u170-in .35s var(--ux-spring)}
+@keyframes u170-in{from{opacity:0;transform:translateY(6px)}}
+</style>
+<div class="ux u170">
+  <div class="u170-hd"><div><b>Payments API latency<em>Recovered</em></b><small>Oct 12 · 32 min impact</small></div><button class="u170-zm" type="button">Zoom to incident</button></div>
+  <div class="u170-ch">
+    <svg viewBox="0 0 308 140" aria-hidden="true"><rect class="u170-bd" y="6" height="106" fill="color-mix(in srgb,#E03131 12%,transparent)"/><path class="u170-ar" fill="color-mix(in srgb,#E03131 18%,transparent)"/><path class="u170-ln" fill="none" stroke="#E03131" stroke-width="1.8" stroke-linejoin="round"/><line x1="0" x2="308" y1="112" y2="112" stroke="var(--ux-line-2)"/><g class="u170-tk" font-size="10" font-weight="700" fill="var(--ux-ink-3)"></g><text x="2" y="14" font-size="10" font-weight="800" fill="var(--ux-ink-3)">Error rate</text></svg>
+    <div class="u170-mm" aria-hidden="true"><i></i><b></b></div>
+  </div>
+  <div class="u170-dt" aria-live="polite"><time></time><span></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ch = root.querySelector('.u170-ch'), ar = root.querySelector('.u170-ar'), ln = root.querySelector('.u170-ln'), bd = root.querySelector('.u170-bd'), tk = root.querySelector('.u170-tk');
+  var zm = root.querySelector('.u170-zm'), dt = root.querySelector('.u170-dt'), mmw = root.querySelector('.u170-mm b'), mmi = root.querySelector('.u170-mm i');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var EV = [[540, 'Detected', 'Error rate crossed 5% and paged on-call', '#E03131'], [544, 'Acked', 'On-call engineer acknowledged the alert', '#F76707'], [552, 'Cause', 'Database connection pool was exhausted', '#7048E8'], [561, 'Mitigated', 'Pool enlarged and servers restarted', '#1C7ED6'], [572, 'Recovered', 'Error rate back to normal', '#2B8A3E'], [630, 'Review', 'Post-incident review agreed on follow-ups', '#868E96']];
+  var ICON = ['!', '✓', '?', '↓', '✓', '✎'];
+  var FULL = [480, 720], ZOOM = [534, 578], W = 308, NS = 'http://www.w3.org/2000/svg';
+  var dom = FULL.slice(), zoomed = false, sel = -1;
+  function rate(m) {
+    var base = 0.7 + 0.25 * Math.sin(m / 7) + 0.15 * Math.sin(m / 3.1);
+    if (m < 538 || m > 575) return base;
+    if (m < 546) return base + 11.7 * (m - 538) / 8;
+    if (m < 561) return base + 11.7 - 1.6 * Math.sin((m - 546) / 2.3) * 0.5;
+    return base + 11.7 * Math.max(0, 1 - (m - 561) / 11);
+  }
+  var SER = []; for (var m = 470; m <= 730; m += 1) SER.push([m, rate(m)]);
+  function x(m) { return (m - dom[0]) / (dom[1] - dom[0]) * W; }
+  function y(v) { return 112 - v / 13.5 * 100; }
+  function fmt(m) { var h = Math.floor(m / 60), mm = Math.round(m % 60); return (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm; }
+  var evs = EV.map(function (e, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u170-ev';
+    b.style.setProperty('--c', e[3]); b.textContent = ICON[i]; b.setAttribute('data-l', e[1]);
+    b.setAttribute('aria-label', fmt(e[0]) + ' ' + e[1]);
+    b.addEventListener('click', function () { pick(i); });
+    b.addEventListener('keydown', function (k) {
+      var d = k.key === 'ArrowRight' ? 1 : k.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      k.preventDefault();
+      var n = Math.max(0, Math.min(EV.length - 1, (sel < 0 ? i : sel) + d));
+      if (!evs[n].classList.contains('hid')) { pick(n); evs[n].focus(); }
+    });
+    ch.appendChild(b);
+    return b;
+  });
+  var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'u170-cl'; ch.appendChild(cl);
+  cl.addEventListener('click', function () { zoomTo(true); });
+  function draw() {
+    var pts = SER.filter(function (p) { return p[0] >= dom[0] - 2 && p[0] <= dom[1] + 2; }).map(function (p) { return x(p[0]).toFixed(1) + ' ' + y(p[1]).toFixed(1); });
+    ln.setAttribute('d', 'M' + pts.join(' L'));
+    ar.setAttribute('d', 'M' + pts[0].split(' ')[0] + ' 112 L' + pts.join(' L') + ' L' + pts[pts.length - 1].split(' ')[0] + ' 112Z');
+    bd.setAttribute('x', x(540).toFixed(1)); bd.setAttribute('width', (x(572) - x(540)).toFixed(1));
+    var span = dom[1] - dom[0], step = [5, 10, 15, 30, 60].filter(function (s) { return s / span * W >= 42; })[0] || 60;
+    tk.innerHTML = '';
+    for (var t = Math.ceil(dom[0] / step) * step; t <= dom[1]; t += step) {
+      var tx = x(t);
+      if (tx < 14 || tx > W - 14) continue;
+      var l = document.createElementNS(NS, 'line'); l.setAttribute('x1', tx); l.setAttribute('x2', tx); l.setAttribute('y1', 112); l.setAttribute('y2', 116); l.setAttribute('stroke', 'var(--ux-line-2)'); tk.appendChild(l);
+      var s = document.createElementNS(NS, 'text'); s.setAttribute('x', tx); s.setAttribute('y', 129); s.setAttribute('text-anchor', 'middle'); s.textContent = fmt(t); tk.appendChild(s);
+    }
+    var xs = EV.map(function (e) { return x(e[0]); });
+    evs.forEach(function (b, i) {
+      var ex = xs[i], gap = Math.min.apply(null, xs.map(function (o, k) { return k === i ? 1e9 : Math.abs(o - ex); }));
+      b.style.left = ex.toFixed(1) + 'px'; b.style.display = ex < -20 || ex > W + 20 ? 'none' : '';
+      b.style.setProperty('--lo', gap < 27 ? '0' : '1');
+    });
+    mmw.style.left = ((dom[0] - FULL[0]) / 240 * 100) + '%'; mmw.style.width = ((dom[1] - dom[0]) / 240 * 100) + '%';
+  }
+  function cluster(show) {
+    var group = [];
+    if (show) EV.forEach(function (e, i) { if (e[0] >= 538 && e[0] <= 575) group.push(i); });
+    evs.forEach(function (b, i) { b.classList.toggle('hid', group.indexOf(i) >= 0); });
+    cl.classList.toggle('show', group.length > 0);
+    if (group.length) {
+      var cx = group.reduce(function (s, i) { return s + x(EV[i][0]); }, 0) / group.length;
+      cl.style.left = cx.toFixed(1) + 'px'; cl.textContent = group.length;
+      cl.setAttribute('aria-label', 'Events: ' + group.length + ', press to zoom in');
+    }
+  }
+  function detail() {
+    var t = dt.querySelector('time'), s = dt.querySelector('span');
+    if (sel < 0) { t.textContent = 'Summary'; dt.style.removeProperty('--c'); s.textContent = 'Detected → recovered in 32 min · peak error rate 12.4%'; }
+    else { var e = EV[sel]; t.textContent = fmt(e[0]); dt.style.setProperty('--c', e[3]); s.innerHTML = '<b></b>'; s.firstChild.textContent = e[1]; s.appendChild(document.createTextNode(e[2])); }
+    dt.classList.remove('fresh'); void dt.offsetWidth; dt.classList.add('fresh');
+  }
+  function pick(i) {
+    sel = sel === i ? -1 : i;
+    evs.forEach(function (b, k) { b.classList.toggle('on', k === sel); b.setAttribute('aria-pressed', String(k === sel)); });
+    detail();
+  }
+  function zoomTo(z) {
+    zoomed = z;
+    zm.textContent = z ? 'Show all' : 'Zoom to incident';
+    if (!z && sel >= 0 && EV[sel][0] >= 538 && EV[sel][0] <= 575) pick(sel);
+    cluster(false);
+    var from = dom.slice(), to = z ? ZOOM : FULL, t0 = performance.now();
+    (function f(now) {
+      if (!root.isConnected) return;
+      var k = rm ? 1 : Math.max(0, Math.min(1, (now - t0) / 650)), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      dom = [from[0] + (to[0] - from[0]) * e, from[1] + (to[1] - from[1]) * e];
+      draw();
+      if (k < 1) { requestAnimationFrame(f); return; }
+      if (!z) cluster(true);
+    })(t0);
+  }
+  zm.addEventListener('click', function () { zoomTo(!zoomed); });
+  mmi.style.left = ((540 - FULL[0]) / 240 * 100) + '%'; mmi.style.width = (32 / 240 * 100) + '%';
+  draw(); cluster(true); detail();
+})();
+</script>

@@ -1,0 +1,127 @@
+<!-- Lucian UX/UI Prompt #065 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#065 -->
+<!--
+Element: Number-match device approval
+ID: 065 · Category: Sign-in & Sign-up · Tags: 2fa, number-matching, approval, countdown, security
+What it does: When a sign-in request comes from a new device, the time left shrinks around a ring and the location dot pulses like a heartbeat. Pick the number shown on the other screen to approve with a check; a wrong pick shakes, and denying turns it into a red shield.
+How to use it: The other screen shows 42. Pick 42 to approve, try a different number, or deny with “It’s not me”
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#065
+-->
+<style>
+.u065{position:relative;width:340px;height:480px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u065-map{position:relative;height:150px;background:linear-gradient(180deg,color-mix(in srgb,var(--ux-accent) 12%,var(--ux-surface-2)),var(--ux-surface-2));overflow:hidden}
+.u065-map::before{content:"";position:absolute;inset:-20px;background:repeating-linear-gradient(0deg,transparent 0 27px,var(--ux-line) 27px 28px),repeating-linear-gradient(90deg,transparent 0 27px,var(--ux-line) 27px 28px);transform:perspective(300px) rotateX(35deg) translateY(-20px)}
+.u065-road{position:absolute;left:-10%;right:-10%;top:58%;height:14px;background:var(--ux-surface);transform:rotate(-8deg);opacity:.9}
+.u065-pin{position:absolute;left:50%;top:52%;width:16px;height:16px;margin:-8px;border-radius:50%;background:var(--ux-accent);box-shadow:0 0 0 4px var(--ux-surface)}
+.u065-pin::before,.u065-pin::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--ux-accent);animation:u065-pulse 2s ease-out infinite}
+.u065-pin::after{animation-delay:1s}
+@keyframes u065-pulse{from{transform:scale(1);opacity:.7}to{transform:scale(4);opacity:0}}
+.u065-time{position:absolute;right:14px;top:14px;width:52px;height:52px;border-radius:50%;background:var(--ux-surface);display:grid;place-items:center;box-shadow:0 6px 14px -8px var(--ux-shadow-strong)}
+.u065-time svg{position:absolute;inset:4px;width:44px;height:44px;transform:rotate(-90deg)}
+.u065-time circle{fill:none;stroke-width:3.5}
+.u065-time .t{stroke:var(--ux-surface-3)}
+.u065-time .p{stroke:var(--ux-accent);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,1) * 100);transition:stroke .3s}
+.u065-time.low .p{stroke:var(--ux-danger)}
+.u065-time b{font-size:13px;font-weight:850;font-variant-numeric:tabular-nums}
+.u065-body{position:absolute;left:0;right:0;top:150px;bottom:0;padding:18px 22px 22px;display:flex;flex-direction:column;transition:opacity .35s,transform .5s var(--ux-ease)}
+.u065-dev{display:flex;align-items:center;gap:12px}
+.u065-dev i{width:42px;height:42px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink)}
+.u065-dev i svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u065-dev b{display:block;font-size:16px;font-weight:800;letter-spacing:-.03em}
+.u065-dev small{display:block;margin-top:2px;font-size:12.5px;font-weight:600;color:var(--ux-ink-3)}
+.u065-ask{margin:18px 0 10px;font-size:14px;font-weight:700;color:var(--ux-ink-2)}
+.u065-nums{display:flex;gap:10px}
+.u065-n{flex:1;height:72px;border:0;border-radius:18px;background:var(--ux-surface-2);font-size:28px;font-weight:850;letter-spacing:-.03em;color:var(--ux-ink);font-variant-numeric:tabular-nums;transition:transform .3s var(--ux-spring),background-color .3s,box-shadow .3s}
+.u065-n:hover{background:var(--ux-surface-3)}
+.u065-n:active{transform:scale(.94)}
+.u065-n:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u065-n.wrong{box-shadow:inset 0 0 0 2px var(--ux-danger);color:var(--ux-danger);animation:u065-no .4s}
+@keyframes u065-no{20%{transform:translateX(-6px)}45%{transform:translateX(5px)}70%{transform:translateX(-2px)}}
+.u065-msg{min-height:20px;margin-top:10px;font-size:12.5px;font-weight:650;color:var(--ux-danger)}
+.u065-deny{margin-top:auto;height:48px;border:0;border-radius:15px;background:none;box-shadow:inset 0 0 0 1.5px var(--ux-line-2);color:var(--ux-danger);font-size:14.5px;font-weight:750;transition:background-color .3s,transform .3s var(--ux-spring)}
+.u065-deny:hover{background:color-mix(in srgb,var(--ux-danger) 8%,transparent)}
+.u065-deny:active{transform:scale(.97)}
+.u065-deny:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u065-res{position:absolute;left:0;right:0;top:150px;bottom:0;padding:0 26px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity .35s,transform .55s var(--ux-spring)}
+.u065-res span{width:76px;height:76px;margin-top:-30px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--ux-accent-ink)}
+.u065-res span svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.u065-res b{margin-top:16px;font-size:20px;font-weight:850;letter-spacing:-.04em}
+.u065-res p{margin:6px 0 18px;font-size:13.5px;line-height:1.5;color:var(--ux-ink-3)}
+.u065-res button{height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--ux-surface-2);color:var(--ux-ink);font-size:13.5px;font-weight:720}
+.u065-res button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u065[data-s] .u065-body{opacity:0;transform:translateY(-16px);pointer-events:none}
+.u065[data-s="ok"] .u065-res.ok,.u065[data-s="no"] .u065-res.no,.u065[data-s="late"] .u065-res.late{opacity:1;transform:none;pointer-events:auto}
+.u065[data-s="no"] .u065-pin,.u065[data-s="late"] .u065-pin{background:var(--ux-ink-3)}
+.u065[data-s] .u065-pin::before,.u065[data-s] .u065-pin::after{animation:none;opacity:0}
+.u065[data-s="ok"] .u065-pin{background:var(--ux-mint)}
+</style>
+<div class="ux u065">
+  <div class="u065-map" aria-hidden="true"><span class="u065-road"></span><span class="u065-pin"></span></div>
+  <div class="u065-time" role="timer" aria-label="Time left"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="t" cx="22" cy="22" r="19"/><circle class="p" cx="22" cy="22" r="19" pathLength="100"/></svg><b>60</b></div>
+  <div class="u065-body">
+    <div class="u065-dev"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2.5 19h19"/></svg></i><span><b>Sign-in request from a new device</b><small>MacBook Pro · Seoul · just now</small></span></div>
+    <p class="u065-ask" id="u065-ask">Pick the number shown on the sign-in screen</p>
+    <div class="u065-nums" role="group" aria-label="Choose a number"><button class="u065-n" type="button">17</button><button class="u065-n" type="button">42</button><button class="u065-n" type="button">86</button></div>
+    <p class="u065-msg" role="alert"></p>
+    <button class="u065-deny" type="button">It’s not me · Deny</button>
+  </div>
+  <div class="u065-res ok" aria-hidden="true" style="--c:var(--ux-mint)"><span><svg viewBox="0 0 34 34"><path d="M9 17.5l5.5 5.5L25.5 12"/></svg></span><b>Sign-in approved</b><p>Continue on your MacBook Pro</p><button type="button" tabindex="-1">Start over</button></div>
+  <div class="u065-res no" aria-hidden="true" style="--c:var(--ux-danger)"><span><svg viewBox="0 0 34 34"><path d="M17 5l10 4v7c0 6.5-4.4 11-10 13-5.6-2-10-6.5-10-13V9z"/><path d="M13 13l8 8M21 13l-8 8"/></svg></span><b>Request blocked</b><p>We recommend changing your password</p><button type="button" tabindex="-1">Start over</button></div>
+  <div class="u065-res late" aria-hidden="true" style="--c:var(--ux-warn)"><span><svg viewBox="0 0 34 34"><circle cx="17" cy="17" r="11"/><path d="M17 11v6l4 3"/></svg></span><b>Request expired</b><p>Request again from the sign-in screen</p><button type="button" tabindex="-1">Request again</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var timer = root.querySelector('.u065-time'), sec = timer.querySelector('b'), msg = root.querySelector('.u065-msg');
+  var nums = root.querySelectorAll('.u065-n'), res = root.querySelectorAll('.u065-res');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LIMIT = 60, t0 = 0, raf = 0, tries = 0;
+  var uid = 'u065' + Math.random().toString(36).slice(2, 7);
+  root.querySelector('.u065-ask').id = uid; root.querySelector('.u065-nums').setAttribute('aria-describedby', uid);
+  function finish(s) {
+    cancelAnimationFrame(raf);
+    root.setAttribute('data-s', s);
+    root.querySelector('.u065-body').inert = true;
+    res.forEach(function (r) {
+      var on = r.classList.contains(s);
+      r.setAttribute('aria-hidden', String(!on));
+      r.querySelector('button').tabIndex = on ? 0 : -1;
+      if (on) r.querySelector('button').focus({ preventScroll: true });
+    });
+    if (s !== 'ok' && !rm) root.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(5px)' }, { transform: 'none' }], { duration: 320 });
+  }
+  function tick(now) {
+    if (!root.isConnected) return;
+    var left = Math.max(0, LIMIT - (now - t0) / 1000);
+    timer.style.setProperty('--p', (left / LIMIT).toFixed(4));
+    sec.textContent = Math.ceil(left);
+    timer.classList.toggle('low', left <= 10);
+    if (left <= 0) { finish('late'); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  function start() {
+    root.removeAttribute('data-s');
+    root.querySelector('.u065-body').inert = false;
+    res.forEach(function (r) { r.setAttribute('aria-hidden', 'true'); r.querySelector('button').tabIndex = -1; });
+    nums.forEach(function (n) { n.classList.remove('wrong'); n.disabled = false; });
+    msg.textContent = ''; tries = 0;
+    t0 = performance.now();
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(tick);
+  }
+  nums.forEach(function (n) {
+    n.addEventListener('click', function () {
+      if (n.textContent === '42') { finish('ok'); return; }
+      tries++;
+      n.classList.remove('wrong'); void n.offsetWidth; n.classList.add('wrong');
+      n.disabled = true;
+      msg.textContent = tries > 1 ? 'One more miss blocks the request' : 'Wrong number. Check the sign-in screen again';
+      if (tries > 2) finish('no');
+    });
+  });
+  root.querySelector('.u065-deny').addEventListener('click', function () { finish('no'); });
+  res.forEach(function (r) { r.querySelector('button').addEventListener('click', function () { start(); nums[0].focus({ preventScroll: true }); }); });
+  start();
+})();
+</script>

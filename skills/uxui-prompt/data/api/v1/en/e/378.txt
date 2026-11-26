@@ -1,0 +1,78 @@
+<!-- Lucian UX/UI Prompt #378 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#378 -->
+<!--
+Element: Particles that form words
+ID: 378 · Category: Hero & Backgrounds · Tags: particles, text, spring, canvas, morph
+What it does: Hundreds of specks of light lie scattered, then spring in to assemble into the shape of a word. Bring the cursor close and the specks are pushed aside, opening a hole that closes again as you move away; press and they all fly to the positions of the next word to spell it out.
+How to use it: Move the cursor over the letters to scatter them, and press to change the word
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#378
+-->
+<style>
+.u378{position:relative;width:340px;height:320px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 70% at 50% 45%,#22144A,#0A0716 70%);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u378-cv{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:pointer}
+</style>
+<div class="ux u378"><canvas class="u378-cv" role="img" aria-label="Particle letters, press to change the word"></canvas></div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u378-cv'), cx = cv.getContext('2d');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 340, H = 320, dpr = Math.min(2, window.devicePixelRatio || 1), N = 720;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var WORDS = ['HELLO', 'NICE', 'LUCIAN'], wi = 0, ptr = null;
+  function targets(word) {
+    var o = document.createElement('canvas'); o.width = W; o.height = H;
+    var c = o.getContext('2d'), size = Math.min(150, Math.floor(560 / Math.max(2, word.length)));
+    c.fillStyle = '#fff'; c.font = '900 ' + size + 'px system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(word, W / 2, H / 2 + 4);
+    var d = c.getImageData(0, 0, W, H).data, pts = [];
+    for (var y = 0; y < H; y += 4) for (var x = 0; x < W; x += 4) if (d[(y * W + x) * 4 + 3] > 128) pts.push([x, y]);
+    for (var k = pts.length - 1; k > 0; k--) { var j = (Math.random() * (k + 1)) | 0, t = pts[k]; pts[k] = pts[j]; pts[j] = t; }
+    return pts;
+  }
+  var P = [];
+  for (var i = 0; i < N; i++) P.push({ x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0, tx: W / 2, ty: H / 2, h: 250 + Math.random() * 80, on: true });
+  function assign() {
+    var pts = targets(WORDS[wi]);
+    P.forEach(function (p, i) {
+      if (i < pts.length) { p.tx = pts[i][0] + (Math.random() - 0.5) * 1.5; p.ty = pts[i][1] + (Math.random() - 0.5) * 1.5; p.on = true; }
+      else { var a = Math.random() * 6.28, r = 150 + Math.random() * 60; p.tx = W / 2 + Math.cos(a) * r; p.ty = H / 2 + Math.sin(a) * r; p.on = false; }
+    });
+  }
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    cx.globalCompositeOperation = 'lighter';
+    P.forEach(function (p) {
+      var sp = Math.min(1, Math.hypot(p.vx, p.vy) / 300);
+      cx.fillStyle = 'hsla(' + (p.h - sp * 60).toFixed(0) + ',90%,' + (68 + sp * 20).toFixed(0) + '%,' + (p.on ? 0.9 : 0.18) + ')';
+      cx.fillRect(p.x - 1.3, p.y - 1.3, 2.6, 2.6);
+    });
+    cx.globalCompositeOperation = 'source-over';
+  }
+  var vis = true, raf = 0, last = 0;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+    P.forEach(function (p) {
+      var ax = (p.tx - p.x) * 38 - p.vx * 7.5, ay = (p.ty - p.y) * 38 - p.vy * 7.5;
+      if (ptr) { var dx = p.x - ptr.x, dy = p.y - ptr.y, d2 = dx * dx + dy * dy; if (d2 < 3600) { var f = (1 - d2 / 3600) * 9000 / (Math.sqrt(d2) + 6); ax += dx * f / 40; ay += dy * f / 40; } }
+      p.vx += ax * dt; p.vy += ay * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    });
+    draw();
+    raf = requestAnimationFrame(frame);
+  }
+  function run() { if (rm) { P.forEach(function (p) { p.x = p.tx; p.y = p.ty; }); draw(); return; } if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  function loc(e) { var r = cv.getBoundingClientRect(), k = cv.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  cv.addEventListener('pointermove', function (e) { ptr = loc(e); });
+  cv.addEventListener('pointerleave', function () { ptr = null; });
+  cv.addEventListener('click', function () {
+    wi = (wi + 1) % WORDS.length; assign();
+    P.forEach(function (p) { p.vx += (Math.random() - 0.5) * 260; p.vy += (Math.random() - 0.5) * 260; });
+    run();
+  });
+  assign(); run();
+})();
+</script>

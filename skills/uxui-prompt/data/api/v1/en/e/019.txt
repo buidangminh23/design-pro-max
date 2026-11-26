@@ -1,0 +1,89 @@
+<!-- Lucian UX/UI Prompt #019 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#019 -->
+<!--
+Element: Interest chips multi-select
+ID: 019 · Category: Toggles & Pickers · Tags: chips, multi-select, filter, limit, toggle
+What it does: Pick a chip and a check slides out from the left as it fills with color. You can pick up to five; try a sixth and the chip shakes its head while the counter flashes a warning.
+How to use it: Pick several chips — and see what happens when you go past five
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#019
+-->
+<style>
+.u019{position:relative;width:340px}
+.u019-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+.u019-head b{display:block;font-size:19px;font-weight:760;letter-spacing:-.03em}
+.u019-head small{display:block;margin-top:4px;font-size:13px;color:var(--ux-ink-3)}
+.u019-cnt{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--ux-ink-2);font-variant-numeric:tabular-nums;transition:color .3s var(--ux-ease)}
+.u019-dots{display:flex;gap:3px}
+.u019-dots i{width:7px;height:7px;border-radius:50%;background:var(--ux-line-2);transition:background-color .3s var(--ux-ease),transform .4s var(--ux-spring)}
+.u019-dots i.on{background:var(--ux-accent);transform:scale(1.15)}
+.u019.is-warn .u019-cnt{color:var(--ux-danger);animation:u019-flash .5s var(--ux-ease)}
+@keyframes u019-flash{30%{transform:scale(1.08)}}
+.u019-list{display:flex;flex-wrap:wrap;align-content:center;gap:8px;height:200px}
+.u019-chip{display:inline-flex;align-items:center;height:42px;padding:0 16px;border:0;border-radius:999px;background:var(--ux-surface);color:var(--ux-ink-2);font-size:14.5px;font-weight:640;
+  box-shadow:inset 0 0 0 1px var(--ux-line-2);transition:background-color .35s var(--ux-ease),color .3s var(--ux-ease),box-shadow .3s var(--ux-ease),padding .45s var(--ux-spring),transform .4s var(--ux-spring)}
+.u019-chip:hover{color:var(--ux-ink);box-shadow:inset 0 0 0 1px var(--ux-ink-3)}
+.u019-chip:active{transform:scale(.94)}
+.u019-chip:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u019-chip i{display:grid;place-items:center;width:0;height:18px;margin-right:0;overflow:hidden;opacity:0;transition:width .45s var(--ux-spring),margin .45s var(--ux-spring),opacity .25s var(--ux-ease)}
+.u019-chip svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u019-chip[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-page);box-shadow:0 10px 18px -12px var(--ux-shadow-strong);padding-left:12px}
+.u019-chip[aria-pressed="true"] i{width:18px;margin-right:6px;opacity:1}
+.u019-chip.is-no{animation:u019-no .4s var(--ux-ease)}
+@keyframes u019-no{20%{transform:translateX(-5px)}45%{transform:translateX(4px)}70%{transform:translateX(-2px)}}
+.u019-msg{height:20px;margin:14px 0 0;font-size:13px;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}
+.u019.is-warn .u019-msg{color:var(--ux-danger)}
+</style>
+<div class="ux u019">
+  <div class="u019-head">
+    <div><b>Your interests</b><small>We’ll tune your feed to match</small></div>
+    <span class="u019-cnt"><span class="u019-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="u019-n">0/5</span></span>
+  </div>
+  <div class="u019-list" role="group" aria-label="Interests, up to 5"></div>
+  <p class="u019-msg" aria-live="polite"></p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var list = root.querySelector('.u019-list');
+  var dots = root.querySelectorAll('.u019-dots i');
+  var n = root.querySelector('.u019-n');
+  var msg = root.querySelector('.u019-msg');
+  var NAMES = ['Design systems', 'Motion', 'Typography', '3D', 'Data viz', 'AI agents', 'Accessibility', 'Branding', 'Photo', 'Sound'];
+  var PRE = [0, 1, 5];
+  var MAX = 5, t = 0;
+  var chips = NAMES.map(function (name, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'u019-chip';
+    b.setAttribute('aria-pressed', String(PRE.indexOf(i) >= 0));
+    b.innerHTML = '<i aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></i>';
+    b.appendChild(document.createTextNode(name));
+    list.appendChild(b);
+    return b;
+  });
+  function count() { return chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; }).length; }
+  function render() {
+    var k = count();
+    n.textContent = k + '/' + MAX;
+    Array.prototype.forEach.call(dots, function (d, i) { d.classList.toggle('on', i < k); });
+    if (!root.classList.contains('is-warn')) msg.textContent = k === MAX ? 'You’ve picked all five' : '';
+  }
+  chips.forEach(function (c) {
+    c.addEventListener('click', function () {
+      var on = c.getAttribute('aria-pressed') === 'true';
+      if (!on && count() >= MAX) {
+        c.classList.remove('is-no'); void c.offsetWidth; c.classList.add('is-no');
+        root.classList.remove('is-warn'); void root.offsetWidth; root.classList.add('is-warn');
+        msg.textContent = 'You can pick up to five';
+        clearTimeout(t);
+        t = setTimeout(function () { if (root.isConnected) { root.classList.remove('is-warn'); render(); } }, 1600);
+        return;
+      }
+      c.setAttribute('aria-pressed', String(!on));
+      render();
+    });
+  });
+  render();
+})();
+</script>

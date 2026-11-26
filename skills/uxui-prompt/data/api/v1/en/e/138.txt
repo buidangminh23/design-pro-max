@@ -1,0 +1,18 @@
+<!-- Lucian UX/UI Prompt #138 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#138 -->
+<!--
+Element: Document redaction
+ID: 138 · Category: Document & Data Editing · Tags: redaction-editor, editing, interactive
+What it does: An editor for hiding sensitive parts of a document, like names and email addresses. Press a marked span to black it out, and press again to bring the text back.
+How to use it: Press the highlighted name or email
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#138
+-->
+<style>
+.u138{width:min(100%,370px);font-size:14px;line-height:1.6;color:var(--ux-ink)}.u138 button,.u138 input,.u138 textarea,.u138 select{font:inherit;color:inherit;max-width:100%;min-width:0}.u138 button{cursor:pointer;min-height:44px;border:1px solid var(--ux-line-2);border-radius:8px;background:var(--ux-surface);padding:8px 12px}.u138 input,.u138 textarea,.u138 select{border:1px solid var(--ux-line-2);border-radius:6px;background:var(--ux-surface);padding:8px 10px}.u138 .quiet{color:var(--ux-ink-2)}.u138 .primary{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:transparent}.u138 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u138 [hidden]{display:none!important}.u138 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.u138 *{animation:none!important;transition:none!important}}
+.u138{background:var(--ux-surface);border:1px solid var(--ux-line-2);padding:28px 24px;box-shadow:4px 4px 0 var(--ux-surface-3)}.u138 .document{font:17px/2.15 Georgia,'Apple SD Gothic Neo',serif}.u138 .sensitive{border:0;background:color-mix(in srgb,var(--ux-danger) 12%,transparent);border-radius:2px;padding:2px 5px;min-height:44px;font:inherit;transition:background .25s,color .25s}.u138 .sensitive[aria-pressed="true"]{background:var(--ux-ink);color:transparent;user-select:none}.u138 .sensitive[aria-pressed="true"]:focus-visible{outline-offset:3px}.u138 .sensitive[data-secret="mail"]{font-size:15px;max-width:100%;overflow-wrap:anywhere}
+</style>
+<div class="ux u138"><div class="document">Participant <button class="sensitive" data-secret="name" aria-pressed="false" aria-label="Redact name">Seoyun Kim</button>will be reached at<br><button class="sensitive" data-secret="mail" aria-pressed="false" aria-label="Redact email">seoyun@example.com</button><br>for updates.</div><span class="sr" data-state aria-live="polite"></span></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,$=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)],esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const motion=(node,frames,opts={})=>{if(node?.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.8,.2,1)',...opts})};function render(){$('[data-state]').textContent=$$('[aria-pressed="true"]').length+' redacted'}$$('.sensitive').forEach(b=>b.onclick=()=>{const hidden=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(hidden));b.setAttribute('aria-label',(hidden?'Restore ':'Redact ')+(b.dataset.secret==='name'?'name':'email'));render()});render();})();
+</script>

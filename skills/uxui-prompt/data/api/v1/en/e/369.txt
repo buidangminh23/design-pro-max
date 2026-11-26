@@ -1,0 +1,67 @@
+<!-- Lucian UX/UI Prompt #369 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#369 -->
+<!--
+Element: Photo stack that fans out
+ID: 369 · Category: Sections & Content · Tags: stack, fan, photos, layout, morph
+What it does: Hover the stack of polaroids and it fans out slightly; tap it and the photos fly out into a neat grid. Tap one photo in the grid and the photos gather back into a stack with that one on top, each landing at a slightly different angle.
+How to use it: Hover the stack, tap it to spread it out, then tap a photo to gather them again
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#369
+-->
+<style>
+.u369{position:relative;width:340px;height:330px;border-radius:28px;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u369-p{position:absolute;left:50%;top:50%;width:96px;height:112px;margin:-56px 0 0 -48px;border:0;padding:7px 7px 24px;border-radius:6px;background:#fff;box-shadow:0 10px 20px -10px rgba(0,0,0,.45),0 0 0 1px rgba(0,0,0,.05);transition:transform .7s cubic-bezier(.3,1.2,.4,1);transition-delay:var(--dl,0ms)}
+.u369-p i{display:block;width:100%;height:100%;border-radius:2px;background:var(--bg)}
+.u369-p span{position:absolute;left:0;right:0;bottom:5px;text-align:center;font:600 10.5px/1 ui-rounded,-apple-system,sans-serif;color:#555}
+.u369-p:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+</style>
+<div class="ux u369"></div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var CAP = ['Sea', 'Alley', 'Sunset', 'Forest path', 'Snow', 'Flowers'];
+  var BG = ['linear-gradient(#74C0FC,#1C7ED6)', 'linear-gradient(135deg,#FFD8A8,#E8590C)', 'linear-gradient(#FFD43B,#F76707 55%,#5F3DC4)', 'linear-gradient(#B2F2BB,#2F9E44)', 'linear-gradient(#F1F3F5,#ADB5BD)', 'radial-gradient(circle at 40% 40%,#FFDEEB,#E64980)'];
+  var order = [0, 1, 2, 3, 4, 5], spread = false, hover = false;
+  var tilt = CAP.map(function () { return (Math.random() - 0.5) * 16; });
+  var ps = CAP.map(function (c, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u369-p';
+    b.innerHTML = '<i style="--bg:' + BG[i] + '"></i><span></span>';
+    b.querySelector('span').textContent = c;
+    b.addEventListener('click', function () { tap(i); });
+    b.addEventListener('pointerenter', function () { hover = true; if (!spread) place(); });
+    b.addEventListener('pointerleave', function () { hover = false; if (!spread) place(); });
+    root.appendChild(b);
+    return b;
+  });
+  function place() {
+    order.forEach(function (i, z) {
+      var b = ps[i], t;
+      b.style.zIndex = spread ? 1 : z + 1;
+      if (spread) {
+        var col = z % 3, row = Math.floor(z / 3);
+        t = 'translate(' + ((col - 1) * 104) + 'px,' + ((row - 0.5) * 124) + 'px) rotate(0deg)';
+        b.style.setProperty('--dl', (z * 40) + 'ms');
+        b.setAttribute('aria-label', CAP[i] + ', tap to gather with this on top');
+      } else {
+        var k = z - (order.length - 1);
+        t = hover ? 'translate(' + (k * 16) + 'px,' + (k * -3) + 'px) rotate(' + (k * 7 + 2) + 'deg)' : 'translate(' + (k * 1.5) + 'px,' + (k * -1.5) + 'px) rotate(' + tilt[i] + 'deg)';
+        b.style.setProperty('--dl', ((order.length - 1 - z) * 30) + 'ms');
+        b.setAttribute('aria-label', 'Photo stack, tap to spread');
+        b.tabIndex = z === order.length - 1 ? 0 : -1;
+      }
+      if (spread) b.tabIndex = 0;
+      b.style.transform = t;
+    });
+  }
+  function tap(i) {
+    if (!spread) { spread = true; hover = false; place(); return; }
+    order = order.filter(function (x) { return x !== i; }).concat(i);
+    tilt = tilt.map(function () { return (Math.random() - 0.5) * 16; });
+    tilt[i] = (Math.random() - 0.5) * 6;
+    spread = false; place();
+    ps[i].focus({ preventScroll: true });
+  }
+  place();
+})();
+</script>

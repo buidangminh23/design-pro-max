@@ -1,0 +1,77 @@
+<!-- Lucian UX/UI Prompt #348 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#348 -->
+<!--
+Element: Spinning circular text badge
+ID: 348 · Category: Text Motion · Tags: text, circle, badge, rotate, svg
+What it does: Text set along a circular path turns slowly; hover and it speeds up, leave and it coasts back down with inertia. Press it and the center arrow springs up as the text changes, the new letters filling in one by one around the circle. The number below shows the current speed.
+How to use it: Hover the badge to spin it faster, and press it to change the text
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#348
+-->
+<style>
+.u348{position:relative;width:340px;height:330px;display:flex;flex-direction:column;align-items:center;padding:18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u348-b{position:relative;width:218px;height:218px;margin-top:6px;border:0;padding:0;border-radius:50%;background:radial-gradient(circle,var(--ux-surface) 40%,var(--ux-surface-2) 41%);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u348-b svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+.u348-g text{font:800 15.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;fill:var(--ux-ink)}
+.u348-g tspan{fill-opacity:0;transition:fill-opacity .25s}
+.u348-g tspan.on{fill-opacity:1}
+.u348-c{position:absolute;left:50%;top:50%;width:78px;height:78px;margin:-39px 0 0 -39px;border-radius:50%;display:grid;place-items:center;background:var(--ux-ink);color:var(--ux-page);transition:transform .5s var(--ux-spring),background-color .4s}
+.u348-c svg{position:static;width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transform:rotate(-45deg);transition:transform .6s var(--ux-spring)}
+.u348-b:hover .u348-c{transform:scale(1.06)}
+.u348-b:hover .u348-c svg{transform:rotate(0deg)}
+.u348-c.pop{animation:u348-pop .6s var(--ux-spring)}
+@keyframes u348-pop{30%{transform:scale(.78)}}
+.u348-ft{margin-top:auto;display:flex;align-items:center;justify-content:space-between;align-self:stretch;padding:0 4px;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u348-ft b{font:700 13px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u348">
+  <button class="u348-b" type="button">
+    <svg viewBox="0 0 220 220" aria-hidden="true"><defs><path id="u348-path" d="M110 110m-86 0a86 86 0 1 1 172 0a86 86 0 1 1-172 0"/></defs><g class="u348-g"><text><textPath href="#u348-path" textLength="532" lengthAdjust="spacing"></textPath></text></g></svg>
+    <span class="u348-c" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+  </button>
+  <div class="u348-ft"><span>Each press changes the text</span><span>Spin speed <b class="u348-v">18°/s</b></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u348-b'), g = root.querySelector('.u348-g'), tp = root.querySelector('textPath'), c = root.querySelector('.u348-c'), v = root.querySelector('.u348-v');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pid = 'u348-p' + Math.random().toString(36).slice(2, 7);
+  root.querySelector('path').id = pid;
+  tp.setAttribute('href', '#' + pid);
+  var TEXTS = ['SCROLL TO EXPLORE • SCROLL TO EXPLORE • ', 'OPEN FOR PROJECTS • 2026 • OPEN • ', 'MADE WITH CARE • LUCIANLABS • '];
+  var ti = 0, ang = 0, vel = 18, target = 18, last = 0, raf = 0, shown = 0;
+  function setText(s, animate) {
+    tp.textContent = '';
+    Array.from(s).forEach(function (ch, i) {
+      var t = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      t.textContent = ch;
+      tp.appendChild(t);
+      if (!animate || rm) t.classList.add('on');
+      else setTimeout(function () { t.classList.add('on'); }, 120 + i * 22);
+    });
+    btn.setAttribute('aria-label', 'Text badge, press to change the text');
+  }
+  function tick(now) {
+    if (!root.isConnected) return;
+    var dt = Math.max(0, Math.min(50, now - (last || now))) / 1000;
+    last = now;
+    vel += (target - vel) * (target > vel ? 0.06 : 0.025);
+    ang = (ang + vel * dt) % 360;
+    g.setAttribute('transform', 'rotate(' + ang.toFixed(2) + ' 110 110)');
+    if (now - shown > 120) { shown = now; v.textContent = Math.round(vel) + '°/s'; }
+    raf = requestAnimationFrame(tick);
+  }
+  btn.addEventListener('pointerenter', function () { target = 150; });
+  btn.addEventListener('pointerleave', function () { target = 18; });
+  btn.addEventListener('click', function () {
+    ti = (ti + 1) % TEXTS.length;
+    setText(TEXTS[ti], true);
+    c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+    vel += 120;
+  });
+  setText(TEXTS[0], false);
+  if (!rm) raf = requestAnimationFrame(tick);
+})();
+</script>

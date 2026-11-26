@@ -1,0 +1,118 @@
+<!-- Lucian UX/UI Prompt #003 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#003 -->
+<!--
+Element: Hold to delete
+ID: 003 · Category: Buttons · Tags: button, hold, destructive, confirm, undo
+What it does: To prevent accidental deletes, a red fill rises only while you keep the button pressed. When it is full the file crumples away, and Undo brings it right back.
+How to use it: Press and hold the button for 1.2 seconds. With a keyboard, hold Space
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#003
+-->
+<style>
+.u003{position:relative;width:320px;height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px}
+.u003-file{display:flex;align-items:center;gap:14px;width:268px;padding:14px 16px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 30px -22px var(--ux-shadow-strong);transform-origin:50% 100%;transition:transform .7s var(--ux-spring),opacity .5s var(--ux-ease),filter .5s var(--ux-ease)}
+.u003-ic{width:40px;height:46px;border-radius:9px;flex:none;position:relative;background:linear-gradient(160deg,#A48BFF,#6A57F2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+.u003-ic::after{content:"FIG";position:absolute;left:0;right:0;bottom:7px;text-align:center;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#fff}
+.u003-ic::before{content:"";position:absolute;right:0;top:0;width:12px;height:12px;border-radius:0 9px 0 6px;background:rgba(255,255,255,.35)}
+.u003-file b{display:block;font-size:15px;font-weight:680;letter-spacing:-.02em}
+.u003-file small{display:block;margin-top:3px;font-size:12.5px;color:var(--ux-ink-3)}
+.u003-file.is-gone{transform:translateY(18px) scale(.55) rotate(-6deg);opacity:0;filter:blur(6px)}
+.u003-row{position:relative;height:64px;width:268px}
+.u003-btn{--p:0;position:absolute;inset:0;border:0;border-radius:999px;padding:0;overflow:hidden;isolation:isolate;background:color-mix(in srgb,var(--ux-danger) 12%,var(--ux-surface));color:var(--ux-danger);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ux-danger) 40%,transparent);touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .5s var(--ux-spring),opacity .4s var(--ux-ease),width .6s var(--ux-ease)}
+.u003-btn:focus-visible{outline:2px solid var(--ux-danger);outline-offset:4px}
+.u003-lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;font-size:16.5px;font-weight:700;letter-spacing:-.02em;white-space:nowrap}
+.u003-lab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.u003-fill{position:absolute;inset:0;background:var(--ux-danger);color:var(--ux-accent-ink);clip-path:inset(0 calc(100% - var(--p) * 100%) 0 0 round 999px)}
+.u003-btn.is-holding{transform:scale(.97);animation:u003-shake .12s linear infinite;animation-play-state:var(--shake,paused)}
+@keyframes u003-shake{0%,100%{translate:0 0}25%{translate:-.6px .3px}75%{translate:.6px -.3px}}
+.u003-btn.is-gone{opacity:0;transform:scale(.9);pointer-events:none}
+.u003-done{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px 0 22px;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);opacity:0;transform:translateY(10px) scale(.96);pointer-events:none;transition:opacity .4s var(--ux-ease),transform .6s var(--ux-spring)}
+.u003-done span{font-size:15px;font-weight:650}
+.u003-undo{height:46px;padding:0 18px;border:0;border-radius:999px;background:color-mix(in srgb,var(--ux-page) 16%,transparent);color:inherit;font-size:14.5px;font-weight:700;transition:background-color .3s var(--ux-ease),transform .4s var(--ux-spring)}
+.u003-undo:hover{background:color-mix(in srgb,var(--ux-page) 26%,transparent)}
+.u003-undo:active{transform:scale(.94)}
+.u003-done.is-on{opacity:1;transform:none;pointer-events:auto}
+</style>
+<div class="ux u003">
+  <div class="u003-file">
+    <span class="u003-ic" aria-hidden="true"></span>
+    <span><b>Brand concept v3.fig</b><small>48.2 MB · Edited yesterday</small></span>
+  </div>
+  <div class="u003-row">
+    <button class="u003-btn" type="button" aria-label="Hold to delete Brand concept v3.fig">
+      <span class="u003-lab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7h15M9.5 7V4.8h5V7M7 7l.8 12.2h8.4L17 7"/></svg>Hold to delete</span>
+      <span class="u003-lab u003-fill" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.8h5V7M7 7l.8 12.2h8.4L17 7"/></svg>Hold to delete</span>
+    </button>
+    <div class="u003-done" role="status">
+      <span>File deleted</span>
+      <button class="u003-undo" type="button">Undo</button>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u003-btn');
+  var file = root.querySelector('.u003-file');
+  var done = root.querySelector('.u003-done');
+  var undo = root.querySelector('.u003-undo');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var HOLD = 1200;
+  var p = 0, raf = 0, last = 0, holding = false, finished = false;
+
+  function set(v) { p = v; btn.style.setProperty('--p', v.toFixed(4)); }
+  function tick(now) {
+    if (!root.isConnected) return;
+    var dt = now - (last || now);
+    last = now;
+    if (holding) set(Math.min(1, p + dt / HOLD));
+    else set(Math.max(0, p - dt / (HOLD / 2.4)));
+    btn.style.setProperty('--shake', holding && p > 0.55 && !rm ? 'running' : 'paused');
+    if (p >= 1 && holding) { complete(); return; }
+    if (holding || p > 0) raf = requestAnimationFrame(tick);
+    else { raf = 0; last = 0; }
+  }
+  function start() {
+    if (finished) return;
+    holding = true;
+    btn.classList.add('is-holding');
+    if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
+  }
+  function stop() {
+    holding = false;
+    btn.classList.remove('is-holding');
+    if (!raf && p > 0) raf = requestAnimationFrame(tick);
+  }
+  function complete() {
+    holding = false; finished = true; raf = 0; last = 0;
+    btn.classList.remove('is-holding');
+    file.classList.add('is-gone');
+    btn.classList.add('is-gone');
+    btn.setAttribute('tabindex', '-1');
+    done.classList.add('is-on');
+    undo.focus({ preventScroll: true });
+  }
+  function restore() {
+    finished = false;
+    set(0);
+    file.classList.remove('is-gone');
+    btn.classList.remove('is-gone');
+    btn.removeAttribute('tabindex');
+    done.classList.remove('is-on');
+    btn.focus({ preventScroll: true });
+  }
+  btn.addEventListener('pointerdown', function (e) { if (e.button === 0) { btn.setPointerCapture(e.pointerId); start(); } });
+  btn.addEventListener('pointerup', stop);
+  btn.addEventListener('pointercancel', stop);
+  btn.addEventListener('lostpointercapture', stop);
+  btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  btn.addEventListener('keydown', function (e) {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (!e.repeat) start(); }
+  });
+  btn.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') stop(); });
+  btn.addEventListener('blur', stop);
+  btn.addEventListener('click', function (e) { e.preventDefault(); });
+  undo.addEventListener('click', restore);
+})();
+</script>

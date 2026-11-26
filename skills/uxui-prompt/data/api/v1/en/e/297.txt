@@ -1,0 +1,82 @@
+<!-- Lucian UX/UI Prompt #297 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#297 -->
+<!--
+Element: Stack-the-blocks page builder
+ID: 297 · Category: Site Builder Tools · Tags: page-builder, blocks, no-code, reorder, builder
+What it does: In a page builder, press Hero, Features, Pricing, Testimonials or Footer in the block list on the left and that block's wireframe unfolds onto the canvas on the right. Rest the pointer on a block for up, down and delete buttons; moving a block slides it past its neighbors, and deleting folds it away. The block count and a Saved indicator blink at the top.
+How to use it: Press blocks on the left to stack them, then rest the pointer on a block to reorder
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#297
+-->
+<style>
+.u297{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u297-sd{position:absolute;left:10px;top:10px;bottom:10px;width:86px;padding:10px 7px;border-radius:18px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line)}
+.u297-sd small{display:block;padding:0 4px 6px;font-size:9.5px;font-weight:850;color:var(--ux-ink-3)}
+.u297-pk{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;margin-bottom:5px;padding:6px 0 5px;border:0;border-radius:11px;background:var(--ux-surface-2);color:var(--ux-ink-2);font:inherit;font-size:9.5px;font-weight:800;cursor:pointer;transition:transform .15s,background .2s}
+.u297-pk:hover,.u297-pk.g-hov{background:var(--ux-accent-soft);color:var(--ux-accent)}
+.u297-pk:active{transform:scale(.95)}
+.u297-pk i{display:block;width:44px;height:22px;border-radius:5px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);position:relative;overflow:hidden}
+.u297-tp{position:absolute;left:106px;right:12px;top:14px;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u297-tp b{margin-right:auto;color:var(--ux-ink);font-weight:900}
+.u297-tp span{display:inline-flex;align-items:center;gap:4px}
+.u297-tp span::before{content:"";width:6px;height:6px;border-radius:50%;background:#10B981}
+.u297-tp span.is-blink{animation:u297-bl .6s ease}
+@keyframes u297-bl{40%{opacity:.2}}
+.u297-cv{position:absolute;left:106px;right:12px;top:36px;bottom:10px;padding:8px;border-radius:16px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);overflow:hidden}
+.u297-em{position:absolute;inset:8px;display:grid;place-items:center;padding:0 20px;border:1.5px dashed var(--ux-line);border-radius:12px;text-align:center;font-size:10.5px;font-weight:700;color:var(--ux-ink-3)}
+.u297-ls{position:relative;margin:0;padding:0;list-style:none}
+.u297-bl{position:relative;display:grid;grid-template-rows:1fr;margin-bottom:5px;transition:grid-template-rows .4s cubic-bezier(.3,1,.4,1),opacity .3s,margin .4s}
+.u297-bl>div{min-height:0;overflow:hidden}
+.u297-bl.is-new,.u297-bl.is-gone{grid-template-rows:0fr;opacity:0;margin-bottom:0}
+.u297-wf{position:relative;padding:7px;border-radius:10px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);transition:box-shadow .2s}
+.u297-bl:hover .u297-wf,.u297-bl.g-hov .u297-wf,.u297-bl:focus-within .u297-wf{box-shadow:inset 0 0 0 1.5px var(--ux-accent)}
+.u297-wf small{position:absolute;left:7px;top:-1px;padding:1px 5px;border-radius:0 0 5px 5px;background:var(--ux-accent);color:#fff;font-size:7.5px;font-weight:850;opacity:0;transition:opacity .2s}
+.u297-bl:hover .u297-wf small,.u297-bl.g-hov .u297-wf small,.u297-bl:focus-within .u297-wf small{opacity:1}
+.u297-wf i{display:block;border-radius:3px;background:var(--ux-surface-3)}
+.u297-ac{position:absolute;right:5px;top:5px;display:flex;gap:2px;opacity:0;transition:opacity .2s}
+.u297-bl:hover .u297-ac,.u297-bl.g-hov .u297-ac,.u297-bl:focus-within .u297-ac{opacity:1}
+.u297-ac button{width:20px;height:20px;border:0;border-radius:6px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);color:var(--ux-ink-2);display:grid;place-items:center;cursor:pointer}
+.u297-ac button svg{width:9px;height:9px}
+.u297-rm:hover,.u297-rm.g-hov{color:#E11D48}
+.u297 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+@media (prefers-reduced-motion: reduce){.u297-bl{transition:none}.u297-tp span.is-blink{animation:none}}
+</style>
+<div class="ux u297">
+  <div class="u297-sd"><small>Blocks</small></div>
+  <div class="u297-tp"><b class="u297-ct"></b><span class="u297-sv"></span></div>
+  <div class="u297-cv"><div class="u297-em">Press a block on the left to start your page</div><ul class="u297-ls"></ul></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sd = root.querySelector('.u297-sd'), ls = root.querySelector('.u297-ls'), em = root.querySelector('.u297-em'), ct = root.querySelector('.u297-ct'), sv = root.querySelector('.u297-sv');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BK = ['Hero', 'Features', 'Pricing', 'Reviews', 'Footer'];
+  var WF = [
+    '<i style="width:60%;height:9px"></i><i style="width:84%;height:5px;margin-top:5px"></i><i style="width:30%;height:10px;margin-top:6px;border-radius:5px;background:var(--ux-accent)"></i>',
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px"><i style="height:22px"></i><i style="height:22px"></i><i style="height:22px"></i></div>',
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;align-items:end"><i style="height:24px"></i><i style="height:30px;background:color-mix(in srgb,var(--ux-accent) 45%,var(--ux-surface-3))"></i><i style="height:24px"></i></div>',
+    '<div style="display:flex;gap:5px;align-items:center"><i style="width:16px;height:16px;border-radius:50%"></i><div style="flex:1"><i style="width:90%;height:5px"></i><i style="width:60%;height:5px;margin-top:4px"></i></div></div>',
+    '<div style="display:flex;gap:6px"><i style="width:22%;height:6px"></i><i style="width:22%;height:6px"></i><i style="width:22%;height:6px"></i></div>'
+  ];
+  var MINI = ['<i style="position:absolute;left:6px;top:5px;width:22px;height:4px;border-radius:2px;background:var(--ux-surface-3)"></i><i style="position:absolute;left:6px;top:12px;width:12px;height:5px;border-radius:2px;background:var(--ux-accent)"></i>', '<i style="position:absolute;left:5px;right:5px;top:6px;height:10px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--ux-surface-3) 0 10px,transparent 10px 13px)"></i>', '<i style="position:absolute;left:8px;top:5px;width:8px;height:12px;border-radius:2px;background:var(--ux-surface-3)"></i><i style="position:absolute;left:18px;top:3px;width:8px;height:14px;border-radius:2px;background:var(--ux-accent)"></i><i style="position:absolute;left:28px;top:5px;width:8px;height:12px;border-radius:2px;background:var(--ux-surface-3)"></i>', '<i style="position:absolute;left:6px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--ux-surface-3)"></i><i style="position:absolute;left:18px;top:8px;width:20px;height:4px;border-radius:2px;background:var(--ux-surface-3)"></i>', '<i style="position:absolute;left:5px;right:5px;bottom:4px;height:4px;border-radius:2px;background:var(--ux-surface-3)"></i>'];
+  BK.forEach(function (n, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u297-pk'; b.innerHTML = '<i aria-hidden="true">' + MINI[i] + '</i><span></span>'; b.lastChild.textContent = n; b.setAttribute('aria-label', n + ' — add'); b.addEventListener('click', function () { add(i); }); sd.appendChild(b); });
+  var ICU = '<svg viewBox="0 0 9 9" aria-hidden="true"><path d="M2 6l2.5-2.5L7 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', ICD = '<svg viewBox="0 0 9 9" aria-hidden="true"><path d="M2 3l2.5 2.5L7 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>', ICX = '<svg viewBox="0 0 9 9" aria-hidden="true"><path d="M2 2l5 5M7 2L2 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  function saved() { var n = ls.querySelectorAll('.u297-bl:not(.is-gone)').length; ct.textContent = n + ' blocks'; em.style.display = n ? 'none' : ''; sv.textContent = 'Saved'; sv.classList.remove('is-blink'); void sv.offsetWidth; sv.classList.add('is-blink'); }
+  function flip(fn) {
+    var L = Array.prototype.slice.call(ls.children), y0 = L.map(function (l) { return l.offsetTop; }); fn();
+    if (rm) return;
+    L.forEach(function (l, k) { var dy = y0[k] - l.offsetTop; if (!dy) return; l.animate([{ transform: 'translateY(' + dy + 'px)' }, { transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.3,1.2,.5,1)' }); });
+  }
+  function add(i) {
+    var li = document.createElement('li'); li.className = 'u297-bl is-new';
+    li.innerHTML = '<div><div class="u297-wf"><small></small>' + WF[i] + '<div class="u297-ac"><button type="button" class="u297-up" aria-label="Move up">' + ICU + '</button><button type="button" class="u297-dn" aria-label="Move down">' + ICD + '</button><button type="button" class="u297-rm" aria-label="Delete">' + ICX + '</button></div></div></div>';
+    li.querySelector('small').textContent = BK[i];
+    li.querySelector('.u297-up').addEventListener('click', function () { var p = li.previousElementSibling; if (p) flip(function () { ls.insertBefore(li, p); }); saved(); });
+    li.querySelector('.u297-dn').addEventListener('click', function () { var n = li.nextElementSibling; if (n) flip(function () { ls.insertBefore(n, li); }); saved(); });
+    li.querySelector('.u297-rm').addEventListener('click', function () { li.classList.add('is-gone'); setTimeout(function () { li.remove(); }, rm ? 0 : 420); saved(); });
+    ls.appendChild(li); void li.offsetWidth; li.classList.remove('is-new'); saved();
+  }
+  ct.textContent = 0 + ' blocks';
+})();
+</script>
