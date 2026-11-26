@@ -1,0 +1,1 @@
+We added --prune to ProgramArguments in com.example.sync.plist yesterday, but the log shows no pruning. print.txt is the output of launchctl print gui/501/com.example.sync. Our nightly backup runs as com.example.backup from /Library/LaunchDaemons, and launchctl list in my shell does not show it, so I think it is gone.

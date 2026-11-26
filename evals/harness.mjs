@@ -13,7 +13,7 @@
  * Every run pins its model and effort, by default those in RUN_DEFAULTS, so a change to the user's own config does not
  * change a round; --model and --effort override them, and each run's meta records what it used.
  *
- *   node evals/harness.mjs run --suite routing|launch-scroll|launch-page|launch-video|menubar-widgets|web-shells --host claude|codex --condition with|without --out <dir>
+ *   node evals/harness.mjs run --suite routing|launch-scroll|launch-page|launch-video|menubar-widgets|web-shells|host-ops --host claude|codex --condition with|without --out <dir>
  *        [--ids a,b] [--listing] [--install project|user] [--model <id>] [--effort <level>]
  *                                  --listing keeps the session so the host's skill listing can be read back
  *   node evals/harness.mjs trace --out <dir>                re-extract every trace from the raw output
@@ -40,6 +40,7 @@ const SUITES = {
   'launch-video': { file: path.join(ROOT, 'evals', 'apple', 'launch-video', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
   'menubar-widgets': { file: path.join(ROOT, 'evals', 'apple', 'menubar-widgets', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
   'web-shells': { file: path.join(ROOT, 'evals', 'apple', 'web-shells', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
+  'host-ops': { file: path.join(ROOT, 'evals', 'apple', 'host-ops', 'evals.json'), list: (doc) => doc.evals, maxTurns: 60, timeout: 1500 },
 };
 const SKILL_ROOT = { claude: '.claude/skills/apple', codex: '.agents/skills/apple' };
 export const RUN_DEFAULTS = { claude: { model: 'claude-opus-5-5[1m]', effort: 'medium' }, codex: { model: 'gpt-6.2-sol', effort: 'high' } };
