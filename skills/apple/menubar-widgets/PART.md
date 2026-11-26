@@ -94,6 +94,8 @@ node <absolute path to this folder>/scripts/probe-extension.mjs --app "/Applicat
 
 Give the user: the task read and the surface chosen (or why a menu or a window was enough); what was built and which references were copied; each checker's summary line with any errors fixed; and the proof boundary: the scan reads Swift text one file deep, the snapshots prove offscreen rendering of the views at their sizes inside the content margins on this machine and macOS version, the probe proves process start times and executable paths at one moment. None of them prove the placed widget on the desktop, the menu bar on a real display, Edit Widget, VoiceOver or taste. Say which of those the user should check by hand.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - `MenuBarExtra`, scenes, SwiftUI views and their performance: the SwiftUI row of the router.

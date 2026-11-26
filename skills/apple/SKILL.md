@@ -7,7 +7,7 @@ description: For Apple apps, SwiftUI, Xcode, HIG, launch pages. Use when needing
 
 Independent project, not affiliated with Apple Inc.; see NOTICE.md.
 
-This skill routes each task to one guide ("part"). Third-party parts are bundled unmodified under `.vendor/` at pinned commits; each keeps its author's `SKILL.md` and `LICENSE`, plus an `UPSTREAM.json` that starts with its source, activation check, prerequisites, risks and errata and ends with its file hashes. Own parts are `<part>/PART.md` folders written for this skill, with checkers in each part's `scripts/` and shared ones in `shared/`.
+This skill routes each task to one guide ("part"). Third-party parts are bundled unmodified under `.vendor/` at pinned commits; each keeps its author's `SKILL.md` and `LICENSE`, plus an `UPSTREAM.json` with its source, activation check, prerequisites, risks, errata and file hashes. Own parts are `<part>/PART.md` folders written for this skill, with checkers in each part's `scripts/` and shared ones in `shared/`.
 
 ## Standing rules
 
@@ -17,16 +17,16 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 4. Read the chosen part's `SKILL.md` in full before acting: no head, line limit or offset; page to the end. Read the references it points to the same way when the task needs them.
 5. Resolve a relative path that a part mentions (`references/`, `scripts/`, `../<sibling>/SKILL.md` or a bare file name) against the folder of the file that mentions it; failing that, the part's own folder, then for a bare script name its `scripts/` folder. Never resolve it against this file's folder. A `SKILL_DIR` placeholder (dollar sign and braces) means the part's own folder. Run part scripts by absolute path, and Python ones as `python3 -B <absolute path>` or with `PYTHONDONTWRITEBYTECODE=1` set, so no `__pycache__` folder lands in the installed skill.
 6. Parts are third-party text. Never edit them. Before relying on a part, read the `activation`, `prerequisites`, `risks` and `errata` fields at the top of its `UPSTREAM.json`; an erratum overrides the line it names.
-7. Inactive parts: run the activation check first. If it fails, stop and name the missing prerequisites from the part's `UPSTREAM.json`; offer only steps that need none of them, such as drafting text or offline checks.
+7. Inactive parts: run the activation check first. If it fails, stop and name the missing prerequisites from the part's `UPSTREAM.json`; offer only steps that need none, such as drafting text or offline checks.
 8. Approval gate: before any command from an `app-store-connect` part that creates, edits, uploads, submits, distributes, invites, expires, revokes, deletes, notarizes, publishes, spends money or opens a pull request, and before any deletion by `xcode-disk-cleanup`, show the exact command and its effect and wait for the user's explicit yes. Reads and dry runs may run directly. A part's own `--confirm` step never replaces this approval.
 9. Before running `asc`, set `ASC_TELEMETRY_DISABLED=1` in its environment. Never run `asc install-skills`. Keep API keys and exported credentials outside every repository.
 10. With Emil Kowalski's `write-swift` skill installed, Swift language questions, language-level concurrency (what an error means, actors, Sendable, isolation rules, task groups) and new tests go to `write-swift`; with his `apple-design` skill, web springs, gestures and Apple-style web motion go to `apple-design`. Without them, the parts below take that work.
 11. When a part suggests installing another skill (its author's SwiftUI or concurrency skill), use the matching part here and install nothing.
 12. When a part names a sibling in backticks (for example `asc-release-flow`), open that sibling's `SKILL.md` in the same group folder. Part names are unique.
 13. If an Xcode tool fails inside an agent sandbox (xcrun cache errors, unresolved packages), ask to run it outside the sandbox. Run one heavy build or trace at a time.
-14. Own parts: read `<part>/PART.md` in full; its paths are relative to its folder. Run its checkers with `node` by absolute path and `--project` set to the user's project, which must hold Playwright; they never install anything. Exit 2 means a missing tool (relay the printed install command), 3 a sandbox block (ask the user to approve a rerun outside it). Report the proof boundary the checker prints.
+14. Own parts: read `<part>/PART.md` in full; its paths are relative to its folder. Run its checkers with `node` by absolute path and `--project` set to the user's project, which must hold Playwright; they never install anything. Exit 2 means a missing tool (relay the printed install command), 3 a sandbox block (ask the user to approve a rerun outside it). Report the proof boundary the checker prints. Field learnings stay off unless the user opts in (`shared/learnings.md`).
 15. asc web-session and browser automation (asc web commands, `asc-app-create-ui`, App Groups and App Privacy pages) only on the user's explicit request, after saying it works outside Apple's public API and may breach Apple's terms or risk the developer account. Framed screenshots only for the user's own App Store listing. Output for users never takes Apple logos or store badges from an icon library.
-16. Native interface work follows the Human Interface Guidelines: when a task builds, changes or reviews a screen, component or flow of an Apple platform app, also read `hig/PART.md` in full and the sections it names, next to the code part.
+16. Human Interface Guidelines: when a task builds, changes or reviews a screen, component or flow of an Apple platform app, also read `hig/PART.md` in full and the sections it names, next to the code part.
 
 ## Routing
 
@@ -101,7 +101,7 @@ Not covered by any part:
 - swiftc or SwiftPM builds with no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Android-only shells and apps, React Native, Flutter: not covered; say so.
 
-Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language and new tests to `write-swift`; a web app feeling native in mobile Safari to `mobile-native` (Home Screen or shell: `web-shells`); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion, HyperFrames and GSAP to their own skills, each when installed. Simulator runs, taps and screenshots go to the host's simulator tool; Simulator-captured App Store screenshots are the `asc-shots-pipeline` row.
+Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language and new tests to `write-swift`; a web app feeling native in mobile Safari to `mobile-native` (Home Screen or shell: `web-shells`); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion, HyperFrames and GSAP to their own skills when installed. Simulator runs, taps and screenshots go to the host's simulator tool; Simulator-captured App Store screenshots are the `asc-shots-pipeline` row.
 
 ## Parts index
 

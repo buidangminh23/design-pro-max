@@ -95,6 +95,8 @@ node <absolute path to this folder>/scripts/check-feed.mjs --platforms darwin-aa
 
 Give the user: the task read and the channel chosen (or why a notarized zip was enough); what was built and which templates were copied; each checker's summary line with any errors fixed; and the proof boundary: the probe proves what codesign and spctl say about this copy at one moment, the static checks read text against the steps this part knows, and none of them prove a quarantined download on another Mac, what a peer process accepts at run time, a stapled ticket, `brew style` on the user's Homebrew, or an update installing on a real Mac. Say which of those the user should check by hand, starting with a download on a clean user account.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - Archiving, exporting with Developer ID, submitting to the notary service and stapling: the router's notarization row.

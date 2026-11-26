@@ -84,6 +84,8 @@ node <absolute path to this folder>/scripts/probe-launchd.mjs --label <label> --
 
 Give the user: the read from section 1; the decision from section 2 and why a lighter one was or was not enough; the files written or changed; every command that needs the user (a password dialog, a permission in System Settings, a rerun outside the sandbox) with what it does; what each check printed, with errors fixed; and the proof boundary: the scan reads text, not what a script does at run time; the plist check proves the file, not the loaded job; the probe proves what launchd held at one moment, not that the next run succeeds. Nothing here proves the Mac stays reachable after a restart, a log out or an update; say what was and was not tried.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - Menu bar apps, widgets and their stale extension processes: `../menubar-widgets/PART.md`.

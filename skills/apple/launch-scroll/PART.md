@@ -90,6 +90,8 @@ The probe also checks an image sequence: no manifest or frame requested behind a
 
 Give the user: the beat table; which engine and why; what the static layout shows and when it is used (reduced motion, rejected probe, short viewport, no support); the probe's summary line with any errors fixed; and the proof boundary: headless Chromium and synthetic media prove structure, gating, load order and encode parameters, not iOS Safari, Low Power Mode, real device frame rates or taste. Say which of those the user should check on a device.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - GSAP APIs: `gsap-scrolltrigger` and the other GSAP skills, if installed.

@@ -87,6 +87,8 @@ node <absolute path to this folder>/scripts/probe-webkit.mjs --app server/handle
 
 Give the user: the read from section 1; the choice from section 2 and why the lighter options were or were not enough; the files written; what each check printed, with errors fixed; and the proof boundary: the static check proves what the configs and the built bundle say, not what a device loads at run time or what a Tauri binary embeds; the probe proves challenges and cookie handling in Playwright's WebKit, not whether a device shows a credential prompt (Playwright never does), not iOS Safari, a real home-screen web app, WKWebView inside the shell, in-app browsers or devices. Ask the user to open the app once from the Home Screen or the built shell on a device and sign in.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - A web app that should feel native in mobile Safari (viewport, safe areas, tap behaviour): `mobile-native`, if installed.

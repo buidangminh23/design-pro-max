@@ -58,3 +58,5 @@ When asked to review, or after building, produce one table:
 - A custom control that drops a state, an accessibility trait or a platform behaviour that the system control has.
 - A redrawn, recolored or animated Apple mark or button.
 - Fixed point sizes, colors or device dimensions copied from one screenshot instead of the system's semantic values.
+
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
