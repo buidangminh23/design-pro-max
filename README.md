@@ -137,7 +137,10 @@ scripts/bundle-sync.mjs      sync, check and update for the bundled skills
 scripts/lib/bundles.mjs      the bundle record, its checks and BUNDLED_MEDIA, the only bundles that may ship images
 scripts/vendor-sync.mjs      sync, check, notices, and stage, classify, confirm and apply for upstream updates
 scripts/vendor-guard.mjs     offline guard
-scripts/gen.mjs              writes skills.json, the parts index, the README credits and the trademark line
+scripts/gen.mjs              writes skills.json, the parts index, the README credits, the trademark line and each design's shared/ copy
+scripts/new-design.mjs       scaffolds another design: its designs/<name>.json, router stub, placeholder icon and NOTICE.md
+scripts/lib/designs.mjs      the designs registry the scripts iterate over instead of assuming skills/apple
+shared/                      the canonical shared runtime; gen.mjs copies it byte for byte into skills/<design>/shared/
 scripts/check-history.mjs    keeps unreviewed images and vendored agents/ and assets/ files out of git history
 scripts/release.mjs          checks, packs and verifies the release ZIP; bumps versions and card stats; pushes the tag
 scripts/ci-local.mjs         runs the CI steps and the verify run locally when Actions cannot run
@@ -149,7 +152,7 @@ rules.json                   the own parts' rules: level, evidence, check, fixtu
 evidence/ledger.json         own-words claims with their label, source and source hash
 evidence/ip-hashes.json      salted hashes of the private identifiers, private terms and Apple text corpus
 evidence/token-hashes.json   hashed measured reference values lint-tokens compares against (public measurements, recoverable)
-designs/apple.json           the apple skill's design record: marks, never-ship list, phrase gates, newest released OS
+designs/apple.json           the apple skill's design record: marks, never-ship list, phrase gates, newest released OS; one designs/<name>.json per design
 designs/brand/logo.png       the project logo in this README's header (reviewed media)
 designs/renders/devices/     the owner's device render, its frames, preview and outputs (reviewed media, never released)
 fixtures/                    pass and fail cases for every error rule, with pages and a planted-defect launch page; media is built at run time
@@ -305,7 +308,7 @@ Node 22 or later; no dependencies.
 | `node scripts/vendor-sync.mjs classify --from <dir> [--json \| --markdown]` | Offline. Compares a staged update with the tree: `safe` only when no file that ships in a moved part changes, so the pins move past upstream commits that touched nothing in the parts; any added, removed or edited file, executable bit, licence or skill name makes it `needs-review`, because agents read and run these files with the user's permissions and no pattern can prove new text safe. Each reason names the file, and the added lines of each changed text file are listed with what they bring: links by host and path, commands, injection phrases, words that mix scripts and fenced code. `--markdown` prints the pull request body |
 | `node scripts/vendor-sync.mjs confirm --from <dir>` | Network. Proves a staged update came from upstream: each moved source's staged commit must be on its default branch and descend from the pin, and every moved part must match a fresh copy made at that commit, record for record |
 | `node scripts/vendor-sync.mjs apply --from <dir>` | Copies a staged update into the tree after refusing symlinks, special files, paths outside the moved parts and any manifest change other than commits; executable bits come from each part's `UPSTREAM.json` |
-| `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, each own part's `references/evidence.md`, launch-page's `tokens.css` and `theme.tailwind.css` from its `tokens.json`, the README credits table, the trademark line in this README and in `skills/apple/NOTICE.md`, and the licences of the third-party drawings the skill ships (`MEDIA_NOTICES` in `scripts/lib/media.mjs`) in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; `--check` fails when one is out of date. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
+| `node scripts/gen.mjs [--check]` | Writes `skills.json`, `skills/apple/references/parts-index.md`, each own part's `references/evidence.md`, launch-page's `tokens.css` and `theme.tailwind.css` from its `tokens.json`, the README credits table, the trademark line in this README and in `skills/apple/NOTICE.md`, and the licences of the third-party drawings the skill ships (`MEDIA_NOTICES` in `scripts/lib/media.mjs`) in `skills/apple/NOTICE.md`, from the skill folders and `vendor/sources.json`; for every design in `designs/`, a byte-identical copy of `shared/` in `skills/<design>/shared/` and, for a design other than apple whose `NOTICE.md` has a trademarks block, the line for the marks of its record that its text uses; `--check` fails when one is out of date or when a design's `shared/` holds a file that `shared/` does not, which a write removes. Only the lines between `<!-- gen:<name> -->` markers are generated. The trademark line names the Apple marks that the project's own shipped text uses, the Apple logo while the skill ships it, and Cisco's IOS sentence when iOS is named |
 | `node scripts/vendor-guard.mjs [--json]` | Offline guard over what git would ship: MIT licences, part files, sizes, file system entries, file types and signatures, UTF-8, names, hidden Unicode, secrets, skill layout and personal data in the project's own files; risky command patterns are reported as warnings |
 | `node scripts/bundle-sync.mjs sync [--only <name>]` | Network. Fetches each bundle's pinned commit, proves its release tag points at it, copies its skill folder byte for byte into `skills/<name>/` with the repository's licence as `LICENSE`, and records every file in `vendor/bundles.json` |
 | `node scripts/bundle-sync.mjs check` | Offline: each bundled folder holds exactly the files `vendor/bundles.json` records, with their sizes, hashes and executable bits, plus its `LICENSE` |
@@ -326,6 +329,18 @@ Node 22 or later; no dependencies.
 | `npm test` | The test suite, including sync runs against local fake upstream repositories, the evidence ledger and rules, the citation lint, the own-part checkers' pure code and a red-first check of the harness |
 
 To change a pin, edit `vendor/sources.json`, run `sync`, `check`, `notices`, `gen` and the guard, and review the upstream diff before committing.
+
+### Adding a design
+
+Each design is one skill, `skills/<name>/`, with a record `designs/<name>.json` (`design`, `skill`, and optionally `marks` and `owner`). The scripts read `scripts/lib/designs.mjs` for the list instead of assuming `skills/apple`: the guard requires each design's `SKILL.md`, gen.mjs and `release.mjs check` require each design in `skills.json` with an exact copy of `shared/`, and `verify.mjs` and the evidence lints find each own part in the folder of the design it belongs to (`DESIGN_PARTS` in `scripts/lib/evidence.mjs`).
+
+```
+node scripts/new-design.mjs <name> [--marks "<mark>, <mark>"] [--owner "<owner>"]
+```
+
+writes the record, a router stub, a neutral placeholder icon and, with `--marks`, a `NOTICE.md` whose trademarks block gen.mjs fills with the marks the design's text uses; then it runs gen.mjs. A design name is neutral: lowercase words joined by `-`, naming no mark of any design, and every design gets its own icon rather than a brand logo. The placeholder icon is new media, so review it and record its hash in `scripts/lib/media.mjs` before a release. Edit the shared runtime only in `shared/` at the repository root and run `node scripts/gen.mjs`; the copies under `skills/<design>/shared/` are generated. Vendored parts stay with apple, the design `vendor/sources.json` describes: the guard fails a `.vendor/` folder in any other design, and `release.mjs verify` fails a part shipped outside `skills/apple/.vendor/`.
+
+Installer contract for more than one design: `skills.json` lists every skill folder of the release as `{ "name", "path" }`, so an updater entry with the skill name `*` installs every entry of `skills.json` from the one release ZIP, and keeps its installed state per repository and skill name, so that two designs from this repository never share one record. The updater scripts that read this contract live in the owner's own repository and are not part of this one.
 
 ### Workflows
 

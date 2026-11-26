@@ -7,12 +7,13 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PRIMARY_DESIGN, designSkillDir, designVendorDir } from './designs.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const SOURCES_FILE = 'vendor/sources.json';
 export const SKILLS_DIR = 'skills';
-export const SKILL_DIR = `${SKILLS_DIR}/apple`;
-export const VENDOR_DIR = `${SKILL_DIR}/.vendor`;
+export const SKILL_DIR = designSkillDir(PRIMARY_DESIGN);
+export const VENDOR_DIR = designVendorDir(PRIMARY_DESIGN);
 export const UPSTREAM_FILE = 'UPSTREAM.json';
 export const NOTICES_FILE = 'THIRD_PARTY_NOTICES.md';
 export const LICENSE_NAMES = ['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'COPYING'];

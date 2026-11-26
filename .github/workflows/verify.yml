@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "shared/**"
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
       - "skills/apple/menubar-widgets/**"
@@ -19,6 +20,7 @@ on:
       - ".github/workflows/verify.yml"
   pull_request:
     paths:
+      - "shared/**"
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
       - "skills/apple/menubar-widgets/**"
