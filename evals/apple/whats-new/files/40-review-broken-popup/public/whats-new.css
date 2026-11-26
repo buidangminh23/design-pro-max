@@ -1,0 +1,8 @@
+.wn-box { position: fixed; inset: 10% 20%; background: #fff; border-radius: 24px; padding: 24px; overflow: hidden; }
+.wn-track { display: flex; transition: transform 400ms ease; }
+.wn-slide { flex: 0 0 100%; }
+.wn-slide video { width: 100%; }
+.wn-slide p { color: #aaa; }
+.wn-x { position: absolute; top: 12px; right: 16px; font-size: 12px; cursor: pointer; }
+.wn-dot { width: 8px; height: 8px; padding: 0; border-radius: 50%; border: 0; background: #ccc; }
+.wn-prev, .wn-next { width: 20px; height: 20px; }

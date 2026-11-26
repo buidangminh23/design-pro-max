@@ -529,6 +529,36 @@
       }
     },
     {
+      "id": "r58",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "Our macOS SwiftUI app 2.4 has three new features. After people update, show a popup once with a picture or short clip per feature, left and right arrows and page dots, and add a What's New menu item to open it again.",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
+      "id": "r59",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "In our Tauri app with a React UI, show a What's New card after an update with a short looping video of the new tray view. It should only appear once per version and never on a fresh install.",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
+      "id": "r60",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "Review the What's New modal in our web app, which ships in a Capacitor shell on iPhone: it shows on every launch, the arrows disappear on the last page, and the feature videos play with sound on pages you cannot see. What should we fix?",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
       "id": "r50",
       "kind": "row",
       "row": "macOS menu bar apps and WidgetKit widgets",
@@ -723,6 +753,16 @@
       "kind": "near-miss",
       "row": "Android shell split",
       "prompt": "Wrap our React web app in Capacitor for Android only and make the hardware back button close our modals instead of leaving the app.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n26",
+      "kind": "near-miss",
+      "row": "Android What's New split",
+      "prompt": "Add a What's New dialog to our Android-only Jetpack Compose app that shows after an update, with a pager of the new features.",
       "expect": {
         "trigger": false,
         "instead": "no skill"

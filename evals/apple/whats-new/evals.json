@@ -1,0 +1,156 @@
+{
+  "skill_name": "apple",
+  "part": "whats-new",
+  "description": "Part evals for whats-new in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 37,
+      "name": "swiftui-single-card",
+      "prompt": "Add a What's New popup to our macOS SwiftUI app for version 2.4. There is only one feature this time; it is in FEATURES.md. Make it a card like Apple's: image on top, badge, title, text, a Got it button and a close X.",
+      "expected_output": "A single-card What's New sheet on the main window built from the Swift reference (or equivalent code): media on top, badge, title, description and a Got it button, with no arrows, dots or page counter; a version store keyed on CFBundleShortVersionString that stores silently on a first install, shows after an update and marks the version seen on dismissal; a What's New… menu item; and a Swift 6 type-check with its proof boundary.",
+      "files": [
+        "files/37-swiftui-single-card/FEATURES.md",
+        "files/37-swiftui-single-card/Info.plist.txt",
+        "files/37-swiftui-single-card/Sources/PebbleApp.swift"
+      ],
+      "expectations": [
+        "[WN-NAV-01] The single feature is one card with no previous or next arrows, no page dots and no page counter, and the primary button reads Got it and dismisses.",
+        "[WN-ONCE-01] It decides on CFBundleShortVersionString (not CFBundleVersion): no stored version stores 2.4.0 silently and shows nothing, an older stored version shows the sheet, and the version is stored when the sheet is dismissed, not when it opens.",
+        "[WN-DIALOG-01] The popup is a sheet on the main window with a labelled close button, Return on the primary button (.defaultAction) and Escape on close (.cancelAction).",
+        "[reopen] It adds a What's New… menu item that reopens the sheet.",
+        "[verify] It type-checks the Swift with -swift-version 6 for macOS 14 (or builds the app) and states that this does not prove how the sheet looks or what VoiceOver reads."
+      ],
+      "checks": [
+        "WN-NAV-01",
+        "WN-ONCE-01",
+        "WN-DIALOG-01"
+      ]
+    },
+    {
+      "id": 38,
+      "name": "swiftui-pager-video",
+      "prompt": "Ledger 3.0 has three new features (FEATURES.md), one with a screen recording. Build the What's New pager for our SwiftUI app; it ships on macOS and iOS. Arrows left and right, dots, and the video should loop.",
+      "expected_output": "A pager sheet with previous and next arrow buttons and custom dots (no page tab style on macOS), every page stacked so the card keeps one size and one media ratio, a muted looping clip that plays only on its page, has a pause control because it is longer than 5 seconds, and shows its poster with a play button under Reduce Motion; the card is shown once per version with a reopen item, and the code type-checks with Swift 6.",
+      "files": [
+        "files/38-swiftui-pager-video/FEATURES.md",
+        "files/38-swiftui-pager-video/Sources/LedgerApp.swift"
+      ],
+      "expectations": [
+        "[WN-NAV-01] Several features show previous and next buttons with labels and a page indicator that reads Feature N of M; the unusable arrow is disabled, not removed; the primary button reads Next until the last page and Got it on the last.",
+        "[macos-pager] It does not rely on TabView's page style or page index style on macOS, which do not exist there; it uses a state index (or a paging scroll view) with custom dots.",
+        "[WN-LAYOUT-01] All pages share one size (stacked in a ZStack or measured to the tallest) and one media aspect ratio, including the page with no media.",
+        "[WN-MEDIA-01] The clip is muted, loops with AVPlayerLooper or an equivalent, plays only while its page is current, rewinds when the page changes, and has a labelled pause control because it runs 8 seconds.",
+        "[WN-MOTION-01] With Reduce Motion on the clip does not start by itself (poster and a play button) and pages change without sliding.",
+        "[bundle] The clip is bundled with the app, not streamed at launch."
+      ],
+      "checks": [
+        "WN-NAV-01",
+        "WN-LAYOUT-01",
+        "WN-MEDIA-01",
+        "WN-MOTION-01"
+      ]
+    },
+    {
+      "id": 39,
+      "name": "tauri-react-pager",
+      "prompt": "Our Tauri + React tray app (Quota Meter) is releasing 0.9 with three features listed in FEATURES.md. Add a What's New popup with left/right buttons that shows after the update, and a way to open it again from Settings.",
+      "expected_output": "The bundled whats-new.js and whats-new.css copied into the app, called once from the root component after the first render with the version read through Tauri's getVersion(), a pager with named arrows, dots that are at least 24 CSS px and a modal dialog that restores focus; a Settings item calling it with force; a run of check-whats-new.mjs against the dev server or the built frontend with its output and proof boundary.",
+      "files": [
+        "files/39-tauri-react-pager/FEATURES.md",
+        "files/39-tauri-react-pager/package.json",
+        "files/39-tauri-react-pager/src-tauri/tauri.conf.json",
+        "files/39-tauri-react-pager/src/App.tsx",
+        "files/39-tauri-react-pager/src/Tray.tsx"
+      ],
+      "expectations": [
+        "[lib] It reuses assets/lib/whats-new.js and whats-new.css (or code that emits the same dialog contract) instead of writing a div overlay.",
+        "[WN-ONCE-01] It reads the app version with getVersion() from @tauri-apps/api/app, shows nothing on a first install, shows after an update and stores the version only on dismissal.",
+        "[WN-DIALOG-01] The popup is a modal dialog opened with showModal (or role dialog with aria-modal), labelled by its title, with a named close button, Escape to close and focus restored to the element that had it.",
+        "[WN-TARGET-01] The arrows, close and primary buttons and each dot's hit area are at least 24 by 24 CSS pixels.",
+        "[reopen] The Settings view gets a What's New… item that calls showWhatsNew with force: true.",
+        "[verify] It runs check-whats-new.mjs with --project against the dev server or the built frontend (or says exactly how), reports the findings and the proof boundary, which excludes the Tauri WebView itself."
+      ],
+      "checks": [
+        "WN-DIALOG-01",
+        "WN-NAV-01",
+        "WN-ONCE-01",
+        "WN-TARGET-01"
+      ]
+    },
+    {
+      "id": 40,
+      "name": "review-broken-popup",
+      "prompt": "Review our What's New popup in public/ before we ship Atlas 5.2. Users say it is annoying and our accessibility tester filed bugs. List what is wrong and fix it.",
+      "expected_output": "A review that finds the popup is a plain div with no dialog role, focus handling or Escape; the close control is a span; it opens on a first install and is marked seen when it opens; the arrows disappear at the ends; every video autoplays with sound, inline handling and posters missing; the pages slide with a transform even under reduced motion; the dots and arrows are under 24 CSS px; the description grey is low contrast; then a fix (ideally the bundled lib) and a checker run with its proof boundary.",
+      "files": [
+        "files/40-review-broken-popup/public/index.html",
+        "files/40-review-broken-popup/public/whats-new.css",
+        "files/40-review-broken-popup/public/whats-new.js"
+      ],
+      "expectations": [
+        "[WN-DIALOG-01] It flags the div without role dialog or aria-modal, the span used as a close control, and the missing focus move, Escape and focus return.",
+        "[WN-ONCE-01] It flags that the popup opens on a first install (no stored value counts as a change) and stores the version when it opens instead of when it is dismissed.",
+        "[WN-NAV-01] It flags the previous and next buttons that are hidden at the ends instead of disabled, and the unlabelled arrow and dot buttons.",
+        "[WN-MEDIA-01] It flags videos that are not muted, have no playsinline and no poster, all autoplay at once, and loop with no pause control.",
+        "[WN-MOTION-01] It flags the sliding transform with no reduced-motion handling.",
+        "[WN-TARGET-01] It flags the 8 px dots and 20 px arrows as under the 24 by 24 CSS px minimum.",
+        "[WN-WARN-CONTRAST] It flags the #aaa description on white as under 4.5:1.",
+        "[verify] It runs check-whats-new.mjs (with --serve public) before and after the fix, or explains why it could not, and gives the proof boundary."
+      ],
+      "checks": [
+        "WN-DIALOG-01",
+        "WN-ONCE-01",
+        "WN-NAV-01",
+        "WN-MEDIA-01",
+        "WN-MOTION-01",
+        "WN-TARGET-01"
+      ]
+    },
+    {
+      "id": 41,
+      "name": "reopen-and-once",
+      "prompt": "Read NOTES.md. Fix how Canvas decides when to show the What's New sheet, and give people a way to open it again.",
+      "expected_output": "A fix that compares CFBundleShortVersionString instead of CFBundleVersion, stores the version silently on a first install, stores it when the sheet is dismissed rather than when it is shown, and a What's New… item in the app menu that reopens it; with a Swift 6 type-check.",
+      "files": [
+        "files/41-reopen-and-once/NOTES.md",
+        "files/41-reopen-and-once/Sources/CanvasApp.swift",
+        "files/41-reopen-and-once/Sources/WhatsNewGate.swift"
+      ],
+      "expectations": [
+        "[WN-ONCE-01] It explains the three reports from the code: an empty stored value counts as a change (so new users see it), CFBundleVersion changes every build (so testers see it each build), and the value is written on appear instead of on dismissal.",
+        "[WN-ONCE-01] The fix stores CFBundleShortVersionString silently when nothing is stored, shows the sheet only when a different version is stored, and stores the version in the sheet's onDismiss.",
+        "[reopen] It adds a What's New… command in the app menu (or the Help menu) that presents the sheet again.",
+        "[WN-DIALOG-01] The sheet keeps a labelled close or Got it button with .defaultAction and Escape to close.",
+        "[verify] It type-checks the Swift with -swift-version 6 or builds the app, and says that a manual install-over-update test is still needed."
+      ],
+      "checks": [
+        "WN-ONCE-01",
+        "WN-DIALOG-01"
+      ]
+    },
+    {
+      "id": 42,
+      "name": "vietnamese-labels",
+      "prompt": "Thêm popup Có gì mới cho bản 1.6 của Sổ Chi (FEATURES.vi.md). Hai tính năng, có nút trái phải. Giao diện phải hoàn toàn bằng tiếng Việt.",
+      "expected_output": "A two-page pager built with the bundled lib, every label passed in Vietnamese (close, previous and next feature, Tiếp, Hiểu rồi, the N of M page label, the dot labels, the region label, pause and play), the version read through Capacitor's App plugin, shown once per version, and a checker run; the reply to the user in Vietnamese.",
+      "files": [
+        "files/42-vietnamese-labels/FEATURES.vi.md",
+        "files/42-vietnamese-labels/package.json",
+        "files/42-vietnamese-labels/src/App.tsx",
+        "files/42-vietnamese-labels/src/main.tsx"
+      ],
+      "expectations": [
+        "[WN-NAV-01] It builds a pager with previous and next buttons and dots for the two features; the primary button reads Tiếp on the first page and Hiểu rồi on the last.",
+        "[localize] Every accessible name and label is Vietnamese, including the close button, the arrows, the dots' Feature N of M label, the page label and the region label; nothing is left in English.",
+        "[WN-DIALOG-01] The dialog is labelled by the Vietnamese title, closes with Escape and returns focus.",
+        "[WN-ONCE-01] It reads the version with the Capacitor App plugin's getInfo() (or the build version), shows nothing on a first install and stores the version on dismissal.",
+        "[reply] It answers the user in Vietnamese."
+      ],
+      "checks": [
+        "WN-NAV-01",
+        "WN-DIALOG-01",
+        "WN-ONCE-01"
+      ]
+    }
+  ]
+}

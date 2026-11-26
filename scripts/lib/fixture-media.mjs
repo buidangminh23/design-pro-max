@@ -3,6 +3,7 @@
  *
  *   buildFixtureMedia(folder, { encodeScrub, makeSequence })  launch-scroll and launch-page cases
  *   buildLaunchVideoMedia(folder, { encode })                 launch-video cases
+ *   buildWhatsNewMedia(folder)                                whats-new cases
  *
  * Good media go through the parts' own encode-scrub.mjs, make-sequence.mjs and encode.mjs, which the fixtures therefore
  * exercise too; each bad recipe breaks one rule.
@@ -106,5 +107,24 @@ export function buildLaunchVideoMedia(folder, { encode }) {
   build('lv-untagged', '-i', master, '-an', '-vf', 'format=yuv420p', '-c:v', 'libx264', '-profile:v', 'high', '-movflags', '+faststart');
   build('lv-start-wrong', '-ss', '1.5', '-i', media['lv-clip'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
   build('lv-recorded', ...LV_SOURCE(2.2, '400x225', 25), '-an', '-c:v', 'libvpx', '-b:v', '1M', '-deadline', 'realtime', '-cpu-used', '8');
+  return media;
+}
+
+export function buildWhatsNewMedia(folder) {
+  fs.mkdirSync(folder, { recursive: true });
+  const file = (name) => path.join(folder, name);
+  const media = {
+    'wn-loop': file('wn-loop.mp4'),
+    'wn-loop-poster': file('wn-loop.jpg'),
+    'wn-short': file('wn-short.mp4'),
+    'wn-short-poster': file('wn-short.jpg'),
+  };
+  const clip = (name, seconds) => {
+    if (!fs.existsSync(media[name])) ffmpeg('-f', 'lavfi', '-i', 'testsrc2=size=640x360:rate=30', '-t', String(seconds), ...LV_THREADS, '-vf', `format=yuv420p,${LV_TAGS}`, ...H264, '-crf', '28', media[name]);
+    const poster = `${name}-poster`;
+    if (!fs.existsSync(media[poster])) ffmpeg('-i', media[name], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '3', media[poster]);
+  };
+  clip('wn-loop', 6);
+  clip('wn-short', 3);
   return media;
 }

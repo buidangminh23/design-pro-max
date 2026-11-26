@@ -1,0 +1,82 @@
+<!doctype html>
+<!-- whats-new reference: one feature, one card (design-pro-max). On load it runs the once-per-version rule: a first
+     visit stores the version and shows nothing, a visit with an older stored version opens the card, dismissing it
+     stores the version. The "What's New…" button reopens it at any time with force: true. Every visual is drawn in
+     CSS; in an app the media is a bundled image or a short muted clip. Copy is placeholder text. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notchly: What's New, one feature</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>
+  :root { color-scheme: light dark; --app-bg: #f2f2f5; --app-ink: #1d1d1f; --app-muted: #5c5f66; --app-panel: #ffffff; --app-accent: #0066cc; }
+  @media (prefers-color-scheme: dark) { :root { --app-bg: #151517; --app-ink: #f5f5f7; --app-muted: #a8abb3; --app-panel: #232327; --app-accent: #4ba3ff; } }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--app-bg); color: var(--app-ink); }
+  body { margin: 0; min-height: 100dvh; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; place-items: center; padding: 16px; }
+  .app { width: min(720px, 100%); display: grid; gap: 16px; padding: 32px; border-radius: 20px; background: var(--app-panel); }
+  .app h1 { margin: 0; font-size: 22px; }
+  .app p { margin: 0; color: var(--app-muted); line-height: 1.5; }
+  .app button { justify-self: start; min-height: 44px; padding: 10px 20px; border: 1px solid currentColor; border-radius: 9999px; background: none; color: var(--app-accent); font: inherit; font-weight: 600; cursor: pointer; }
+  .app button:focus-visible { outline: 3px solid var(--app-accent); outline-offset: 2px; }
+
+  .wn-art { position: relative; overflow: hidden; background: linear-gradient(160deg, #d8e6ff 0%, #f4e9ff 55%, #ffe8d8 100%); }
+  .wn-art-screen { position: absolute; inset: 14% 10% 0; border-radius: 14px 14px 0 0; background: #1b1c22; box-shadow: 0 12px 40px rgba(20, 30, 60, 0.25); }
+  .wn-art-notch { position: absolute; top: 9%; left: 50%; translate: -50% 0; width: 46%; height: 17%; border-radius: 9999px; background: #000; display: flex; align-items: center; gap: 6%; padding-inline: 5%; }
+  .wn-art-notch::before { content: ""; width: 14%; aspect-ratio: 1; border-radius: 9999px; background: linear-gradient(135deg, #ff9f43, #ff4f81); }
+  .wn-art-notch::after { content: ""; flex: 1; height: 22%; border-radius: 9999px; background: linear-gradient(90deg, #34c759 0 62%, #3a3b40 62%); }
+  .wn-art-row { position: absolute; left: 12%; right: 12%; height: 6%; border-radius: 9999px; background: #2c2d35; }
+  .wn-art-row:nth-of-type(1) { top: 40%; }
+  .wn-art-row:nth-of-type(2) { top: 52%; right: 30%; }
+  .wn-art-row:nth-of-type(3) { top: 64%; right: 45%; }
+  @media (prefers-color-scheme: dark) { .wn-art { background: linear-gradient(160deg, #1d2a4a 0%, #2c1f45 55%, #3d2a22 100%); } }
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>Notchly</h1>
+  <p>The app window. The What's New card opens over it after an update, and from the Help menu at any time.</p>
+  <button type="button" id="show">What's New…</button>
+</main>
+<script type="module">
+  import { showWhatsNew } from '../lib/whats-new.js';
+
+  const VERSION = '2.4.0';
+
+  function art() {
+    const node = document.createElement('div');
+    node.className = 'wn-art';
+    node.setAttribute('role', 'img');
+    node.setAttribute('aria-label', 'A slimmer pill at the top of the screen showing a timer');
+    const screen = document.createElement('div');
+    screen.className = 'wn-art-screen';
+    for (let i = 0; i < 3; i += 1) {
+      const row = document.createElement('span');
+      row.className = 'wn-art-row';
+      screen.append(row);
+    }
+    const notch = document.createElement('div');
+    notch.className = 'wn-art-notch';
+    screen.append(notch);
+    node.append(screen);
+    return node;
+  }
+
+  const features = () => [
+    {
+      badge: 'Redesigned',
+      title: 'Pill mode, redrawn',
+      body: 'The pill now follows the height of the system’s live activities, so it lines up with the camera housing on every Mac and never covers the menu bar.',
+      media: { type: 'element', element: art() },
+    },
+  ];
+
+  document.getElementById('show').addEventListener('click', () => {
+    showWhatsNew({ version: VERSION, features: features(), force: true });
+  });
+
+  showWhatsNew({ version: VERSION, features: features() });
+</script>
+</body>
+</html>
