@@ -74,7 +74,7 @@ struct WhatsNewVideo: View {
                 .accessibilityHidden(true)
             if let poster, !looping.isPlaying {
                 Color.clear
-                    .overlay { Image(poster).resizable().scaledToFill() }
+                    .overlay { Image(poster).resizable().scaledToFit() }
                     .clipped()
                     .accessibilityHidden(true)
             }
@@ -148,7 +148,7 @@ final class PlayerHostView: NSView {
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         wantsLayer = true
-        playerLayer.videoGravity = .resizeAspectFill
+        playerLayer.videoGravity = .resizeAspect
         layer = playerLayer
     }
 
@@ -165,7 +165,7 @@ struct PlayerLayerView: UIViewRepresentable {
     func makeUIView(context: Context) -> PlayerHostView {
         let view = PlayerHostView()
         view.playerLayer.player = player
-        view.playerLayer.videoGravity = .resizeAspectFill
+        view.playerLayer.videoGravity = .resizeAspect
         return view
     }
 

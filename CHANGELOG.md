@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Changed
+
+- whats-new: images and videos now show whole inside the popup's media frame instead of being cropped to it: `object-fit: contain` in `whats-new.css`, `scaledToFit` and `resizeAspect` in the Swift references, letterboxed on the media background. A feature's media takes `fit: 'cover'` to fill and crop as before.
+
 ## [0.2.1] - 2026-11-25
 
 ### Added

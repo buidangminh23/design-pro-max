@@ -16,7 +16,7 @@ One feature gets one card and nothing that suggests more [WN-NAV-01]:
 
 - A white card in light mode and a dark one in dark mode, centred over a dimmed app, with a large corner radius and generous padding.
 - A close button at the top right: a small grey circle with an X, inside a hit area of Apple's recommended size [WN-WARN-TARGET44], named "Close" [WN-DIALOG-01].
-- The media frame across the full content width, with a fixed aspect ratio (16:9 unless the popup sets another) and its own, smaller corner radius [WN-LAYOUT-01].
+- The media frame across the full content width, with a fixed aspect ratio (16:9 unless the popup sets another) and its own, smaller corner radius [WN-LAYOUT-01]. Images and videos show whole inside it, never cropped: a file of another shape is letterboxed on the media background (`object-fit: contain` on the web, `scaledToFit` and `resizeAspect` in SwiftUI). Pass `fit: 'cover'` on one feature's media to fill the frame and crop instead, for a picture with nothing important near its edges. Set the popup's `aspectRatio` to the shape of the media, so nothing needs bars.
 - Below it, on the left: a badge (one word, uppercase, letter-spaced, a tinted accent pill), the title (bold, one line if it can), and the description in the secondary text colour, about three lines at most [WN-WARN-TEXT].
 - On the right, aligned to the bottom of the text: the primary button, a filled accent pill reading "Got it", which dismisses.
 
@@ -43,7 +43,7 @@ Two to five features share one card that changes its content, not its size:
 | `--wn-width` | `min(620px, 100vw - 32px)` | the card never touches the window edge |
 | `--wn-pad` | `32px` | padding inside the card |
 | `--wn-radius`, `--wn-media-radius` | `28px`, `20px` | the media radius is smaller than the card's |
-| `--wn-aspect` | `16 / 9` | one ratio per popup, set through `aspectRatio` |
+| `--wn-aspect` | `16 / 9` | one ratio per popup, set through `aspectRatio`; media show whole inside it unless `fit: 'cover'` |
 | `--wn-accent`, `--wn-on-accent` | a system-like blue, white | the primary button and the badge tint |
 | `--wn-duration`, `--wn-shift` | `220ms`, `24px` | page change: a short slide plus a fade |
 

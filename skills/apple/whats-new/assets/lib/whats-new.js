@@ -9,7 +9,8 @@
 // showWhatsNew(options) returns a Promise that resolves on close with { shown: true, reason, page }, or at once with
 // { shown: false, reason } when nothing opens; a second call while one is waiting or open gets that call's result, so
 // the popup never shows twice. Media per feature: { type: 'image', src, alt }, { type: 'video', src, poster } or
-// { type: 'element', element }. Only the current page's video plays; under reduced motion no video starts on its own
+// { type: 'element', element }. Images and videos show whole inside the frame, letterboxed on the media background;
+// add fit: 'cover' to a feature's media to fill the frame and crop instead. Only the current page's video plays; under reduced motion no video starts on its own
 // and pages change without movement; a looping video longer than 5 s gets a pause control.
 
 export const DEFAULTS = Object.freeze({
@@ -142,6 +143,7 @@ async function waitForOtherModals(win) {
 
 function buildMedia(doc, media, labels) {
   const frame = element(doc, 'div', { class: 'wn-media' });
+  if (media?.fit === 'cover') frame.dataset.fit = 'cover';
   if (!media || media.type === 'none') {
     frame.classList.add('wn-media-empty');
     return { frame, video: null, toggle: null };

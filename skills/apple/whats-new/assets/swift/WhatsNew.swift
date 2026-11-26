@@ -376,7 +376,7 @@ private struct MediaFrame: View {
                 .overlay {
                     Image(name)
                         .resizable()
-                        .scaledToFill()
+                        .scaledToFit()
                 }
                 .clipped()
                 .modifier(MediaLabel(label: label))
