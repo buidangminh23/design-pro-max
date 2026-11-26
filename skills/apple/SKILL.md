@@ -73,7 +73,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Wall of Apps entry, on an explicit request only | `.vendor/app-store-connect/asc-wall-submit/SKILL.md` | inactive |
 | Web page scenes that pin, zoom or scrub video or a canvas image sequence on scroll; sequence memory budgets; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
 | Launch and landing pages (hero, feature tiles, galleries, marquees, pricing, FAQ) or a review of one: type scale, SF fonts on the web, contrast, reveals, hero intros, pause controls | `launch-page/PART.md` | active |
-| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, embed clips that load late and pause; whether a still is enough; App Store app previews from a user's capture | `launch-video/PART.md` | active |
+| Demo clips rendered from code or recorded from the real app after a privacy pre-flight: HTML and CSS rebuilds rendered to MP4, WebM or transparent video, lazy embeds with pause; whether a still is enough; App Store app previews | `launch-video/PART.md` | active |
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: layout, type, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities | `hig/PART.md` | active |
 | In-app What's New popups after an update: one card or a pager, image or looping video, once per version, a reopen item; SwiftUI, web, Tauri | `whats-new/PART.md` | active |
@@ -95,7 +95,6 @@ Routing notes:
 
 Not covered by any part:
 
-- Screen recording: not covered; read `launch-video/PART.md` section 0 and offer its two paths.
 - Narrated launch films, AI footage, HLS streaming: not covered; say so.
 - Live Activities and App Intents beyond widget configuration: no code part (design in `hig`); suggest Xcode's coding assistant. SMAppService login items, MDM and fleets: not covered; use `write-swift` if installed and Apple's docs.
 - swiftc or SwiftPM builds with no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).

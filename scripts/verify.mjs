@@ -9,6 +9,7 @@
  *
  *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
+ * A capture-plan case reads a pre-flight and a recorded screen probe, so it records nothing.
  * A case with platform runs only on that platform (menubar-widgets snapshots need macOS) and is listed as skipped elsewhere.
  *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
@@ -161,6 +162,9 @@ function runCase(entry, skill, media, scratch) {
       buildSite(entry, skill, media, site);
       args = [script, '--serve', site, '--page', entry.page, '--out', path.join(scratch, 'frames', entry.id), '--project', ROOT, ...(entry.args ?? [])];
     }
+  } else if (entry.checker === 'capture-plan') {
+    const file = (name) => (name.startsWith('assets/') ? path.join(skill, entry.part, ...name.split('/')) : path.join(ROOT, 'fixtures', entry.part, ...name.split('/')));
+    args = [path.join(skill, entry.part, 'scripts', 'capture-plan.mjs'), ...(entry.preflight ? ['--preflight', file(entry.preflight)] : []), ...(entry.devices ? ['--devices', file(entry.devices)] : []), ...(entry.args ?? [])];
   } else if (entry.checker === 'probe-scene') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
@@ -193,7 +197,7 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-', 'probe-app': 'DD-', 'check-installer': 'DD-', 'check-cask': 'DD-', 'check-feed': 'DD-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'capture-plan': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-', 'probe-app': 'DD-', 'check-installer': 'DD-', 'check-cask': 'DD-', 'check-feed': 'DD-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));

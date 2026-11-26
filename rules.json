@@ -365,7 +365,7 @@
       "implementedBy": ["launch-video/scripts/app-preview.mjs"]
     },
     {
-      "id": "LV-WARN-APP-BITRATE",
+      "id": "LV-WARN-BITRATE",
       "part": "launch-video",
       "level": "warn",
       "statement": "An H.264 app preview aims at about 10 to 12 Mbps of video and 256 kbps of AAC audio, with the moov box first.",
@@ -376,7 +376,7 @@
       "implementedBy": ["launch-video/scripts/app-preview.mjs"]
     },
     {
-      "id": "LV-WARN-APP-SOURCE",
+      "id": "LV-WARN-FOOTAGE",
       "part": "launch-video",
       "level": "warn",
       "statement": "An app preview shows only screen captures of the app itself, with narration and video or text overlays allowed to explain what the capture alone does not; footage rendered from a mock or another app does not qualify, so the encoder takes footage the user supplies and never renders its own.",
@@ -385,6 +385,39 @@
       "check": "shared/check-media.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": ["launch-video/scripts/app-preview.mjs"]
+    },
+    {
+      "id": "LV-CAP-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "A screen capture of the real app is planned or run only after a completed recording pre-flight: the recording, the person who consents and the date filled in, and every item ticked (consent, demo data, notifications off, private windows closed, no secrets, no other people, status bar hidden, region cropped to the slot). Without one the capture plan stops before probing the screen.",
+      "values": "3 fields filled; 8 items ticked",
+      "evidence": ["POL-1"],
+      "check": "launch-video/scripts/capture-plan.mjs",
+      "fixtures": { "pass": ["cap-01-complete"], "fail": ["cap-01-no-preflight", "cap-01-template", "cap-01-unticked", "cap-01-missing"] },
+      "implementedBy": ["launch-video/scripts/capture-plan.mjs", "launch-video/assets/reference/capture-preflight.md"]
+    },
+    {
+      "id": "LV-WARN-REGION",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "A capture region is at least as wide in points as the slot is in CSS pixels, so the clip is never upscaled to fit.",
+      "values": "region width in points at least the slot width in CSS px",
+      "evidence": ["PV-14"],
+      "check": "launch-video/scripts/capture-plan.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/capture-plan.mjs"]
+    },
+    {
+      "id": "LV-WARN-CAPTURE",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "Capture guidance stays a warning on a system where no test capture has been measured for this part; Windows has one through ddagrab and gdigrab, macOS and Linux do not yet, and gdigrab is not used above 30 fps.",
+      "values": "Windows measured; macOS and Linux warn; gdigrab at most 30 fps",
+      "evidence": ["POL-4"],
+      "check": "launch-video/scripts/capture-plan.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/capture-plan.mjs"]
     },
     {
       "id": "LP-FONT-01",

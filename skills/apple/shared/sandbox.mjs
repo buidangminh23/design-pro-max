@@ -10,6 +10,14 @@ export const SANDBOX_SIGNATURES = [
   { tool: 'videotoolbox', pattern: /-12908\b/, reason: 'VideoToolbox refused the encoder session (-12908)' },
   { tool: 'chromium', pattern: /sandbox_init|Operation not permitted[^\n]*(?:mach|launchd)/i, reason: 'the browser sandbox could not start' },
   { tool: 'server', pattern: /listen (?:EPERM|EACCES)/, reason: 'the local file server may not listen on a port' },
+  {
+    tool: 'avfoundation',
+    pattern: /AVFoundation video devices:(?:(?!Capture screen)[\s\S])*?AVFoundation audio devices:/,
+    reason: 'no screen capture device is visible: an agent sandbox, an SSH session or a missing Screen Recording permission hides it',
+  },
+  { tool: 'ddagrab', pattern: /DuplicateOutput|Desktop Duplication[^\n]*(?:failed|not available|denied)|E_ACCESSDENIED/i, reason: 'Desktop Duplication refused the capture session' },
+  { tool: 'gdigrab', pattern: /Failed to capture image/, reason: 'the GDI screen grabber cannot read this session' },
+  { tool: 'x11grab', pattern: /Cannot open display/, reason: 'no X display is visible from this process' },
 ];
 
 const quote = (value) => (/^[\w./:=@%+,-]+$/.test(value) ? value : `'${String(value).replace(/'/g, "'\\''")}'`);

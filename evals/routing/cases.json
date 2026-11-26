@@ -499,6 +499,16 @@
       }
     },
     {
+      "id": "r81",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "Record my app's screen for a 6-second demo clip on our landing page, and set it up so the page stays fast.",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
       "id": "r49",
       "kind": "row",
       "row": "Web page scenes that scrub a canvas image sequence on scroll",

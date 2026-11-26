@@ -4370,6 +4370,19 @@
       "correction": "Browsers may ignore a preload hint, so load the whole film explicitly into a Blob or through MSE within a 150-250vh window instead.",
       "sourceSha": "8375fe3f2c6167c60d7abec15f0458a9e52cc85c3fd96431a4823e14a6d159c1"
     },
+    "POL-1": {
+      "claim": "This skill captures a real screen only after the person who owns it has consented and a recording pre-flight is complete: demo data, notifications off, private windows closed, no secrets or other people in view, and the region cropped to the slot. The agent never starts a capture without both.",
+      "value": "capture only after consent and a completed pre-flight",
+      "label": "policy",
+      "date": "2026-11-26",
+      "source": "https://developer.apple.com/documentation/screencapturekit",
+      "method": "Project policy set by the owner in the approved plan.",
+      "confidence": "high",
+      "remeasure": "A policy; revisit only if the owner changes it.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "6b21733acc36e0df663d3c0eec7c01103a90003877b1407695a227fd1361d8a3"
+    },
     "POL-2": {
       "claim": "Web output from this skill never uses SF Symbols: no symbol glyphs, exports or symbol fonts; icons come from a licensed set.",
       "value": "no SF Symbols in web output",
@@ -4395,6 +4408,19 @@
       "status": "current",
       "correction": null,
       "sourceSha": "595e7a2426e15be033c2821b28eca14d4b5800381d84b804296e1b4382a81160"
+    },
+    "POL-4": {
+      "claim": "Capture guidance for an operating system stays a warning until a test capture on that system has been measured for this part; Windows has one, macOS and Linux do not yet.",
+      "value": "warn until a test capture is measured; Windows measured",
+      "label": "policy",
+      "date": "2026-11-26",
+      "source": "https://ffmpeg.org/ffmpeg-devices.html",
+      "method": "Project policy set by the owner in the approved plan.",
+      "confidence": "high",
+      "remeasure": "A policy; revisit only if the owner changes it.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "2cdcc962d1fd76441af6b9481a278e6af0d392cf452a4cd1bb47079613ef292e"
     },
     "IL-13": {
       "claim": "Observing a status item button's effectiveAppearance with key-value observing and marking the button for display on every callback can loop: the menu bar's own snapshot of the item sets the appearance again, which fires the observer again, and the idle app keeps a core busy.",
