@@ -92,6 +92,8 @@ For a motion review, suggest the user run `/review-animations` if they have it; 
 
 Give the user: the page read and the mode; which sections were built and which were left out or marked as placeholders, and why; what the page shows without script and under reduced motion; the checker's summary line with any errors fixed; and the proof boundary: headless Chromium proves font requests, computed sizes and leading, contrast on rendered pixels in the light and dark schemes, visibility without script and under reduced motion, keyboard pause controls for CSS animations and media, the intro end state and reveal persistence, not Safari, real devices, assistive technology, contrast over video, SMIL, canvas or animated images, or taste. Say which of those the user should check by hand.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - One component's animation, easing or interaction: `animate`, if installed.

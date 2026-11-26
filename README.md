@@ -69,7 +69,8 @@ skills/
     agents/openai.yaml       display name and icon for Codex
     assets/apple.svg         the skill icon (the Apple logo)
     shared/                  the checker runtime the project's own parts share: report contract, MP4 reader, media check,
-                             test server, fixture harness, Playwright resolver, sandbox detection and the motion classes
+                             test server, fixture harness, Playwright resolver, sandbox detection, the motion classes
+                             and the opt-in field learnings (learnings.md, learnings.mjs), off unless the user opts in
     launch-scroll/           own part: pinned and scroll-scrubbed scenes on web pages
       PART.md                the guide the router sends to
       references/            engines and geometry, scrub video, frame sequences, gates, generated evidence

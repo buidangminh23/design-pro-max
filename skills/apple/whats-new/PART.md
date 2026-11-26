@@ -95,6 +95,8 @@ SwiftUI code has no checker here. Read it against section 3 and type-check it: `
 
 Give the user: the read from section 1; the choice from section 2 and why the lighter options were or were not enough; the files written; what the checker printed, with errors fixed; and the proof boundary: the checker proves the dialog's DOM, focus, page and playback state and the stored version in Playwright's Chromium or WebKit at the viewport it used; it does not prove what VoiceOver or another screen reader says, how a device or a Tauri or Capacitor WebView plays the video, or anything about a SwiftUI sheet. For SwiftUI, a type-check proves the code compiles, not how the sheet looks or reads. Ask the user to install the update over the previous version once on a device or a Mac and open the app, then reopen the popup from the menu with VoiceOver on.
 
+If learnings are on in the user's project, add one entry as `../shared/learnings.md` says; otherwise skip it.
+
 ## 9. Routing
 
 - App Store release-note text for the same version: the asc-whats-new-writer row of the router.
