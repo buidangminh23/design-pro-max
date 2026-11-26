@@ -913,6 +913,127 @@
       "check": "whats-new/scripts/check-whats-new.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": []
+    },
+    {
+      "id": "HO-ENV-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "A script never reads a .env file as shell code (source or a dot command of a .env file, export or eval of its text): a line with an unbalanced quote, a $( or an ampersand runs as a command and zsh prints the secret in its command not found message. Read one value with grep and cut and check only its length.",
+      "values": "no source, . , export $(...) or eval of a .env file; one value read with grep -E ^NAME= and cut -d= -f2-",
+      "evidence": ["IL-6"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets", "env-03-read-one-value"], "fail": ["env-01-sourced", "env-02-exported"] },
+      "implementedBy": ["host-ops/assets/env-value.sh"]
+    },
+    {
+      "id": "HO-PIPE-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "With pipefail on, no pipeline ends in grep -q: grep exits at the first match, the command before it can be killed by SIGPIPE, and the pipeline then reports failure although it matched. Capture the output first, or let grep read everything with its output sent to /dev/null.",
+      "values": "no | grep -q, --quiet or --silent after set -o pipefail or setopt pipefail until it is turned off",
+      "evidence": ["IL-12"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets", "pipe-02-captured", "pipe-03-no-pipefail"], "fail": ["pipe-01-grep-q-pipefail"] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-PRIV-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "An agent never handles an administrator password: no sudo -S or --stdin, no password in do shell script. A root command runs through do shell script with administrator privileges so macOS asks the person at the Mac, or the user runs the sudo command.",
+      "values": "no sudo -S, sudo --stdin or do shell script ... password; with administrator privileges and no password clause",
+      "evidence": ["IL-5"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets", "priv-03-admin-dialog"], "fail": ["priv-01-sudo-stdin", "priv-02-script-password"] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-OSA-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "AppleScript names its target application as a quoted literal, or inside a using terms from block: a tell application with a variable or an unquoted name does not load the dictionary when the script compiles, so the app's terms fail or mean something else.",
+      "values": "tell application \"<name>\" or tell application id \"<bundle id>\"; a variable only inside using terms from application \"<name>\"",
+      "evidence": ["IL-2"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": ["osa-03-literal-and-terms"], "fail": ["osa-01-tell-variable", "osa-02-tell-in-shell"] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-TMP-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "Nothing that must persist lives under /tmp or /private/tmp: no git worktree or clone made there, and no launchd job whose program, arguments or working directory point there, because macOS deletes old files in that folder on its own schedule and at restart.",
+      "values": "no git worktree add or git clone into /tmp or /private/tmp; no Program, ProgramArguments or WorkingDirectory under them",
+      "evidence": ["IL-8"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": ["scan-shipped-assets", "tmp-03-kept-worktree"], "fail": ["tmp-01-worktree", "tmp-02-job-in-tmp"] },
+      "implementedBy": ["host-ops/assets/com.example.sync.plist"]
+    },
+    {
+      "id": "HO-PLIST-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "A launchd property list passes plutil -lint and has a dictionary root, a Label, and Program or a non-empty ProgramArguments array of strings whose program is an absolute path; launchd looks a bare name up only in its short default PATH. The file is named <Label>.plist.",
+      "values": "plutil -lint OK; Label; Program or ProgramArguments[0] absolute; default launchd PATH /usr/bin:/bin:/usr/sbin:/sbin",
+      "evidence": ["IL-4"],
+      "check": "host-ops/scripts/check-plist.mjs",
+      "fixtures": { "pass": ["plist-01-shipped"], "fail": ["plist-02-relative-program", "plist-03-no-label", "plist-04-malformed"] },
+      "implementedBy": ["host-ops/assets/com.example.sync.plist"]
+    },
+    {
+      "id": "HO-LAUNCHD-01",
+      "part": "host-ops",
+      "level": "error",
+      "statement": "A job is proven loaded before it is trusted: launchctl print finds its label in the domain named (system for a LaunchDaemon, gui/<uid> for a LaunchAgent), loaded from the property list on disk with the program and arguments that file holds now, and its last exit code is 0 or it never exited. An edited file applies only after launchctl bootout and bootstrap.",
+      "values": "found in the domain; loaded path equals the plist; loaded program and arguments equal the file; last exit code 0 or never exited; exit 113 means not found",
+      "evidence": ["IL-4"],
+      "check": "host-ops/scripts/probe-launchd.mjs",
+      "fixtures": { "pass": ["launchd-01-current", "launchd-02-never-exited"], "fail": ["launchd-03-stale-copy", "launchd-04-not-found", "launchd-05-last-exit", "launchd-06-other-file"] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-WARN-OPENENV",
+      "part": "host-ops",
+      "level": "warn",
+      "statement": "Start a GUI app from an agent shell with env -i and only HOME, USER, LOGNAME, SHELL, TMPDIR and the system PATH, since open -a passes the calling environment, tokens included, to the app.",
+      "values": "env -i HOME USER LOGNAME SHELL TMPDIR PATH=/usr/bin:/bin:/usr/sbin:/sbin open -a <App>",
+      "evidence": ["IL-7"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-WARN-LOG",
+      "part": "host-ops",
+      "level": "warn",
+      "statement": "In zsh, call the unified log as /usr/bin/log: log is a zsh builtin that lists logins.",
+      "values": "/usr/bin/log show or /usr/bin/log stream in zsh",
+      "evidence": ["IL-24"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-WARN-SSH",
+      "part": "host-ops",
+      "level": "warn",
+      "statement": "Send a remote command over SSH in single quotes or as a here-document with a quoted delimiter, and run it in a login shell when it needs the user's PATH: in double quotes, $ and $( expand on the local machine first.",
+      "values": "ssh <host> 'zsh -lc ...' or ssh <host> 'zsh -ls' <<'EOF'",
+      "evidence": ["IL-1"],
+      "check": "host-ops/scripts/scan-host.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "HO-WARN-TCC",
+      "part": "host-ops",
+      "level": "warn",
+      "statement": "A launchd job that reaches a protected folder (an external volume, Desktop, Documents, Downloads, iCloud Drive) starts a dedicated binary rather than a shell or script interpreter, since macOS records privacy permission against the binary launchd starts; never grant Full Disk Access to a shell.",
+      "values": "a dedicated binary as the program of a job that reads protected folders; no Full Disk Access for /bin/sh, /bin/bash or /bin/zsh",
+      "evidence": ["IL-3"],
+      "check": "host-ops/scripts/check-plist.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
     }
   ]
 }

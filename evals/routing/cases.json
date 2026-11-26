@@ -795,6 +795,36 @@
       "kind": "recorded",
       "prompt": "Review my SwiftUI screen against the HIG",
       "expect": null
+    },
+    {
+      "id": "r61",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "Over SSH to our build Mac, gh says I am not logged in and docker push says the keychain cannot be accessed, but both work in Terminal on the Mac itself. How do I make our deploy script work over SSH?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
+    },
+    {
+      "id": "r62",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "I edited ~/Library/LaunchAgents/com.example.sync.plist to add an argument, but the job still runs the old command, and launchctl list does not show our backup daemon at all. How do I check what launchd is really running?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
+    },
+    {
+      "id": "r63",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "Our agent runs on a headless Mac mini and needs to run pmset as root. Should it pipe the admin password into sudo -S from a .env file we source at the top of the script?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
     }
   ]
 }

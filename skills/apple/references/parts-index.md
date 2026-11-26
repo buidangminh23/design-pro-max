@@ -498,3 +498,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 7 error, 5 warn; evidence in `whats-new/references/evidence.md`
 - Checkers: `whats-new/scripts/check-whats-new.mjs`
+
+### `host-ops`
+
+- Guide: `host-ops/PART.md`
+- Status: active
+- Rules: 7 error, 4 warn; evidence in `host-ops/references/evidence.md`
+- Checkers: `host-ops/scripts/scan-host.mjs`, `host-ops/scripts/check-plist.mjs`, `host-ops/scripts/probe-launchd.mjs`

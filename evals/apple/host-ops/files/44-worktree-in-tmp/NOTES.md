@@ -1,0 +1,1 @@
+This deploy worked for weeks. Since Monday it fails with "fatal: '/private/tmp/app-prod' is a missing but already registered worktree", and some runs print "starting all services" although the web container was running.

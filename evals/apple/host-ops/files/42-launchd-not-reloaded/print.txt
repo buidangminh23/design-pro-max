@@ -1,0 +1,15 @@
+gui/501/com.example.sync = {
+	active count = 0
+	path = /Library/LaunchAgents-copy/com.example.sync.plist
+	type = LaunchAgent
+	state = not running
+
+	program = /usr/local/bin/node
+	arguments = {
+		/usr/local/bin/node
+		/usr/local/libexec/example-sync/sync.mjs
+	}
+
+	runs = 41
+	last exit code = 0
+}

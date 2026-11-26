@@ -96,7 +96,7 @@ test('every fixture case names an existing page, a known checker and known media
   const recipes = [buildFixtureMedia, buildLaunchVideoMedia, buildWhatsNewMedia].flatMap((build) => build.toString().match(/'([a-z0-9-]+)':|\b([a-z]+):\s*path\.join/g).map((key) => key.replace(/[':]|\s*path\.join/g, '')));
   for (const part of OWN_PARTS) {
     for (const entry of loadCases(ROOT, part)) {
-      assert.ok(['probe-scene', 'check-media', 'check-embed', 'render-frames', 'check-page', 'lint-css', 'scan-swift', 'probe-extension', 'snapshot-widgets', 'check-shell', 'probe-webkit', 'check-whats-new'].includes(entry.checker), entry.id);
+      assert.ok(['probe-scene', 'check-media', 'check-embed', 'render-frames', 'check-page', 'lint-css', 'scan-swift', 'probe-extension', 'snapshot-widgets', 'check-shell', 'probe-webkit', 'check-whats-new', 'scan-host', 'check-plist', 'probe-launchd'].includes(entry.checker), entry.id);
       for (const folder of [entry.project, entry.bundle].filter(Boolean)) assert.ok(fs.existsSync(path.join(ROOT, 'fixtures', part, folder)), `${entry.id}: ${folder}`);
       if (entry.app) assert.ok(fs.existsSync(entry.app.startsWith('assets/') ? path.join(ROOT, SKILL_DIR, part, entry.app) : path.join(ROOT, 'fixtures', part, entry.app)), `${entry.id}: ${entry.app}`);
       if (entry.poster) assert.ok(recipes.includes(entry.poster), `${entry.id}: ${entry.poster}`);
