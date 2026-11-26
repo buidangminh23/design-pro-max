@@ -73,40 +73,41 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Wall of Apps entry, on an explicit request only | `.vendor/app-store-connect/asc-wall-submit/SKILL.md` | inactive |
 | Web page scenes that pin, zoom or scrub video or a canvas image sequence on scroll; sequence memory budgets; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
 | Launch and landing pages (hero, feature tiles, galleries, marquees, pricing, FAQ) or a review of one: type scale, SF fonts on the web, contrast, reveals, hero intros, pause controls | `launch-page/PART.md` | active |
-| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough; App Store app previews encoded from a screen capture the user supplies | `launch-video/PART.md` | active |
-| A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
-| Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
+| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, embed clips that load late and pause; whether a still is enough; App Store app previews from a user's capture | `launch-video/PART.md` | active |
+| A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
+| Design or review a native app screen, component or flow against the Human Interface Guidelines: layout, type, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities | `hig/PART.md` | active |
 | In-app What's New popups after an update: one card or a pager, image or looping video, once per version, a reopen item; SwiftUI, web, Tauri | `whats-new/PART.md` | active |
-| Operating an always-on or remote Mac from an agent: commands over SSH and the login Keychain, shells and PATH, launchd jobs that do not load or run, privacy (TCC) denials, root commands without a password in the agent, `.env` secrets, AppleScript targets, sleep and FileVault restarts, stuck Simulator runtimes, Apple tools that fail only in the agent sandbox | `host-ops/PART.md` | active |
-| macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
+| Running an always-on or remote Mac from an agent: SSH and the login Keychain, PATH, launchd jobs, TCC denials, root without a password, `.env` secrets, sleep and FileVault restarts, tools that fail only in the sandbox | `host-ops/PART.md` | active |
+| macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, widget snapshots | `menubar-widgets/PART.md` | active |
+| Mac apps outside the App Store: signing, installers, casks, feeds | `desktop-distribution/PART.md` | active |
 
 Routing notes:
 
-- Swift concurrency: read the default isolation, NonisolatedNonsendingByDefault and the strict-concurrency level from Package.swift, the .pbxproj or the swiftc build script before advising. Core Data threading starts in `.vendor/core-data-expert/references/concurrency.md`.
-- Swift Testing: async tests start in `.vendor/swift-testing-pro/references/async-tests.md`; concurrency bugs found there follow the concurrency row.
-- SwiftData migrations: the part has one migration rule; also use Apple's VersionedSchema documentation.
+- Swift concurrency: read default isolation, NonisolatedNonsendingByDefault and strict-concurrency from Package.swift, the .pbxproj or the build script first. Core Data threading starts in `.vendor/core-data-expert/references/concurrency.md`.
+- Swift Testing: async tests start in `.vendor/swift-testing-pro/references/async-tests.md`; concurrency bugs there follow the concurrency row.
+- SwiftData migrations: one rule in the part; also Apple's VersionedSchema docs.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
-- Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design or HIG review to `hig`, Tuist manifests to the Tuist row, one SwiftUI API (a MenuBarExtra modifier) to SwiftUI.
-- App Store metadata keywords are limited to 100 bytes, not 100 characters.
-- A launch page with scroll scenes or clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
-- Running or keeping a Mac working from an agent starts at `host-ops/PART.md`; Xcode disk space stays the disk space row.
-- In-app What's New popups go to `whats-new`; App Store What's New text to the asc-whats-new-writer row; teaching one control in place is TipKit in `hig`.
+- Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design to `hig`, Tuist manifests to the Tuist row, one SwiftUI API to SwiftUI.
+- App Store keywords are limited to 100 bytes, not characters.
+- A launch page with scenes or clips: a whole page starts at `launch-page/PART.md`; one scene or clip, even on a landing page, goes to `launch-scroll` or `launch-video`.
+- Running a Mac from an agent: `host-ops`; Xcode disk space stays the disk space row.
+- In-app What's New popups go to `whats-new`; App Store What's New text to asc-whats-new-writer; teaching one control is TipKit in `hig`.
 
 Not covered by any part:
 
-- Screen recording: not covered; read `launch-video/PART.md` section 0, say so and offer its two paths.
+- Screen recording: not covered; read `launch-video/PART.md` section 0 and offer its two paths.
 - Narrated launch films, AI footage and HLS streaming: not covered; say so.
-- Live Activities and App Intents beyond widget configuration: no code part (their design is in `hig/PART.md`); suggest Xcode's coding assistant. SMAppService login items, DMG or curl installers, Sparkle, MDM and fleets: not covered (one Mac from an agent is `host-ops`); use `write-swift` if installed and Apple's documentation.
+- Live Activities and App Intents beyond widget configuration: no code part (design in `hig`); suggest Xcode's coding assistant. SMAppService login items, MDM and fleets: not covered; use `write-swift` if installed and Apple's docs.
 - swiftc or SwiftPM builds with no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Android-only shells and apps, React Native and Flutter: not covered; say so.
 
-Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language questions and new tests to `write-swift`; a web app that should feel native in mobile Safari to `mobile-native` (Home Screen or shell: the `web-shells` row); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion compositions and HyperFrames templates to their own skills; GSAP APIs to the GSAP skills, each when installed. Simulator runs, taps and screenshots go to the host's simulator tool; Simulator-captured App Store screenshots are the `asc-shots-pipeline` row.
+Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language and new tests to `write-swift`; a web app feeling native in mobile Safari to `mobile-native` (Home Screen or shell: `web-shells`); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion, HyperFrames and GSAP to their own skills, each when installed. Simulator runs, taps and screenshots go to the host's simulator tool; Simulator-captured App Store screenshots are the `asc-shots-pipeline` row.
 
 ## Parts index
 
 `references/parts-index.md` lists each part's group, status, activation check, prerequisites and errata pointers (full text in its `UPSTREAM.json`); read a part's entry before using it.
 
-- Active (14): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets`, `web-shells`, `whats-new` and `host-ops`.
+- Active (15): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets`, `web-shells`, `whats-new`, `host-ops` and `desktop-distribution`.
 - `xcode-build/` (6): inactive until `xcodebuild -list`, run outside the agent sandbox, lists a scheme. They need python3; say that `xcodebuild clean` will run before it does.
 - `macos-menubar-tuist-app`: inactive until Tuist.swift and Project.swift exist and `tuist version` succeeds.
-- `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public pull requests.
+- `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public PRs.

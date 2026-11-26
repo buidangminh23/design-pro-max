@@ -1034,6 +1034,204 @@
       "check": "host-ops/scripts/check-plist.mjs",
       "fixtures": { "pass": [], "fail": [] },
       "implementedBy": []
+    },
+    {
+      "id": "DD-SIGN-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A Mac app given out as a build passes codesign --verify --deep --strict: its seal is intact and every nested executable, library and bundle is signed, inside out, before the app itself.",
+      "values": "codesign --verify --deep --strict exits 0; no nested code unsigned",
+      "evidence": ["IL-20", "IL-19"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": ["probe-notarized"], "fail": ["probe-broken-seal", "probe-unsigned-helper"] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-TEAM-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "Every helper, runtime and library inside the app is signed with the app's own team identifier (or, for an ad hoc app, ad hoc too), and no helper starts node, python, ruby, deno or bun from outside the bundle: a peer that checks the team identifier, and library validation under the hardened runtime, refuse code from another team.",
+      "values": "the app's team on all nested code; runtimes bundled, never taken from PATH, Homebrew or a version manager",
+      "evidence": ["IL-19"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": ["probe-notarized"], "fail": ["probe-team-mismatch", "probe-outside-runtime"] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-GATE-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A Developer ID app distributed outside the App Store is notarized: spctl --assess --type execute accepts it with the source Notarized Developer ID.",
+      "values": "spctl accepts it; source=Notarized Developer ID",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": ["probe-notarized"], "fail": ["probe-unnotarized"] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-INSTALL-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A shell installer downloads over https with certificate checks on, computes the SHA-256 of the archive and compares it with the published checksum, stopping on a mismatch, before it unpacks anything.",
+      "values": "https only; SHA-256 compared before unpacking",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/check-installer.mjs",
+      "fixtures": { "pass": ["installer-shipped", "installer-minimal"], "fail": ["install-01-no-checksum", "install-01-http", "install-01-insecure", "install-01-sum-not-compared"] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-INSTALL-02",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A shell installer verifies the unpacked app with codesign --verify --deep --strict before it moves the app into place, since curl leaves no quarantine flag for Gatekeeper to act on.",
+      "values": "codesign --verify --deep --strict on the staged copy, before the swap",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/check-installer.mjs",
+      "fixtures": { "pass": ["installer-shipped", "installer-minimal"], "fail": ["install-02-no-verify", "install-02-not-strict", "install-02-after-swap"] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-INSTALL-03",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A shell installer copies the app with ditto to a staging path beside the destination and replaces the installed copy with two renames (the old copy aside, the staged copy into place), never by deleting the installed app first or copying over it in place.",
+      "values": "ditto staging; old copy renamed aside, staged copy renamed into place; no rm or cp on the installed app before the swap",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/check-installer.mjs",
+      "fixtures": { "pass": ["installer-shipped", "installer-minimal"], "fail": ["install-03-rm-then-copy", "install-03-copy-over"] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-CASK-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A Homebrew cask uses the declarative install-step stanzas that the current cask style check wants instead of Ruby preflight, postflight, uninstall_preflight or uninstall_postflight blocks.",
+      "values": "no flight do ... end blocks; confirm with brew style --cask",
+      "evidence": ["IL-22"],
+      "check": "desktop-distribution/scripts/check-cask.mjs",
+      "fixtures": { "pass": ["cask-shipped", "cask-comment-mentions-postflight"], "fail": ["cask-01-postflight-block", "cask-01-uninstall-postflight-block"] },
+      "implementedBy": ["desktop-distribution/assets/example.rb"]
+    },
+    {
+      "id": "DD-CASK-02",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A cask's uninstall stanza removes no login item and no files under ~/Library, since brew upgrade runs uninstall too; those go in zap.",
+      "values": "login items and user files only in zap",
+      "evidence": ["IL-22"],
+      "check": "desktop-distribution/scripts/check-cask.mjs",
+      "fixtures": { "pass": ["cask-shipped", "cask-comment-mentions-postflight"], "fail": ["cask-02-uninstall-login-item", "cask-02-uninstall-trash-library"] },
+      "implementedBy": ["desktop-distribution/assets/example.rb"]
+    },
+    {
+      "id": "DD-CASK-03",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "The cask of an app that updates itself declares auto_updates true and bumps version and sha256 for every release, so Homebrew and the app install the same build.",
+      "values": "auto_updates true for a self-updating app",
+      "evidence": ["IL-22"],
+      "check": "desktop-distribution/scripts/check-cask.mjs",
+      "fixtures": { "pass": ["cask-shipped", "cask-comment-mentions-postflight"], "fail": ["cask-03-no-auto-updates"] },
+      "implementedBy": ["desktop-distribution/assets/example.rb"]
+    },
+    {
+      "id": "DD-FEED-01",
+      "part": "desktop-distribution",
+      "level": "error",
+      "statement": "A self-update feed carries, from the first release on, an entry with an https url and a signature for every platform the release ships (darwin-aarch64 and darwin-x86_64 by default), and a version; a Sparkle appcast's newest item has an https enclosure with an EdDSA signature and a version.",
+      "values": "every shipped os-arch platform with an https url and a signature; a version",
+      "evidence": ["IL-21"],
+      "check": "desktop-distribution/scripts/check-feed.mjs",
+      "fixtures": { "pass": ["feed-shipped", "feed-every-platform", "appcast-signed"], "fail": ["feed-01-no-darwin-aarch64", "feed-01-no-signature", "feed-01-http-url", "appcast-01-no-signature"] },
+      "implementedBy": ["desktop-distribution/assets/latest.json"]
+    },
+    {
+      "id": "DD-WARN-ADHOC",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "An ad hoc or development signature is for builds the person installs on their own Mac or through the checksum-checking installer; anyone else downloading the app gets a Developer ID build that is notarized.",
+      "values": "ad hoc or development signature: own Macs or the curl installer only",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-WARN-RUNTIME",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "Developer ID code has the hardened runtime and a secure timestamp, which notarization requires.",
+      "values": "hardened runtime flag and a secure timestamp",
+      "evidence": ["IL-20"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-WARN-PATH",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "Build, sign and package with /usr/bin first on PATH: an xattr, codesign, ditto, hdiutil or plutil installed by pip, Homebrew or npm ahead of the system copy can break bundling or signing.",
+      "values": "the system copies in /usr/bin, /bin, /usr/sbin and /sbin come first",
+      "evidence": ["IL-23"],
+      "check": "desktop-distribution/scripts/probe-app.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-WARN-XATTR",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "An installer removes the quarantine flag with /usr/bin/xattr by its full path, and only from the copy that passed the checksum and the signature check.",
+      "values": "/usr/bin/xattr after the checks",
+      "evidence": ["IL-20", "IL-23"],
+      "check": "desktop-distribution/scripts/check-installer.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-WARN-REGISTER",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "After the swap an installer registers the app with lsregister -f and each embedded extension with pluginkit -a, so Finder, Launchpad and the widget gallery see the new copy.",
+      "values": "lsregister -f; pluginkit -a for each extension",
+      "evidence": ["IL-20", "IL-14"],
+      "check": "desktop-distribution/scripts/check-installer.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["desktop-distribution/assets/install-macos.sh"]
+    },
+    {
+      "id": "DD-WARN-CASKSHA",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "A cask pins a version and the sha256 of the release archive and downloads over https; sha256 :no_check and version :latest skip the check Homebrew would make.",
+      "values": "a pinned version, an https url and a sha256",
+      "evidence": ["IL-22"],
+      "check": "desktop-distribution/scripts/check-cask.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["desktop-distribution/assets/example.rb"]
+    },
+    {
+      "id": "DD-WARN-DMG",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "A disk image given out with a Developer ID app is signed, notarized and stapled itself, and checked with hdiutil verify and spctl before it is published.",
+      "values": "signed, notarized and stapled image; hdiutil verify passes",
+      "evidence": ["IL-20"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
+    },
+    {
+      "id": "DD-WARN-BETA",
+      "part": "desktop-distribution",
+      "level": "warn",
+      "statement": "On a beta of macOS, expect Homebrew to ask for the newest Xcode or Command Line Tools and to miss bottles; leave App Store apps to macOS automatic updates rather than mas upgrade, which needs sudo.",
+      "values": "beta OS: Homebrew may want the newest tools; App Store apps through automatic updates",
+      "evidence": ["IL-23"],
+      "check": null,
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": []
     }
   ]
 }

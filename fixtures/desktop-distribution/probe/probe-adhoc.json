@@ -1,0 +1,40 @@
+{
+  "verify": {
+    "status": 0,
+    "output": "/Applications/Relay.app: valid on disk\n/Applications/Relay.app: satisfies its Designated Requirement\n"
+  },
+  "spctl": {
+    "status": 3,
+    "output": "/Applications/Relay.app: rejected\n"
+  },
+  "code": {
+    ".": {
+      "status": 0,
+      "output": "Executable=/Applications/Relay.app/Contents/MacOS/Relay\nIdentifier=com.example.relay\nFormat=Mach-O universal (x86_64 arm64)\nCodeDirectory v=20500 size=1200 flags=0x2(adhoc) hashes=30+7 location=embedded\nSignature=adhoc\nTeamIdentifier=not set\n"
+    },
+    "Contents/Resources/runtime/node": {
+      "status": 0,
+      "output": "Executable=/Applications/Relay.app/Contents/Resources/runtime/node\nIdentifier=node\nFormat=Mach-O universal (x86_64 arm64)\nCodeDirectory v=20500 size=1200 flags=0x2(adhoc) hashes=30+7 location=embedded\nSignature=adhoc\nTeamIdentifier=not set\n"
+    }
+  },
+  "tools": {
+    "xattr": [
+      "/usr/bin/xattr"
+    ],
+    "codesign": [
+      "/usr/bin/codesign"
+    ],
+    "ditto": [
+      "/usr/bin/ditto"
+    ],
+    "hdiutil": [
+      "/usr/bin/hdiutil"
+    ],
+    "plutil": [
+      "/usr/bin/plutil"
+    ],
+    "spctl": [
+      "/usr/sbin/spctl"
+    ]
+  }
+}

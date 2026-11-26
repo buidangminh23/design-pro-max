@@ -505,3 +505,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 7 error, 4 warn; evidence in `host-ops/references/evidence.md`
 - Checkers: `host-ops/scripts/scan-host.mjs`, `host-ops/scripts/check-plist.mjs`, `host-ops/scripts/probe-launchd.mjs`
+
+### `desktop-distribution`
+
+- Guide: `desktop-distribution/PART.md`
+- Status: active
+- Rules: 10 error, 8 warn; evidence in `desktop-distribution/references/evidence.md`
+- Checkers: `desktop-distribution/scripts/probe-app.mjs`, `desktop-distribution/scripts/check-installer.mjs`, `desktop-distribution/scripts/check-cask.mjs`, `desktop-distribution/scripts/check-feed.mjs`

@@ -1,0 +1,15 @@
+{
+  "version": "2.1.0",
+  "notes": "Example",
+  "pub_date": "2026-01-01T00:00:00Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IGV4YW1wbGU=",
+      "url": "http://downloads.example.com/Relay-2.1.0-macos.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IGV4YW1wbGU=",
+      "url": "https://downloads.example.com/Relay-2.1.0-macos.app.tar.gz"
+    }
+  }
+}

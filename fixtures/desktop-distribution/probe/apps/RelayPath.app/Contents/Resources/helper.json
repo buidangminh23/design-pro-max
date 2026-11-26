@@ -1,0 +1,6 @@
+{
+  "command": "/opt/homebrew/bin/node",
+  "args": [
+    "Contents/Resources/helper/main.js"
+  ]
+}

@@ -193,7 +193,7 @@ test('the verify workflow runs every fixture with ffmpeg and Playwright on own-p
   const verify = read('verify.yml');
   assert.doesNotMatch(verify, /tags: \["v\*"\]/, 'the release workflow runs verify for tags, a tag trigger would run it twice');
   assert.match(verify, /^ {2}workflow_call:\n {4}inputs:\n {6}ref:\n/m);
-  for (const filter of ['"skills/apple/shared/**"', '"skills/apple/launch-*/**"', '"skills/apple/menubar-widgets/**"', '"skills/apple/web-shells/**"', '"skills/apple/whats-new/**"', '"skills/apple/host-ops/**"', '"rules.json"', '"fixtures/**"', '"evidence/**"']) {
+  for (const filter of ['"skills/apple/shared/**"', '"skills/apple/launch-*/**"', '"skills/apple/menubar-widgets/**"', '"skills/apple/web-shells/**"', '"skills/apple/whats-new/**"', '"skills/apple/host-ops/**"', '"skills/apple/desktop-distribution/**"', '"rules.json"', '"fixtures/**"', '"evidence/**"']) {
     assert.equal(verify.split(filter).length - 1, 2, `${filter} filters both pushes and pull requests`);
   }
   const scripts = runScripts(verify).join('\n');

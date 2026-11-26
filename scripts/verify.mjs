@@ -23,7 +23,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia, buildWhatsNewMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops', 'desktop-distribution'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -127,6 +127,16 @@ export function hostOpsArgs(entry, skill, scratch, root = ROOT) {
   return [script('probe-launchd'), '--label', entry.label, '--domain', entry.domain, '--plist', plist, '--print', print, '--exit', String(entry.exit ?? 0)];
 }
 
+const DESKTOP_CHECKERS = ['probe-app', 'check-installer', 'check-cask', 'check-feed'];
+
+/** Arguments for a desktop-distribution case: a recorded probe of a fixture app, or one installer, cask or feed file. */
+export function desktopDistributionArgs(entry, skill, root = ROOT) {
+  const script = path.join(skill, entry.part, 'scripts', `${entry.checker}.mjs`);
+  const file = (name) => (name.startsWith('assets/') ? path.join(skill, entry.part, ...name.split('/')) : path.join(root, 'fixtures', entry.part, ...name.split('/')));
+  if (entry.checker === 'probe-app') return [script, '--app', file(entry.app), '--record', file(entry.record), ...(entry.args ?? [])];
+  return [script, ...(entry.args ?? []), file(entry.file)];
+}
+
 export const runsHere = (entry, platform = process.platform) => !entry.platform || entry.platform === platform;
 
 function runCase(entry, skill, media, scratch) {
@@ -173,6 +183,8 @@ function runCase(entry, skill, media, scratch) {
   } else if (entry.checker === 'probe-webkit') {
     const app = entry.app.startsWith('assets/') ? path.join(skill, entry.part, ...entry.app.split('/')) : path.join(ROOT, 'fixtures', entry.part, ...entry.app.split('/'));
     args = [path.join(skill, entry.part, 'scripts', 'probe-webkit.mjs'), '--app', app, '--project', ROOT, ...(entry.args ?? [])];
+  } else if (DESKTOP_CHECKERS.includes(entry.checker)) {
+    args = desktopDistributionArgs(entry, skill);
   } else {
     throw new Error(`${entry.id}: unknown checker ${entry.checker}`);
   }
@@ -181,7 +193,7 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-', 'probe-app': 'DD-', 'check-installer': 'DD-', 'check-cask': 'DD-', 'check-feed': 'DD-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
