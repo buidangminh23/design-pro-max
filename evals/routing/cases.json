@@ -489,6 +489,16 @@
       }
     },
     {
+      "id": "r80",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "I recorded a 25-second screen capture of my iPhone app. How do I turn it into an App Store app preview for the 6.9-inch iPhone size?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
       "id": "r49",
       "kind": "row",
       "row": "Web page scenes that scrub a canvas image sequence on scroll",
@@ -686,16 +696,6 @@
       "expect": {
         "trigger": false,
         "instead": "out of scope"
-      }
-    },
-    {
-      "id": "n16",
-      "kind": "near-miss",
-      "row": "App Store preview video",
-      "prompt": "How do I make an App Store app preview video for an iPhone app?",
-      "expect": {
-        "trigger": false,
-        "instead": "out of scope until 1.0"
       }
     },
     {

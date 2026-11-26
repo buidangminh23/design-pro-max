@@ -2,7 +2,7 @@
  * Media for the own parts' fixtures, generated with ffmpeg from synthetic sources so no media file is ever committed.
  *
  *   buildFixtureMedia(folder, { encodeScrub, makeSequence })  launch-scroll and launch-page cases
- *   buildLaunchVideoMedia(folder, { encode })                 launch-video cases
+ *   buildLaunchVideoMedia(folder, { encode, appPreview })     launch-video cases, including App Store app previews
  *
  * Good media go through the parts' own encode-scrub.mjs, make-sequence.mjs and encode.mjs, which the fixtures therefore
  * exercise too; each bad recipe breaks one rule.
@@ -71,7 +71,7 @@ const LV_THREADS = ['-threads', '2'];
  * Media for the launch-video fixtures, from the same synthetic source at 640x360 or smaller. The good clips go through
  * the part's own encode.mjs; each bad recipe breaks exactly one encode rule.
  */
-export function buildLaunchVideoMedia(folder, { encode }) {
+export function buildLaunchVideoMedia(folder, { encode, appPreview }) {
   fs.mkdirSync(folder, { recursive: true });
   const file = (name) => path.join(folder, name);
   const masters = { clip: [file('lv-master.mkv'), 2], loop: [file('lv-loop-master.mkv'), 6] };
@@ -94,6 +94,13 @@ export function buildLaunchVideoMedia(folder, { encode }) {
     'lv-untagged': file('lv-untagged.mp4'),
     'lv-start-wrong': file('lv-start-wrong.jpg'),
     'lv-recorded': file('lv-recorded.webm'),
+    'ap-footage': file('ap-footage.mkv'),
+    'ap-good': path.join(folder, 'app-preview', 'preview.mp4'),
+    'ap-short': file('ap-short.mp4'),
+    'ap-60fps': file('ap-60fps.mp4'),
+    'ap-wrong-size': file('ap-wrong-size.mp4'),
+    'ap-no-audio': file('ap-no-audio.mp4'),
+    'ap-mono': file('ap-mono.mp4'),
   };
   const master = masters.clip[0];
   const build = (name, ...args) => {
@@ -106,5 +113,24 @@ export function buildLaunchVideoMedia(folder, { encode }) {
   build('lv-untagged', '-i', master, '-an', '-vf', 'format=yuv420p', '-c:v', 'libx264', '-profile:v', 'high', '-movflags', '+faststart');
   build('lv-start-wrong', '-ss', '1.5', '-i', media['lv-clip'], '-frames:v', '1', '-vf', TO_DISPLAY_RGB, '-q:v', '2');
   build('lv-recorded', ...LV_SOURCE(2.2, '400x225', 25), '-an', '-c:v', 'libvpx', '-b:v', '1M', '-deadline', 'realtime', '-cpu-used', '8');
+  if (appPreview) buildAppPreviewMedia(media, appPreview, build);
   return media;
+}
+
+const AP_SIZE = '886x1920';
+const AP_VIDEO = ['-vf', 'format=yuv420p', '-c:v', 'libx264', '-profile:v', 'high', '-level:v', '4.0', '-preset', 'ultrafast', '-movflags', '+faststart'];
+const AP_STEREO = ['-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-ac', '2', '-c:a', 'aac', '-b:a', '256k', '-shortest'];
+
+/**
+ * App Store app preview media for the iphone-6.9 class: the good preview goes through the part's own app-preview.mjs
+ * from 16 s of synthetic footage; each bad recipe breaks exactly one LV-APP-01 check.
+ */
+function buildAppPreviewMedia(media, appPreview, build) {
+  build('ap-footage', ...LV_SOURCE(16, '720x1280'), '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-crf', '18', '-preset', 'ultrafast');
+  if (!fs.existsSync(media['ap-good'])) run(process.execPath, [appPreview, media['ap-footage'], '--device', 'iphone-6.9', '--out', media['ap-good'], '--threads', '2']);
+  build('ap-short', ...LV_SOURCE(10, AP_SIZE), ...AP_STEREO, ...AP_VIDEO);
+  build('ap-60fps', ...LV_SOURCE(16, AP_SIZE, 60), ...AP_STEREO, ...AP_VIDEO);
+  build('ap-wrong-size', ...LV_SOURCE(16, '1080x1920'), ...AP_STEREO, ...AP_VIDEO);
+  build('ap-no-audio', ...LV_SOURCE(16, AP_SIZE), '-an', ...AP_VIDEO);
+  build('ap-mono', ...LV_SOURCE(16, AP_SIZE), '-f', 'lavfi', '-i', 'sine=frequency=440:sample_rate=48000', '-ac', '1', '-c:a', 'aac', '-b:a', '128k', '-shortest', ...AP_VIDEO);
 }

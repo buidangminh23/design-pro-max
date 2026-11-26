@@ -1,0 +1,36 @@
+{
+  "description": "Values in evidence/ledger.json that come from public data sets and can drift: browser support from mdn/browser-compat-data and Fyrd/caniuse, and licence fields from the npm registry. scripts/freshness.mjs reads only these data files, never a web page, and compares them with the snapshots below, which state what the ledger entry says. A difference opens an issue; nobody re-measures or edits the ledger automatically.",
+  "watches": [
+    {
+      "id": "TQ-14",
+      "kind": "bcd",
+      "path": "css/properties/animation-timeline.json",
+      "feature": "css.properties.animation-timeline",
+      "snapshot": { "chrome": "115", "safari": "26", "firefox": "preview" }
+    },
+    {
+      "id": "PV-24",
+      "kind": "caniuse",
+      "feature": "hevc",
+      "snapshot": { "chrome": "107 partial", "firefox": "137 partial" }
+    },
+    {
+      "id": "PV-24",
+      "kind": "caniuse",
+      "feature": "av1",
+      "snapshot": { "safari": "17 partial", "ios_saf": "17.0 partial" }
+    },
+    {
+      "id": "EC-10",
+      "kind": "npm-license",
+      "package": "gsap",
+      "snapshot": { "license": "Standard 'no charge' license: https://gsap.com/standard-license." }
+    },
+    {
+      "id": "EC-10",
+      "kind": "npm-license",
+      "package": "remotion",
+      "snapshot": { "license": "SEE LICENSE IN LICENSE.md" }
+    }
+  ]
+}
