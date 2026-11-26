@@ -96,10 +96,10 @@ Routing notes:
 Not covered by any part:
 
 - Screen recording: not covered; read `launch-video/PART.md` section 0 and offer its two paths.
-- Narrated launch films, AI footage and HLS streaming: not covered; say so.
+- Narrated launch films, AI footage, HLS streaming: not covered; say so.
 - Live Activities and App Intents beyond widget configuration: no code part (design in `hig`); suggest Xcode's coding assistant. SMAppService login items, MDM and fleets: not covered; use `write-swift` if installed and Apple's docs.
 - swiftc or SwiftPM builds with no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
-- Android-only shells and apps, React Native and Flutter: not covered; say so.
+- Android-only shells and apps, React Native, Flutter: not covered; say so.
 
 Near misses: web springs, gestures and sheets go to `apple-design`; one web animation to `animate`; React Native motion to `animate-expo`; Swift language and new tests to `write-swift`; a web app feeling native in mobile Safari to `mobile-native` (Home Screen or shell: `web-shells`); store marketing images to `app-store-screenshots`; launch plans to `launch`; Remotion, HyperFrames and GSAP to their own skills, each when installed. Simulator runs, taps and screenshots go to the host's simulator tool; Simulator-captured App Store screenshots are the `asc-shots-pipeline` row.
 
