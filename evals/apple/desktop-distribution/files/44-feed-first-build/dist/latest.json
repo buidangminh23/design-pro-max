@@ -1,0 +1,15 @@
+{
+  "version": "1.4.0",
+  "notes": "Fixes",
+  "pub_date": "2026-11-01T00:00:00Z",
+  "platforms": {
+    "darwin-x86_64": {
+      "signature": "c2lnbmF0dXJl",
+      "url": "https://downloads.example.com/Relay-1.4.0-x64.app.tar.gz"
+    },
+    "windows-x86_64": {
+      "signature": "c2lnbmF0dXJl",
+      "url": "https://downloads.example.com/Relay-1.4.0-setup.exe"
+    }
+  }
+}

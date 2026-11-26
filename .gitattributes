@@ -18,6 +18,7 @@ skills/uxui-prompt/data/** -text linguist-vendored
 /package.json export-ignore
 /rules.json export-ignore
 /scripts export-ignore
+/shared export-ignore
 /test export-ignore
 /vendor export-ignore
 /web-card.json export-ignore

@@ -1,5 +1,5 @@
 {
-  "description": "launch-video fixtures. Each case runs one checker against media files, a page or a render, built in a temporary folder by scripts/verify.mjs; media come from the recipes in scripts/lib/fixture-media.mjs, so no media file is committed. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it.",
+  "description": "launch-video fixtures. Each case runs one checker against media files, a page, a render or a capture pre-flight, built in a temporary folder by scripts/verify.mjs; media come from the recipes in scripts/lib/fixture-media.mjs, so no media file is committed. A fail case must exit 1 with an error for its rule; a pass case must report its rule as passed with no error for it.",
   "cases": [
     {
       "id": "enc-encoded",
@@ -196,6 +196,131 @@
       "checker": "render-frames",
       "page": "pages/render-01-clock-in-step.html",
       "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "app-01-encoded",
+      "rule": "LV-APP-01",
+      "expect": "pass",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-good"]
+    },
+    {
+      "id": "app-01-too-short",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-short"]
+    },
+    {
+      "id": "app-01-60fps",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-60fps"]
+    },
+    {
+      "id": "app-01-wrong-size",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-wrong-size"]
+    },
+    {
+      "id": "app-01-no-audio",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-no-audio"]
+    },
+    {
+      "id": "app-01-mono",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-mono"]
+    },
+    {
+      "id": "cap-01-complete",
+      "rule": "LV-CAP-01",
+      "expect": "pass",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-complete.md",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-01-no-preflight",
+      "rule": "LV-CAP-01",
+      "expect": "fail",
+      "checker": "capture-plan",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-01-template",
+      "rule": "LV-CAP-01",
+      "expect": "fail",
+      "checker": "capture-plan",
+      "preflight": "assets/reference/capture-preflight.md",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-01-unticked",
+      "rule": "LV-CAP-01",
+      "expect": "fail",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-unticked.md",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-01-missing",
+      "rule": "LV-CAP-01",
+      "expect": "fail",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-missing.md",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-warn-region-upscaled",
+      "rule": "LV-WARN-REGION",
+      "expect": "warn",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-complete.md",
+      "devices": "capture/devices-mac-screen.txt",
+      "args": ["--platform", "darwin", "--slot", "640x360", "--duration", "6", "--region", "0,0,320,180"]
+    },
+    {
+      "id": "cap-warn-platform-linux",
+      "rule": "LV-WARN-CAPTURE",
+      "expect": "warn",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-complete.md",
+      "devices": "capture/probe-ok.txt",
+      "args": ["--platform", "linux", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360"]
+    },
+    {
+      "id": "cap-warn-platform-gdigrab-60",
+      "rule": "LV-WARN-CAPTURE",
+      "expect": "warn",
+      "checker": "capture-plan",
+      "preflight": "capture/preflight-complete.md",
+      "devices": "capture/probe-ok.txt",
+      "args": ["--platform", "win32", "--slot", "640x360", "--duration", "6", "--region", "0,0,640,360", "--grabber", "gdigrab", "--fps", "60"]
     }
   ]
 }

@@ -4,10 +4,14 @@ on:
   push:
     branches: [main]
     paths:
+      - "shared/**"
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
       - "skills/apple/menubar-widgets/**"
       - "skills/apple/web-shells/**"
+      - "skills/apple/whats-new/**"
+      - "skills/apple/host-ops/**"
+      - "skills/apple/desktop-distribution/**"
       - "rules.json"
       - "fixtures/**"
       - "evidence/**"
@@ -16,10 +20,14 @@ on:
       - ".github/workflows/verify.yml"
   pull_request:
     paths:
+      - "shared/**"
       - "skills/apple/shared/**"
       - "skills/apple/launch-*/**"
       - "skills/apple/menubar-widgets/**"
       - "skills/apple/web-shells/**"
+      - "skills/apple/whats-new/**"
+      - "skills/apple/host-ops/**"
+      - "skills/apple/desktop-distribution/**"
       - "rules.json"
       - "fixtures/**"
       - "evidence/**"

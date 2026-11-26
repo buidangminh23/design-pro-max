@@ -9,11 +9,12 @@
  *
  *   node scripts/verify.mjs [--only <case id or rule id>[,<more>]] [--keep] [--json]
  *
+ * A capture-plan case reads a pre-flight and a recorded screen probe, so it records nothing.
  * A case with platform runs only on that platform (menubar-widgets snapshots need macOS) and is listed as skipped elsewhere.
  *
  * Needs ffmpeg and ffprobe on PATH and Playwright with Chromium installed in this repository (npm install --no-save
  * playwright, then npx playwright install chromium-headless-shell); the web-shells cases also need its WebKit (npx
- * playwright install webkit) and openssl. Exit codes: 0 every case judged right, 1 a case
+ * playwright install webkit) and openssl; the whats-new cases build their clips with ffmpeg at run time. Exit codes: 0 every case judged right, 1 a case
  * judged wrong, 2 a missing tool.
  */
 import fs from 'node:fs';
@@ -21,10 +22,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
-import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
+import { SHARED_DIR } from './lib/designs.mjs';
+import { partSkillDir } from './lib/evidence.mjs';
+import { buildFixtureMedia, buildLaunchVideoMedia, buildWhatsNewMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells'];
-const SHIPPED = ['shared', ...PARTS];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops', 'desktop-distribution'];
 
 export function loadCases(root = ROOT) {
   return PARTS.flatMap((part) => {
@@ -110,12 +112,41 @@ export function menubarWidgetsArgs(entry, skill, scratch, root = ROOT) {
   return [...args, ...sources(entry.sources)];
 }
 
+const HOST_OPS_CHECKERS = ['scan-host', 'check-plist', 'probe-launchd'];
+
+/** Arguments for a host-ops case: text files to scan or lint, or a recorded launchctl print beside a copied plist. */
+export function hostOpsArgs(entry, skill, scratch, root = ROOT) {
+  const script = (name) => path.join(skill, entry.part, 'scripts', `${name}.mjs`);
+  const fixture = (file) => path.join(root, 'fixtures', entry.part, ...file.split('/'));
+  const source = (file) => (file.startsWith('assets/') ? path.join(skill, entry.part, ...file.split('/')) : fixture(file));
+  if (entry.checker !== 'probe-launchd') return [script(entry.checker), ...(entry.args ?? []), ...entry.sources.map(source)];
+  const folder = path.join(scratch, 'launchd', entry.id);
+  fs.mkdirSync(folder, { recursive: true });
+  const plist = path.join(folder, path.basename(entry.plist));
+  fs.copyFileSync(fixture(entry.plist), plist);
+  const print = path.join(folder, path.basename(entry.print));
+  fs.writeFileSync(print, fs.readFileSync(fixture(entry.print), 'utf8').replaceAll('@DIR@', folder));
+  return [script('probe-launchd'), '--label', entry.label, '--domain', entry.domain, '--plist', plist, '--print', print, '--exit', String(entry.exit ?? 0)];
+}
+
+const DESKTOP_CHECKERS = ['probe-app', 'check-installer', 'check-cask', 'check-feed'];
+
+/** Arguments for a desktop-distribution case: a recorded probe of a fixture app, or one installer, cask or feed file. */
+export function desktopDistributionArgs(entry, skill, root = ROOT) {
+  const script = path.join(skill, entry.part, 'scripts', `${entry.checker}.mjs`);
+  const file = (name) => (name.startsWith('assets/') ? path.join(skill, entry.part, ...name.split('/')) : path.join(root, 'fixtures', entry.part, ...name.split('/')));
+  if (entry.checker === 'probe-app') return [script, '--app', file(entry.app), '--record', file(entry.record), ...(entry.args ?? [])];
+  return [script, ...(entry.args ?? []), file(entry.file)];
+}
+
 export const runsHere = (entry, platform = process.platform) => !entry.platform || entry.platform === platform;
 
 function runCase(entry, skill, media, scratch) {
   let args;
   if (MENUBAR_CHECKERS.includes(entry.checker)) {
     args = menubarWidgetsArgs(entry, skill, scratch);
+  } else if (HOST_OPS_CHECKERS.includes(entry.checker)) {
+    args = hostOpsArgs(entry, skill, scratch);
   } else if (entry.checker === 'check-media') {
     const demo = [...(entry.profile ? ['--profile', entry.profile] : []), ...(entry.poster ? ['--poster', media[entry.poster]] : [])];
     args = [path.join(skill, 'shared', 'check-media.mjs'), ...demo, ...(entry.args ?? []), ...entry.files.map((recipe) => media[recipe])];
@@ -132,6 +163,9 @@ function runCase(entry, skill, media, scratch) {
       buildSite(entry, skill, media, site);
       args = [script, '--serve', site, '--page', entry.page, '--out', path.join(scratch, 'frames', entry.id), '--project', ROOT, ...(entry.args ?? [])];
     }
+  } else if (entry.checker === 'capture-plan') {
+    const file = (name) => (name.startsWith('assets/') ? path.join(skill, entry.part, ...name.split('/')) : path.join(ROOT, 'fixtures', entry.part, ...name.split('/')));
+    args = [path.join(skill, entry.part, 'scripts', 'capture-plan.mjs'), ...(entry.preflight ? ['--preflight', file(entry.preflight)] : []), ...(entry.devices ? ['--devices', file(entry.devices)] : []), ...(entry.args ?? [])];
   } else if (entry.checker === 'probe-scene') {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
@@ -144,12 +178,18 @@ function runCase(entry, skill, media, scratch) {
     const site = path.join(scratch, 'sites', entry.id);
     buildSite(entry, skill, media, site);
     args = [path.join(skill, entry.checkerPart ?? entry.part, 'scripts', 'lint-css.mjs'), ...entry.sources.map((file) => path.join(site, file))];
+  } else if (entry.checker === 'check-whats-new') {
+    const site = path.join(scratch, 'sites', entry.id);
+    buildSite(entry, skill, media, site);
+    args = [path.join(skill, entry.part, 'scripts', 'check-whats-new.mjs'), '--serve', site, '--page', entry.page, '--server', entry.server ?? 'range', '--project', ROOT, ...(entry.args ?? [])];
   } else if (entry.checker === 'check-shell') {
     const fixture = (folder) => path.join(ROOT, 'fixtures', entry.part, ...folder.split('/'));
     args = [path.join(skill, entry.part, 'scripts', 'check-shell.mjs'), ...(entry.project ? ['--project', fixture(entry.project)] : []), ...(entry.bundle ? ['--bundle', fixture(entry.bundle)] : []), ...(entry.args ?? [])];
   } else if (entry.checker === 'probe-webkit') {
     const app = entry.app.startsWith('assets/') ? path.join(skill, entry.part, ...entry.app.split('/')) : path.join(ROOT, 'fixtures', entry.part, ...entry.app.split('/'));
     args = [path.join(skill, entry.part, 'scripts', 'probe-webkit.mjs'), '--app', app, '--project', ROOT, ...(entry.args ?? [])];
+  } else if (DESKTOP_CHECKERS.includes(entry.checker)) {
+    args = desktopDistributionArgs(entry, skill);
   } else {
     throw new Error(`${entry.id}: unknown checker ${entry.checker}`);
   }
@@ -158,11 +198,11 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'capture-plan': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'check-whats-new': 'WN-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-', 'probe-app': 'DD-', 'check-installer': 'DD-', 'check-cask': 'DD-', 'check-feed': 'DD-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
-  const shipped = (defect) => !defect.part || fs.existsSync(path.join(root, SKILL_DIR, defect.part));
+  const shipped = (defect) => !defect.part || fs.existsSync(path.join(root, ...partSkillDir(defect.part).split('/'), defect.part));
   const mine = file.defects.filter((defect) => defect.checker === entry.checker && shipped(defect) && rulesOf(entry).includes(defect.rule));
   const notRun = file.defects.filter((defect) => !shipped(defect)).map((defect) => `${defect.rule} (${defect.checker})`);
   const errors = findings.filter((finding) => finding.level === 'error');
@@ -194,7 +234,8 @@ async function main(argv) {
   const { evaluateRun } = await import(new URL(`../${SKILL_DIR}/shared/harness.mjs`, import.meta.url));
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'dpm-verify-'));
   const skill = path.join(scratch, 'skill');
-  for (const folder of SHIPPED) copyTree(path.join(ROOT, SKILL_DIR, folder), path.join(skill, folder));
+  copyTree(path.join(ROOT, ...SKILL_DIR.split('/'), SHARED_DIR), path.join(skill, SHARED_DIR));
+  for (const part of PARTS) copyTree(path.join(ROOT, ...partSkillDir(part).split('/'), part), path.join(skill, part));
   const wanted = only ? only.split(',') : [];
   const selected = loadCases().filter((entry) => !only || wanted.some((name) => entry.id === name || rulesOf(entry).includes(name)));
   if (!selected.length) {
@@ -208,7 +249,8 @@ async function main(argv) {
   const needed = new Set(cases.map((entry) => entry.part));
   const media = {
     ...(needed.has('launch-scroll') || needed.has('launch-page') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs'), makeSequence: path.join(skill, 'launch-scroll', 'scripts', 'make-sequence.mjs') }) : {}),
-    ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs') }) : {}),
+    ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs'), appPreview: path.join(skill, 'launch-video', 'scripts', 'app-preview.mjs') }) : {}),
+    ...(needed.has('whats-new') ? buildWhatsNewMedia(path.join(scratch, 'media-whats-new')) : {}),
   };
   const results = [];
   for (const entry of cases) {

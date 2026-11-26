@@ -12,12 +12,16 @@
  *                                            rules.json and evidence/ledger.json
  *   skills/apple/launch-page/assets/{tokens.css,theme.tailwind.css}
  *                                            the launch-page token sets, from that folder's tokens.json
+ *   skills/<design>/shared/                  for each design in designs/, a byte-identical copy of shared/
+ *   skills/<design>/NOTICE.md                for each other design whose NOTICE.md has a trademarks block: the
+ *                                            trademark line for the marks of its designs/<design>.json it uses
  *
  *   node scripts/gen.mjs [--check] [--root <dir>]
  *
  * In README.md and NOTICE.md only the lines between <!-- gen:<name> --> and <!-- /gen:<name> --> are generated. The
  * trademark line names the Apple marks that the project's own shipped text uses, plus the Apple logo while the skill
- * ships it as its icon, and adds Cisco's IOS sentence whenever it names iOS.
+ * ships it as its icon, and adds Cisco's IOS sentence whenever it names iOS. A file in a design's shared/ folder that
+ * shared/ does not hold is stray: --check reports it and a write removes it.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -43,6 +47,7 @@ import {
 import { MEDIA_NOTICES } from './lib/media.mjs';
 import { BUNDLED_MEDIA, loadBundles } from './lib/bundles.mjs';
 import { OWN_PARTS, RULES_FILE, buildEvidence, loadLedger, loadRules } from './lib/evidence.mjs';
+import { SHARED_DIR, loadDesigns } from './lib/designs.mjs';
 import { TAILWIND_CSS, TOKENS_CSS, TOKENS_SOURCE, buildTailwindTheme, buildTokensCss, loadTokens } from './lib/tokens.mjs';
 
 export const SKILLS_FILE = 'skills.json';
@@ -215,8 +220,8 @@ export function buildBundles(manifest) {
  * The Apple marks a text uses, in the order of APPLE_MARKS. A mark counts only as a whole word: Swift inside SwiftUI
  * or iPad inside iPadOS does not.
  */
-export function usedMarks(text) {
-  return APPLE_MARKS.filter((mark) => new RegExp(`(?<![\\p{L}\\p{N}_])${escapeRegExp(mark)}(?![\\p{L}\\p{N}_])`, 'u').test(text));
+export function usedMarks(text, marks = APPLE_MARKS) {
+  return marks.filter((mark) => new RegExp(`(?<![\\p{L}\\p{N}_])${escapeRegExp(mark)}(?![\\p{L}\\p{N}_])`, 'u').test(text));
 }
 
 /**
@@ -287,7 +292,64 @@ function ownText(root, generated) {
 }
 
 /**
+ * The trademark sentence of a design other than the primary one, for the marks of its record that its text uses.
+ */
+export function designTrademarkLine(design, marks) {
+  if (!marks.length) return '';
+  const one = marks.length === 1;
+  const list = one ? marks[0] : `${marks.slice(0, -1).join(', ')} and ${marks.at(-1)}`;
+  const owner = design.owner ?? (one ? 'its owner' : 'their respective owners');
+  const endorser = design.owner ?? (one ? 'its owner' : 'them');
+  return `${list} ${one ? 'is a trademark' : 'are trademarks'} of ${owner}. The ${design.name} skill is not affiliated with or endorsed by ${endorser}.`;
+}
+
+/** The text of one design's own files, without the generated trademark blocks. */
+function designText(root, design) {
+  const texts = [];
+  for (const entry of walk(root, design.skillDir)) {
+    const inside = entry.path.slice(design.skillDir.length + 1).split('/');
+    if (entry.kind !== 'file' || inside.some((segment) => segment.startsWith('.'))) continue;
+    if (TEXT_EXTENSIONS.has(path.posix.extname(entry.path).toLowerCase())) texts.push(readText(root, entry.path));
+  }
+  return withoutBlocks(texts.join('\n'));
+}
+
+/** The designs in designs/, or none in a checkout without the folder. */
+function designsOf(root) {
+  return describeEntry(root, 'designs')?.kind === 'dir' ? loadDesigns(root) : [];
+}
+
+/**
+ * The files of the canonical shared/ folder, as paths below it, sorted. Empty when the checkout has no shared/.
+ */
+export function sharedFiles(root = ROOT) {
+  if (describeEntry(root, SHARED_DIR)?.kind !== 'dir') return [];
+  return walk(root, SHARED_DIR)
+    .filter((entry) => entry.kind === 'file')
+    .map((entry) => entry.path.slice(SHARED_DIR.length + 1))
+    .sort(compareStrings);
+}
+
+/**
+ * The files in a design's shared/ folder that shared/ does not hold. A design's copy must equal shared/ exactly.
+ */
+export function strayShared(root = ROOT) {
+  const canonical = sharedFiles(root);
+  if (!canonical.length) return [];
+  const known = new Set(canonical);
+  const stray = [];
+  for (const design of designsOf(root)) {
+    for (const entry of walk(root, design.sharedDir)) {
+      if (entry.kind === 'dir') continue;
+      if (!known.has(entry.path.slice(design.sharedDir.length + 1))) stray.push(entry.path);
+    }
+  }
+  return stray.sort(compareStrings);
+}
+
+/**
  * Every generated file with its expected content, plus the marks and the trademark line they were built from.
+ * Shared copies are Buffers, every other file a string.
  */
 export function generate(root = ROOT) {
   const manifest = loadSources(root);
@@ -317,6 +379,18 @@ export function generate(root = ROOT) {
   const line = trademarkLine(marks, { logo: describeEntry(root, LOGO_FILE)?.kind === 'file' });
   files.set(README_FILE, replaceBlock(readme, 'trademarks', line, README_FILE));
   files.set(NOTICE_FILE, replaceBlock(replaceBlock(readText(root, NOTICE_FILE), 'trademarks', line, NOTICE_FILE), 'media', mediaNoticeBlock(SKILL_DIR), NOTICE_FILE));
+  const designs = designsOf(root);
+  for (const design of designs.filter((item) => !item.primary)) {
+    const notice = `${design.skillDir}/NOTICE.md`;
+    if (describeEntry(root, notice)?.kind !== 'file') continue;
+    const text = readText(root, notice);
+    if (!text.includes(startMarker('trademarks'))) continue;
+    files.set(notice, replaceBlock(text, 'trademarks', designTrademarkLine(design, usedMarks(designText(root, design), design.marks)), notice));
+  }
+  const shared = sharedFiles(root);
+  for (const design of designs) {
+    for (const file of shared) files.set(`${design.sharedDir}/${file}`, readRegular(path.join(root, SHARED_DIR, ...file.split('/'))));
+  }
   return { files, marks, trademarks: line };
 }
 
@@ -329,11 +403,12 @@ export function staleFiles(root = ROOT) {
   for (const [file, content] of files) {
     let current = null;
     try {
-      current = readRegular(path.join(root, ...file.split('/')))?.toString('utf8') ?? null;
+      current = readRegular(path.join(root, ...file.split('/')));
     } catch (error) {
       throw new Error(`${file}: ${error.message}`);
     }
-    if (current !== content) stale.push(file);
+    const expected = Buffer.isBuffer(content) ? content : Buffer.from(content, 'utf8');
+    if (current === null || !current.equals(expected)) stale.push(file);
   }
   return stale;
 }
@@ -360,20 +435,36 @@ function main(argv) {
   const options = parseArgs(argv);
   if (options.check) {
     const stale = staleFiles(options.root);
+    const stray = strayShared(options.root);
+    for (const file of stray) process.stderr.write(`${file} is not in ${SHARED_DIR}/; run node scripts/gen.mjs to remove it\n`);
     for (const file of stale) process.stderr.write(`${file} is out of date; run node scripts/gen.mjs\n`);
-    if (stale.length) process.exitCode = 1;
+    if (stale.length || stray.length) process.exitCode = 1;
     else process.stdout.write('Generated files are up to date.\n');
     return;
   }
-  const { files } = generate(options.root);
+  for (const line of writeGenerated(options.root)) process.stdout.write(`${line}\n`);
+  process.stdout.write('Generated files are up to date.\n');
+}
+
+/**
+ * Write every generated file whose content differs and remove stray shared copies. Returns one line per change.
+ */
+export function writeGenerated(root = ROOT) {
+  const changes = [];
+  const { files } = generate(root);
   for (const [file, content] of files) {
-    const target = path.join(options.root, ...file.split('/'));
-    if (readRegular(target)?.toString('utf8') === content) continue;
+    const target = path.join(root, ...file.split('/'));
+    const bytes = Buffer.isBuffer(content) ? content : Buffer.from(content, 'utf8');
+    if (readRegular(target)?.equals(bytes)) continue;
     fs.mkdirSync(path.dirname(target), { recursive: true });
     writeRegular(target, content);
-    process.stdout.write(`Wrote ${file}.\n`);
+    changes.push(`Wrote ${file}.`);
   }
-  process.stdout.write('Generated files are up to date.\n');
+  for (const file of strayShared(root)) {
+    fs.rmSync(path.join(root, ...file.split('/')), { force: true });
+    changes.push(`Removed ${file}, which is not in ${SHARED_DIR}/.`);
+  }
+  return changes;
 }
 
 if (isMainModule(import.meta.url)) {

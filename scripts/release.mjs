@@ -46,7 +46,8 @@ import {
 } from './lib/vendor.mjs';
 import { isReviewedMedia, mediaKind } from './lib/media.mjs';
 import { readBlobs } from './check-history.mjs';
-import { SKILLS_FILE, skillsList } from './gen.mjs';
+import { SKILLS_FILE, sharedFiles, skillsList, strayShared } from './gen.mjs';
+import { SHARED_DIR, loadDesigns } from './lib/designs.mjs';
 import { visiblePath } from './vendor-guard.mjs';
 import { OWN_PARTS, loadCases, loadLedger, loadRules } from './lib/evidence.mjs';
 import { BUNDLES_FILE, BUNDLE_LICENCE, bundleDir, loadBundles } from './lib/bundles.mjs';
@@ -62,7 +63,7 @@ export const CARD_FILE = 'web-card.json';
 export const STAT_KEYS = ['guides', 'activeGuides', 'errorRules', 'failFixtures', 'evalCases', 'ledgerClaims'];
 export const VERSIONED_FILES = ['package.json', '.claude-plugin/plugin.json', '.claude-plugin/marketplace.json', '.codex-plugin/plugin.json'];
 export const PUSH_ATTEMPTS = 3;
-export const REPO_ONLY = ['.github', '.claude-plugin', '.codex-plugin', '.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'designs', 'evals', 'evidence', 'fixtures', 'package.json', 'rules.json', 'scripts', 'test', 'vendor', 'web-card.json'];
+export const REPO_ONLY = ['.github', '.claude-plugin', '.codex-plugin', '.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'designs', 'evals', 'evidence', 'fixtures', 'package.json', 'rules.json', 'scripts', SHARED_DIR, 'test', 'vendor', 'web-card.json'];
 
 const VERSION = /^\d+\.\d+\.\d+$/;
 const TAG = /^v(\d+\.\d+\.\d+)$/;
@@ -227,6 +228,7 @@ export function checkRelease(root = ROOT, tag = null) {
   } catch (error) {
     problems.push(error.message);
   }
+  problems.push(...designProblemsForRelease(root));
   if (describeEntry(root, CARD_FILE) && describeEntry(root, 'evidence/ledger.json')) {
     try {
       problems.push(...cardProblems(JSON.parse(readText(root, CARD_FILE)), releaseStats(root)));
@@ -253,6 +255,38 @@ export function checkRelease(root = ROOT, tag = null) {
     }
   }
   return { version, problems };
+}
+
+/**
+ * Problems with the designs a release ships: each design in designs/ is a skill in skills.json, and its shared/ folder
+ * holds exactly the files of shared/, byte for byte.
+ */
+export function designProblemsForRelease(root) {
+  if (!describeEntry(root, 'designs')) return [];
+  let designs;
+  try {
+    designs = loadDesigns(root);
+  } catch (error) {
+    return error.message.split('\n');
+  }
+  const problems = [];
+  let skills = [];
+  try {
+    skills = skillsList(root).map((skill) => skill.path);
+  } catch (error) {
+    problems.push(error.message);
+  }
+  const canonical = sharedFiles(root);
+  for (const design of designs) {
+    if (!skills.includes(design.skillDir)) problems.push(`${design.file}: ${design.skillDir} is not a skill in ${SKILLS_FILE}`);
+    for (const file of canonical) {
+      const copy = readRegular(path.join(root, ...design.sharedDir.split('/'), ...file.split('/')));
+      const source = readRegular(path.join(root, SHARED_DIR, ...file.split('/')));
+      if (!copy || !source || !copy.equals(source)) problems.push(`${design.sharedDir}/${file}: differs from ${SHARED_DIR}/${file}; run node scripts/gen.mjs`);
+    }
+  }
+  for (const file of strayShared(root)) problems.push(`${file}: is not in ${SHARED_DIR}/; run node scripts/gen.mjs`);
+  return problems;
 }
 
 /**
@@ -507,6 +541,7 @@ export function verifyAssets(dir, { root = null, head = false } = {}) {
   for (const item of PAYLOAD) if (!top.has(item)) report(`${item}: is missing from the archive`);
   const skills = skillProblems(files, problems);
   const parts = partProblems(files, problems);
+  for (const folder of parts) if (!folder.startsWith(`${VENDOR_DIR}/`)) report(`${folder}: vendored parts ship only under ${VENDOR_DIR}, the folder ${SOURCES_FILE} describes`);
   if (root) {
     treeProblems(root, zip.version, files, report, head);
     const expected = loadSources(root).parts.map((part) => part.id).sort(compareStrings);

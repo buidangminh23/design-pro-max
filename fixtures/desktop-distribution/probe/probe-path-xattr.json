@@ -1,0 +1,41 @@
+{
+  "verify": {
+    "status": 0,
+    "output": "/Applications/Relay.app: valid on disk\n/Applications/Relay.app: satisfies its Designated Requirement\n"
+  },
+  "spctl": {
+    "status": 0,
+    "output": "/Applications/Relay.app: accepted\nsource=Notarized Developer ID\norigin=Developer ID Application: Example Corp (ABCDE12345)\n"
+  },
+  "code": {
+    ".": {
+      "status": 0,
+      "output": "Executable=/Applications/Relay.app/Contents/MacOS/Relay\nIdentifier=com.example.relay\nFormat=Mach-O universal (x86_64 arm64)\nCodeDirectory v=20500 size=1200 flags=0x10000(runtime) hashes=30+7 location=embedded\nSignature size=9043\nAuthority=Developer ID Application: Example Corp (ABCDE12345)\nAuthority=Developer ID Certification Authority\nAuthority=Apple Root CA\nTimestamp=Jan 1, 2026 at 10:00:00\nTeamIdentifier=ABCDE12345\n"
+    },
+    "Contents/Resources/runtime/node": {
+      "status": 0,
+      "output": "Executable=/Applications/Relay.app/Contents/Resources/runtime/node\nIdentifier=node\nFormat=Mach-O universal (x86_64 arm64)\nCodeDirectory v=20500 size=1200 flags=0x10000(runtime) hashes=30+7 location=embedded\nSignature size=9043\nAuthority=Developer ID Application: Example Corp (ABCDE12345)\nAuthority=Developer ID Certification Authority\nAuthority=Apple Root CA\nTimestamp=Jan 1, 2026 at 10:00:00\nTeamIdentifier=ABCDE12345\n"
+    }
+  },
+  "tools": {
+    "xattr": [
+      "/usr/local/bin/xattr",
+      "/usr/bin/xattr"
+    ],
+    "codesign": [
+      "/usr/bin/codesign"
+    ],
+    "ditto": [
+      "/usr/bin/ditto"
+    ],
+    "hdiutil": [
+      "/usr/bin/hdiutil"
+    ],
+    "plutil": [
+      "/usr/bin/plutil"
+    ],
+    "spctl": [
+      "/usr/sbin/spctl"
+    ]
+  }
+}

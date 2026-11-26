@@ -1,0 +1,43 @@
+gui/501/com.example.sync = {
+	active count = 0
+	path = @DIR@/com.example.sync.plist
+	type = LaunchAgent
+	state = not running
+
+	program = /usr/local/bin/node
+	arguments = {
+		/usr/local/bin/node
+		/usr/local/libexec/example-sync/sync.mjs
+		--interval
+		900
+	}
+
+	working directory = /usr/local/var/example-sync
+
+	stdout path = /usr/local/var/log/com.example.sync.log
+	stderr path = /usr/local/var/log/com.example.sync.log
+	inherited environment = {
+		SSH_AUTH_SOCK => /private/var/run/com.apple.launchd.example/Listeners
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	domain = gui/501 [100005]
+	asid = 100005
+	minimum runtime = 10
+	exit timeout = 5
+	runs = 3
+	pid = 0
+	immediate reason = interval
+	forks = 0
+	execs = 3
+	initialized = 1
+	trampolined = 1
+	started suspended = 0
+	proxy started suspended = 0
+	last exit code = 78: EX_CONFIG
+
+	run interval = 900 seconds
+}

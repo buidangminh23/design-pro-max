@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "notes": "Example release notes.",
+  "pub_date": "2026-01-01T00:00:00Z",
+  "platforms": {
+    "darwin-aarch64": {
+      "signature": "REPLACE-WITH-THE-SIGNATURE-FILE-CONTENTS-FOR-THIS-ARCHIVE",
+      "url": "https://downloads.example.com/Example-1.0.0-macos-universal.app.tar.gz"
+    },
+    "darwin-x86_64": {
+      "signature": "REPLACE-WITH-THE-SIGNATURE-FILE-CONTENTS-FOR-THIS-ARCHIVE",
+      "url": "https://downloads.example.com/Example-1.0.0-macos-universal.app.tar.gz"
+    }
+  }
+}

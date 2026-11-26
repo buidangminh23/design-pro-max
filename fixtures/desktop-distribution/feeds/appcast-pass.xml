@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>Relay</title>
+    <item>
+      <title>2.1.0</title>
+      <sparkle:version>210</sparkle:version>
+      <sparkle:shortVersionString>2.1.0</sparkle:shortVersionString>
+      <enclosure url="https://downloads.example.com/Relay-2.1.0.zip" length="1024" type="application/octet-stream" sparkle:edSignature="dW50cnVzdGVkIGNvbW1lbnQ="/>
+    </item>
+  </channel>
+</rss>

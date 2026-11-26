@@ -489,6 +489,26 @@
       }
     },
     {
+      "id": "r80",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "I recorded a 25-second screen capture of my iPhone app. How do I turn it into an App Store app preview for the 6.9-inch iPhone size?",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
+      "id": "r81",
+      "kind": "row",
+      "row": "Demo clips rendered from code",
+      "prompt": "Record my app's screen for a 6-second demo clip on our landing page, and set it up so the page stays fast.",
+      "expect": {
+        "trigger": true,
+        "part": "launch-video"
+      }
+    },
+    {
       "id": "r49",
       "kind": "row",
       "row": "Web page scenes that scrub a canvas image sequence on scroll",
@@ -529,6 +549,36 @@
       }
     },
     {
+      "id": "r58",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "Our macOS SwiftUI app 2.4 has three new features. After people update, show a popup once with a picture or short clip per feature, left and right arrows and page dots, and add a What's New menu item to open it again.",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
+      "id": "r59",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "In our Tauri app with a React UI, show a What's New card after an update with a short looping video of the new tray view. It should only appear once per version and never on a fresh install.",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
+      "id": "r60",
+      "kind": "row",
+      "row": "In-app What's New popups after an update",
+      "prompt": "Review the What's New modal in our web app, which ships in a Capacitor shell on iPhone: it shows on every launch, the arrows disappear on the last page, and the feature videos play with sound on pages you cannot see. What should we fix?",
+      "expect": {
+        "trigger": true,
+        "part": "whats-new"
+      }
+    },
+    {
       "id": "r50",
       "kind": "row",
       "row": "macOS menu bar apps and WidgetKit widgets",
@@ -536,6 +586,26 @@
       "expect": {
         "trigger": true,
         "part": "menubar-widgets"
+      }
+    },
+    {
+      "id": "r64",
+      "kind": "row",
+      "row": "Mac apps outside the App Store",
+      "prompt": "Our Mac app is ad hoc signed and people install it with a curl script that just unzips it over the copy in /Applications. Some users end up with a broken app after an update, and our helper process is refused by the app on some Macs. How should the installer and the signing work?",
+      "expect": {
+        "trigger": true,
+        "part": "desktop-distribution"
+      }
+    },
+    {
+      "id": "r65",
+      "kind": "row",
+      "row": "Mac apps outside the App Store",
+      "prompt": "Apple silicon Macs never get our app's self-updates while Intel Macs do, and after brew upgrade our cask also removes the app's login item. Where do we look first and what do we change in the update feed and the cask?",
+      "expect": {
+        "trigger": true,
+        "part": "desktop-distribution"
       }
     },
     {
@@ -689,16 +759,6 @@
       }
     },
     {
-      "id": "n16",
-      "kind": "near-miss",
-      "row": "App Store preview video",
-      "prompt": "How do I make an App Store app preview video for an iPhone app?",
-      "expect": {
-        "trigger": false,
-        "instead": "out of scope until 1.0"
-      }
-    },
-    {
       "id": "n17",
       "kind": "near-miss",
       "row": "Material Design split",
@@ -723,6 +783,16 @@
       "kind": "near-miss",
       "row": "Android shell split",
       "prompt": "Wrap our React web app in Capacitor for Android only and make the hardware back button close our modals instead of leaving the app.",
+      "expect": {
+        "trigger": false,
+        "instead": "no skill"
+      }
+    },
+    {
+      "id": "n26",
+      "kind": "near-miss",
+      "row": "Android What's New split",
+      "prompt": "Add a What's New dialog to our Android-only Jetpack Compose app that shows after an update, with a pager of the new features.",
       "expect": {
         "trigger": false,
         "instead": "no skill"
@@ -755,6 +825,36 @@
       "kind": "recorded",
       "prompt": "Review my SwiftUI screen against the HIG",
       "expect": null
+    },
+    {
+      "id": "r61",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "Over SSH to our build Mac, gh says I am not logged in and docker push says the keychain cannot be accessed, but both work in Terminal on the Mac itself. How do I make our deploy script work over SSH?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
+    },
+    {
+      "id": "r62",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "I edited ~/Library/LaunchAgents/com.example.sync.plist to add an argument, but the job still runs the old command, and launchctl list does not show our backup daemon at all. How do I check what launchd is really running?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
+    },
+    {
+      "id": "r63",
+      "kind": "row",
+      "row": "Operating an always-on or remote Mac from an agent",
+      "prompt": "Our agent runs on a headless Mac mini and needs to run pmset as root. Should it pipe the admin password into sudo -S from a .env file we source at the top of the script?",
+      "expect": {
+        "trigger": true,
+        "part": "host-ops"
+      }
     }
   ]
 }

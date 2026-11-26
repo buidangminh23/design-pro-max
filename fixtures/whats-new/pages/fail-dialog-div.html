@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whats-new fixture: a div that is not a dialog</title>
+<style>
+  body { margin: 0; min-height: 100dvh; font-family: system-ui, sans-serif; background: #f2f2f5; }
+  .popup { position: fixed; inset: 0; margin: auto; width: 520px; height: 320px; padding: 32px; border-radius: 28px; background: #fff; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24); }
+  .popup .x { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 9999px; background: #ececf0; }
+  .popup .ok { position: absolute; right: 32px; bottom: 32px; min-height: 44px; padding: 10px 22px; border: 0; border-radius: 9999px; background: #0066cc; color: #fff; font: inherit; }
+</style>
+</head>
+<body>
+<main><h1>Fixture app</h1></main>
+<script type="module">
+  const KEY = 'whats-new:last-seen';
+  const VERSION = '3.1.0';
+  const stored = localStorage.getItem(KEY);
+  if (!stored) localStorage.setItem(KEY, VERSION);
+  else if (stored !== VERSION) {
+    const popup = document.createElement('div');
+    popup.className = 'popup';
+    popup.innerHTML = '<button class="x"></button><h2>Pill mode, redrawn</h2><p>The pill follows the height of the live activity area.</p><button class="ok">Got it</button>';
+    const done = () => { popup.remove(); localStorage.setItem(KEY, VERSION); };
+    popup.querySelector('.x').addEventListener('click', done);
+    popup.querySelector('.ok').addEventListener('click', done);
+    document.body.append(popup);
+  }
+</script>
+</body>
+</html>

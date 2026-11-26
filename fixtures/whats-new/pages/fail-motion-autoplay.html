@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>whats-new fixture: video autoplays under reduced motion</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>body { margin: 0; min-height: 100dvh; font-family: system-ui, sans-serif; background: #f2f2f5; } main { padding: 32px; }</style>
+</head>
+<body>
+<main><h1>Fixture app</h1><button type="button" id="show">What's New…</button></main>
+<script type="module">
+import { run, videoFeatures, whenOpen } from './fixture.js';
+whenOpen((dialog) => setInterval(() => {
+  const video = dialog.querySelector('.wn-page[data-current] video');
+  if (video?.paused) video.play().catch(() => {});
+}, 100));
+run(videoFeatures);
+</script>
+</body>
+</html>

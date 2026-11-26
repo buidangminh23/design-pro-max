@@ -1,0 +1,5 @@
+Executable=/opt/homebrew/Cellar/node/25.2.0/bin/node
+Identifier=node
+CodeDirectory v=20400 size=1 flags=0x2(adhoc) hashes=1+0 location=embedded
+Signature=adhoc
+TeamIdentifier=not set

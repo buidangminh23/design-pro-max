@@ -8,6 +8,10 @@
  *
  *   node check-media.mjs [--profile scrub] <file> [<file> ...]
  *   node check-media.mjs --profile demo [--poster <image>] [--slot <type>] [--loop] <file> [<file> ...]
+ *   node check-media.mjs --profile app-preview --device <class> <file> [<file> ...]
+ *
+ * Profile `app-preview` holds LV-APP-01: an App Store app preview matches the published specification for its display
+ * class (codec and container, H.264 level, progressive scan, size, frame rate, duration, file size, audio layout).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +24,7 @@ export const MEDIA_BOUNDARY =
   'Proof boundary: ffprobe, ffmpeg and the MP4 box reader prove the files themselves: box order, streams, pixel format and ' +
   'range, colour tags, keyframe spacing and, with a poster, the start image against frame 0. No browser ran, so they do ' +
   'not prove how a page loads, picks or plays these files, iOS Safari, Low Power Mode, real device decoding or taste.';
-export const PROFILES = ['scrub', 'demo'];
+export const PROFILES = ['scrub', 'demo', 'app-preview'];
 export const SCRUB = Object.freeze({ maxKeyframeDistance: 8, preferredDistance: 6, preferredDistanceAbove30: 5 });
 
 const MP4_EXTENSIONS = new Set(['.mp4', '.m4v', '.mov']);
@@ -59,11 +63,24 @@ export function probeMedia(file) {
   return {
     file,
     format: data.format?.format_name ?? null,
+    duration: Number(data.format?.duration) || null,
+    size: Number(data.format?.size) || fs.statSync(file).size,
+    bitRate: Number(data.format?.bit_rate) || null,
     audioStreams: streams.filter((stream) => stream.codec_type === 'audio').length,
+    audio: streams.filter((stream) => stream.codec_type === 'audio').map((stream) => ({
+      codec: stream.codec_name,
+      channels: stream.channels ?? null,
+      sampleRate: Number(stream.sample_rate) || null,
+      bitRate: Number(stream.bit_rate) || null,
+      disposition: stream.disposition ?? {},
+    })),
     video: video && {
       codec: video.codec_name,
       tag: video.codec_tag_string,
       profile: video.profile ?? null,
+      level: Number.isFinite(video.level) ? video.level : null,
+      fieldOrder: video.field_order ?? null,
+      bitRate: Number(video.bit_rate) || null,
       pixFmt: video.pix_fmt,
       width: video.width,
       height: video.height,
@@ -231,9 +248,116 @@ export function checkDemoSet(infos, report, { poster = null, slot = null, loop =
   }
 }
 
-export function checkFiles(files, report, { profile = 'scrub', ...demo } = {}) {
+
+const PORTRAIT_AND_LANDSCAPE = (width, height) => [[width, height], [height, width]];
+
+/** App Store app preview sizes per display class, portrait then landscape; the last three classes are landscape only. */
+export const APP_PREVIEW_DEVICES = Object.freeze({
+  'iphone-6.9': PORTRAIT_AND_LANDSCAPE(886, 1920),
+  'iphone-6.7': PORTRAIT_AND_LANDSCAPE(886, 1920),
+  'iphone-6.5': PORTRAIT_AND_LANDSCAPE(886, 1920),
+  'iphone-6.3': PORTRAIT_AND_LANDSCAPE(886, 1920),
+  'iphone-5.8': PORTRAIT_AND_LANDSCAPE(886, 1920),
+  'iphone-5.5': PORTRAIT_AND_LANDSCAPE(1080, 1920),
+  'iphone-4': PORTRAIT_AND_LANDSCAPE(1080, 1920),
+  'iphone-4.7': PORTRAIT_AND_LANDSCAPE(750, 1334),
+  'ipad-13': PORTRAIT_AND_LANDSCAPE(1200, 1600),
+  'ipad-11': PORTRAIT_AND_LANDSCAPE(1200, 1600),
+  'ipad-10.5': PORTRAIT_AND_LANDSCAPE(1200, 1600),
+  'ipad-12.9-2nd-gen': [...PORTRAIT_AND_LANDSCAPE(1200, 1600), ...PORTRAIT_AND_LANDSCAPE(900, 1200)],
+  'ipad-9.7': PORTRAIT_AND_LANDSCAPE(900, 1200),
+  mac: [[1920, 1080]],
+  'apple-tv': [[1920, 1080]],
+  'vision-pro': [[3840, 2160]],
+});
+
+export const APP_PREVIEW = Object.freeze({
+  minSeconds: 15,
+  maxSeconds: 30,
+  maxBytes: 500 * 1000 * 1000,
+  maxFps: 30,
+  maxH264Level: 40,
+  h264TargetBitRate: [10e6, 12e6],
+  aacBitRate: 256000,
+  sampleRates: [44100, 48000],
+  h264Profiles: ['Constrained Baseline', 'Baseline', 'Main', 'High'],
+  h264Containers: ['.mov', '.m4v', '.mp4'],
+  proresContainers: ['.mov'],
+});
+
+export function appPreviewDevice(device) {
+  if (!Object.hasOwn(APP_PREVIEW_DEVICES, device)) throw new UsageError(`Unknown device ${device}; devices: ${Object.keys(APP_PREVIEW_DEVICES).join(', ')}.`);
+  return APP_PREVIEW_DEVICES[device];
+}
+
+function checkPreviewAudio(info, report, where, prores) {
+  const tracks = info.audio;
+  const layout = tracks.length === 1 ? tracks[0].channels === 2 : tracks.length === 2 && tracks.every((track) => track.channels === 1);
+  report.check('LV-APP-01', layout, `${where}: audio layout`, tracks.length ? tracks.map((track) => `${track.codec} ${track.channels ?? '?'} ch`).join(' + ') : 'no audio track', 'one stereo track, or two mono tracks (left, then right)');
+  for (const [index, track] of tracks.entries()) {
+    const label = `${where}: audio track ${index + 1}`;
+    const pcm = String(track.codec).startsWith('pcm_');
+    report.check('LV-APP-01', track.codec === 'aac' || (prores && pcm), `${label} codec`, track.codec, prores ? 'AAC or 16, 24 or 32-bit PCM' : 'AAC');
+    report.check('LV-APP-01', APP_PREVIEW.sampleRates.includes(track.sampleRate), `${label} sample rate`, `${track.sampleRate ?? '?'} Hz`, '44.1 or 48 kHz');
+    if (track.codec === 'aac' && track.bitRate) {
+      const total = track.bitRate * (tracks.length === 2 ? 2 : 1);
+      report.check('LV-WARN-BITRATE', Math.abs(total - APP_PREVIEW.aacBitRate) <= 16000, `${label} bit rate`, `${Math.round(total / 1000)} kbps`, '256 kbps AAC', 'warn');
+    }
+  }
+}
+
+function checkPreviewVideoCodec(info, report, where) {
+  const { video } = info;
+  const extension = path.extname(info.file).toLowerCase();
+  if (video.codec === 'prores') {
+    report.check('LV-APP-01', /HQ/i.test(video.profile ?? ''), `${where}: ProRes profile`, video.profile ?? 'unknown', 'ProRes 422 HQ');
+    report.check('LV-APP-01', APP_PREVIEW.proresContainers.includes(extension), `${where}: container`, extension || info.format, 'ProRes only in .mov');
+    return true;
+  }
+  report.check('LV-APP-01', video.codec === 'h264', `${where}: codec`, video.codec, 'H.264, or ProRes 422 HQ in .mov');
+  report.check('LV-APP-01', APP_PREVIEW.h264Containers.includes(extension), `${where}: container`, extension || info.format, '.mov, .m4v or .mp4');
+  if (video.codec !== 'h264') return false;
+  report.check('LV-APP-01', APP_PREVIEW.h264Profiles.includes(video.profile), `${where}: profile`, video.profile ?? 'unknown', 'up to High');
+  report.check('LV-APP-01', video.level !== null && video.level <= APP_PREVIEW.maxH264Level, `${where}: level`, video.level === null ? 'unknown' : (video.level / 10).toFixed(1), 'at most 4.0');
+  report.check('LV-APP-01', video.pixFmt === 'yuv420p' && isLimitedRange(video), `${where}: pixel format`, `${video.pixFmt}, ${video.colorRange ?? 'unknown'} range`, 'yuv420p in limited range');
+  if (info.mp4) report.check('LV-WARN-BITRATE', info.mp4.moovFirst, `${where}: box order`, info.mp4.order.join(','), 'moov before mdat', 'warn');
+  if (video.bitRate) {
+    const [low, high] = APP_PREVIEW.h264TargetBitRate;
+    report.check('LV-WARN-BITRATE', video.bitRate >= low * 0.5 && video.bitRate <= high * 1.25, `${where}: video bit rate`, `${(video.bitRate / 1e6).toFixed(1)} Mbps`, 'about 10-12 Mbps for H.264', 'warn');
+  }
+  return false;
+}
+
+/** LV-APP-01 and its warnings for one App Store app preview file of a display class. */
+export function checkAppPreviewFile(info, report, device) {
+  const sizes = appPreviewDevice(device);
+  const where = name(info);
+  const { video } = info;
+  if (!video) {
+    report.error('LV-APP-01', where, 'no video stream', 'one video stream');
+    return;
+  }
+  const prores = checkPreviewVideoCodec(info, report, where);
+  const progressive = !video.fieldOrder || video.fieldOrder === 'progressive' || video.fieldOrder === 'unknown';
+  report.check('LV-APP-01', progressive, `${where}: scan`, video.fieldOrder ?? 'unknown', 'progressive');
+  const fits = sizes.some(([width, height]) => width === video.width && height === video.height);
+  report.check('LV-APP-01', fits, `${where}: resolution for ${device}`, `${video.width}x${video.height}`, sizes.map(([width, height]) => `${width}x${height}`).join(' or '));
+  report.check('LV-APP-01', video.fps !== null && video.fps <= APP_PREVIEW.maxFps + 0.01, `${where}: frame rate`, video.fps ? `${Math.round(video.fps * 100) / 100} fps` : 'unknown', 'at most 30 fps');
+  const seconds = info.duration;
+  report.check('LV-APP-01', seconds !== null && seconds >= APP_PREVIEW.minSeconds - 0.05 && seconds <= APP_PREVIEW.maxSeconds + 0.05, `${where}: duration`, seconds ? `${seconds.toFixed(2)} s` : 'unknown', '15 to 30 seconds');
+  report.check('LV-APP-01', info.size <= APP_PREVIEW.maxBytes, `${where}: file size`, `${Math.round(info.size / 1e6)} MB`, 'at most 500 MB');
+  checkPreviewAudio(info, report, where, prores);
+  report.warn('LV-WARN-FOOTAGE', `${where}: content`, 'cannot be checked from the file', 'screen captures of the app itself, with optional narration and overlays (App Review 2.3.4)');
+}
+
+export function checkFiles(files, report, { profile = 'scrub', device = null, ...demo } = {}) {
   if (!PROFILES.includes(profile)) throw new UsageError(`Unknown profile ${profile}; profiles: ${PROFILES.join(', ')}.`);
   const infos = files.map((file) => probeMedia(file));
+  if (profile === 'app-preview') {
+    if (!device) throw new UsageError('--profile app-preview needs --device <class>.');
+    for (const info of infos) checkAppPreviewFile(info, report, device);
+    return infos;
+  }
   if (profile === 'demo') {
     for (const info of infos) checkDemoFile(info, report);
     checkDemoSet(infos, report, demo);
@@ -246,8 +370,9 @@ export function checkFiles(files, report, { profile = 'scrub', ...demo } = {}) {
 
 async function main() {
   const args = dropProject(process.argv.slice(2));
-  const usage = 'Usage: node check-media.mjs [--profile scrub] <file> [<file> ...]\n       node check-media.mjs --profile demo [--poster <image>] [--slot <type>] [--loop] <file> [<file> ...]';
+  const usage = 'Usage: node check-media.mjs [--profile scrub] <file> [<file> ...]\n       node check-media.mjs --profile demo [--poster <image>] [--slot <type>] [--loop] <file> [<file> ...]\n       node check-media.mjs --profile app-preview --device <class> <file> [<file> ...]';
   let profile = 'scrub';
+  let device = null;
   const demo = {};
   const files = [];
   for (let index = 0; index < args.length; index += 1) {
@@ -259,6 +384,7 @@ async function main() {
     else if (args[index] === '--poster') demo.poster = value();
     else if (args[index] === '--slot') demo.slot = value();
     else if (args[index] === '--loop') demo.loop = true;
+    else if (args[index] === '--device') device = value();
     else if (args[index] === '--help' || args[index] === '-h') throw new UsageError(usage);
     else if (args[index].startsWith('--')) throw new UsageError(`Unknown option ${args[index]}.`, usage);
     else files.push(args[index]);
@@ -266,8 +392,10 @@ async function main() {
   if (!files.length) throw new UsageError(usage);
   if (profile !== 'demo' && Object.keys(demo).length) throw new UsageError('--poster, --slot and --loop need --profile demo.', usage);
   if (demo.slot) slotBudget(demo.slot);
+  if (device !== null && profile !== 'app-preview') throw new UsageError('--device needs --profile app-preview.', usage);
+  if (device !== null) appPreviewDevice(device);
   const report = createReport({ tool: 'check-media', boundary: MEDIA_BOUNDARY });
-  checkFiles(files, report, { profile, ...demo });
+  checkFiles(files, report, { profile, device, ...demo });
   return report.summary();
 }
 

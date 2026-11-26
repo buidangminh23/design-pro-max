@@ -1,0 +1,126 @@
+<!doctype html>
+<!-- whats-new reference: three features in a pager with Vietnamese labels (design-pro-max). Previous and next
+     buttons sit either side of the page dots; the primary button reads "Tiếp" until the last page, then "Hiểu rồi"
+     and closes. The once-per-version rule runs on load as in whats-new-single.html; "Có gì mới…" reopens it with
+     force: true. Every visual is drawn in CSS. Feature copy stays English placeholder text. -->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notchly: What's New, a pager</title>
+<link rel="stylesheet" href="../lib/whats-new.css">
+<style>
+  :root { color-scheme: light dark; --app-bg: #f2f2f5; --app-ink: #1d1d1f; --app-muted: #5c5f66; --app-panel: #ffffff; --app-accent: #0066cc; }
+  @media (prefers-color-scheme: dark) { :root { --app-bg: #151517; --app-ink: #f5f5f7; --app-muted: #a8abb3; --app-panel: #232327; --app-accent: #4ba3ff; } }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--app-bg); color: var(--app-ink); }
+  body { margin: 0; min-height: 100dvh; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; place-items: center; padding: 16px; }
+  .app { width: min(720px, 100%); display: grid; gap: 16px; padding: 32px; border-radius: 20px; background: var(--app-panel); }
+  .app h1 { margin: 0; font-size: 22px; }
+  .app p { margin: 0; color: var(--app-muted); line-height: 1.5; }
+  .app button { justify-self: start; min-height: 44px; padding: 10px 20px; border: 1px solid currentColor; border-radius: 9999px; background: none; color: var(--app-accent); font: inherit; font-weight: 600; cursor: pointer; }
+  .app button:focus-visible { outline: 3px solid var(--app-accent); outline-offset: 2px; }
+
+  .wn-art { position: relative; overflow: hidden; background: linear-gradient(160deg, #d8e6ff 0%, #f4e9ff 55%, #ffe8d8 100%); }
+  .wn-art-screen { position: absolute; inset: 14% 10% 0; border-radius: 14px 14px 0 0; background: #1b1c22; box-shadow: 0 12px 40px rgba(20, 30, 60, 0.25); }
+  .wn-art-notch { position: absolute; top: 9%; left: 50%; translate: -50% 0; width: 46%; height: 17%; border-radius: 9999px; background: #000; display: flex; align-items: center; gap: 6%; padding-inline: 5%; }
+  .wn-art-notch::before { content: ""; width: 14%; aspect-ratio: 1; border-radius: 9999px; background: linear-gradient(135deg, #ff9f43, #ff4f81); }
+  .wn-art-notch::after { content: ""; flex: 1; height: 22%; border-radius: 9999px; background: linear-gradient(90deg, #34c759 0 62%, #3a3b40 62%); }
+  .wn-art-row { position: absolute; left: 12%; right: 12%; height: 6%; border-radius: 9999px; background: #2c2d35; }
+  .wn-art-row:nth-of-type(1) { top: 40%; }
+  .wn-art-row:nth-of-type(2) { top: 52%; right: 30%; }
+  .wn-art-row:nth-of-type(3) { top: 64%; right: 45%; }
+  .wn-art--widgets { background: linear-gradient(160deg, #dff7ea 0%, #e3f0ff 100%); }
+  .wn-art--widgets .wn-art-screen { display: grid; grid-template-columns: 1fr 1fr; gap: 6%; padding: 7%; background: #f9fafc; }
+  .wn-art-tile { border-radius: 12px; background: linear-gradient(135deg, #34c759, #30b0c7); }
+  .wn-art-tile:nth-child(2) { background: linear-gradient(135deg, #5e5ce6, #bf5af2); }
+  .wn-art-tile:nth-child(3) { grid-column: 1 / -1; background: linear-gradient(90deg, #ff9f0a, #ff375f); }
+  .wn-art--keys { background: linear-gradient(160deg, #fff1d6 0%, #ffe0e6 100%); display: grid; place-items: center; }
+  .wn-art-keys { display: flex; gap: 4%; width: 70%; }
+  .wn-art-key { flex: 1; aspect-ratio: 1; border-radius: 18%; background: #ffffff; box-shadow: 0 6px 0 #d9c7b8, 0 10px 24px rgba(80, 50, 30, 0.18); }
+  .wn-art-key:nth-child(2) { background: #1d1d1f; box-shadow: 0 6px 0 #000, 0 10px 24px rgba(0, 0, 0, 0.3); }
+  @media (prefers-color-scheme: dark) {
+    .wn-art--widgets { background: linear-gradient(160deg, #173528 0%, #182a45 100%); }
+    .wn-art--widgets .wn-art-screen { background: #1b1c22; }
+    .wn-art--keys { background: linear-gradient(160deg, #3d3020 0%, #3d2028 100%); }
+  }
+  @media (prefers-color-scheme: dark) { .wn-art { background: linear-gradient(160deg, #1d2a4a 0%, #2c1f45 55%, #3d2a22 100%); } }
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>Notchly</h1>
+  <p>Cửa sổ ứng dụng. Thẻ Có gì mới mở ra sau khi cập nhật, và từ menu Trợ giúp bất cứ lúc nào.</p>
+  <button type="button" id="show">Có gì mới…</button>
+</main>
+<script type="module">
+  import { showWhatsNew } from '../lib/whats-new.js';
+
+  const VERSION = '2.4.0';
+
+  const LABELS = {
+    close: 'Đóng',
+    previous: 'Tính năng trước',
+    next: 'Tính năng sau',
+    nextButton: 'Tiếp',
+    done: 'Hiểu rồi',
+    pageOf: '{n} trên {m}',
+    dot: 'Tính năng {n} trên {m}',
+    region: 'Có gì mới',
+    pause: 'Tạm dừng video',
+    play: 'Phát video',
+    releaseNotes: 'Tất cả ghi chú phát hành',
+  };
+
+  function make(tag, className, children = []) {
+    const node = document.createElement(tag);
+    node.className = className;
+    node.append(...children);
+    return node;
+  }
+
+  function pillArt() {
+    const rows = [0, 1, 2].map(() => make('span', 'wn-art-row'));
+    const screen = make('div', 'wn-art-screen', [...rows, make('div', 'wn-art-notch')]);
+    return make('div', 'wn-art', [screen]);
+  }
+
+  function widgetsArt() {
+    const tiles = [0, 1, 2].map(() => make('span', 'wn-art-tile'));
+    return make('div', 'wn-art wn-art--widgets', [make('div', 'wn-art-screen', tiles)]);
+  }
+
+  function keysArt() {
+    const keys = [0, 1, 2].map(() => make('span', 'wn-art-key'));
+    return make('div', 'wn-art wn-art--keys', [make('div', 'wn-art-keys', keys)]);
+  }
+
+  const features = () => [
+    {
+      badge: 'Redesigned',
+      title: 'Pill mode, redrawn',
+      body: 'The pill now follows the height of the system’s live activities, so it lines up with the camera housing on every Mac and never covers the menu bar.',
+      media: { type: 'element', element: pillArt() },
+    },
+    {
+      badge: 'New',
+      title: 'Widgets on the desktop',
+      body: 'Pin the timer, the clipboard and the battery widgets to the desktop. They refresh on their own and follow light and dark.',
+      media: { type: 'element', element: widgetsArt() },
+    },
+    {
+      badge: 'Improved',
+      title: 'Shortcuts for everything',
+      body: 'Every action in the pill now has a keyboard shortcut you can change in Settings.',
+      media: { type: 'element', element: keysArt() },
+    },
+  ];
+
+  document.getElementById('show').addEventListener('click', () => {
+    showWhatsNew({ version: VERSION, features: features(), labels: LABELS, releaseNotesUrl: '#release-notes', force: true });
+  });
+
+  showWhatsNew({ version: VERSION, features: features(), labels: LABELS, releaseNotesUrl: '#release-notes' });
+</script>
+</body>
+</html>

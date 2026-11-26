@@ -77,9 +77,42 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
           exit 1
 
+  review:
+    name: Review text edits with a pinned model
+    needs: fetch
+    if: ${{ !cancelled() && needs.fetch.outputs.uploaded == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: vendor-sync
+          path: ${{ runner.temp }}/staged
+      - name: Review an update that the review gate takes
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node scripts/vendor-sync.mjs review --from "$RUNNER_TEMP/staged" --out "$RUNNER_TEMP/review/review.json"
+      - name: Upload the review record
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: vendor-review
+          path: ${{ runner.temp }}/review/
+          if-no-files-found: ignore
+          retention-days: 3
+
   propose:
     name: Open or update the pull request
-    needs: fetch
+    needs: [fetch, review]
     if: ${{ !cancelled() && needs.fetch.outputs.uploaded == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -100,6 +133,12 @@ jobs:
         with:
           name: vendor-sync
           path: ${{ runner.temp }}/staged
+      - name: Download the review record
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: vendor-review
+          path: ${{ runner.temp }}/review
       - name: Confirm the staged files against upstream
         run: node scripts/vendor-sync.mjs confirm --from "$RUNNER_TEMP/staged"
       - name: Classify the update
@@ -207,6 +246,7 @@ jobs:
           labelled=true
           gh label create vendor-sync --color 0e8a16 --description "Weekly sync of the vendored parts" --force > /dev/null || labelled=false
           gh label create needs-review --color d93f0b --description "Upstream change the owner must review before merging" --force > /dev/null || labelled=false
+          gh label create vendor-hold --color 5319e7 --description "The owner keeps this vendor update; the review gate never merges it" --force > /dev/null || labelled=false
           if [ "$VERDICT" = safe ]; then
             gh pr edit "$number" --add-label vendor-sync --remove-label needs-review > /dev/null || labelled=false
           else
@@ -215,13 +255,34 @@ jobs:
           if [ "$labelled" = false ]; then
             echo "::warning::The pull request is open, but its labels could not be set; its body states the verdict."
           fi
+      - name: Decide whether the update may merge without the owner
+        id: gate
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ steps.pr.outputs.number }}
+          HEAD_SHA: ${{ steps.push.outputs.head }}
+        run: |
+          if ! gh pr view "$NUMBER" --json labels --jq '[.labels[].name]' > "$RUNNER_TEMP/labels.json"; then
+            echo '["vendor-hold"]' > "$RUNNER_TEMP/labels.json"
+          fi
+          proposed=$(git log -1 --format=%cI "$HEAD_SHA" 2>/dev/null || echo unknown)
+          if ! node scripts/vendor-sync.mjs gate --classification "$RUNNER_TEMP/verdict.json" --review "$RUNNER_TEMP/review/review.json" --labels "$RUNNER_TEMP/labels.json" --proposed-at "$proposed" > "$RUNNER_TEMP/decision.json"; then
+            echo '{"merge":false,"mode":"error","reasons":["the gate command failed"]}' > "$RUNNER_TEMP/decision.json"
+          fi
+          {
+            echo "### Merge decision"
+            echo
+            jq -r '"Merge without the owner after CI: \(.merge) (\(.mode))", (.reasons[] | "- \(.)")' "$RUNNER_TEMP/decision.json"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "merge=$(jq -r '.merge == true' "$RUNNER_TEMP/decision.json")" >> "$GITHUB_OUTPUT"
       - name: Run CI on the pull request's head commit
         id: ci
         if: steps.pr.outputs.number != ''
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ steps.push.outputs.head }}
-          VERDICT: ${{ steps.classify.outputs.verdict }}
+          MERGE: ${{ steps.gate.outputs.merge }}
         run: |
           since=$(date -u -d '2 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
           gh workflow run ci.yml --ref "$BRANCH"
@@ -236,8 +297,8 @@ jobs:
             exit 1
           fi
           echo "CI run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$run"
-          if [ "$VERDICT" != safe ]; then
-            echo "The update needs review; the owner reads this run with the pull request."
+          if [ "$MERGE" != true ]; then
+            echo "The update waits for the owner, who reads this run with the pull request; the step summary says why."
             exit 0
           fi
           if ! gh run watch "$run" --exit-status --interval 30 > /dev/null; then
@@ -245,8 +306,8 @@ jobs:
             exit 1
           fi
           echo "passed=true" >> "$GITHUB_OUTPUT"
-      - name: Merge a safe update once CI passed and main has not moved
-        if: steps.classify.outputs.verdict == 'safe' && steps.ci.outputs.passed == 'true'
+      - name: Merge a pin-only or gate-approved update once CI passed and main has not moved
+        if: steps.gate.outputs.merge == 'true' && steps.ci.outputs.passed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ steps.pr.outputs.number }}
