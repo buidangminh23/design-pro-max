@@ -491,3 +491,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 5 error, 4 warn; evidence in `web-shells/references/evidence.md`
 - Checkers: `web-shells/scripts/check-shell.mjs`, `web-shells/scripts/probe-webkit.mjs`
+
+### `desktop-distribution`
+
+- Guide: `desktop-distribution/PART.md`
+- Status: active
+- Rules: 10 error, 8 warn; evidence in `desktop-distribution/references/evidence.md`
+- Checkers: `desktop-distribution/scripts/probe-app.mjs`, `desktop-distribution/scripts/check-installer.mjs`, `desktop-distribution/scripts/check-cask.mjs`, `desktop-distribution/scripts/check-feed.mjs`

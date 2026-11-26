@@ -77,6 +77,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
 | macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
+| Mac apps outside the App Store: signing, installers, casks, feeds | `desktop-distribution/PART.md` | active |
 
 Routing notes:
 
@@ -92,7 +93,7 @@ Not covered by any part:
 
 - Screen recording: not covered; read `launch-video/PART.md` section 0 and answer from it: say so, then offer its two paths.
 - Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
-- Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
+- Live Activities and App Intents beyond widget configuration: no code part (design: `hig/PART.md`); suggest Xcode's own coding assistant. SMAppService login items and macOS administration: not covered; use `write-swift` if installed, and Apple's docs.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Android-only shells, React Native and Flutter: not covered; say so.
 - Never stretch a part to fit.
