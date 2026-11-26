@@ -9,11 +9,19 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { SKILL_DIR } from './vendor.mjs';
+import { PRIMARY_DESIGN, designSkillDir } from './designs.mjs';
 
 export const LEDGER_FILE = 'evidence/ledger.json';
 export const RULES_FILE = 'rules.json';
-export const OWN_PARTS = ['launch-scroll', 'hig', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops', 'desktop-distribution'];
+export const DESIGN_PARTS = {
+  [PRIMARY_DESIGN]: ['launch-scroll', 'hig', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops', 'desktop-distribution'],
+};
+export const OWN_PARTS = Object.values(DESIGN_PARTS).flat();
+
+/** The design an own part belongs to; a part of no registered design falls back to the primary design. */
+export const designOfPart = (part) => Object.keys(DESIGN_PARTS).find((name) => DESIGN_PARTS[name].includes(part)) ?? PRIMARY_DESIGN;
+/** The skill folder an own part lives in, such as skills/apple. */
+export const partSkillDir = (part) => designSkillDir(designOfPart(part));
 export const LABELS = ['measured', 'documented', 'inferred', 'policy'];
 export const ENTRY_KEYS = ['claim', 'value', 'label', 'date', 'source', 'method', 'confidence', 'remeasure', 'status', 'correction', 'sourceSha'];
 export const RULE_KEYS = ['id', 'part', 'level', 'statement', 'values', 'evidence', 'check', 'fixtures', 'implementedBy'];
@@ -72,8 +80,9 @@ export function rulesProblems(root, rules, ledger) {
     if (!rule.evidence?.length) problems.push(`${id}: needs evidence`);
     for (const ref of rule.evidence ?? []) if (!entries[ref]) problems.push(`${id}: evidence ${ref} is not in ${LEDGER_FILE}`);
     const sourced = (rule.evidence ?? []).some((ref) => entries[ref] && entries[ref].label !== 'inferred');
+    const skillDir = partSkillDir(rule.part);
     for (const file of [rule.check, ...(rule.implementedBy ?? [])].filter(Boolean)) {
-      if (!fs.existsSync(path.join(root, SKILL_DIR, ...file.split('/')))) problems.push(`${id}: ${file} does not exist under ${SKILL_DIR}`);
+      if (!fs.existsSync(path.join(root, ...skillDir.split('/'), ...file.split('/')))) problems.push(`${id}: ${file} does not exist under ${skillDir}`);
     }
     if (rule.level !== 'error') continue;
     if (!sourced) problems.push(`${id}: an error rule needs evidence that is not inferred`);
@@ -139,13 +148,14 @@ export function citationProblems(text, file, ledger, rules) {
 
 /** The text files of an own part that the lints read: PART.md and the hand-written references. */
 export function partTextFiles(root, part) {
-  const folder = path.join(root, SKILL_DIR, part);
+  const skillDir = partSkillDir(part);
+  const folder = path.join(root, ...skillDir.split('/'), part);
   const files = ['PART.md'];
   const references = path.join(folder, 'references');
   if (fs.existsSync(references)) {
     for (const name of fs.readdirSync(references).sort()) if (name.endsWith('.md') && name !== 'evidence.md') files.push(`references/${name}`);
   }
-  return files.filter((file) => fs.existsSync(path.join(folder, file))).map((file) => `${SKILL_DIR}/${part}/${file}`);
+  return files.filter((file) => fs.existsSync(path.join(folder, file))).map((file) => `${skillDir}/${part}/${file}`);
 }
 
 /** The ledger ids an own part cites in its text, sorted. */

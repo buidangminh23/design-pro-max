@@ -21,10 +21,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
+import { SHARED_DIR } from './lib/designs.mjs';
+import { partSkillDir } from './lib/evidence.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia, buildWhatsNewMedia } from './lib/fixture-media.mjs';
 
 export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'whats-new', 'host-ops', 'desktop-distribution'];
-const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
   return PARTS.flatMap((part) => {
@@ -197,7 +198,7 @@ const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));
-  const shipped = (defect) => !defect.part || fs.existsSync(path.join(root, SKILL_DIR, defect.part));
+  const shipped = (defect) => !defect.part || fs.existsSync(path.join(root, ...partSkillDir(defect.part).split('/'), defect.part));
   const mine = file.defects.filter((defect) => defect.checker === entry.checker && shipped(defect) && rulesOf(entry).includes(defect.rule));
   const notRun = file.defects.filter((defect) => !shipped(defect)).map((defect) => `${defect.rule} (${defect.checker})`);
   const errors = findings.filter((finding) => finding.level === 'error');
@@ -229,7 +230,8 @@ async function main(argv) {
   const { evaluateRun } = await import(new URL(`../${SKILL_DIR}/shared/harness.mjs`, import.meta.url));
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'dpm-verify-'));
   const skill = path.join(scratch, 'skill');
-  for (const folder of SHIPPED) copyTree(path.join(ROOT, SKILL_DIR, folder), path.join(skill, folder));
+  copyTree(path.join(ROOT, ...SKILL_DIR.split('/'), SHARED_DIR), path.join(skill, SHARED_DIR));
+  for (const part of PARTS) copyTree(path.join(ROOT, ...partSkillDir(part).split('/'), part), path.join(skill, part));
   const wanted = only ? only.split(',') : [];
   const selected = loadCases().filter((entry) => !only || wanted.some((name) => entry.id === name || rulesOf(entry).includes(name)));
   if (!selected.length) {

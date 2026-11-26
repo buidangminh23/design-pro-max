@@ -37,13 +37,14 @@ import {
   validateSources,
   walk,
 } from './lib/vendor.mjs';
+import { PRIMARY_DESIGN, designNames, designSkillDir, designVendorDir } from './lib/designs.mjs';
 
 export const LIMITS = { part: 1024 * 1024, vendor: 3 * 1024 * 1024 };
 export const RULES = ['sources', 'licence', 'part-files', 'size', 'filesystem', 'file-types', 'paths', 'hidden-unicode', 'secrets', 'layout', 'personal'];
 
 const ROOT_SKIP = new Set(['.git', 'node_modules']);
 const UXUI_DATA_DIR = 'skills/uxui-prompt/data/';
-const OWN_EXCLUDED = [`${VENDOR_DIR}/`, UXUI_DATA_DIR, 'test/fixtures/'];
+const OWN_EXCLUDED = [UXUI_DATA_DIR, 'test/fixtures/'];
 const ZERO_WIDTH_SPACE = 'U+200B';
 const RESERVED_DIRS = new Set(['.claude', '.agents', '.codex', '.git']);
 const PLUGIN_DIRS = new Set(['.claude-plugin', '.codex-plugin']);
@@ -269,7 +270,7 @@ export function listEntries(root) {
   return [...entries.values()].sort((a, b) => compareStrings(a.path, b.path));
 }
 
-const isOwnFile = (file) => !OWN_EXCLUDED.some((prefix) => file.startsWith(prefix));
+const isOwnFile = (file, designs) => ![...designs.map((name) => `${designVendorDir(name)}/`), ...OWN_EXCLUDED].some((prefix) => file.startsWith(prefix));
 
 /**
  * Read a file below `root` by name without following a symlink or blocking on a FIFO. Returns its text, null when it
@@ -352,7 +353,7 @@ function nameProblem(relative, vendored) {
   return null;
 }
 
-function checkSkills(root, entries, fail) {
+function checkSkills(root, entries, fail, designs) {
   const skillEntries = entries.filter((entry) => entry.path.startsWith(`${SKILLS_DIR}/`));
   for (const entry of skillEntries) {
     const segments = entry.path.split('/');
@@ -361,14 +362,18 @@ function checkSkills(root, entries, fail) {
     if (entry.kind === 'dir' && PLUGIN_DIRS.has(name) && segments.length > 2) fail('layout', entry.path, `${name} must not sit inside a skill folder`);
     if (entry.kind === 'file' && name === 'metadata.json') fail('layout', entry.path, 'installers drop files named metadata.json');
     if (entry.kind === 'file' && GIT_METADATA_NAMES.has(name)) {
-      fail('layout', entry.path, entry.path.startsWith(`${VENDOR_DIR}/`) ? 'nested git metadata changes what git stores; exclude it in vendor/sources.json' : 'git metadata under skills/ changes what git stores and what a release ships; keep attributes and ignore rules at the repository root');
+      fail('layout', entry.path, designs.some((name) => entry.path.startsWith(`${designVendorDir(name)}/`)) ? 'nested git metadata changes what git stores; exclude it in vendor/sources.json' : 'git metadata under skills/ changes what git stores and what a release ships; keep attributes and ignore rules at the repository root');
     }
   }
   const visible = skillEntries
     .filter((entry) => entry.kind === 'file' && entry.path.endsWith('/SKILL.md'))
     .filter((entry) => !entry.path.split('/').slice(1, -1).some((segment) => segment.startsWith('.')))
     .map((entry) => entry.path);
-  const folders = new Set([SKILL_DIR, ...skillEntries.filter((entry) => entry.kind === 'dir' && SKILL_FOLDER.test(entry.path)).map((entry) => entry.path)]);
+  for (const name of designs.filter((design) => design !== PRIMARY_DESIGN)) {
+    const vendor = designVendorDir(name);
+    if (skillEntries.some((entry) => entry.path === vendor || entry.path.startsWith(`${vendor}/`))) fail('layout', vendor, `vendored parts belong to the ${PRIMARY_DESIGN} design, the one ${SOURCES_FILE} describes; give ${name} its own manifest before vendoring into it`);
+  }
+  const folders = new Set([SKILL_DIR, ...designs.map(designSkillDir), ...skillEntries.filter((entry) => entry.kind === 'dir' && SKILL_FOLDER.test(entry.path)).map((entry) => entry.path)]);
   for (const folder of folders) if (!visible.includes(`${folder}/SKILL.md`)) fail('layout', `${folder}/SKILL.md`, 'missing');
   for (const file of visible) {
     if (!VISIBLE_SKILL.test(file)) {
@@ -404,7 +409,13 @@ export function runGuard(root = ROOT, { terms } = {}) {
   const entries = listEntries(root);
   const parts = readSources(root, fail);
   for (const part of parts) checkPart(root, part, fail);
-  const skillFolders = checkSkills(root, entries, fail);
+  let designs = [PRIMARY_DESIGN];
+  try {
+    designs = designNames(root);
+  } catch (error) {
+    for (const line of error.message.split('\n')) fail('layout', line.split(':')[0], line.slice(line.indexOf(':') + 1).trim());
+  }
+  const skillFolders = checkSkills(root, entries, fail, designs);
   const privateWords = terms ?? privateTerms({ vocabulary: projectVocabulary(parts, skillFolders, packageName(root)) });
 
   let vendorBytes = 0;
@@ -451,7 +462,7 @@ export function runGuard(root = ROOT, { terms } = {}) {
     const searchable = text ?? bytes.toString('latin1');
     const where = (line) => (text === null ? '' : ` (line ${line})`);
     for (const finding of findAll(SECRET_PATTERNS, searchable)) fail('secrets', entry.path, `looks like a ${finding.label}${where(finding.line)}`);
-    if (isOwnFile(entry.path)) for (const finding of personalScan(searchable, privateWords)) fail('personal', entry.path, `contains a ${finding.label}${where(finding.line)}`);
+    if (isOwnFile(entry.path, designs)) for (const finding of personalScan(searchable, privateWords)) fail('personal', entry.path, `contains a ${finding.label}${where(finding.line)}`);
     if (text === null) continue;
     const hidden = hiddenCharacters(text).filter((item) => !(entry.path.startsWith(UXUI_DATA_DIR) && item.codePoint === ZERO_WIDTH_SPACE));
     if (hidden.length) {
