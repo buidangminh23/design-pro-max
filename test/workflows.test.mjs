@@ -162,12 +162,22 @@ test('the release workflow publishes to npm by trusted publishing after the GitH
   assert.doesNotMatch(text, /NODE_AUTH_TOKEN|NPM_TOKEN|--provenance/);
 });
 
-test('the vendor sync stages read-only, confirms upstream and merges only safe updates after CI', () => {
+test('the vendor sync stages read-only, confirms upstream and merges only safe or gate-approved updates after CI', () => {
   const sync = read('vendor-sync.yml');
   assert.match(sync, /cron: "41 2 \* \* 1"/);
   assert.match(sync, /workflow_dispatch:/);
-  const [fetch, propose, heartbeat] = jobs(sync);
-  assert.deepEqual([fetch.name, propose.name, heartbeat.name], ['fetch', 'propose', 'heartbeat']);
+  const [fetch, review, propose, heartbeat] = jobs(sync);
+  assert.deepEqual([fetch.name, review.name, propose.name, heartbeat.name], ['fetch', 'review', 'propose', 'heartbeat']);
+  assert.ok(review.lines.some((line) => /^ {6}contents: read$/.test(line)));
+  assert.ok(!review.lines.some((line) => /: write$/.test(line)), 'the review job holds no write permission');
+  assert.ok(!review.lines.join('\n').includes('github.token'), 'the review job never sees the job token');
+  const keySteps = steps(review).filter((lines) => lines.join('\n').includes('secrets.ANTHROPIC_API_KEY'));
+  assert.equal(keySteps.length, 1, 'one review step gets the API key');
+  assert.ok(keySteps[0].join('\n').includes('node scripts/vendor-sync.mjs review --from'));
+  assert.equal(sync.split('secrets.').length - 1, 1, 'no other job or step reads a secret');
+  assert.match(propose.lines.join('\n'), /^ {4}needs: \[fetch, review\]$/m);
+  const download = steps(propose).find((lines) => lines.join('\n').includes('name: vendor-review'));
+  assert.ok(download.some((line) => line.includes('continue-on-error: true')), 'a missing review record only keeps the update for the owner');
   assert.ok(fetch.lines.some((line) => /^ {6}contents: read$/.test(line)));
   assert.ok(!fetch.lines.some((line) => /: write$/.test(line)));
   for (const permission of ['actions: write', 'contents: write', 'pull-requests: write']) assert.ok(propose.lines.includes(`      ${permission}`), permission);
@@ -177,12 +187,18 @@ test('the vendor sync stages read-only, confirms upstream and merges only safe u
   assert.match(proposeText, /gh pr list --head "\$BRANCH" --base main --state open --json number,isCrossRepository --jq '\[\.\[\] \| select\(\.isCrossRepository == false\)\]/);
   assert.match(proposeText, /--ignored=matching/);
   const merge = steps(propose).find((lines) => /gh pr merge/.test(lines.join('\n')));
-  assert.ok(merge[0].includes('Merge a safe update'));
-  assert.ok(merge.some((line) => line.includes("if: steps.classify.outputs.verdict == 'safe' && steps.ci.outputs.passed == 'true'")));
+  assert.ok(merge[0].includes('Merge a pin-only or gate-approved update'));
+  assert.ok(merge.some((line) => line.includes("if: steps.gate.outputs.merge == 'true' && steps.ci.outputs.passed == 'true'")));
   assert.ok(merge.some((line) => line.includes('--match-head-commit "$HEAD_SHA"')));
-  const order = ['confirm --from', 'classify --from', 'apply --from', 'npm test', 'node scripts/vendor-guard.mjs', 'node scripts/check-history.mjs', 'check --root "$RUNNER_TEMP/committed"', 'git push', 'gh pr create', 'gh workflow run ci.yml', 'gh run watch', 'gh pr merge'].map((text) => proposeText.indexOf(text));
+  const gate = steps(propose).find((lines) => lines.join('\n').includes('vendor-sync.mjs gate')).join('\n');
+  assert.match(gate, /--classification "\$RUNNER_TEMP\/verdict\.json" --review "\$RUNNER_TEMP\/review\/review\.json"/);
+  assert.match(gate, /"merge":false/, 'a failing gate command keeps the update for the owner');
+  assert.match(gate, /git log -1 --format=%cI "\$HEAD_SHA"/, 'the hold counts from the commit the branch holds');
+  const ci = steps(propose).find((lines) => lines.join('\n').includes('gh workflow run ci.yml')).join('\n');
+  assert.match(ci, /MERGE: \$\{\{ steps\.gate\.outputs\.merge \}\}/);
+  const order = ['confirm --from', 'classify --from', 'apply --from', 'npm test', 'node scripts/vendor-guard.mjs', 'node scripts/check-history.mjs', 'check --root "$RUNNER_TEMP/committed"', 'git push', 'gh pr create', 'vendor-sync.mjs gate', 'gh workflow run ci.yml', 'gh run watch', 'gh pr merge'].map((text) => proposeText.indexOf(text));
   assert.ok(order.every((index) => index >= 0), 'the propose job runs every step');
-  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'confirm, classify, apply, check, commit, push, propose, CI, merge, in that order');
+  assert.deepEqual(order, [...order].sort((a, b) => a - b), 'confirm, classify, apply, check, commit, push, propose, gate, CI, merge, in that order');
   const heartbeatText = heartbeat.lines.join('\n');
   assert.match(heartbeatText, /if \[ "\$days" -lt 45 \]/);
   assert.match(heartbeatText, /gh issue create/);
