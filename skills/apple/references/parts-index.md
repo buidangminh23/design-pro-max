@@ -468,7 +468,7 @@ Written for this skill and active without an activation check. Their checkers ne
 
 - Guide: `launch-video/PART.md`
 - Status: active
-- Rules: 7 error, 8 warn; evidence in `launch-video/references/evidence.md`
+- Rules: 8 error, 10 warn; evidence in `launch-video/references/evidence.md`
 - Checkers: `shared/check-media.mjs`, `launch-video/scripts/check-embed.mjs`, `launch-video/scripts/render-frames.mjs`
 
 ### `launch-page`

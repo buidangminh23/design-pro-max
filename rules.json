@@ -354,6 +354,39 @@
       "implementedBy": ["launch-video/assets/lib/demo-embed.js"]
     },
     {
+      "id": "LV-APP-01",
+      "part": "launch-video",
+      "level": "error",
+      "statement": "An App Store app preview matches the published specification for its display class: H.264 up to High at level 4.0 in .mov, .m4v or .mp4, or ProRes 422 HQ in .mov; progressive; the exact size of the class in the chosen orientation; at most 30 fps; 15 to 30 seconds; at most 500 MB; one stereo track or two mono tracks of AAC (or PCM with ProRes) at 44.1 or 48 kHz.",
+      "values": "H.264 High at most level 4.0 or ProRes 422 HQ; class size; at most 30 fps; 15-30 s; at most 500 MB; stereo AAC at 44.1 or 48 kHz",
+      "evidence": ["PV-25"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": ["app-01-encoded"], "fail": ["app-01-too-short", "app-01-60fps", "app-01-wrong-size", "app-01-no-audio", "app-01-mono"] },
+      "implementedBy": ["launch-video/scripts/app-preview.mjs"]
+    },
+    {
+      "id": "LV-WARN-APP-BITRATE",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "An H.264 app preview aims at about 10 to 12 Mbps of video and 256 kbps of AAC audio, with the moov box first.",
+      "values": "video about 10-12 Mbps; audio 256 kbps",
+      "evidence": ["PV-25"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/app-preview.mjs"]
+    },
+    {
+      "id": "LV-WARN-APP-SOURCE",
+      "part": "launch-video",
+      "level": "warn",
+      "statement": "An app preview shows only screen captures of the app itself, with narration and video or text overlays allowed to explain what the capture alone does not; footage rendered from a mock or another app does not qualify, so the encoder takes footage the user supplies and never renders its own.",
+      "values": "captures of the app itself; narration and overlays allowed",
+      "evidence": ["PV-26"],
+      "check": "shared/check-media.mjs",
+      "fixtures": { "pass": [], "fail": [] },
+      "implementedBy": ["launch-video/scripts/app-preview.mjs"]
+    },
+    {
       "id": "LP-FONT-01",
       "part": "launch-page",
       "level": "error",

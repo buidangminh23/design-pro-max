@@ -1,0 +1,53 @@
+name: Freshness
+
+on:
+  schedule:
+    - cron: "41 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: freshness
+  cancel-in-progress: false
+
+env:
+  TITLE: "Freshness: ledger values drifted from their data sets"
+
+jobs:
+  check:
+    name: Compare ledger values with their public data sets
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Check the watched values
+        id: check
+        run: |
+          set +e
+          node scripts/freshness.mjs --out "$RUNNER_TEMP/freshness.md"
+          status=$?
+          set -e
+          if [ "$status" -gt 1 ]; then exit "$status"; fi
+          echo "drifted=$([ "$status" -eq 1 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Open or update the drift issue
+        if: steps.check.outputs.drifted == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          number=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$TITLE\" in:title" --json number,title --jq "[.[] | select(.title == env.TITLE)][0].number // empty")
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/freshness.md"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body-file "$RUNNER_TEMP/freshness.md"
+          fi

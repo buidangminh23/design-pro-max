@@ -4227,6 +4227,32 @@
       "correction": null,
       "sourceSha": "54f36f9cf951058a6e4eaf4005ea881d025bbeec7cc9419657cd3b8d6a7af688"
     },
+    "PV-25": {
+      "claim": "Apple's App Store Connect reference sets app previews to H.264 up to High level 4.0 or ProRes 422 HQ, progressive, at most 30 fps, 15 to 30 seconds, at most 500 MB, with stereo AAC (or PCM with ProRes) at 44.1 or 48 kHz and one exact frame size per display class.",
+      "value": "H.264 High at most level 4.0 (target 10-12 Mbps) in .mov, .m4v or .mp4, or ProRes 422 HQ in .mov; at most 30 fps; 15-30 s; at most 500 MB; AAC 256 kbps at 44.1 or 48 kHz; 886x1920 for the 5.8 to 6.9-inch iPhones, 1080x1920 for 5.5 and 4-inch, 750x1334 for 4.7-inch, 1200x1600 for 10.5 to 13-inch iPad, 900x1200 for 9.7-inch, 1920x1080 for Mac and Apple TV, 3840x2160 for Apple Vision Pro",
+      "label": "documented",
+      "date": "2026-11-26",
+      "source": "https://developer.apple.com/help/app-store-connect/reference/app-preview-specifications",
+      "method": "Read Apple's app preview specification page; the 3840x2160 size exceeds the macroblock limit of H.264 level 4.0, so that class is encoded as ProRes.",
+      "confidence": "high",
+      "remeasure": "Re-read the specification page before each release and compare every value in APP_PREVIEW and APP_PREVIEW_DEVICES.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "9fe37b7cea15e80cf217a3b723342ca754aad7dac493250c53a6295cb0ccc5fe"
+    },
+    "PV-26": {
+      "claim": "App Review allows app previews made only of screen captures of the app itself, with narration and video or text overlays to explain what the capture alone does not.",
+      "value": "captures of the app itself; narration and overlays allowed",
+      "label": "documented",
+      "date": "2026-11-26",
+      "source": "https://developer.apple.com/app-store/review/guidelines/",
+      "method": "Read guideline 2.3.4 of the App Review Guidelines.",
+      "confidence": "high",
+      "remeasure": "Re-read guideline 2.3.4 before each release.",
+      "status": "current",
+      "correction": null,
+      "sourceSha": "aa21f65c3c81e392a97edfa443f4bf81809fe1739f591db1df59fca17c611778"
+    },
     "PV-N0": {
       "claim": "Direction for demo clips, derived from measured reference clips: short loops with one idea each, brief eased transitions, holds long enough to read, steady scripted typing, one cursor move per target and a static camera.",
       "value": "loops 4-8 s; transitions 300-500 ms; holds at least 1 s, 1.5 s for a result; typing 8-12 characters per second; cursor moves 0.3-0.8 s; one-shots up to 5 s need no pause; 30 fps",

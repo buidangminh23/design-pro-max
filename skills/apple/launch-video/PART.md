@@ -1,6 +1,6 @@
 # launch-video
 
-Demo clips for launch and product pages, rendered from code: a UI rebuilt in HTML and CSS, stepped frame by frame in a headless browser, encoded into web-ready files and embedded so they load late, start on their first frame and can be paused. This part decides whether a clip is needed at all, and checks every step with the bundled scripts. Real screen recording of an app is not covered in this release. Paths below are relative to this file's folder.
+Demo clips for launch and product pages, rendered from code: a UI rebuilt in HTML and CSS, stepped frame by frame in a headless browser, encoded into web-ready files and embedded so they load late, start on their first frame and can be paused. This part decides whether a clip is needed at all, and checks every step with the bundled scripts. It also encodes and checks App Store app previews from a screen capture the user supplies (section 5). Real screen recording of an app is not covered in this release. Paths below are relative to this file's folder.
 
 ## 0. Every answer, before anything else
 
@@ -8,6 +8,7 @@ These are the points runs miss most. Check each one that applies, in your first 
 
 - **Slot first.** Show the Slot Read (section 1): the slot's size, its place on the page, loop or one-shot, and its file budget from the table in `references/encode-recipes.md` (a card is 400 KB per file [LV-WARN-BUDGET]). If the request does not say, ask; do not render first.
 - **Recording requests.** Asked to record or capture the real app: say plainly that this part does not record a real app's screen, then offer both paths in so many words: (1) an HTML and CSS rebuild rendered to video, or (2) the user records the app and you encode that clip and embed it on the page (sections 5 and 6). Name both the encoding and the embedding. Never imply a capture will happen.
+- **App Store previews.** Asked for an App Store app preview: it must be a screen capture of the app itself, which the user records; never offer a rendered rebuild as a preview. Ask for the capture and the display classes, then encode each with `scripts/app-preview.mjs` and read `references/app-preview.md` [LV-APP-01] [LV-WARN-APP-SOURCE].
 - **Live first.** When the source is HTML or CSS that could run on the page (a CSS animation, a mock), say it can run live with no video bytes, then either recommend that or say why a video is still wanted (section 1, option 2).
 - **Someone else's clips.** Asked how another site made its clips: give no verdict either way (section 1), then turn to what the team can do: rebuild its own UI in HTML and CSS and render it, or encode and embed its own recording.
 - **Hard rules beat the request.** A request for one codec, autoplay or no pause button still gets the compliant set (section 7). An AV1-only or VP9-only request: encode the H.264 file too and list it last in the markup, then say why (WebKit plays AV1 only with a hardware decoder) [LV-WARN-AV1]. Mentioning H.264 as an option the user may add later does not meet the rule. A transparent clip ships HEVC with alpha, then VP9 with alpha, then H.264 flattened over the background colour, and the answer or the delivered notes must say, in these words or close to them, that VP9 alone turns opaque in Safari [LV-WARN-ALPHA].
@@ -60,6 +61,8 @@ Never use the browser's built-in page recording for a master: it writes VP8 at 2
 
 `scripts/encode.mjs <frames folder or master> --out <folder>` writes the clip set and checks it. Profiles: `h264` (always), `vp9`, `av1`. Every file is muted with no audio track [LV-ENC-02], 4:2:0 in limited range, and carries the three colour tags written with `setparams` and read back [LV-ENC-03]; the H.264 file is High profile with the moov box first [LV-ENC-01]. It also writes the start image, frame 0 through the browser's colour conversion [LV-POSTER-01]. With `--alpha` it writes HEVC with alpha (VideoToolbox, macOS only), VP9 with alpha, and H.264 flattened over `--background` [LV-WARN-ALPHA]. VP9 with alpha keeps its transparency in Chrome and turns opaque in WebKit, while HEVC with alpha works in both (TQ-20). The VideoToolbox encoder fails inside the agent sandbox (TQ-31): the script then exits 3 and prints the command to run outside it. Ask the user to approve that rerun or run it; never leave the sandbox on your own. Size targets per slot are in `references/encode-recipes.md` [LV-WARN-BUDGET].
 
+App Store app previews have their own encoder: `scripts/app-preview.mjs <capture> --device <class> --out <file>` re-encodes footage the user supplies into the specification of one display class (H.264 High at level 4.0, or ProRes 422 HQ for Apple Vision Pro; the exact frame size; at most 30 fps; 15 to 30 seconds; stereo audio) and checks the result [LV-APP-01]. Read `references/app-preview.md` in full first: it holds the size table, the rules for what the footage may show [LV-WARN-APP-SOURCE] and the bit-rate targets [LV-WARN-APP-BITRATE]. A preview keeps its audio track, so [LV-ENC-02] does not apply to it.
+
 ## 6. Embed
 
 Copy `assets/lib/demo-embed.js` and follow `assets/reference/demo-embed.html` and `references/embed-component.md`:
@@ -80,8 +83,9 @@ Each has a check that was seen failing on a broken fixture. These rules hold eve
 - [LV-EMBED-01] A clip below the fold has no `autoplay` attribute, `preload="none"`, no `poster` attribute, and no source or video bytes until it comes near.
 - [LV-EMBED-02] Motion over 5 s has native controls or a labelled pause control that works from the keyboard, and under reduced motion nothing plays, also after loading.
 - [LV-RENDER-01] A master has duration x fps frames at twice the slot's CSS pixels, every image painted, never the built-in recording.
+- [LV-APP-01] An App Store app preview matches the specification of its display class: codec, level and container, progressive scan, exact size, at most 30 fps, 15 to 30 seconds, at most 500 MB, stereo audio at 44.1 or 48 kHz.
 
-Warnings (guidance, not failures): direction bands [LV-WARN-DIRECTION]; slot budgets [LV-WARN-BUDGET]; delivered density [LV-WARN-DENSITY]; frame rate [LV-WARN-FPS]; AV1 first and H.264 last [LV-WARN-AV1]; loop seam [LV-WARN-SEAM]; the alpha pair [LV-WARN-ALPHA].
+Warnings (guidance, not failures): direction bands [LV-WARN-DIRECTION]; slot budgets [LV-WARN-BUDGET]; delivered density [LV-WARN-DENSITY]; frame rate [LV-WARN-FPS]; AV1 first and H.264 last [LV-WARN-AV1]; loop seam [LV-WARN-SEAM]; the alpha pair [LV-WARN-ALPHA]; app preview bit rates [LV-WARN-APP-BITRATE]; app preview footage is a capture of the app itself [LV-WARN-APP-SOURCE].
 
 ## 8. Build in the user's project
 
@@ -100,6 +104,7 @@ Warnings (guidance, not failures): direction bands [LV-WARN-DIRECTION]; slot bud
 - HEVC, VP9 or AV1 without an H.264 file last, or VP9 with alpha as the only transparent file.
 - SF Pro, SF Symbols, product photos, store badges, copied text, or class names and media from another site.
 - Claims about how someone else's clips were made.
+- An App Store preview made from a rendered rebuild, a mock or footage of another app, or one stretched, looped or sped up to fit.
 
 ## 10. Verify
 
@@ -111,6 +116,8 @@ node <absolute path to this folder>/scripts/encode.mjs <frames folder> --out pub
 node <absolute path to this folder>/../shared/check-media.mjs --profile demo --poster public/media/search.start.jpg --slot card --loop public/media/search.av1.webm public/media/search.webm public/media/search.mp4
 node <absolute path to this folder>/scripts/check-embed.mjs --url http://localhost:5173/ --project .
 node <absolute path to this folder>/scripts/render-frames.mjs --check <frames folder or master video> --slot 640x360 --duration 6
+node <absolute path to this folder>/scripts/app-preview.mjs <capture> --device iphone-6.9 --out previews/iphone-6.9.mp4
+node <absolute path to this folder>/../shared/check-media.mjs --profile app-preview --device iphone-6.9 previews/iphone-6.9.mp4
 ```
 
 Output is JSON lines `{rule, level, where, measured, expected}` and a summary; exit 0 passes, 1 means an error rule failed, 2 a missing tool or bad usage, 3 a sandbox block. On exit 3, ask the user to approve a rerun outside the sandbox or to run the printed command.
@@ -125,4 +132,4 @@ Give the user: the Slot Read and the decision; the beat table; the files written
 - Remotion compositions or HyperFrames templates: their own skills, if installed. GSAP timelines: the GSAP skills, if installed.
 - One web animation that is not a clip: `animate`, if installed. Springs and gestures: `apple-design`, if installed.
 - Spacing of the page around the clip: `design-spacing-rhythm`, if installed. Icons: `icons-pro-max`, if installed.
-- Narration, AI footage, long films with audio, HLS streaming and app store preview videos: not covered; say so.
+- Narration, AI footage, long films with audio and HLS streaming: not covered; say so. App Store screenshots: `app-store-screenshots`, if installed.

@@ -73,7 +73,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Wall of Apps entry, on an explicit request only | `.vendor/app-store-connect/asc-wall-submit/SKILL.md` | inactive |
 | Web page scenes that pin, zoom or scrub video or a canvas image sequence on scroll; sequence memory budgets; janky or frozen scrubbing; whether a section should pin at all | `launch-scroll/PART.md` | active |
 | Launch and landing pages (hero, feature tiles, galleries, marquees, pricing, FAQ) or a review of one: type scale, SF fonts on the web, contrast, reveals, hero intros, pause controls | `launch-page/PART.md` | active |
-| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
+| Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough; App Store app previews encoded from a screen capture the user supplies | `launch-video/PART.md` | active |
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
 | In-app What's New popups after an update: one card or a pager, image or looping video, once per version, a reopen item; SwiftUI, web, Tauri | `whats-new/PART.md` | active |
@@ -93,7 +93,7 @@ Routing notes:
 Not covered by any part:
 
 - Screen recording: not covered; read `launch-video/PART.md` section 0, say so and offer its two paths.
-- Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
+- Narrated launch films, AI footage and HLS streaming: not covered; say so.
 - Live Activities and App Intents beyond widget configuration: no code part (their design is in `hig/PART.md`); suggest Xcode's coding assistant. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if installed and Apple's documentation.
 - swiftc or SwiftPM builds with no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Android-only shells and apps, React Native and Flutter: not covered; say so.

@@ -196,6 +196,60 @@
       "checker": "render-frames",
       "page": "pages/render-01-clock-in-step.html",
       "args": ["--slot", "400x225", "--fps", "30", "--duration", "2"]
+    },
+    {
+      "id": "app-01-encoded",
+      "rule": "LV-APP-01",
+      "expect": "pass",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-good"]
+    },
+    {
+      "id": "app-01-too-short",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-short"]
+    },
+    {
+      "id": "app-01-60fps",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-60fps"]
+    },
+    {
+      "id": "app-01-wrong-size",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-wrong-size"]
+    },
+    {
+      "id": "app-01-no-audio",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-no-audio"]
+    },
+    {
+      "id": "app-01-mono",
+      "rule": "LV-APP-01",
+      "expect": "fail",
+      "checker": "check-media",
+      "profile": "app-preview",
+      "args": ["--device", "iphone-6.9"],
+      "files": ["ap-mono"]
     }
   ]
 }

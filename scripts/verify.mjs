@@ -212,7 +212,7 @@ async function main(argv) {
   const needed = new Set(cases.map((entry) => entry.part));
   const media = {
     ...(needed.has('launch-scroll') || needed.has('launch-page') ? buildFixtureMedia(path.join(scratch, 'media'), { encodeScrub: path.join(skill, 'launch-scroll', 'scripts', 'encode-scrub.mjs'), makeSequence: path.join(skill, 'launch-scroll', 'scripts', 'make-sequence.mjs') }) : {}),
-    ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs') }) : {}),
+    ...(needed.has('launch-video') ? buildLaunchVideoMedia(path.join(scratch, 'media-video'), { encode: path.join(skill, 'launch-video', 'scripts', 'encode.mjs'), appPreview: path.join(skill, 'launch-video', 'scripts', 'app-preview.mjs') }) : {}),
     ...(needed.has('whats-new') ? buildWhatsNewMedia(path.join(scratch, 'media-whats-new')) : {}),
   };
   const results = [];
