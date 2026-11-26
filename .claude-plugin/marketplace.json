@@ -9,7 +9,7 @@
     {
       "name": "design-pro-max",
       "description": "Design skills for coding agents: a router for Apple-platform work with vendored MIT guides, Apple Human Interface Guidelines in its own words, and its own guides for launch pages, demo clips, scroll-pinned web scenes, menu bar apps and widgets, and web apps on the Home Screen or in Capacitor or Tauri shells, plus spacing and icon skills. Independent project, not affiliated with Apple Inc.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "source": "./",
       "category": "design",
       "author": {

@@ -1,6 +1,6 @@
 {
   "name": "@minhspark/design-pro-max",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Design skills for AI coding agents: apple, a router over vendored Apple-platform skills and its own guides for the Human Interface Guidelines, launch pages, demo clips, scroll scenes, menu bar apps and widgets, and web shells, plus the bundled design-spacing-rhythm and icons-pro-max skills",
   "license": "MIT",
   "type": "module",
