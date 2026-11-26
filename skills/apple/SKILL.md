@@ -76,6 +76,7 @@ This skill routes each task to one guide ("part"). Third-party parts are bundled
 | Demo clips rendered from code: rebuild a UI in HTML and CSS, render it to MP4, WebM or transparent video, encode and embed clips that load late and can be paused; whether a still or a live replica is enough | `launch-video/PART.md` | active |
 | A web app on iPhone, iPad or Mac: home-screen web app or Capacitor or Tauri shell, the origin it loads, a stale or staging URL in a built app, Basic Auth blank pages, cookies, WebKit tests | `web-shells/PART.md` | active |
 | Design or review a native app screen, component or flow against the Human Interface Guidelines: platform conventions, layout, typography, color, Dark Mode, accessibility, components, patterns, inputs, widgets, Live Activities, system technologies | `hig/PART.md` | active |
+| Operating an always-on or remote Mac from an agent: commands over SSH and the login Keychain, shells and PATH, launchd jobs that do not load or run, privacy (TCC) denials, root commands without a password in the agent, `.env` secrets, AppleScript targets, sleep and FileVault restarts, stuck Simulator runtimes, Apple tools that fail only in the agent sandbox | `host-ops/PART.md` | active |
 | macOS menu bar apps and WidgetKit code: status items, MenuBarExtra menus and popovers, appearance redraws and high CPU, Edit Widget options through App Intents, placeholder widgets after an update, offscreen widget snapshots; whether a menu or a window is enough | `menubar-widgets/PART.md` | active |
 
 Routing notes:
@@ -85,6 +86,7 @@ Routing notes:
 - SwiftData migrations: the part has one migration rule; use Apple's VersionedSchema documentation as well.
 - Scene and view APIs inside a Tuist menu bar app go to `.vendor/swiftui-expert-skill/SKILL.md`.
 - Menu bar or WidgetKit code starts at `menubar-widgets/PART.md`; widget design or HIG review goes to `hig`, Tuist manifests to the Tuist row, one SwiftUI API (a MenuBarExtra modifier) to SwiftUI.
+- Running or keeping a Mac working from an agent starts at `host-ops/PART.md`; freeing Xcode and simulator disk space stays the disk space row, a stale widget extension after an update is `menubar-widgets`.
 - Keywords in App Store metadata are limited to 100 bytes, not 100 characters.
 - A launch page with a scroll scene or demo clips: the main goal picks the first row. A whole page starts at `launch-page/PART.md`; one scene or one clip, even on a landing page, goes straight to `launch-scroll` or `launch-video`.
 
@@ -92,7 +94,7 @@ Not covered by any part:
 
 - Screen recording: not covered; read `launch-video/PART.md` section 0 and answer from it: say so, then offer its two paths.
 - Narrated launch films, AI footage, HLS streaming and App Store preview videos: not covered; say so.
-- Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle and macOS administration: not covered; use `write-swift` if it is installed and Apple's documentation.
+- Live Activities and App Intents beyond widget configuration: no code part (their design guidelines are in `hig/PART.md`); suggest Xcode's own coding assistant inside Xcode. SMAppService login items, DMG or curl installers, Sparkle, MDM and fleet management: not covered (operating one Mac from an agent is the `host-ops` row); use `write-swift` if it is installed and Apple's documentation.
 - Builds made with swiftc or SwiftPM and no Xcode project get no build part: add `-Xfrontend -warn-long-function-bodies=<ms>`, `-Xfrontend -warn-long-expression-type-checking=<ms>` or `-Xfrontend -debug-time-function-bodies` by hand (Swift 6.4 has no `-debug-time-compilation`).
 - Android-only shells, React Native and Flutter: not covered; say so.
 - Never stretch a part to fit.
@@ -103,7 +105,7 @@ Near misses: web springs, gestures and sheets go to `apple-design`; one web anim
 
 `references/parts-index.md` lists every part with its group, status, activation check, prerequisites and errata pointers; each part's `UPSTREAM.json` holds the full text. Read a part's entry there before using it.
 
-- Active (12): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets` and `web-shells`.
+- Active (13): `swiftui-expert-skill`, `swift-concurrency`, `swift-testing-pro`, `swiftdata-pro`, `core-data-expert`, `xcode-disk-cleanup` and the own parts `launch-scroll`, `launch-page`, `launch-video`, `hig`, `menubar-widgets`, `web-shells` and `host-ops`.
 - `xcode-build/` (6): inactive until `xcodebuild -list`, run outside the agent sandbox, lists a scheme. They need python3; say that `xcodebuild clean` will run before it does.
 - `macos-menubar-tuist-app`: inactive until Tuist.swift and Project.swift exist and `tuist version` succeeds.
 - `app-store-connect/` (25): inactive until `command -v asc` succeeds, `asc auth status --validate` passes and the user confirms a paid Apple Developer Program account; `asc-apple-ads`, `asc-revenuecat-catalog-sync` and `asc-wall-submit` have their own checks in the index. They can spend money, submit for review and open public pull requests.

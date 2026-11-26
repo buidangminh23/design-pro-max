@@ -104,6 +104,11 @@ skills/
       assets/                a login page with a session cookie, remote-shell configs for Capacitor and Tauri, a web app manifest,
                              and the offline page that is all a remote shell's webDir or frontendDist should hold
       scripts/               check-shell.mjs (the origin a shell loads), probe-webkit.mjs (WebKit sign-in and cookie probe)
+    host-ops/                own part: operating an always-on or remote Mac from an agent
+      PART.md                the guide the router sends to
+      references/            shells and SSH, launchd and permissions, staying reachable, toolchains and sandboxes, generated evidence
+      assets/                a LaunchAgent property list and a reader for one .env value
+      scripts/               scan-host.mjs (static script scan), check-plist.mjs (launchd plist lint), probe-launchd.mjs (read-only launchctl print probe)
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -166,6 +171,7 @@ Written for this project and released under its MIT licence. Each has a `PART.md
 | `launch-video` | Demo clips rendered from code, never screen recordings: whether a still or a live replica is enough, an HTML and CSS rebuild of the UI rendered frame by frame at 2x, H.264, VP9, AV1 and transparent encodes with a frame-0 start image, and a lazy embed that starts late, plays one clip at a time and can be paused. 7 error rules and 8 warnings | Node 22 or later; ffmpeg and ffprobe; Playwright with Chromium in the user's project; macOS outside an agent sandbox for HEVC with alpha |
 | `menubar-widgets` | macOS menu bar apps and WidgetKit widgets: whether a menu or a window is enough, status items that redraw only when light or dark changes, Edit Widget options through AppIntentConfiguration, stale extension processes after a self-update, offscreen widget snapshots with byte baselines, and testing beside the installed copy. 5 error rules and 6 warnings | Node 22 or later; on macOS, Swift for the snapshot checks (they skip elsewhere); `ps` and `lsof` for the read-only probe |
 | `web-shells` | Web apps on iPhone, iPad and Mac: a home-screen web app or a Capacitor or Tauri shell, the origin a built shell really loads, sign-in with a login page and a session cookie instead of HTTP Basic Auth, and cookies in WebKit tests. 5 error rules and 4 warnings | Node 22 or later; Playwright with WebKit in the user's project for the probe; openssl for its local HTTPS server |
+| `host-ops` | Operating an always-on or remote Mac from an agent: commands over SSH, login shells and PATH, the login Keychain, launchd jobs proven with `launchctl print`, privacy permissions that follow the launched binary, root commands through the system dialog, `.env` secrets read one value at a time, AppleScript targets, sleep, FileVault restarts and updates, and Apple tools that fail only inside agent sandboxes. 7 error rules and 4 warnings | Node 22 or later; on macOS, `plutil` and `launchctl` for the live checks (they skip elsewhere) |
 | `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
 
 Known limit, measured in `evals/RESULTS.md`: on Claude Code, apple started on 45 of the 53 routing rows at high effort (the bar is 90 %) and on 40 at medium; for plain knowledge questions such as Swift 6 migration or Swift Testing, Claude Code often answers without starting a skill. Start it by name with `/apple` when the answer should follow this skill. Codex started it on all 53.
@@ -332,7 +338,7 @@ To record Apple text that a part quotes, add an entry to the part's `appleText` 
 
 <!-- gen:trademarks -->
 
-Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari, Siri, Swift, SwiftUI, Xcode, TestFlight, App Store, AirPlay, Apple Pay, Apple Pencil, Apple TV, Apple Vision Pro, CarPlay, CareKit, Digital Crown, Dynamic Island, Face ID, FaceTime, HealthKit, HomeKit, iCloud, iMessage, Live Photos, Mac Catalyst, ResearchKit, SharePlay, Spotlight, Touch ID, SF Symbols, Apple Wallet, Live Activities, Handoff, Multi-Touch, Finder, Mission Control and Apple Music are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
+Apple, the Apple logo, iOS, iPadOS, macOS, watchOS, tvOS, visionOS, iPhone, iPad, Mac, Apple Watch, Safari, Siri, Swift, SwiftUI, Xcode, TestFlight, App Store, AirPlay, Apple Pay, Apple Pencil, Apple TV, Apple Vision Pro, CarPlay, CareKit, Digital Crown, Dynamic Island, Face ID, FaceTime, HealthKit, HomeKit, iCloud, iMessage, Live Photos, Mac Catalyst, ResearchKit, SharePlay, Spotlight, Touch ID, SF Symbols, Apple Wallet, Live Activities, Handoff, AirDrop, Multi-Touch, Finder, Mission Control and Apple Music are trademarks of Apple Inc., registered in the U.S. and other countries and regions. IOS is a trademark or registered trademark of Cisco in the U.S. and other countries and is used under license.
 
 <!-- /gen:trademarks -->
 

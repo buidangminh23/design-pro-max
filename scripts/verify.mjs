@@ -23,7 +23,7 @@ import { spawnSync } from 'node:child_process';
 import { ROOT, SKILL_DIR, isMainModule } from './lib/vendor.mjs';
 import { buildFixtureMedia, buildLaunchVideoMedia } from './lib/fixture-media.mjs';
 
-export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells'];
+export const PARTS = ['launch-scroll', 'launch-video', 'launch-page', 'menubar-widgets', 'web-shells', 'host-ops'];
 const SHIPPED = ['shared', ...PARTS];
 
 export function loadCases(root = ROOT) {
@@ -110,12 +110,31 @@ export function menubarWidgetsArgs(entry, skill, scratch, root = ROOT) {
   return [...args, ...sources(entry.sources)];
 }
 
+const HOST_OPS_CHECKERS = ['scan-host', 'check-plist', 'probe-launchd'];
+
+/** Arguments for a host-ops case: text files to scan or lint, or a recorded launchctl print beside a copied plist. */
+export function hostOpsArgs(entry, skill, scratch, root = ROOT) {
+  const script = (name) => path.join(skill, entry.part, 'scripts', `${name}.mjs`);
+  const fixture = (file) => path.join(root, 'fixtures', entry.part, ...file.split('/'));
+  const source = (file) => (file.startsWith('assets/') ? path.join(skill, entry.part, ...file.split('/')) : fixture(file));
+  if (entry.checker !== 'probe-launchd') return [script(entry.checker), ...(entry.args ?? []), ...entry.sources.map(source)];
+  const folder = path.join(scratch, 'launchd', entry.id);
+  fs.mkdirSync(folder, { recursive: true });
+  const plist = path.join(folder, path.basename(entry.plist));
+  fs.copyFileSync(fixture(entry.plist), plist);
+  const print = path.join(folder, path.basename(entry.print));
+  fs.writeFileSync(print, fs.readFileSync(fixture(entry.print), 'utf8').replaceAll('@DIR@', folder));
+  return [script('probe-launchd'), '--label', entry.label, '--domain', entry.domain, '--plist', plist, '--print', print, '--exit', String(entry.exit ?? 0)];
+}
+
 export const runsHere = (entry, platform = process.platform) => !entry.platform || entry.platform === platform;
 
 function runCase(entry, skill, media, scratch) {
   let args;
   if (MENUBAR_CHECKERS.includes(entry.checker)) {
     args = menubarWidgetsArgs(entry, skill, scratch);
+  } else if (HOST_OPS_CHECKERS.includes(entry.checker)) {
+    args = hostOpsArgs(entry, skill, scratch);
   } else if (entry.checker === 'check-media') {
     const demo = [...(entry.profile ? ['--profile', entry.profile] : []), ...(entry.poster ? ['--poster', media[entry.poster]] : [])];
     args = [path.join(skill, 'shared', 'check-media.mjs'), ...demo, ...(entry.args ?? []), ...entry.files.map((recipe) => media[recipe])];
@@ -158,7 +177,7 @@ function runCase(entry, skill, media, scratch) {
   return { code: result.status ?? -1, stdout: result.stdout ?? '', stderr: result.stderr ?? '', seconds: (Date.now() - started) / 1000 };
 }
 
-const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-' };
+const PART_PREFIX = { 'check-page': 'LP-', 'probe-scene': 'LS-', 'lint-css': 'LP-', 'check-media': 'LV-', 'check-embed': 'LV-', 'check-shell': 'WS-', 'probe-webkit': 'WS-', 'scan-host': 'HO-', 'check-plist': 'HO-', 'probe-launchd': 'HO-' };
 
 export function expectedProblems(entry, findings, root = ROOT) {
   const file = JSON.parse(fs.readFileSync(path.join(root, 'fixtures', entry.part, entry.expected), 'utf8'));

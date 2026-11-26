@@ -491,3 +491,10 @@ Written for this skill and active without an activation check. Their checkers ne
 - Status: active
 - Rules: 5 error, 4 warn; evidence in `web-shells/references/evidence.md`
 - Checkers: `web-shells/scripts/check-shell.mjs`, `web-shells/scripts/probe-webkit.mjs`
+
+### `host-ops`
+
+- Guide: `host-ops/PART.md`
+- Status: active
+- Rules: 7 error, 4 warn; evidence in `host-ops/references/evidence.md`
+- Checkers: `host-ops/scripts/scan-host.mjs`, `host-ops/scripts/check-plist.mjs`, `host-ops/scripts/probe-launchd.mjs`

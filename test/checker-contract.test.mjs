@@ -26,6 +26,8 @@ test('the checkers that load no Playwright accept and ignore --project, as the r
   const runs = [
     [script('launch-page', 'scripts', 'lint-css.mjs'), ['--project', project, css], /"tool":"lint-css"/],
     [script('menubar-widgets', 'scripts', 'scan-swift.mjs'), ['--project', project, swift], /"tool":"scan-swift"/],
+    [script('host-ops', 'scripts', 'scan-host.mjs'), ['--project', project, path.join(ROOT, 'fixtures', 'host-ops', 'scripts', 'env-read.sh')], /"tool":"scan-host"/],
+    [script('host-ops', 'scripts', 'check-plist.mjs'), ['--project', project, script('host-ops', 'assets', 'com.example.sync.plist')], /"tool":"check-plist"/],
     [script('menubar-widgets', 'scripts', 'snapshot-widgets.mjs'), ['--project', project, '--out', folder, '--update', swift], /--update needs --baseline/],
     [script('launch-video', 'scripts', 'encode.mjs'), ['missing.mov', '--project', project, '--out', path.join(folder, 'out')], /missing\.mov does not exist/],
     [script('launch-scroll', 'scripts', 'encode-scrub.mjs'), ['missing.mov', '--project', project, '--out', path.join(folder, 'out')], /missing\.mov does not exist/],
