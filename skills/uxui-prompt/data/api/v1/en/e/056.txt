@@ -1,0 +1,131 @@
+<!-- Lucian UX/UI Prompt #056 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#056 -->
+<!--
+Element: Monthly–yearly pricing toggle
+ID: 056 · Category: Cards & Content · Tags: pricing, toggle, odometer, plan, radio-card
+What it does: Switch between monthly and yearly and only the changed digits of each price roll down, while the “2 months free” badge wiggles. Pick a plan and the highlight frame slides over, with the feature list and the start button text changing along.
+How to use it: Switch Monthly and Yearly at the top to see the prices roll, then pick a plan. Arrow keys work too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#056
+-->
+<style>
+.u056{position:relative;width:340px;height:490px;display:flex;flex-direction:column;gap:14px}
+.u056-sw{position:relative;display:flex;align-self:center;padding:4px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line)}
+.u056-knob{position:absolute;top:4px;bottom:4px;left:4px;width:var(--w,90px);border-radius:999px;background:var(--ux-ink);transform:translateX(var(--x,0));transition:transform .5s var(--ux-spring),width .5s var(--ux-spring)}
+.u056-sw button{position:relative;height:40px;padding:0 18px;border:0;border-radius:999px;background:none;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:720;color:var(--ux-ink-2);transition:color .3s}
+.u056-sw button[aria-checked="true"]{color:var(--ux-page)}
+.u056-sw button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u056-badge{height:22px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;background:linear-gradient(120deg,#FFB547,#FF6B8B);color:#fff;font-size:11px;font-weight:800;transform-origin:20% 50%}
+.u056-badge.wig{animation:u056-wig .7s var(--ux-ease)}
+@keyframes u056-wig{20%{transform:rotate(-10deg) scale(1.12)}45%{transform:rotate(8deg) scale(1.12)}70%{transform:rotate(-4deg)}}
+.u056-plans{position:relative;display:flex;flex-direction:column;gap:10px;margin:0;padding:0;border:0;min-width:0}
+.u056-sr{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0 0 0 0)}
+.u056-ring{position:absolute;left:0;right:0;top:0;height:var(--h,108px);border-radius:22px;box-shadow:0 0 0 2px var(--ux-accent),0 18px 34px -22px var(--ux-accent);transform:translateY(var(--y,0));transition:transform .55s var(--ux-spring),height .4s;pointer-events:none;z-index:1}
+.u056-p{position:relative;display:flex;align-items:center;gap:12px;min-height:108px;padding:16px 18px;border-radius:22px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);cursor:pointer;text-align:left;transition:transform .35s var(--ux-spring)}
+.u056-p:active{transform:scale(.985)}
+.u056-p input{position:absolute;opacity:0;pointer-events:none}
+.u056-p:has(input:focus-visible){outline:2px solid var(--ux-accent);outline-offset:4px}
+.u056-dot{width:22px;height:22px;flex:none;border-radius:50%;box-shadow:inset 0 0 0 2px var(--ux-line-2);display:grid;place-items:center;transition:box-shadow .3s}
+.u056-dot::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--ux-accent);transform:scale(0);transition:transform .4s var(--ux-spring)}
+.u056-p:has(input:checked) .u056-dot{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u056-p:has(input:checked) .u056-dot::after{transform:none}
+.u056-nm{flex:1;min-width:0}
+.u056-nm b{display:flex;align-items:center;gap:6px;font-size:16px;font-weight:800;letter-spacing:-.03em}
+.u056-nm b em{height:20px;padding:0 7px;border-radius:6px;display:inline-flex;align-items:center;background:var(--ux-accent-soft);color:var(--ux-accent);font-style:normal;font-size:10.5px;font-weight:800}
+.u056-nm small{display:block;margin-top:3px;font-size:12.5px;font-weight:600;color:var(--ux-ink-3)}
+.u056-pr{text-align:right}
+.u056-od{display:flex;justify-content:flex-end;height:30px;overflow:hidden;font-size:24px;font-weight:850;line-height:30px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.u056-col{display:flex;flex-direction:column;transform:translateY(calc(var(--d) * -30px));transition:transform .7s var(--ux-spring);transition-delay:calc(var(--k) * 40ms)}
+.u056-pr small{display:block;font-size:11.5px;font-weight:650;color:var(--ux-ink-3);transition:opacity .3s}
+.u056-feat{position:relative;flex:1;margin:0;padding:4px 4px 0;list-style:none}
+.u056-feat li{display:flex;align-items:center;gap:10px;height:30px;font-size:13.5px;font-weight:620;color:var(--ux-ink-2);animation:u056-in .45s var(--ux-spring) backwards;animation-delay:calc(var(--i) * 50ms)}
+.u056-feat svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--ux-mint);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@keyframes u056-in{from{opacity:0;transform:translateX(-10px)}}
+.u056-cta{height:54px;border:0;border-radius:17px;background:var(--ux-ink);color:var(--ux-page);font-size:15px;font-weight:760;transition:transform .35s var(--ux-spring)}
+.u056-cta:active{transform:scale(.97)}
+.u056-cta:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+</style>
+<div class="ux u056">
+  <div class="u056-sw" role="radiogroup" aria-label="Billing cycle">
+    <span class="u056-knob" aria-hidden="true"></span>
+    <button type="button" role="radio" aria-checked="true">Monthly</button>
+    <button type="button" role="radio" aria-checked="false">Yearly <span class="u056-badge">2 months free</span></button>
+  </div>
+  <fieldset class="u056-plans">
+    <legend class="u056-sr">Plan</legend>
+    <span class="u056-ring" aria-hidden="true"></span>
+    <label class="u056-p"><input type="radio" name="p" value="0"><span class="u056-dot" aria-hidden="true"></span><span class="u056-nm"><b>Basic</b><small>A workspace for one</small></span><span class="u056-pr"><span class="u056-od" data-p="0"></span><small>/ mo</small></span></label>
+    <label class="u056-p"><input type="radio" name="p" value="1" checked><span class="u056-dot" aria-hidden="true"></span><span class="u056-nm"><b>Pro <em>Best</em></b><small>Teamwork, unlimited history</small></span><span class="u056-pr"><span class="u056-od" data-p="1"></span><small>/ mo</small></span></label>
+  </fieldset>
+  <ul class="u056-feat" aria-live="polite"></ul>
+  <button class="u056-cta" type="button">Start Pro</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sw = root.querySelector('.u056-sw'), knob = root.querySelector('.u056-knob'), opts = sw.querySelectorAll('button');
+  var badge = root.querySelector('.u056-badge'), ring = root.querySelector('.u056-ring');
+  var labels = root.querySelectorAll('.u056-p'), radios = root.querySelectorAll('.u056-p input');
+  var ods = root.querySelectorAll('.u056-od'), notes = root.querySelectorAll('.u056-pr small');
+  var feat = root.querySelector('.u056-feat'), cta = root.querySelector('.u056-cta');
+  var P = [
+    { n: 'Basic', m: 12, y: 10, f: ['3 projects', '40 basic templates', '7-day version history'] },
+    { n: 'Pro', m: 24, y: 20, f: ['Unlimited projects', 'Invite up to 10 people', 'Unlimited version history', 'Priority support'] }
+  ];
+  var yearly = false, plan = 1;
+  var uid = 'u056' + Math.random().toString(36).slice(2, 7);
+  radios.forEach(function (r) { r.name = uid; });
+  function od(el, v) {
+    var s = '$' + v.toLocaleString('en-US');
+    if (el.getAttribute('data-len') !== String(s.length)) {
+      el.setAttribute('data-len', s.length);
+      el.innerHTML = s.split('').map(function (ch, k) {
+        if (ch < '0' || ch > '9') return '<span>' + ch + '</span>';
+        var c = ''; for (var i = 0; i < 10; i++) c += '<span>' + i + '</span>';
+        return '<span class="u056-col" style="--d:' + ch + ';--k:' + k + '">' + c + '</span>';
+      }).join('');
+    } else {
+      var cols = el.querySelectorAll('.u056-col'), dg = s.replace(/\D/g, '');
+      cols.forEach(function (c, i) { c.style.setProperty('--d', dg[i]); });
+    }
+    el.setAttribute('aria-label', s + ' per month');
+    el.setAttribute('role', 'text');
+  }
+  function prices() {
+    ods.forEach(function (el, i) { od(el, yearly ? P[i].y : P[i].m); });
+    notes.forEach(function (n, i) { n.textContent = yearly ? '/ mo · $' + (P[i].y * 12).toLocaleString('en-US') + ' a year' : '/ mo'; });
+  }
+  function place() {
+    var o = opts[yearly ? 1 : 0], l = labels[plan];
+    knob.style.setProperty('--x', (o.offsetLeft - 4) + 'px');
+    knob.style.setProperty('--w', o.offsetWidth + 'px');
+    ring.style.setProperty('--y', l.offsetTop + 'px');
+    ring.style.setProperty('--h', l.offsetHeight + 'px');
+  }
+  function setCycle(y, focus) {
+    yearly = y;
+    opts.forEach(function (o, k) { o.setAttribute('aria-checked', String(k === (y ? 1 : 0))); o.tabIndex = k === (y ? 1 : 0) ? 0 : -1; });
+    place();
+    if (focus) opts[y ? 1 : 0].focus();
+    if (y) { badge.classList.remove('wig'); void badge.offsetWidth; badge.classList.add('wig'); }
+    prices();
+  }
+  function setPlan(i) {
+    plan = i;
+    place();
+    feat.innerHTML = P[i].f.map(function (t, k) { return '<li style="--i:' + k + '"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.4l3.2 3.2L14 5.6"/></svg>' + t + '</li>'; }).join('');
+    cta.textContent = 'Start ' + P[i].n;
+  }
+  opts.forEach(function (o, k) {
+    o.addEventListener('click', function () { setCycle(k === 1); });
+    o.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); setCycle(!yearly, true); }
+    });
+  });
+  radios.forEach(function (r, i) { r.addEventListener('change', function () { setPlan(i); }); });
+  badge.addEventListener('animationend', function () { badge.classList.remove('wig'); });
+  setCycle(false);
+  setPlan(1);
+  if (window.ResizeObserver) new ResizeObserver(place).observe(root);
+})();
+</script>

@@ -1,0 +1,118 @@
+<!-- Lucian UX/UI Prompt #278 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#278 -->
+<!--
+Element: Seat-based price calculator
+ID: 278 · Category: Commerce & Pricing · Tags: pricing, calculator, slider, plans, saas
+What it does: On a pricing page, drag the team size bar and a number bubble follows along while the total below rolls digit by digit. Cross the 10 and 30 marks and the plan name moves from Starter to Team to Business as the per-seat price drops, and the newly unlocked feature line sparkles. Switch to yearly billing and the amount becomes a full year, with a savings badge popping out.
+How to use it: Drag the team size bar left and right, and try yearly billing too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#278
+-->
+<style>
+.u278{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u278-hd{position:absolute;left:20px;right:16px;top:18px;display:flex;align-items:center}
+.u278-hd b{margin-right:auto;font-size:15px;font-weight:900;letter-spacing:-.03em}
+.u278-sg{position:relative;display:flex;padding:3px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u278-sg::before{content:"";position:absolute;left:3px;top:3px;bottom:3px;width:calc(50% - 3px);border-radius:999px;background:var(--ux-surface);box-shadow:0 1px 4px -1px var(--ux-shadow-strong),0 0 0 1px var(--ux-line);transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.u278.is-yr .u278-sg::before{transform:translateX(100%)}
+.u278-bl{position:relative;min-width:50px;height:26px;padding:0 10px;border:0;border-radius:999px;background:none;color:var(--ux-ink-3);font:inherit;font-size:11px;font-weight:850;cursor:pointer;white-space:nowrap;transition:color .2s}
+.u278-bl[aria-checked="true"]{color:var(--ux-ink)}
+.u278-bl:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u278-fr{position:absolute;right:16px;top:50px;padding:2px 7px;border-radius:6px;background:color-mix(in srgb,#10B981 15%,transparent);color:#059669;font-size:9.5px;font-weight:850}
+.u278-sl{position:absolute;left:22px;right:22px;top:82px}
+.u278-sl>small{font-size:10.5px;font-weight:800;color:var(--ux-ink-3)}
+.u278-tr{position:relative;height:40px;margin-top:4px;cursor:pointer;touch-action:none}
+.u278-tr:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px;border-radius:8px}
+.u278-rl{position:absolute;left:0;right:0;top:24px;height:6px;border-radius:3px;background:var(--ux-surface-3)}
+.u278-fl{position:absolute;left:0;top:24px;height:6px;border-radius:3px;background:var(--ux-grad)}
+.u278-tc{position:absolute;top:20px;width:2px;height:14px;margin-left:-1px;border-radius:1px;background:var(--ux-ink-3);opacity:.45}
+.u278-th{position:absolute;top:17px;width:20px;height:20px;margin-left:-10px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.08),0 3px 8px rgba(0,0,0,.2);transition:transform .15s}
+.u278-tr.is-drag .u278-th{transform:scale(1.15)}
+.u278-bb{position:absolute;top:-6px;padding:2px 7px;border-radius:7px;background:var(--ux-ink);color:var(--ux-surface);font-size:10.5px;font-weight:850;white-space:nowrap;transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.u278-cd{position:absolute;left:16px;right:16px;top:150px;bottom:16px;padding:14px 16px;border-radius:18px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u278-pn{display:flex;align-items:center;gap:8px}
+.u278-pl{position:relative;flex:none;height:22px;overflow:hidden;border-radius:7px;transition:width .35s cubic-bezier(.3,1.2,.5,1)}
+.u278-pl span{position:absolute;left:0;top:0;white-space:nowrap;height:22px;padding:0 9px;border-radius:7px;background:var(--ux-accent);color:#fff;font-size:11px;font-weight:850;line-height:22px;transition:transform .4s cubic-bezier(.3,1.4,.5,1),opacity .3s}
+.u278-pl span.is-in{transform:translateY(100%);opacity:0}
+.u278-pl span.is-out{transform:translateY(-100%);opacity:0}
+.u278-pp{white-space:nowrap;font-size:10.5px;font-weight:750;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u278-tt{display:flex;align-items:baseline;gap:3px;margin-top:10px;font-size:30px;white-space:nowrap;transition:font-size .3s;font-weight:900;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.u278-tt em{font-style:normal;font-size:12px;font-weight:800;color:var(--ux-ink-3)}
+.u278-num{display:inline-flex}
+.u278-dg{display:inline-block;height:1.15em;overflow:hidden;line-height:1.15;vertical-align:bottom}
+.u278-dg span{display:block;transition:transform .45s cubic-bezier(.3,1.25,.5,1)}
+.u278-sv{margin-left:auto;padding:3px 8px;border-radius:999px;background:#059669;color:#fff;font-size:10px;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums;transform:scale(0);transform-origin:100% 50%;transition:transform .4s cubic-bezier(.3,1.7,.5,1)}
+.u278.is-yr .u278-sv{transform:none}
+.u278-fs{margin:10px 0 0;padding:0;list-style:none}
+.u278-fs li{display:flex;align-items:center;gap:7px;height:22px;font-size:11px;font-weight:700;color:var(--ux-ink-3);transition:color .3s}
+.u278-fs li i{width:15px;height:15px;border-radius:50%;background:var(--ux-surface-3);display:grid;place-items:center;transition:background .3s}
+.u278-fs li i::after{content:"";width:3px;height:6px;margin-top:-2px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.u278-fs li.is-on{color:var(--ux-ink)}
+.u278-fs li.is-on i{background:#10B981}
+.u278-fs li.is-new{animation:u278-gl .9s ease}
+@keyframes u278-gl{30%{background:color-mix(in srgb,#10B981 18%,transparent);border-radius:7px}}
+@media (prefers-reduced-motion: reduce){.u278-dg span,.u278-pl span,.u278-sv,.u278-sg::before{transition:none}.u278-fs li.is-new{animation:none}}
+</style>
+<div class="ux u278">
+  <div class="u278-hd"><b>Team pricing</b><div class="u278-sg" role="radiogroup" aria-label="Billing period"><button type="button" class="u278-bl" role="radio" aria-checked="true">Monthly</button><button type="button" class="u278-bl" role="radio" aria-checked="false">Yearly</button></div></div>
+  <span class="u278-fr">2 months free</span>
+  <div class="u278-sl"><small>Team size</small><div class="u278-tr" role="slider" tabindex="0" aria-label="Team size" aria-valuemin="1" aria-valuemax="60"><span class="u278-rl"></span><span class="u278-fl"></span><span class="u278-th"></span><span class="u278-bb"></span></div></div>
+  <div class="u278-cd"><div class="u278-pn"><span class="u278-pl"></span><span class="u278-pp"></span><span class="u278-sv"></span></div><div class="u278-tt"><span class="u278-num"></span><em></em></div><ul class="u278-fs"></ul></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tr = root.querySelector('.u278-tr'), fl = root.querySelector('.u278-fl'), th = root.querySelector('.u278-th'), bb = root.querySelector('.u278-bb'), pl = root.querySelector('.u278-pl'), pp = root.querySelector('.u278-pp'), num = root.querySelector('.u278-num'), per = root.querySelector('.u278-tt em'), sv = root.querySelector('.u278-sv'), fs = root.querySelector('.u278-fs'), BL = root.querySelectorAll('.u278-bl');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PL = [['Starter', 12, 1], ['Team', 10, 10], ['Business', 8.5, 30]];
+  var FT = ['Unlimited projects', 'Admin roles and team spaces', 'SSO and audit logs'];
+  var MIN = 1, MAX = 60, seats = 12, yearly = false, plan = -1;
+  FT.forEach(function (f) { var li = document.createElement('li'); li.innerHTML = '<i aria-hidden="true"></i><span></span>'; li.lastChild.textContent = f; fs.appendChild(li); });
+  [10, 30].forEach(function (v) { var t = document.createElement('span'); t.className = 'u278-tc'; t.style.left = ((v - MIN) / (MAX - MIN) * 100) + '%'; tr.insertBefore(t, th); });
+  function money(n) { return n.toLocaleString('en-US'); }
+  var cells = [];
+  function digits(s) {
+    while (cells.length < s.length) { var d = document.createElement('span'); d.className = 'u278-dg'; d.innerHTML = '<span></span>'; num.appendChild(d); cells.push({ el: d, ch: null }); }
+    while (cells.length > s.length) cells.pop().el.remove();
+    s.split('').forEach(function (ch, i) {
+      var c = cells[i]; if (c.ch === ch) return; var inner = c.el.firstChild;
+      if (/\d/.test(ch)) { if (c.ch === null || !/\d/.test(c.ch)) inner.innerHTML = '0<br>1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9'; inner.style.transform = 'translateY(' + (-+ch * 1.15) + 'em)'; } else { inner.textContent = ch; inner.style.transform = 'none'; }
+      c.ch = ch;
+    });
+  }
+  function render() {
+    var p = (seats - MIN) / (MAX - MIN) * 100, k = seats >= 30 ? 2 : seats >= 10 ? 1 : 0;
+    th.style.left = p + '%'; fl.style.width = p + '%'; bb.style.left = p + '%'; bb.textContent = seats + '';
+    tr.setAttribute('aria-valuenow', seats); tr.setAttribute('aria-valuetext', seats + '');
+    if (k !== plan) {
+      var olds = Array.prototype.slice.call(pl.children), nw = document.createElement('span'); nw.textContent = PL[k][0];
+      if (olds.length && !rm) {
+        nw.className = 'is-in'; pl.appendChild(nw); void nw.offsetWidth; nw.className = '';
+        olds.forEach(function (o) { o.className = 'is-out'; setTimeout(function () { o.remove(); }, 400); });
+      } else { pl.innerHTML = ''; pl.appendChild(nw); }
+      pl.style.width = nw.offsetWidth + 'px';
+      Array.prototype.forEach.call(fs.children, function (li, i) { var on = i <= k; if (on && !li.classList.contains('is-on') && plan >= 0) { li.classList.remove('is-new'); void li.offsetWidth; li.classList.add('is-new'); } li.classList.toggle('is-on', on); });
+      plan = k;
+    }
+    var unit = PL[k][1], month = unit * seats, total = yearly ? month * 10 : month;
+    pp.textContent = 'per seat ' + '$' + money(unit) + '/mo';
+    var str = '$' + money(total); digits(str); per.textContent = yearly ? '/yr' : '/mo';
+    num.parentNode.style.fontSize = (str.length <= 8 ? 30 : str.length === 9 ? 28 : str.length === 10 ? 26 : 24) + 'px';
+    sv.textContent = '$' + money(month * 2) + ' saved';
+  }
+  function setSeats(v) { v = Math.max(MIN, Math.min(MAX, Math.round(v))); if (v === seats && plan >= 0) return; seats = v; render(); }
+  function fromX(x) { var r = tr.getBoundingClientRect(); return MIN + (x - r.left) / r.width * (MAX - MIN); }
+  var drag = false;
+  tr.addEventListener('pointerdown', function (e) { drag = true; tr.classList.add('is-drag'); try { tr.setPointerCapture(e.pointerId); } catch (er) {} setSeats(fromX(e.clientX)); });
+  tr.addEventListener('pointermove', function (e) { if (drag) setSeats(fromX(e.clientX)); });
+  function up() { drag = false; tr.classList.remove('is-drag'); }
+  tr.addEventListener('pointerup', up); tr.addEventListener('pointercancel', up);
+  tr.addEventListener('keydown', function (e) {
+    var d = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 10, PageDown: -10 }[e.key];
+    if (e.key === 'Home') d = MIN - seats; if (e.key === 'End') d = MAX - seats;
+    if (d) { e.preventDefault(); setSeats(seats + d); }
+  });
+  Array.prototype.forEach.call(BL, function (b, i) { b.addEventListener('click', function () { yearly = i === 1; root.classList.toggle('is-yr', yearly); BL[0].setAttribute('aria-checked', !yearly); BL[1].setAttribute('aria-checked', yearly); render(); }); });
+  render();
+})();
+</script>

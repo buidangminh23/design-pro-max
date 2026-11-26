@@ -1,0 +1,210 @@
+<!-- Lucian UX/UI Prompt #030 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#030 -->
+<!--
+Element: Date range calendar
+ID: 030 · Category: Inputs & Search · Tags: date, calendar, range, picker, booking
+What it does: Press a start date and the range band follows your cursor; press an end date and the band locks in. Change months and the date grid slides sideways, while the two fields at the top and the summary below update together.
+How to use it: Press a check-in date, move the cursor, then press a check-out date. Arrow keys move between dates too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#030
+-->
+<style>
+.u030{position:relative;width:350px;padding:18px 16px 16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 36px 70px -40px var(--ux-shadow-strong)}
+.u030-pills{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.u030-pill{padding:10px 14px;border-radius:16px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .3s var(--ux-ease),background-color .3s}
+.u030-pill small{display:block;font-size:11.5px;font-weight:700;letter-spacing:.04em;color:var(--ux-ink-3)}
+.u030-pill b{display:block;margin-top:2px;font-size:15.5px;font-weight:740;letter-spacing:-.02em;font-variant-numeric:tabular-nums;transition:color .3s}
+.u030-pill b.ph{color:var(--ux-ink-3);font-weight:600}
+.u030-pill.on{background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u030-top{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}
+.u030-m{position:relative;height:24px;overflow:hidden;flex:1}
+.u030-m span{position:absolute;left:0;top:0;line-height:24px;font-size:16.5px;font-weight:760;letter-spacing:-.03em;transition:transform .45s var(--ux-ease),opacity .3s}
+.u030-nav{display:flex;gap:4px}
+.u030-nav button{width:34px;height:34px;border:0;padding:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink);display:grid;place-items:center;transition:transform .35s var(--ux-spring),background-color .2s}
+.u030-nav button:hover{background:var(--ux-surface-3)}
+.u030-nav button:active{transform:scale(.88)}
+.u030-nav button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u030-nav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u030-wk{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;font-size:12px;font-weight:700;color:var(--ux-ink-3);text-align:center}
+.u030-wk span:first-child{color:var(--ux-danger)}
+.u030-view{position:relative;height:276px;overflow:hidden}
+.u030-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:repeat(6,1fr);row-gap:2px;transition:transform .45s var(--ux-ease),opacity .35s var(--ux-ease)}
+.u030-cell{position:relative;display:grid;place-items:center}
+.u030-cell::before{content:"";position:absolute;left:0;right:0;top:5px;bottom:5px;background:var(--ux-accent-soft);opacity:0;transition:opacity .2s var(--ux-ease)}
+.u030-cell.in::before{opacity:1}
+.u030-cell.s::before{left:50%;border-radius:0}
+.u030-cell.e::before{right:50%}
+.u030-cell.s.e::before{opacity:0}
+.u030-cell:nth-child(7n+1).in::before{border-radius:12px 0 0 12px}
+.u030-cell:nth-child(7n).in::before{border-radius:0 12px 12px 0}
+.u030-d{position:relative;width:40px;height:40px;border:0;padding:0;border-radius:50%;background:none;font-size:14.5px;font-weight:620;color:var(--ux-ink);font-variant-numeric:tabular-nums;transition:background-color .2s var(--ux-ease),color .2s,transform .35s var(--ux-spring)}
+.u030-d:hover{background:var(--ux-surface-2)}
+.u030-d:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u030-d.past{color:var(--ux-ink-3);opacity:.45}
+.u030-d.today::after{content:"";position:absolute;left:50%;bottom:5px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--ux-accent)}
+.u030-cell.s .u030-d,.u030-cell.e .u030-d{background:var(--ux-accent);color:var(--ux-accent-ink);font-weight:760;box-shadow:0 8px 16px -8px color-mix(in srgb,var(--ux-accent) 80%,transparent);animation:u030-pick .4s var(--ux-spring)}
+.u030-cell.s .u030-d.today::after,.u030-cell.e .u030-d.today::after{background:var(--ux-accent-ink)}
+@keyframes u030-pick{from{transform:scale(.7)}}
+.u030-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:12px 4px 0;border-top:1px solid var(--ux-line)}
+.u030-sum{font-size:13.5px;font-weight:650;color:var(--ux-ink-2)}
+.u030-sum b{color:var(--ux-ink)}
+.u030-ok{height:42px;padding:0 18px;border:0;border-radius:13px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:700;transition:opacity .3s,transform .35s var(--ux-spring)}
+.u030-ok[aria-disabled="true"]{opacity:.3}
+.u030-ok:active{transform:scale(.95)}
+.u030-ok:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u030">
+  <div class="u030-pills">
+    <div class="u030-pill on"><small>Check-in</small><b class="u030-a ph">Select date</b></div>
+    <div class="u030-pill"><small>Check-out</small><b class="u030-b ph">Select date</b></div>
+  </div>
+  <div class="u030-top">
+    <div class="u030-m" aria-live="polite"><span></span></div>
+    <div class="u030-nav"><button type="button" data-step="-1" aria-label="Previous month"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button><button type="button" data-step="1" aria-label="Next month"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button></div>
+  </div>
+  <div class="u030-wk" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+  <div class="u030-view"></div>
+  <div class="u030-foot"><span class="u030-sum" aria-live="polite">Choose your dates</span><button class="u030-ok" type="button" aria-disabled="true">Apply</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var view = root.querySelector('.u030-view');
+  var mEl = root.querySelector('.u030-m');
+  var pA = root.querySelector('.u030-a'), pB = root.querySelector('.u030-b');
+  var pills = root.querySelectorAll('.u030-pill');
+  var sum = root.querySelector('.u030-sum');
+  var ok = root.querySelector('.u030-ok');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TODAY = new Date(2026, 9, 10);
+  var cur = { y: 2026, m: 9 };
+  var start = null, end = null, hover = null, focusKey = null;
+  var grid = null;
+  var W = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var keyOf = function (d) { return d.getFullYear() * 10000 + d.getMonth() * 100 + d.getDate(); };
+  var dateOf = function (k) { return new Date(Math.floor(k / 10000), Math.floor(k / 100) % 100, k % 100); };
+  var label = function (k) { var d = dateOf(k); return W[d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); };
+  function build(dir) {
+    var g = document.createElement('div');
+    g.className = 'u030-grid';
+    g.setAttribute('role', 'grid');
+    var first = new Date(cur.y, cur.m, 1).getDay();
+    var n = new Date(cur.y, cur.m + 1, 0).getDate();
+    for (var i = 0; i < 42; i++) {
+      var c = document.createElement('div');
+      c.className = 'u030-cell';
+      c.setAttribute('role', 'gridcell');
+      var d = i - first + 1;
+      if (d >= 1 && d <= n) {
+        var dt = new Date(cur.y, cur.m, d), k = keyOf(dt);
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'u030-d';
+        b.textContent = d;
+        b.dataset.k = k;
+        b.tabIndex = -1;
+        b.setAttribute('aria-label', label(k));
+        if (k < keyOf(TODAY)) { b.classList.add('past'); b.disabled = true; }
+        if (k === keyOf(TODAY)) b.classList.add('today');
+        c.appendChild(b);
+      }
+      g.appendChild(c);
+    }
+    var old = grid;
+    grid = g;
+    if (old && dir && !rm) {
+      g.style.transform = 'translateX(' + (dir * 100) + '%)'; g.style.opacity = '0';
+      view.appendChild(g);
+      void g.offsetWidth;
+      g.style.transform = 'none'; g.style.opacity = '1';
+      old.style.transform = 'translateX(' + (-dir * 100) + '%)'; old.style.opacity = '0';
+      setTimeout(function () { old.remove(); }, 460);
+    } else { if (old) old.remove(); view.appendChild(g); }
+    var s = mEl.lastElementChild, ns = document.createElement('span');
+    ns.textContent = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][cur.m] + ' ' + cur.y;
+    if (dir && !rm) {
+      ns.style.transform = 'translateY(' + (dir * 100) + '%)'; ns.style.opacity = '0';
+      mEl.appendChild(ns); void ns.offsetWidth;
+      ns.style.transform = 'none'; ns.style.opacity = '1';
+      s.style.transform = 'translateY(' + (-dir * 100) + '%)'; s.style.opacity = '0';
+      setTimeout(function () { s.remove(); }, 460);
+    } else { mEl.innerHTML = ''; mEl.appendChild(ns); }
+    paint();
+    roving();
+  }
+  function paint() {
+    var lo = start, hi = end !== null ? end : (start !== null && hover !== null ? hover : null);
+    if (lo !== null && hi !== null && hi < lo) { var t = lo; lo = hi; hi = t; }
+    Array.prototype.forEach.call(grid.children, function (c) {
+      var b = c.firstChild;
+      var k = b ? +b.dataset.k : null;
+      c.classList.toggle('s', k !== null && k === (hi === null ? start : lo));
+      c.classList.toggle('e', k !== null && hi !== null && k === hi);
+      c.classList.toggle('in', k !== null && hi !== null && k >= lo && k <= hi);
+      if (b) b.setAttribute('aria-selected', String(k === start || k === end));
+    });
+  }
+  function roving() {
+    var btns = Array.prototype.slice.call(grid.querySelectorAll('.u030-d:not(:disabled)'));
+    var target = btns.filter(function (b) { return +b.dataset.k === focusKey; })[0] || btns.filter(function (b) { return +b.dataset.k === start; })[0] || btns[0];
+    btns.forEach(function (b) { b.tabIndex = b === target ? 0 : -1; });
+    return target;
+  }
+  function summary() {
+    pA.textContent = start ? label(start) : 'Select date'; pA.classList.toggle('ph', !start);
+    pB.textContent = end ? label(end) : 'Select date'; pB.classList.toggle('ph', !end);
+    pills[0].classList.toggle('on', !start || !!end);
+    pills[1].classList.toggle('on', !!start && !end);
+    if (start && end) {
+      var nights = Math.round((dateOf(end) - dateOf(start)) / 86400000);
+      sum.innerHTML = '<b>' + nights + (nights === 1 ? ' night' : ' nights') + '</b> · ' + (dateOf(start).getMonth() + 1) + '/' + dateOf(start).getDate() + ' – ' + (dateOf(end).getMonth() + 1) + '/' + dateOf(end).getDate();
+    } else sum.textContent = start ? 'Now choose a check-out date' : 'Choose your dates';
+    ok.setAttribute('aria-disabled', String(!(start && end)));
+  }
+  function pick(k) {
+    if (start === null || end !== null) { start = k; end = null; }
+    else if (k === start) { end = null; }
+    else { end = Math.max(k, start); start = Math.min(k, start); }
+    hover = null;
+    focusKey = k;
+    paint(); summary(); roving();
+  }
+  view.addEventListener('click', function (e) { var b = e.target.closest('.u030-d'); if (b && !b.disabled) pick(+b.dataset.k); });
+  view.addEventListener('pointerover', function (e) {
+    var b = e.target.closest('.u030-d');
+    if (b && !b.disabled && start !== null && end === null) { hover = +b.dataset.k; paint(); }
+  });
+  view.addEventListener('pointerleave', function () { if (hover !== null) { hover = null; paint(); } });
+  view.addEventListener('keydown', function (e) {
+    var b = e.target.closest('.u030-d');
+    if (!b) return;
+    var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    var d = dateOf(+b.dataset.k); d.setDate(d.getDate() + step);
+    if (d < TODAY) return;
+    focusKey = keyOf(d);
+    if (start !== null && end === null) { hover = focusKey; paint(); }
+    if (d.getMonth() !== cur.m) { var dir = d > dateOf(+b.dataset.k) ? 1 : -1; cur = { y: d.getFullYear(), m: d.getMonth() }; build(dir); }
+    var t = roving(); if (t) t.focus();
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.u030-nav button'), function (b) {
+    b.addEventListener('click', function () {
+      var s = +b.dataset.step;
+      var d = new Date(cur.y, cur.m + s, 1);
+      if (d < new Date(TODAY.getFullYear(), TODAY.getMonth(), 1)) return;
+      cur = { y: d.getFullYear(), m: d.getMonth() };
+      build(s);
+    });
+  });
+  ok.addEventListener('click', function () {
+    if (ok.getAttribute('aria-disabled') === 'true') return;
+    ok.textContent = 'Applied';
+    setTimeout(function () { if (root.isConnected) ok.textContent = 'Apply'; }, 1400);
+  });
+  build(0);
+  pick(keyOf(new Date(2026, 9, 14)));
+  pick(keyOf(new Date(2026, 9, 17)));
+  focusKey = null;
+})();
+</script>

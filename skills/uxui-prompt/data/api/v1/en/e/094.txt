@@ -1,0 +1,166 @@
+<!-- Lucian UX/UI Prompt #094 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#094 -->
+<!--
+Element: Weather sky you scrub through
+ID: 094 · Category: Widgets & Charts · Tags: weather, widget, scrub, sky, slider
+What it does: Drag the time bar below and the sky shifts through dawn, day, sunset and night while the sun and moon rise and set along a dotted arc. Cloud cover, rain, stars and the temperature all change to match that hour.
+How to use it: Drag the time bar left and right or press an hour label. Focus the bar and use ←/→ to move an hour at a time
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#094
+-->
+<style>
+.u094{position:relative;width:340px;height:420px;display:flex;flex-direction:column;border-radius:32px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u094-sky{position:relative;height:262px;flex:none;overflow:hidden;background:linear-gradient(180deg,var(--s1),var(--s2));color:#fff}
+.u094-stars{position:absolute;inset:0;opacity:var(--night,0)}
+.u094-stars i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:u094-tw 2.6s ease-in-out infinite}
+@keyframes u094-tw{50%{opacity:.3}}
+.u094-arc{position:absolute;left:0;top:0;width:340px;height:262px;fill:none;stroke:#fff;stroke-opacity:.35;stroke-width:1.6;stroke-dasharray:2 6;stroke-linecap:round}
+.u094-orb{position:absolute;left:0;top:0;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;transform:translate(var(--ox),var(--oy))}
+.u094-orb.sun{background:radial-gradient(circle at 40% 38%,#FFF3C4,#FFC94D 55%,#FFB020);box-shadow:0 0 0 8px rgba(255,214,102,.22),0 0 40px 10px rgba(255,190,70,.45)}
+.u094-orb.moon{background:radial-gradient(circle at 36% 36%,#FFFFFF,#DCE3F5 70%);box-shadow:0 0 30px 4px rgba(200,215,255,.35)}
+.u094-orb.moon::after{content:"";position:absolute;width:9px;height:9px;left:16px;top:9px;border-radius:50%;background:rgba(150,165,200,.35)}
+.u094-hz{position:absolute;left:0;right:0;top:206px;bottom:0;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0))}
+.u094-cl{position:absolute;opacity:var(--cloud,.2);transition:opacity .4s}
+.u094-cl svg{display:block;fill:#fff}
+.u094-cl.a{right:-34px;top:58px;width:140px;animation:u094-drift 26s ease-in-out infinite alternate}
+.u094-cl.b{left:150px;top:150px;width:104px;animation:u094-drift 32s ease-in-out infinite alternate-reverse}
+.u094.rain .u094-cl svg{fill:#DDE3EC}
+@keyframes u094-drift{to{transform:translateX(46px)}}
+.u094-drops{position:absolute;inset:0;opacity:0;transition:opacity .5s}
+.u094.rain .u094-drops{opacity:1}
+.u094-drops i{position:absolute;top:-24px;width:1.6px;height:16px;border-radius:1px;background:linear-gradient(transparent,rgba(255,255,255,.75));transform:rotate(12deg);animation:u094-fall .8s linear infinite}
+.u094:not(.rain) .u094-drops i{animation-play-state:paused}
+@keyframes u094-fall{to{transform:translate(-60px,300px) rotate(12deg)}}
+.u094-info{position:absolute;left:22px;top:20px;right:22px;text-shadow:0 1px 10px rgba(0,0,0,.12)}
+.u094-info small{display:block;font-size:13px;font-weight:700;opacity:.88}
+.u094-t{display:block;margin-top:2px;font-size:62px;font-weight:300;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.u094-c{display:block;margin-top:4px;font-size:15px;font-weight:750}
+.u094-now{position:absolute;left:20px;bottom:14px;height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(255,255,255,.2);font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.u094-strip{position:relative;flex:1;padding:0 18px;touch-action:none;cursor:ew-resize;outline:none}
+.u094-strip:focus-visible{box-shadow:inset 0 0 0 2px var(--ux-accent);border-radius:0 0 32px 32px}
+.u094-labs{position:relative;height:96px;margin-top:12px}
+.u094-lb{position:absolute;top:0;width:44px;margin-left:-22px;padding:6px 0 0;border:0;border-radius:14px;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--ux-ink-3);transition:background-color .25s,color .25s,transform .35s var(--ux-spring)}
+.u094-lb small{font-size:11.5px;font-weight:700}
+.u094-lb svg{width:22px;height:22px}
+.u094-lb b{padding-bottom:8px;font-size:13.5px;font-weight:800;color:var(--ux-ink-2);font-variant-numeric:tabular-nums}
+.u094-lb.on{background:var(--ux-surface-2);color:var(--ux-ink);transform:translateY(-2px)}
+.u094-lb.on b{color:var(--ux-ink)}
+.u094-trk{position:relative;height:6px;margin-top:12px;border-radius:3px;background:var(--ux-surface-3)}
+.u094-trk>i{position:absolute;left:0;top:0;bottom:0;width:var(--x);border-radius:inherit;background:linear-gradient(90deg,#3B3F7A,#F7A07C 26%,#5CB8FF 50%,#FF9A6B 77%,#2A2E6E)}
+.u094-kn{position:absolute;top:50%;left:var(--x);width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line-2),0 4px 12px -4px var(--ux-shadow-strong);transition:transform .3s var(--ux-spring)}
+.u094-strip.drag .u094-kn{transform:scale(1.15)}
+.u094-kn i{width:12px;height:12px;border-radius:50%;background:#FFB020;transition:background-color .3s,box-shadow .3s}
+.u094-kn.moon i{background:transparent;box-shadow:inset -4px -1px 0 0 #8B9BFF}
+</style>
+<div class="ux u094">
+  <div class="u094-sky" aria-hidden="true">
+    <div class="u094-stars"></div>
+    <svg class="u094-arc" viewBox="0 0 340 262"><path d="M120 206Q225 -118 330 206"/></svg>
+    <span class="u094-orb sun"></span>
+    <div class="u094-hz"></div>
+    <div class="u094-cl a"><svg viewBox="0 0 150 60"><path d="M30 58a24 24 0 0 1-2-48 32 32 0 0 1 60-4 26 26 0 0 1 34 18 18 18 0 0 1 4 34z"/></svg></div>
+    <div class="u094-cl b"><svg viewBox="0 0 150 60"><path d="M30 58a24 24 0 0 1-2-48 32 32 0 0 1 60-4 26 26 0 0 1 34 18 18 18 0 0 1 4 34z"/></svg></div>
+    <div class="u094-drops"></div>
+    <div class="u094-info"><small>Seoul · Seongsu</small><b class="u094-t">21°</b><span class="u094-c">Sunny</span><small>H 23° · L 13°</small></div>
+    <span class="u094-now"></span>
+  </div>
+  <div class="u094-strip" role="slider" tabindex="0" aria-label="Time of day" aria-valuemin="0" aria-valuemax="23.5">
+    <div class="u094-labs"></div>
+    <div class="u094-trk"><i></i><span class="u094-kn"><i></i></span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sky = root.querySelector('.u094-sky'), orb = root.querySelector('.u094-orb'), tEl = root.querySelector('.u094-t'), cEl = root.querySelector('.u094-c'), now = root.querySelector('.u094-now');
+  var strip = root.querySelector('.u094-strip'), labs = root.querySelector('.u094-labs'), trk = root.querySelector('.u094-trk'), kn = root.querySelector('.u094-kn');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SKY = [[0, '#0B1026', '#1E2656'], [4.5, '#151B44', '#3B3F7A'], [6, '#F3A27E', '#6C7FD8'], [8, '#8ED0FF', '#4A92F0'], [12, '#5CB8FF', '#2F7BFF'], [14.5, '#7DA9D6', '#4E73B0'], [15.5, '#8C9AAD', '#56657A'], [17.4, '#8C9AAD', '#5C6A80'], [18.6, '#FF9F6E', '#7A5CD6'], [20, '#2A2E6E', '#141838'], [24, '#0B1026', '#1E2656']];
+  var ICON = {
+    sun: '<circle cx="11" cy="11" r="4.4" fill="#FFB020"/><path d="M11 2.5v2M11 17.5v2M2.5 11h2M17.5 11h2M5 5l1.4 1.4M15.6 15.6L17 17M5 17l1.4-1.4M15.6 6.4L17 5" stroke="#FFB020" stroke-width="1.8" stroke-linecap="round"/>',
+    moon: '<path d="M14.5 15.8A6.6 6.6 0 0 1 8.2 4.4a6.6 6.6 0 1 0 8.6 9.2 6.6 6.6 0 0 1-2.3 2.2z" fill="#8B9BFF"/>',
+    cloud: '<circle cx="8" cy="8" r="3.4" fill="#FFB020"/><path d="M7 18a3.6 3.6 0 0 1-.4-7.2 5 5 0 0 1 9.6.8A3.2 3.2 0 0 1 16.4 18z" fill="#A7B1C2"/>',
+    rain: '<path d="M6.6 13a3.6 3.6 0 0 1-.4-7.2 5 5 0 0 1 9.6.8 3.2 3.2 0 0 1 .2 6.4z" fill="#A7B1C2"/><path d="M8 15.5l-1 3M11.5 15.5l-1 3M15 15.5l-1 3" stroke="#3D8BFF" stroke-width="1.8" stroke-linecap="round"/>'
+  };
+  function cond(h) { return h < 6 || h >= 19.5 ? ['Clear night', 'moon', .12] : h < 12 ? ['Sunny', 'sun', .1] : h < 15 ? ['Partly cloudy', 'cloud', .55] : h < 17.5 ? ['Showers', 'rain', 1] : ['Clearing', 'cloud', .35]; }
+  function temp(h) { return Math.round(18 + 5 * Math.sin((h - 9) / 24 * Math.PI * 2) - (h >= 15 && h < 17.5 ? 2 : 0)); }
+  function hx(c) { return [parseInt(c.slice(1, 3), 16), parseInt(c.slice(3, 5), 16), parseInt(c.slice(5, 7), 16)]; }
+  function mix(a, b, t) { a = hx(a); b = hx(b); return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')'; }
+  function label(h) { var hh = Math.floor(h), mm = Math.round((h - hh) * 60) >= 30 ? '30' : '00'; return ((hh % 12) || 12) + ':' + mm + (hh < 12 ? ' AM' : ' PM'); }
+  for (var i = 0; i < 18; i++) {
+    var s = document.createElement('i'); s.style.left = (8 + Math.random() * 84) + '%'; s.style.top = (6 + Math.random() * 60) + '%'; s.style.animationDelay = (Math.random() * 2.6) + 's';
+    root.querySelector('.u094-stars').appendChild(s);
+  }
+  for (i = 0; i < 22; i++) {
+    var d = document.createElement('i'); d.style.left = (Math.random() * 120) + '%'; d.style.animationDelay = (-Math.random() * 0.8) + 's'; d.style.animationDuration = (0.6 + Math.random() * 0.4) + 's';
+    root.querySelector('.u094-drops').appendChild(d);
+  }
+  var LB = [3, 6, 9, 12, 15, 18, 21].map(function (h) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u094-lb'; b.tabIndex = -1; b.style.left = (h / 24 * 100) + '%';
+    b.innerHTML = '<small>' + (h % 12 || 12) + (h < 12 ? ' AM' : ' PM') + '</small><svg viewBox="0 0 22 22" aria-hidden="true">' + ICON[cond(h)[1]] + '</svg><b>' + temp(h) + '°</b>';
+    b.setAttribute('aria-label', (h % 12 || 12) + (h < 12 ? ' AM, ' : ' PM, ') + temp(h) + ' degrees, ' + cond(h)[0]);
+    b.addEventListener('click', function (e) { e.stopPropagation(); glide(h); });
+    b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    labs.appendChild(b);
+    return [h, b];
+  });
+  var hour = 9, shownT = null, tw = 0;
+  function set(h) {
+    hour = (h + 24) % 24;
+    var k = 0; while (SKY[k + 1][0] <= hour) k++;
+    var a = SKY[k], b = SKY[k + 1], t = (hour - a[0]) / (b[0] - a[0]);
+    sky.style.setProperty('--s1', mix(a[1], b[1], t)); sky.style.setProperty('--s2', mix(a[2], b[2], t));
+    var day = hour >= 6 && hour < 18, p = day ? (hour - 6) / 12 : ((hour - 18 + 24) % 24) / 12;
+    var x = (1 - p) * (1 - p) * 120 + 2 * (1 - p) * p * 225 + p * p * 330, y = (1 - p) * (1 - p) * 206 + 2 * (1 - p) * p * -118 + p * p * 206;
+    orb.className = 'u094-orb ' + (day ? 'sun' : 'moon');
+    orb.style.setProperty('--ox', x.toFixed(1) + 'px'); orb.style.setProperty('--oy', y.toFixed(1) + 'px');
+    orb.style.opacity = Math.min(1, Math.sin(Math.PI * p) * 3.5).toFixed(2);
+    var c = cond(hour);
+    sky.style.setProperty('--cloud', c[2]);
+    sky.style.setProperty('--night', day ? Math.max(0, 1 - (Math.min(hour - 6, 18 - hour)) * 1.5).toFixed(2) : 1);
+    root.classList.toggle('rain', c[1] === 'rain');
+    var T = temp(hour);
+    if (T !== shownT) {
+      if (shownT !== null && !rm) tEl.animate([{ transform: 'translateY(' + (T > shownT ? 10 : -10) + 'px)', opacity: 0.2 }, { transform: 'none', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      shownT = T; tEl.textContent = T + '°';
+    }
+    cEl.textContent = c[0];
+    now.textContent = label(hour);
+    trk.style.setProperty('--x', (hour / 24 * 100).toFixed(2) + '%');
+    kn.classList.toggle('moon', !day);
+    var near = LB.reduce(function (m, l) { return Math.abs(l[0] - hour) < Math.abs(m[0] - hour) ? l : m; });
+    LB.forEach(function (l) { l[1].classList.toggle('on', l === near && Math.abs(l[0] - hour) <= 1.5); });
+    strip.setAttribute('aria-valuenow', hour.toFixed(1));
+    strip.setAttribute('aria-valuetext', label(hour) + ', ' + T + ' degrees, ' + c[0]);
+  }
+  function glide(to) {
+    cancelAnimationFrame(tw);
+    var from = hour, t0 = performance.now(), dur = rm ? 1 : 700;
+    (function f(n) {
+      if (!root.isConnected) return;
+      var k = Math.min(1, (n - t0) / dur), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      set(from + (to - from) * e);
+      if (k < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  function at(e) { var r = trk.getBoundingClientRect(); return Math.max(0, Math.min(23.5, (e.clientX - r.left) / r.width * 24)); }
+  var down = false;
+  strip.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; down = true; cancelAnimationFrame(tw); strip.setPointerCapture(e.pointerId); strip.classList.add('drag'); set(at(e)); });
+  strip.addEventListener('pointermove', function (e) { if (down) set(at(e)); });
+  function up() { if (!down) return; down = false; strip.classList.remove('drag'); glide(Math.round(hour * 2) / 2); }
+  strip.addEventListener('pointerup', up); strip.addEventListener('pointercancel', up);
+  strip.addEventListener('keydown', function (e) {
+    var to = null, r = Math.round(hour);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') to = Math.min(23.5, r + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') to = Math.max(0, r - 1);
+    else if (e.key === 'Home') to = 0;
+    else if (e.key === 'End') to = 23.5;
+    if (to === null) return;
+    e.preventDefault();
+    glide(to);
+  });
+  set(9);
+  if (rm) set(14); else setTimeout(function () { if (root.isConnected) glide(14); }, 400);
+})();
+</script>

@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #182 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#182 -->
+<!--
+Element: Queue caller
+ID: 182 · Category: Workflow & Systems · Tags: queue-dispenser, new-century
+What it does: A queue display for taking tickets and calling the next number at a counter. Taking a ticket grows the waiting list; calling flips the big number and shortens it.
+How to use it: Alternate between “Ticket +” and “Call next”
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#182
+-->
+<style>
+.u182 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u182 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u182 button:active{transform:translateY(1px)}.u182 button:disabled{opacity:.4;cursor:default}.u182 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u182 .muted{color:var(--ux-ink-2);font-size:12px}.u182 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u182 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u182 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u182 input,.u182 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u182 output{font-variant-numeric:tabular-nums}.u182 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u182 *,.u182 *::before,.u182 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u182 .sign{padding:25px;border-radius:17px;background:#25322e;color:#ecedd8;box-shadow:inset 0 0 0 5px #394b41;position:relative}.u182 .sign small{font:10px ui-monospace;letter-spacing:3px;color:#b8c7ac}.u182 .called{font:700 81px/1.1 ui-monospace,monospace;letter-spacing:-5px;margin-top:9px;display:block;color:#e7efb1}.u182 .ticket-line{display:flex;align-items:center;justify-content:space-between;margin:17px 0;border-bottom:1px dashed var(--ux-line-2);padding-bottom:13px;gap:8px}.u182 .queue{display:flex;gap:6px;min-height:43px;align-items:center;flex-wrap:wrap}.u182 .queue span{background:var(--ux-surface);border:1px dashed var(--ux-line-2);padding:7px;font:14px ui-monospace;animation:ticket-in .3s both}.u182 .actions button{flex:1;font-size:12px}.u182 .reset{flex:0 0 auto;font-size:16px}@keyframes ticket-in{from{transform:translateY(-9px);opacity:0}}
+
+/* Focused composition */
+.u182{max-width:320px}.u182 .sign{padding:22px 25px;max-width:290px;margin:auto;text-align:center;border-radius:12px;box-shadow:inset 0 0 0 4px #394b41}.u182 .sign small{letter-spacing:2px;font-size:11px}.u182 .called{font-size:67px;letter-spacing:-4px}.u182 .queue{justify-content:center;gap:8px;margin:17px 0;min-height:34px}.u182 .queue span{background:transparent;font-size:12px;padding:4px 7px}.u182 .queue-actions{display:flex;justify-content:center;gap:15px}.u182 .queue-actions button{font-size:12px;min-height:36px;padding:7px 14px}.u182 .take{border:0;background:none}</style>
+<div class="ux u182" data-state="initial"><div class="sign"><small>Counter 02</small><output class="called" aria-live="polite">A—041</output></div><div class="queue"><span>A042</span><span>A043</span></div><div class="queue-actions"><button class="take">Ticket +</button><button class="next primary">Call next</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let wait=[42,43],num=43,called=41;const fmt=n=>'A'+String(n).padStart(3,'0');function render(){q('.queue').innerHTML=wait.map(n=>'<span>'+fmt(n)+'</span>').join('');q('.called').textContent='A—'+String(called).padStart(3,'0');q('.next').disabled=!wait.length;q('.take').disabled=wait.length>=5;state('queue-'+wait.join('-')+'-call-'+called)}q('.take').onclick=()=>{wait.push(++num);render()};q('.next').onclick=()=>{called=wait.shift();render();pulse(q('.called'),[{transform:'translateY(10px)',opacity:.2},{transform:'none',opacity:1}])};})();
+</script>

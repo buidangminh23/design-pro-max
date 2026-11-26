@@ -1,0 +1,95 @@
+<!-- Lucian UX/UI Prompt #356 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#356 -->
+<!--
+Element: Watch under the loupe
+ID: 356 · Category: Commerce & Pricing · Tags: magnifier, loupe, zoom, product, hover
+What it does: Hover over a wristwatch photo and a round loupe follows the cursor, magnifying that spot so the dial's tiny lettering, tick marks and even the tip of the second hand come into sharp view. Each press switches between 2.5× and 4×, with the current power shown on the loupe's rim. The hands move with the real time.
+How to use it: Move the cursor over the watch, and press to change the magnification
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#356
+-->
+<style>
+.u356{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 80% at 50% 40%,#F8F5EF,#E6DFD2);background:radial-gradient(90% 80% at 50% 40%,light-dark(#F8F5EF,#2B2721),light-dark(#E6DFD2,#110F0C));box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u356-st{position:absolute;inset:0;cursor:none;touch-action:none}
+.u356-st>svg{position:absolute;inset:0;width:100%;height:100%}
+.u356-lp{position:absolute;left:0;top:0;width:128px;height:128px;margin:-64px 0 0 -64px;border-radius:50%;overflow:hidden;pointer-events:none;opacity:0;transform:scale(.6);transition:opacity .2s,transform .3s cubic-bezier(.3,1.5,.5,1);box-shadow:0 0 0 5px #2C2C30,0 0 0 7px #8E8E96,0 18px 30px -8px rgba(0,0,0,.55);background:#F3EEE5;background:light-dark(#F3EEE5,#221F1A)}
+.u356-lp.is-on{opacity:1;transform:scale(1)}
+.u356-lp svg{position:absolute;left:0;top:0;width:340px;height:340px;transform-origin:0 0}
+.u356-lp::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 25%,rgba(255,255,255,.35),transparent 40%);box-shadow:inset 0 0 18px rgba(0,0,0,.35)}
+.u356-zm{position:absolute;left:0;top:0;padding:2px 6px;border-radius:999px;background:#2C2C30;color:#F3EEE5;font:800 10px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;pointer-events:none;opacity:0;transform:translate(-50%,0);transition:opacity .2s}
+.u356-zm.is-on{opacity:1}
+</style>
+<div class="ux u356">
+  <div class="u356-st" role="img" aria-label="Wristwatch, magnify with the loupe">
+    <svg viewBox="0 0 340 340" class="u356-w" aria-hidden="true">
+      <defs>
+        <radialGradient id="u356-dial" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#1E3A5F"/><stop offset="1" stop-color="#0B1626"/></radialGradient>
+        <linearGradient id="u356-case" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F1F3F5"/><stop offset=".5" stop-color="#ADB5BD"/><stop offset="1" stop-color="#E9ECEF"/></linearGradient>
+      </defs>
+      <path d="M128 20 h84 l-6 70 h-72z M134 250 h72 l6 70 h-84z" fill="#6B4226"/>
+      <path d="M140 30 v52 M200 30 v52 M140 258 v52 M200 258 v52" stroke="#4A2C17" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <circle cx="170" cy="170" r="92" fill="url(#u356-case)"/>
+      <rect x="258" y="160" width="14" height="20" rx="3" fill="#ADB5BD"/>
+      <circle cx="170" cy="170" r="80" fill="url(#u356-dial)"/>
+      <g class="u356-ticks"></g>
+      <text x="170" y="128" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#F1F3F5" letter-spacing="1.5">LUCIAN</text>
+      <text x="170" y="136" text-anchor="middle" font-family="system-ui,sans-serif" font-size="3.2" fill="#ADB5BD" letter-spacing=".6">AUTOMATIC · GENÈVE</text>
+      <text x="170" y="214" text-anchor="middle" font-family="system-ui,sans-serif" font-size="2.6" fill="#ADB5BD" letter-spacing=".5">25 JEWELS · 100M · SWISS MADE</text>
+      <text x="170" y="219" text-anchor="middle" font-family="system-ui,sans-serif" font-size="1.8" fill="#868E96" letter-spacing=".3">N° 0400 / 2026 — made with care in Seoul</text>
+      <rect x="214" y="164" width="16" height="12" rx="1.5" fill="#F8F9FA"/><text class="u356-dt" x="222" y="173" text-anchor="middle" font-family="system-ui,sans-serif" font-size="8" font-weight="700" fill="#212529">15</text>
+      <g class="u356-hh"><path d="M168 172 L170 126 L172 172 Z" fill="#E9ECEF"/></g>
+      <g class="u356-mh"><path d="M169 174 L170 104 L171 174 Z" fill="#F8F9FA"/></g>
+      <g class="u356-sh"><path d="M169.6 186 L170 98 L170.4 186 Z" fill="#FF6B6B"/><circle cx="170" cy="98.5" r="1.2" fill="#FF6B6B"/></g>
+      <circle cx="170" cy="170" r="3.4" fill="#ADB5BD"/><circle cx="170" cy="170" r="1.4" fill="#FF6B6B"/>
+    </svg>
+  </div>
+  <div class="u356-lp" aria-hidden="true"></div>
+  <div class="u356-zm" aria-hidden="true"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var st = root.querySelector('.u356-st'), art = st.querySelector('svg'), lp = root.querySelector('.u356-lp'), zm = root.querySelector('.u356-zm');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var tk = art.querySelector('.u356-ticks'), h = '';
+  for (var i = 0; i < 60; i++) {
+    var a = i * 6 * Math.PI / 180, big = i % 5 === 0, r0 = big ? 66 : 72, r1 = 77;
+    h += '<line x1="' + (170 + Math.sin(a) * r0).toFixed(2) + '" y1="' + (170 - Math.cos(a) * r0).toFixed(2) + '" x2="' + (170 + Math.sin(a) * r1).toFixed(2) + '" y2="' + (170 - Math.cos(a) * r1).toFixed(2) + '" stroke="#F1F3F5" stroke-width="' + (big ? 2 : 0.5) + '"/>';
+    if (big) h += '<text x="' + (170 + Math.sin(a) * 58).toFixed(2) + '" y="' + (171.2 - Math.cos(a) * 58).toFixed(2) + '" text-anchor="middle" font-family="system-ui,sans-serif" font-size="3.2" fill="#ADB5BD">' + (i === 0 ? 60 : i) + '</text>';
+  }
+  tk.innerHTML = h;
+  var uid = Math.random().toString(36).slice(2, 7);
+  art.querySelectorAll('[id]').forEach(function (n) { var old = n.id; n.id = old + uid; art.querySelectorAll('[fill="url(#' + old + ')"]').forEach(function (m) { m.setAttribute('fill', 'url(#' + old + uid + ')'); }); });
+  var big = art.cloneNode(true); big.removeAttribute('class');
+  big.querySelectorAll('[id]').forEach(function (n) { var old = n.id; n.id = old + 'z'; big.querySelectorAll('[fill="url(#' + old + ')"]').forEach(function (m) { m.setAttribute('fill', 'url(#' + old + 'z)'); }); });
+  lp.appendChild(big);
+  var Z = [2.5, 4], zi = 0, pos = null;
+  function hands() {
+    var d = new Date(), s = d.getSeconds() + (rm ? 0 : d.getMilliseconds() / 1000), m = d.getMinutes() + s / 60, hr = (d.getHours() % 12) + m / 60;
+    [art, big].forEach(function (g) {
+      g.querySelector('.u356-sh').setAttribute('transform', 'rotate(' + (s * 6).toFixed(2) + ' 170 170)');
+      g.querySelector('.u356-mh').setAttribute('transform', 'rotate(' + (m * 6).toFixed(2) + ' 170 170)');
+      g.querySelector('.u356-hh').setAttribute('transform', 'rotate(' + (hr * 30).toFixed(2) + ' 170 170)');
+      g.querySelector('.u356-dt').textContent = d.getDate();
+    });
+  }
+  function place() {
+    if (!pos) { lp.classList.remove('is-on'); zm.classList.remove('is-on'); return; }
+    var z = Z[zi];
+    lp.style.left = pos.x + 'px'; lp.style.top = pos.y + 'px';
+    big.style.transform = 'translate(' + (64 - pos.x * z).toFixed(1) + 'px,' + (64 - pos.y * z).toFixed(1) + 'px) scale(' + z + ')';
+    zm.textContent = z + '×'; zm.style.left = pos.x + 'px'; zm.style.top = (pos.y + 70) + 'px';
+    lp.classList.add('is-on'); zm.classList.add('is-on');
+  }
+  var vis = true, raf = 0;
+  function frame() { raf = 0; if (!root.isConnected || !vis) return; hands(); raf = requestAnimationFrame(frame); }
+  function run() { if (rm) { hands(); return; } if (!raf && vis) raf = requestAnimationFrame(frame); }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  function loc(e) { var r = st.getBoundingClientRect(), k = st.offsetWidth / (r.width || 1); return { x: (e.clientX - r.left) * k, y: (e.clientY - r.top) * k }; }
+  st.addEventListener('pointermove', function (e) { pos = loc(e); place(); });
+  st.addEventListener('pointerleave', function () { pos = null; place(); });
+  st.addEventListener('click', function (e) { zi = (zi + 1) % Z.length; if (!pos) pos = loc(e); place(); });
+  if (rm) setInterval(function () { if (root.isConnected) hands(); }, 1000);
+  hands(); run();
+})();
+</script>

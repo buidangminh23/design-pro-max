@@ -1,0 +1,52 @@
+<!-- Lucian UX/UI Prompt #312 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#312 -->
+<!--
+Element: Split-curtain menu
+ID: 312 · Category: Navigation · Tags: text, menu, split, hover, navigation
+What it does: Hover a big menu word and it splits horizontally: the top half slides up, the bottom half slides down, and a line of description unfolds in the gap. The closer the cursor is to the middle of the word, the wider it opens, and moving keyboard focus opens it the same way.
+How to use it: Move the cursor up and down over a menu word
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#312
+-->
+<style>
+.u312{position:relative;width:340px;height:330px;display:flex;flex-direction:column;justify-content:center;padding:14px 18px;border-radius:28px;--fg:var(--ux-page);--fg:light-dark(var(--ux-page),var(--ux-ink));background:var(--ux-ink);background:light-dark(var(--ux-ink),var(--ux-surface-2));box-shadow:0 30px 60px -36px var(--ux-shadow-strong);box-shadow:0 0 0 1px light-dark(transparent,var(--ux-line)),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u312-it{position:relative;display:block;width:100%;height:96px;border:0;padding:0;background:none;text-align:left;color:var(--ux-page);color:var(--fg);cursor:pointer;--o:0}
+.u312-it+.u312-it{border-top:1px solid color-mix(in srgb,var(--fg) 14%,transparent)}
+.u312-h{position:absolute;left:0;right:0;top:50%;height:56px;margin-top:-28px;font-size:56px;line-height:56px;font-weight:900;letter-spacing:-.05em;white-space:nowrap;transition:transform .5s cubic-bezier(.3,1.3,.4,1)}
+.u312-h.t{clip-path:inset(0 0 50% 0);transform:translateY(calc(var(--o) * -1px))}
+.u312-h.b{clip-path:inset(50% 0 0 0);transform:translateY(calc(var(--o) * 1px))}
+.u312-it:nth-child(2) .u312-h{color:var(--ux-accent)}
+.u312-it:nth-child(2) .u312-h.t,.u312-it:nth-child(2) .u312-h.b{color:var(--ux-page);color:var(--fg)}
+.u312-d{position:absolute;left:0;right:0;top:50%;height:22px;margin-top:-11px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:-.01em;color:color-mix(in srgb,var(--fg) 80%,transparent);opacity:calc(var(--o) / 18);transform:scaleY(calc(.3 + var(--o) / 26));transition:transform .5s cubic-bezier(.3,1.3,.4,1),opacity .3s}
+.u312-d::before{content:"";width:18px;height:2px;border-radius:2px;background:var(--ux-accent)}
+.u312-n{position:absolute;right:0;top:12px;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:color-mix(in srgb,var(--fg) 40%,transparent)}
+.u312-it:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px;border-radius:12px}
+</style>
+<nav class="ux u312" aria-label="Main menu">
+  <button class="u312-it" type="button" data-d="Browse 24 projects">WORK</button>
+  <button class="u312-it" type="button" data-d="The story of a small studio">ABOUT</button>
+  <button class="u312-it" type="button" data-d="Let’s talk about a new project">CONTACT</button>
+</nav>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var its = Array.prototype.slice.call(root.querySelectorAll('.u312-it'));
+  its.forEach(function (it, i) {
+    var w = it.textContent.trim(), d = it.getAttribute('data-d');
+    it.textContent = '';
+    it.setAttribute('aria-label', w + ', ' + d);
+    it.innerHTML = '<span class="u312-d" aria-hidden="true"></span><span class="u312-h t" aria-hidden="true"></span><span class="u312-h b" aria-hidden="true"></span><span class="u312-n" aria-hidden="true">0' + (i + 1) + '</span>';
+    it.querySelector('.u312-d').textContent = d;
+    it.querySelectorAll('.u312-h').forEach(function (h) { h.textContent = w; });
+    it.addEventListener('pointermove', function (e) {
+      var r = it.getBoundingClientRect(), y = (e.clientY - r.top) / (r.height || 1);
+      open(it, 10 + 12 * (1 - Math.min(1, Math.abs(y - 0.5) * 2)));
+    });
+    it.addEventListener('pointerleave', function () { if (document.activeElement !== it) open(it, 0); });
+    it.addEventListener('focus', function () { open(it, 18); });
+    it.addEventListener('blur', function () { open(it, 0); });
+    it.addEventListener('click', function () { its.forEach(function (o) { if (o !== it) open(o, 0); }); open(it, 22); });
+  });
+  function open(it, o) { it.style.setProperty('--o', o.toFixed(1)); }
+})();
+</script>

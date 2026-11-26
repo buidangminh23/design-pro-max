@@ -1,0 +1,91 @@
+<!-- Lucian UX/UI Prompt #002 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#002 -->
+<!--
+Element: Magnetic arrow button
+ID: 002 · Category: Buttons · Tags: button, magnetic, cta, hover, arrow
+What it does: The button and its label are pulled toward the cursor at different depths. Hover and the circle on the right floods the whole button; press it and the arrow shoots out and comes back from the other side.
+How to use it: Move the cursor slowly over the button, then press it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#002
+-->
+<style>
+.u002{--bg:#16151B;--fg:#F7F5F0;--blob:linear-gradient(135deg,#8B6CFF,#4F8DFF 60%,#2FC7B4);
+  position:relative;width:340px;height:200px;display:grid;place-items:center}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .u002{--bg:#F4F0E8;--fg:#121117}}
+:root[data-theme="dark"] .u002{--bg:#F4F0E8;--fg:#121117}
+.u002-mag{transition:translate .9s var(--ux-spring)}
+.u002-btn{position:relative;display:flex;align-items:center;gap:18px;height:76px;padding:0 10px 0 32px;border:0;border-radius:999px;background:var(--bg);color:var(--fg);overflow:hidden;isolation:isolate;
+  box-shadow:0 24px 40px -24px rgba(40,24,110,.6),0 0 0 1px color-mix(in srgb,var(--fg) 8%,transparent);
+  transition:transform .6s var(--ux-spring),box-shadow .6s var(--ux-ease)}
+.u002-btn:hover{box-shadow:0 30px 52px -22px rgba(91,72,255,.7),0 0 0 1px transparent}
+.u002-btn:active{transform:scale(.96)}
+.u002-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:5px}
+
+.u002-fill{position:absolute;inset:0;z-index:-1;background:var(--blob);clip-path:circle(28px at calc(100% - 38px) 50%);transition:clip-path .8s var(--ux-ease)}
+.u002-btn:hover .u002-fill,.u002-btn:focus-visible .u002-fill{clip-path:circle(160% at calc(100% - 38px) 50%)}
+.u002-txt{position:relative;overflow:hidden;padding:5px 0;font-size:19px;font-weight:700;letter-spacing:-.03em;white-space:nowrap;transition:translate .7s var(--ux-spring),color .5s var(--ux-ease)}
+.u002-btn:hover .u002-txt{color:#fff}
+.u002-txt span{display:block;transition:transform .6s var(--ux-spring),opacity .35s var(--ux-ease)}
+.u002-txt span+span{position:absolute;left:0;top:5px;transform:translateY(130%);opacity:0}
+.u002[data-state="go"] .u002-txt span:first-child{transform:translateY(-130%);opacity:0}
+.u002[data-state="go"] .u002-txt span+span{transform:none;opacity:1}
+.u002-orb{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff;overflow:hidden;flex:none;transition:translate .7s var(--ux-spring)}
+.u002-orb svg{position:absolute;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u002-orb svg:last-child{transform:translateX(-46px)}
+.u002[data-state="go"] .u002-orb svg:first-child{animation:u002-out .55s var(--ux-ease) forwards}
+.u002[data-state="go"] .u002-orb svg:last-child{animation:u002-in .6s var(--ux-spring) .28s forwards}
+@keyframes u002-out{to{transform:translateX(46px)}}
+@keyframes u002-in{to{transform:none}}
+.u002-glow{position:absolute;left:50%;top:50%;width:300px;height:110px;margin:-40px 0 0 -150px;border-radius:50%;background:var(--blob);filter:blur(36px);opacity:0;z-index:-1;transition:opacity .7s var(--ux-ease)}
+.u002:hover .u002-glow{opacity:.45}
+.u002-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+<div class="ux u002" data-state="idle">
+  <span class="u002-glow" aria-hidden="true"></span>
+  <div class="u002-mag">
+    <button class="u002-btn" type="button">
+      <span class="u002-fill" aria-hidden="true"></span>
+      <span class="u002-txt"><span>Start a project</span><span aria-hidden="true">You’re all set</span></span>
+      <span class="u002-orb" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+      </span>
+    </button>
+  </div>
+  <span class="u002-live" aria-live="polite"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u002-btn');
+  var mag = root.querySelector('.u002-mag');
+  var txt = root.querySelector('.u002-txt');
+  var orb = root.querySelector('.u002-orb');
+  var live = root.querySelector('.u002-live');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var t = 0;
+
+  root.addEventListener('pointermove', function (e) {
+    if (rm) return;
+    var r = btn.getBoundingClientRect();
+    var dx = e.clientX - (r.left + r.width / 2);
+    var dy = e.clientY - (r.top + r.height / 2);
+    var p = Math.max(0, 1 - Math.hypot(dx, dy) / 240);
+    mag.style.translate = (dx * 0.12 * p).toFixed(1) + 'px ' + (dy * 0.22 * p).toFixed(1) + 'px';
+    txt.style.translate = (dx * 0.05 * p).toFixed(1) + 'px ' + (dy * 0.08 * p).toFixed(1) + 'px';
+    orb.style.translate = (dx * 0.1 * p).toFixed(1) + 'px ' + (dy * 0.14 * p).toFixed(1) + 'px';
+  });
+  root.addEventListener('pointerleave', function () {
+    mag.style.translate = txt.style.translate = orb.style.translate = '0px 0px';
+  });
+
+  btn.addEventListener('click', function () {
+    clearTimeout(t);
+    root.dataset.state = 'idle';
+    void btn.offsetWidth;
+    root.dataset.state = 'go';
+    live.textContent = 'You’re all set';
+    t = setTimeout(function () { if (root.isConnected) { root.dataset.state = 'idle'; live.textContent = ''; } }, rm ? 900 : 1900);
+  });
+})();
+</script>

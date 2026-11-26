@@ -1,0 +1,112 @@
+<!-- Lucian UX/UI Prompt #052 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#052 -->
+<!--
+Element: Flip-around membership card
+ID: 052 · Category: Cards & Content · Tags: card, flip, 3d, drag, hologram
+What it does: Drag the card sideways and it turns in 3D with your hand, then snaps to the nearest face when you let go. A simple press flips it too, and the holographic sheen on the front flows with the tilt. Locking it sinks the card into grayscale.
+How to use it: Drag the card left and right to turn it, or press to flip it. Try the lock button below. With a keyboard, flip with Enter or Space
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#052
+-->
+<style>
+.u052{--ry:0deg;--tilt:0deg;--sh:50%;position:relative;width:340px;height:330px;display:flex;flex-direction:column;align-items:center;gap:22px;padding-top:24px;perspective:1100px}
+.u052-card{position:relative;width:320px;height:202px;border:0;padding:0;background:none;border-radius:20px;transform-style:preserve-3d;transform:rotateX(var(--tilt)) rotateY(var(--ry));transition:transform .75s var(--ux-spring);cursor:grab;touch-action:pan-y;color:#fff;text-align:left}
+.u052-card.drag{transition:none;cursor:grabbing}
+.u052-card:focus-visible{outline:none}
+.u052-card:focus-visible .u052-f{box-shadow:0 0 0 3px var(--ux-accent),0 26px 40px -24px rgba(30,20,80,.55)}
+.u052-f{position:absolute;inset:0;border-radius:20px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 26px 40px -24px rgba(30,20,80,.55);transition:filter .6s}
+.u052-front{background:linear-gradient(135deg,#2B1B6B,#5B3FD9 40%,#1E7BD9 75%,#14B8A6)}
+.u052-front::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 35%,rgba(255,170,220,.45) 45%,rgba(160,255,230,.45) 52%,rgba(170,190,255,.4) 58%,transparent 68%);transform:translateX(calc(var(--sh) - 50%));mix-blend-mode:screen;transition:transform .75s var(--ux-spring)}
+.u052-card.drag .u052-front::before{transition:none}
+.u052-front::after{content:"";position:absolute;width:260px;height:260px;right:-90px;bottom:-140px;border-radius:50%;border:30px solid rgba(255,255,255,.08)}
+.u052-chip{position:absolute;left:22px;top:62px;width:42px;height:32px;border-radius:7px;background:linear-gradient(135deg,#F7E3A6,#C9A34E);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.u052-chip::before{content:"";position:absolute;inset:7px 0;border-top:1px solid rgba(0,0,0,.2);border-bottom:1px solid rgba(0,0,0,.2)}
+.u052-brand{position:absolute;left:22px;top:20px;font-size:15px;font-weight:800;letter-spacing:-.02em}
+.u052-tier{position:absolute;right:20px;top:20px;height:24px;padding:0 9px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(255,255,255,.18);font-size:11px;font-weight:800;letter-spacing:.08em}
+.u052-num{position:absolute;left:22px;bottom:44px;font-size:17px;font-weight:700;letter-spacing:.12em;font-variant-numeric:tabular-nums}
+.u052-name{position:absolute;left:22px;bottom:18px;font-size:11.5px;font-weight:700;letter-spacing:.1em;opacity:.8}
+.u052-exp{position:absolute;right:20px;bottom:18px;font-size:11.5px;font-weight:700;opacity:.8;font-variant-numeric:tabular-nums}
+.u052-back{transform:rotateY(180deg);background:linear-gradient(160deg,#1A1B2E,#2A2450)}
+.u052-strip{position:absolute;left:0;right:0;top:22px;height:38px;background:#0B0B14}
+.u052-cvc{position:absolute;left:22px;right:22px;top:76px;display:flex;align-items:center;gap:10px}
+.u052-cvc i{flex:1;height:30px;border-radius:5px;background:repeating-linear-gradient(-45deg,#ECE9F7 0 6px,#DCD7EE 6px 12px)}
+.u052-cvc b{height:30px;padding:0 10px;border-radius:5px;display:grid;place-items:center;background:#fff;color:#16151B;font-size:14px;font-weight:800;letter-spacing:.14em}
+.u052-perk{position:absolute;left:22px;right:22px;bottom:16px;display:flex;gap:6px}
+.u052-perk span{flex:1;padding:7px 8px;border-radius:10px;background:rgba(255,255,255,.08);font-size:10.5px;font-weight:650;line-height:1.35;color:rgba(255,255,255,.7)}
+.u052-perk b{display:block;font-size:13px;color:#fff}
+.u052-lock{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,10,20,.35);opacity:0;transition:opacity .5s}
+.u052-lock svg{width:44px;height:44px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transform:scale(.6);transition:transform .6s var(--ux-spring)}
+.u052.is-locked .u052-f{filter:grayscale(1) brightness(.85)}
+.u052.is-locked .u052-lock{opacity:1}
+.u052.is-locked .u052-lock svg{transform:none}
+.u052-bar{display:flex;gap:8px}
+.u052-b{height:44px;padding:0 16px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:7px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);color:var(--ux-ink);font-size:13.5px;font-weight:700;transition:transform .35s var(--ux-spring),background-color .3s,color .3s}
+.u052-b:active{transform:scale(.94)}
+.u052-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u052-b svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u052-b[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-page);box-shadow:none}
+</style>
+<div class="ux u052">
+  <button class="u052-card" type="button" aria-label="Membership card, front. Press to flip">
+    <span class="u052-f u052-front" aria-hidden="true"><span class="u052-brand">Lumen</span><span class="u052-tier">BLACK</span><span class="u052-chip"></span><span class="u052-num">5241 •••• •••• 0818</span><span class="u052-name">KIM SEOYEON</span><span class="u052-exp">09/29</span><span class="u052-lock"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></span>
+    <span class="u052-f u052-back" aria-hidden="true"><span class="u052-strip"></span><span class="u052-cvc"><i></i><b>482</b></span><span class="u052-perk"><span><b>2.5%</b>Cashback</span><span><b>Free</b>Lounge</span><span><b>12,480</b>Points</span></span><span class="u052-lock"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span></span>
+  </button>
+  <div class="u052-bar">
+    <button class="u052-b u052-flip" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4"/></svg>Show back</button>
+    <button class="u052-b u052-lk" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Lock card</span></button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var card = root.querySelector('.u052-card'), flipB = root.querySelector('.u052-flip'), lk = root.querySelector('.u052-lk');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ang = 0, sx = 0, start = 0, moved = false, down = false, lastX = 0, vx = 0;
+  function apply(a) {
+    root.style.setProperty('--ry', a + 'deg');
+    root.style.setProperty('--sh', (50 + Math.sin(a * Math.PI / 180) * 60).toFixed(1) + '%');
+  }
+  function settle(a) {
+    ang = Math.round(a / 180) * 180;
+    apply(ang);
+    var back = Math.abs(ang / 180) % 2 === 1;
+    card.setAttribute('aria-label', 'Membership card, ' + (back ? 'back' : 'front') + '. Press to flip');
+    flipB.lastChild.textContent = back ? 'Show front' : 'Show back';
+  }
+  function flip() { settle(ang + 180); }
+  card.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    down = true; moved = false; sx = lastX = e.clientX; start = ang; vx = 0;
+    card.setPointerCapture(e.pointerId);
+  });
+  card.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    var dx = e.clientX - sx;
+    if (!moved && Math.abs(dx) > 6) { moved = true; card.classList.add('drag'); }
+    if (!moved) return;
+    vx = e.clientX - lastX; lastX = e.clientX;
+    apply(start + dx * 0.9);
+  });
+  function up(e) {
+    if (!down) return;
+    down = false;
+    card.classList.remove('drag');
+    if (!moved) return;
+    var cur = start + (e.clientX - sx) * 0.9 + vx * 8;
+    settle(cur);
+  }
+  card.addEventListener('pointerup', up);
+  card.addEventListener('pointercancel', up);
+  card.addEventListener('click', function (e) { if (moved) { e.preventDefault(); moved = false; return; } flip(); });
+  card.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && !rm) root.style.setProperty('--tilt', '8deg'); });
+  card.addEventListener('pointerleave', function () { root.style.setProperty('--tilt', '0deg'); });
+  flipB.addEventListener('click', flip);
+  lk.addEventListener('click', function () {
+    var on = lk.getAttribute('aria-pressed') !== 'true';
+    lk.setAttribute('aria-pressed', String(on));
+    lk.lastChild.textContent = on ? 'Unlock' : 'Lock card';
+    root.classList.toggle('is-locked', on);
+  });
+  settle(0);
+})();
+</script>

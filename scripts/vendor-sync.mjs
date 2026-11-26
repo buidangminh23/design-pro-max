@@ -483,6 +483,26 @@ export function buildNotices(root = ROOT) {
       );
     }
   }
+  const uxuiLicence = path.join(root, 'skills', 'uxui-prompt', 'LICENSE');
+  const uxuiRecord = path.join(root, 'vendor', 'uxui-prompt.json');
+  if (fs.existsSync(uxuiLicence) && fs.existsSync(uxuiRecord)) {
+    const text = fs.readFileSync(uxuiLicence, 'utf8');
+    const record = JSON.parse(fs.readFileSync(uxuiRecord, 'utf8'));
+    const marker = fence(text);
+    lines.push(
+      '',
+      `## ${record.repo} and ${record.skill.repo}`,
+      '',
+      `- Authors: ${copyrightLines(text).map(authorsFrom).filter(Boolean).join('; ') || 'not stated'}`,
+      `- Repositories: https://github.com/${record.repo} (commit \`${record.commit}\`), https://github.com/${record.skill.repo} (commit \`${record.skill.commit}\`)`,
+      `- Licence: ${isMitLicence(text) ? 'MIT' : 'see the text below'}`,
+      '- Files: `skills/uxui-prompt/`, the bundled data byte for byte and the skill with the changes listed in its `NOTICE.md`',
+      '',
+      `${marker}text`,
+      text.trimEnd(),
+      marker,
+    );
+  }
   for (const notice of MEDIA_NOTICES) {
     const marker = fence(notice.licence);
     lines.push(

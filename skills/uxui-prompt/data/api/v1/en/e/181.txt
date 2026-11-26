@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #181 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#181 -->
+<!--
+Element: Workload dispatcher
+ID: 181 · Category: Workflow & Systems · Tags: capacity-dispatcher, new-century
+What it does: A dispatcher that assigns incoming tasks by each person’s remaining capacity. Press a person to hand them the top task; their fill rises and the next task comes up.
+How to use it: Press someone with spare capacity to assign the task
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#181
+-->
+<style>
+.u181 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u181 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u181 button:active{transform:translateY(1px)}.u181 button:disabled{opacity:.4;cursor:default}.u181 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u181 .muted{color:var(--ux-ink-2);font-size:12px}.u181 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u181 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u181 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u181 input,.u181 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u181 output{font-variant-numeric:tabular-nums}.u181 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u181 *,.u181 *::before,.u181 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u181 .ticket{padding:18px 18px 18px 26px;border-left:4px solid #45765f;background:var(--ux-surface);box-shadow:0 6px 24px -15px var(--ux-shadow-strong);border-radius:3px 13px 13px 3px;margin:14px 0 22px;position:relative}.u181 .ticket b{display:block;font-size:18px;margin-top:6px}.u181 .team{display:flex;gap:10px}.u181 .bin{flex:1;min-width:0;text-align:center}.u181 .avatar{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;margin:0 auto 9px;background:var(--tone);color:#fff;font-weight:700}.u181 .vessel{height:75px;border:1px solid var(--ux-line-2);border-radius:6px 6px 18px 18px;position:relative;overflow:hidden;margin-top:10px;display:grid;place-items:center}.u181 .vessel i{position:absolute;bottom:0;left:0;right:0;height:var(--fill);background:color-mix(in srgb,var(--tone) 30%,var(--ux-surface));transition:height .55s}.u181 .vessel output{position:relative;font-size:17px}.u181 .assign{width:100%;margin-top:9px;font-size:11px;padding:7px 3px}.u181 .status{margin-top:16px;text-align:center;font-size:12px;color:var(--ux-ink-2)}.u181 .reset{min-height:28px;font-size:11px;padding:2px 8px;background:none;border:0}
+
+/* Focused composition */
+.u181{max-width:320px}.u181 .task-name{font-size:17px;font-weight:550;text-align:center;margin-bottom:24px}.u181 .team{gap:20px}.u181 .bin{border:0;padding:0;background:none;font-size:12px;min-width:0}.u181 .vessel{height:99px;margin:0 0 12px;border-color:var(--ux-line-2);border-radius:6px 6px 22px 22px}.u181 .bin b{font-size:12px;font-weight:500}.u181 .vessel output{font:16px ui-monospace}.u181 .bin:disabled{opacity:.6}</style>
+<div class="ux u181" data-state="initial"><div class="task-name">Homepage accessibility check</div><div class="team"><button class="bin" data-i="0" style="--tone:#5b7867" aria-label="Assign to Seoyeon"><div class="vessel"><i></i><output></output></div><b>Seoyeon</b></button><button class="bin" data-i="1" style="--tone:#7f6990" aria-label="Assign to Minho"><div class="vessel"><i></i><output></output></div><b>Minho</b></button><button class="bin" data-i="2" style="--tone:#ae7653" aria-label="Assign to Jisoo"><div class="vessel"><i></i><output></output></div><b>Jisoo</b></button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let loads=[2,1,3],task=0;const jobs=['Homepage accessibility check','Tidy the brand guide','Review the mobile menu','Clean up the icon set'];function render(){qa('.bin').forEach((b,i)=>{b.querySelector('i').style.setProperty('--fill',loads[i]/5*100+'%');b.querySelector('output').textContent=loads[i]+' / 5';b.disabled=loads[i]>=5});q('.task-name').textContent=jobs[task%4];state('loads-'+loads.join('-'))}qa('.bin').forEach(b=>b.onclick=()=>{loads[+b.dataset.i]++;task++;render();pulse(q('.task-name'),[{transform:'translateY(-6px)',opacity:.3},{transform:'none',opacity:1}])});render();})();
+</script>

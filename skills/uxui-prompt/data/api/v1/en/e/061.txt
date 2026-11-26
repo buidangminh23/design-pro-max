@@ -1,0 +1,214 @@
+<!-- Lucian UX/UI Prompt #061 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#061 -->
+<!--
+Element: Thumbnail-to-lightbox zoom
+ID: 061 · Category: Cards & Content · Tags: lightbox, gallery, zoom, flip, swipe-dismiss
+What it does: Press a photo and it grows from its thumbnail to fill the frame; close it and it shrinks back into place. In the viewer, double-click to zoom and drag around, swipe sideways to move between photos, or drag down to close.
+How to use it: Press a photo to open it. Then try double-click to zoom, dragging sideways to switch and dragging down to close. With a keyboard, open with Enter, switch with the arrow keys and close with Esc
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#061
+-->
+<style>
+.u061{position:relative;width:340px;height:480px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;isolation:isolate}
+.u061-head{display:flex;align-items:baseline;justify-content:space-between;padding:20px 20px 12px}
+.u061-head b{font-size:19px;font-weight:800;letter-spacing:-.04em}
+.u061-head small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u061-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:92px;gap:8px;padding:0 14px}
+.u061-th{position:relative;border:0;padding:0;border-radius:18px;overflow:hidden;background:var(--ux-surface-2);transition:transform .35s var(--ux-spring),opacity .2s}
+.u061-th:nth-child(1){grid-row:span 2}
+.u061-th:nth-child(4),.u061-th:nth-child(5){grid-row:span 2}
+.u061-th:hover{transform:scale(.97)}
+.u061-th:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u061-th.away{opacity:0}
+.u061-th svg,.u061-img svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.u061-scrim{position:absolute;inset:0;z-index:5;background:#07070C;opacity:0;pointer-events:none;transition:opacity .45s}
+.u061.is-open .u061-scrim{opacity:var(--so,1);pointer-events:auto}
+.u061-view{position:absolute;z-index:6;left:0;top:0;width:100%;height:100%;overflow:hidden;visibility:hidden;touch-action:none}
+.u061.is-open .u061-view{visibility:visible}
+.u061-img{position:absolute;inset:0;transform-origin:0 0;transition:transform .45s var(--ux-ease)}
+.u061-img.now{transition:none}
+.u061-ui{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s}
+.u061.is-open.is-ready .u061-ui{opacity:1}
+.u061-x{position:absolute;right:14px;top:14px;width:42px;height:42px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.4);color:#fff;pointer-events:auto;transition:transform .3s var(--ux-spring)}
+.u061-x:active{transform:scale(.88)}
+.u061-x:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.u061-x svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u061-cap{position:absolute;left:18px;right:18px;bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;color:#fff;text-shadow:0 1px 12px rgba(0,0,0,.4)}
+.u061-cap b{display:block;font-size:19px;font-weight:800;letter-spacing:-.035em}
+.u061-cap small{font-size:12.5px;font-weight:650;opacity:.85}
+.u061-cap em{font-style:normal;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.35)}
+.u061-zoom{position:absolute;left:50%;top:16px;transform:translateX(-50%);height:28px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(0,0,0,.4);color:#fff;font-size:12px;font-weight:800;opacity:0;transition:opacity .3s}
+.u061.is-zoom .u061-zoom{opacity:1}
+</style>
+<div class="ux u061">
+  <div class="u061-head"><b>Jeju, 4 days</b><small>5 photos</small></div>
+  <div class="u061-grid"></div>
+  <div class="u061-scrim" aria-hidden="true"></div>
+  <div class="u061-view" role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+    <div class="u061-img"></div>
+    <div class="u061-ui"><span class="u061-zoom">2× zoom</span><button class="u061-x" type="button" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="u061-cap" aria-live="polite"><span><small></small><b></b></span><em></em></div></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var grid = root.querySelector('.u061-grid'), view = root.querySelector('.u061-view'), img = root.querySelector('.u061-img');
+  var scrim = root.querySelector('.u061-scrim'), xBtn = root.querySelector('.u061-x'), cap = root.querySelector('.u061-cap');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var uid = 'u061' + Math.random().toString(36).slice(2, 7);
+  var P = [
+    ['Seongsan Peak', 'Day 1, morning', ['#FFB547', '#FF6B8B', '#3B2F9E'], 0],
+    ['Hyeopjae Beach', 'Day 2, afternoon', ['#7DE3F0', '#22C3A6', '#0E5E63'], 1],
+    ['Camellia trail', 'Day 2, evening', ['#FF9BA8', '#E5484D', '#5B1530'], 2],
+    ['Hallasan ridge', 'Day 3, dawn', ['#B7A4FF', '#5B8CFF', '#1A1B4A'], 0],
+    ['Tangerine farm café', 'Day 4, lunch', ['#FFE2B8', '#FFB547', '#D2702A'], 1]
+  ];
+  function art(p, k) {
+    var g = uid + k + Math.random().toString(36).slice(2, 5), c = p[2];
+    return '<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="' + g + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c[0] + '"/><stop offset=".6" stop-color="' + c[1] + '"/><stop offset="1" stop-color="' + c[2] + '"/></linearGradient></defs>' +
+      '<rect width="300" height="400" fill="url(#' + g + ')"/><circle cx="' + (p[3] === 1 ? 80 : 210) + '" cy="150" r="46" fill="#fff" opacity=".55"/>' +
+      '<path d="M0 270 C 70 220 130 250 190 230 S 270 210 300 240 V400 H0Z" fill="' + c[2] + '" opacity=".55"/>' +
+      '<path d="M0 310 C 80 280 150 320 220 300 S 290 290 300 300 V400 H0Z" fill="' + c[2] + '" opacity=".85"/></svg>';
+  }
+  var ths = P.map(function (p, i) {
+    var b = document.createElement('button');
+    b.className = 'u061-th'; b.type = 'button';
+    b.setAttribute('aria-label', 'Open ' + p[0]);
+    b.innerHTML = art(p, 't' + i);
+    b.addEventListener('click', function () { open(i); });
+    grid.appendChild(b);
+    return b;
+  });
+  var cur = -1, isOpen = false, z = 1, tx = 0, ty = 0;
+  function rectOf(i) { var t = ths[i]; return { l: grid.offsetLeft + t.offsetLeft, t: grid.offsetTop + t.offsetTop, w: t.offsetWidth, h: t.offsetHeight }; }
+  function caption() {
+    cap.querySelector('small').textContent = P[cur][1];
+    cap.querySelector('b').textContent = P[cur][0];
+    cap.querySelector('em').textContent = (cur + 1) + ' / ' + P.length;
+  }
+  function setZoom(nz, ox, oy) {
+    var W = view.clientWidth, H = view.clientHeight;
+    if (nz > 1) { tx = Math.min(0, Math.max(W - W * nz, ox - (ox - tx) * nz / z)); ty = Math.min(0, Math.max(H - H * nz, oy - (oy - ty) * nz / z)); }
+    else { tx = 0; ty = 0; }
+    z = nz;
+    img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + z + ')';
+    root.classList.toggle('is-zoom', z > 1);
+  }
+  function morph(from, to, done) {
+    var full = { l: 0, t: 0, w: root.clientWidth, h: root.clientHeight };
+    var a = from || full, b = to || full;
+    if (rm) { done && done(); return; }
+    view.animate([
+      { left: a.l + 'px', top: a.t + 'px', width: a.w + 'px', height: a.h + 'px', borderRadius: from ? '18px' : '30px' },
+      { left: b.l + 'px', top: b.t + 'px', width: b.w + 'px', height: b.h + 'px', borderRadius: to ? '18px' : '30px' }
+    ], { duration: 520, easing: 'cubic-bezier(.2,.8,.2,1)' }).onfinish = function () { done && done(); };
+  }
+  function open(i) {
+    if (isOpen) return;
+    isOpen = true; cur = i;
+    img.innerHTML = art(P[i], 'v');
+    setZoom(1);
+    caption();
+    root.classList.add('is-open');
+    view.setAttribute('aria-hidden', 'false');
+    ths[i].classList.add('away');
+    morph(rectOf(i), null, function () { root.classList.add('is-ready'); xBtn.focus({ preventScroll: true }); });
+  }
+  function close() {
+    if (!isOpen) return;
+    var i = cur;
+    root.classList.remove('is-ready', 'is-zoom');
+    setZoom(1);
+    view.style.transform = '';
+    root.style.removeProperty('--so');
+    scrim.style.opacity = '0';
+    morph(null, rectOf(i), function () {
+      isOpen = false;
+      root.classList.remove('is-open');
+      scrim.style.opacity = '';
+      view.setAttribute('aria-hidden', 'true');
+      ths[i].classList.remove('away');
+      ths[i].focus({ preventScroll: true });
+    });
+  }
+  function go(d) {
+    if (!isOpen) return;
+    var n = (cur + d + P.length) % P.length;
+    ths[cur].classList.remove('away');
+    cur = n;
+    ths[cur].classList.add('away');
+    setZoom(1);
+    var next = document.createElement('div');
+    next.innerHTML = art(P[n], 'v');
+    if (!rm) img.animate([{ transform: 'translateX(' + (d * 40) + 'px)', opacity: .2 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    img.innerHTML = next.innerHTML;
+    caption();
+  }
+  xBtn.addEventListener('click', close);
+  scrim.addEventListener('click', close);
+  view.addEventListener('dblclick', function (e) {
+    if (e.target.closest('button')) return;
+    var r = view.getBoundingClientRect(), k = view.clientWidth / r.width;
+    img.classList.remove('now');
+    setZoom(z > 1 ? 1 : 2, (e.clientX - r.left) * k, (e.clientY - r.top) * k);
+  });
+  view.addEventListener('wheel', function (e) {
+    if (!isOpen) return;
+    e.preventDefault();
+    var r = view.getBoundingClientRect(), k = view.clientWidth / r.width;
+    img.classList.add('now');
+    setZoom(Math.max(1, Math.min(3, z * (e.deltaY < 0 ? 1.12 : 0.89))), (e.clientX - r.left) * k, (e.clientY - r.top) * k);
+  }, { passive: false });
+  var sx = 0, sy = 0, ox = 0, oy = 0, mode = '';
+  view.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('button') || !isOpen) return;
+    sx = e.clientX; sy = e.clientY; ox = tx; oy = ty; mode = 'wait';
+    view.setPointerCapture(e.pointerId);
+  });
+  view.addEventListener('pointermove', function (e) {
+    if (!mode) return;
+    var r = view.getBoundingClientRect(), k = view.clientWidth / r.width;
+    var dx = (e.clientX - sx) * k, dy = (e.clientY - sy) * k;
+    if (mode === 'wait' && Math.hypot(dx, dy) > 6) mode = z > 1 ? 'pan' : Math.abs(dy) > Math.abs(dx) ? 'down' : 'side';
+    if (mode === 'pan') {
+      img.classList.add('now');
+      var W = view.clientWidth, H = view.clientHeight;
+      tx = Math.min(0, Math.max(W - W * z, ox + dx)); ty = Math.min(0, Math.max(H - H * z, oy + dy));
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + z + ')';
+    } else if (mode === 'down') {
+      var d = Math.max(0, dy);
+      view.style.transform = 'translateY(' + d + 'px) scale(' + (1 - d / 1600) + ')';
+      root.style.setProperty('--so', Math.max(0.2, 1 - d / 300).toFixed(2));
+    } else if (mode === 'side') {
+      img.classList.add('now');
+      img.style.transform = 'translateX(' + dx * 0.5 + 'px)';
+    }
+  });
+  function up(e) {
+    if (!mode) return;
+    var r = view.getBoundingClientRect(), k = view.clientWidth / r.width;
+    var dx = (e.clientX - sx) * k, dy = (e.clientY - sy) * k, m = mode;
+    mode = '';
+    img.classList.remove('now');
+    if (m === 'down') {
+      if (dy > 110) { close(); return; }
+      view.style.transition = 'transform .4s cubic-bezier(.34,1.4,.64,1)';
+      view.style.transform = '';
+      root.style.removeProperty('--so');
+      setTimeout(function () { view.style.transition = ''; }, 420);
+    } else if (m === 'side') {
+      img.style.transform = '';
+      if (Math.abs(dx) > 70) go(dx < 0 ? 1 : -1);
+    }
+  }
+  view.addEventListener('pointerup', up);
+  view.addEventListener('pointercancel', up);
+  root.addEventListener('keydown', function (e) {
+    if (!isOpen) return;
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    else if (e.key === 'Tab') { e.preventDefault(); xBtn.focus(); }
+  });
+})();
+</script>

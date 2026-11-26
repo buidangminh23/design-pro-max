@@ -1,0 +1,124 @@
+<!-- Lucian UX/UI Prompt #359 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#359 -->
+<!--
+Element: Score-or-rank slope chart
+ID: 359 · Category: Data Motion · Tags: slope-chart, comparison, ranking, transition, data
+What it does: Eight departments' satisfaction last year and this year are joined by slope lines between two posts, drawn one after another from left to right when the chart first appears. Risers turn green and fallers red, and choosing Rank above slides each end from its score position to its rank position so the lines cross over each other. Hover a line or name to keep only that department and see how much it moved below.
+How to use it: Hover a line or name, then switch between Score and Rank above
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#359
+-->
+<style>
+.u359{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u359-hd{position:absolute;left:20px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:center}
+.u359-hd b{font-size:14px;font-weight:900}
+.u359-seg{display:flex;padding:3px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u359-md{border:0;padding:4px 11px;border-radius:999px;background:none;color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.u359-md.is-on{background:var(--ux-ink);color:var(--ux-surface)}
+.u359-md:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u359-sv{position:absolute;left:0;top:0;width:340px;height:340px}
+.u359-ax{stroke:var(--ux-line);stroke-width:2}
+.u359-at{font-size:10.5px;font-weight:800;fill:var(--ux-ink-3);text-anchor:middle}
+.u359-it{cursor:pointer;transition:opacity .25s}
+.u359-it .u359-ln{fill:none;stroke-width:2.4;stroke-linecap:round}
+.u359-it .u359-hz{fill:none;stroke:transparent;stroke-width:14}
+.u359-it circle{transform-box:fill-box;transform-origin:center}
+.u359-it text{font-size:11px;font-weight:700;fill:var(--ux-ink-2)}
+.u359-it text tspan{font-weight:900;fill:var(--ux-ink)}
+.u359.is-f .u359-it{opacity:.14}
+.u359.is-f .u359-it.is-hl{opacity:1}
+.u359.is-f .u359-it.is-hl .u359-ln{stroke-width:3.4}
+.u359-in{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:11px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.u359-in em{font-style:normal}
+</style>
+<div class="ux u359">
+  <div class="u359-hd"><b>Team satisfaction</b><div class="u359-seg" role="group" aria-label="View"><button type="button" class="u359-md is-on" aria-pressed="true">Score</button><button type="button" class="u359-md" aria-pressed="false">Rank</button></div></div>
+  <svg class="u359-sv" viewBox="0 0 340 340">
+    <line class="u359-ax" x1="112" y1="66" x2="112" y2="276"/><line class="u359-ax" x1="228" y1="66" x2="228" y2="276"/>
+    <text class="u359-at" x="112" y="58">Last yr</text><text class="u359-at" x="228" y="58">This yr</text>
+    <g class="u359-g"></g>
+  </svg>
+  <div class="u359-in" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var g = root.querySelector('.u359-g'), info = root.querySelector('.u359-in'), mds = root.querySelectorAll('.u359-md');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NAME = ['Eng', 'Design', 'Sales', 'Mktg', 'HR', 'Finance', 'Support', 'Planning'];
+  var A = [72, 68, 75, 61, 70, 58, 52, 66], B = [81, 74, 63, 70, 66, 60, 69, 58];
+  var XL = 112, XR = 228, mode = 0, hov = -1, IT = [];
+  function rankOf(arr) { var o = arr.map(function (v, i) { return i; }).sort(function (a, b) { return arr[b] - arr[a]; }), r = []; o.forEach(function (i, k) { r[i] = k; }); return r; }
+  var RA = rankOf(A), RB = rankOf(B);
+  function yv(v) { return 270 - (v - 50) / 35 * 196; }
+  function yr(k) { return 76 + k * 27; }
+  function targets() { return NAME.map(function (n, i) { return mode ? [yr(RA[i]), yr(RB[i])] : [yv(A[i]), yv(B[i])]; }); }
+  function relax(ys) {
+    var o = ys.map(function (y, i) { return { i: i, y: y }; }).sort(function (a, b) { return a.y - b.y; });
+    for (var it = 0; it < 30; it++) for (var k = 1; k < o.length; k++) { var d = o[k].y - o[k - 1].y; if (d < 14) { var m = (14 - d) / 2; o[k].y += m; o[k - 1].y -= m; } }
+    var out = []; o.forEach(function (p) { out[p.i] = p.y; }); return out;
+  }
+  NAME.forEach(function (n, i) {
+    var it = document.createElementNS('http://www.w3.org/2000/svg', 'g'); it.setAttribute('class', 'u359-it');
+    var c = B[i] > A[i] ? '#10B981' : '#F43F5E';
+    it.innerHTML = '<line class="u359-hz"/><line class="u359-ln" stroke="' + c + '" pathLength="1"/><circle r="4" fill="' + c + '"/><circle r="4" fill="' + c + '"/><text text-anchor="end"></text><text></text>';
+    it.addEventListener('pointerenter', function () { setHov(i); });
+    it.addEventListener('pointerleave', function () { if (hov === i) setHov(-1); });
+    g.appendChild(it);
+    var el = it.children;
+    IT.push({ g: it, hz: el[0], ln: el[1], c1: el[2], c2: el[3], t1: el[4], t2: el[5], y1: 0, y2: 0 });
+  });
+  function label() {
+    var t = targets(), L = relax(t.map(function (p) { return p[0]; })), R = relax(t.map(function (p) { return p[1]; }));
+    IT.forEach(function (o, i) {
+      var a = mode ? '#' + (RA[i] + 1) : A[i], b = mode ? '#' + (RB[i] + 1) : B[i];
+      o.t1.innerHTML = NAME[i] + ' <tspan>' + a + '</tspan>'; o.t2.innerHTML = '<tspan>' + b + '</tspan> ' + NAME[i];
+      o.L = L[i]; o.R = R[i];
+    });
+  }
+  function place(k) {
+    IT.forEach(function (o) {
+      [o.hz, o.ln].forEach(function (l) { l.setAttribute('x1', XL); l.setAttribute('x2', XR); l.setAttribute('y1', o.y1.toFixed(1)); l.setAttribute('y2', o.y2.toFixed(1)); });
+      o.c1.setAttribute('cx', XL); o.c1.setAttribute('cy', o.y1.toFixed(1)); o.c2.setAttribute('cx', XR); o.c2.setAttribute('cy', o.y2.toFixed(1));
+      o.t1.setAttribute('x', XL - 9); o.t1.setAttribute('y', (o.ly1 + 3.8).toFixed(1)); o.t2.setAttribute('x', XR + 9); o.t2.setAttribute('y', (o.ly2 + 3.8).toFixed(1));
+    });
+  }
+  var tw = 0;
+  function go(anim) {
+    var t = targets(); label();
+    var from = IT.map(function (o) { return [o.y1, o.y2, o.ly1, o.ly2]; });
+    cancelAnimationFrame(tw);
+    if (!anim || rm) { IT.forEach(function (o, i) { o.y1 = t[i][0]; o.y2 = t[i][1]; o.ly1 = o.L; o.ly2 = o.R; }); place(); return; }
+    var t0 = performance.now();
+    (function f(now) {
+      var k = Math.min(1, (now - t0) / 650), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      IT.forEach(function (o, i) { o.y1 = from[i][0] + (t[i][0] - from[i][0]) * e; o.y2 = from[i][1] + (t[i][1] - from[i][1]) * e; o.ly1 = from[i][2] + (o.L - from[i][2]) * e; o.ly2 = from[i][3] + (o.R - from[i][3]) * e; });
+      place();
+      if (k < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  function setHov(i) {
+    hov = i; root.classList.toggle('is-f', i >= 0);
+    IT.forEach(function (o, k) { o.g.classList.toggle('is-hl', k === i); });
+    if (i < 0) { info.textContent = 'Hover a line to compare'; return; }
+    var d = B[i] - A[i];
+    info.innerHTML = NAME[i] + ' ' + A[i] + ' → ' + B[i] + ' <em style="color:' + (d > 0 ? '#10B981' : '#F43F5E') + '">(' + (d > 0 ? '+' : '') + d + ')</em>';
+  }
+  mds.forEach(function (b, k) { b.addEventListener('click', function () { mode = k; mds.forEach(function (x, j) { x.classList.toggle('is-on', j === k); x.setAttribute('aria-pressed', j === k); }); go(true); }); });
+  go(false); setHov(-1);
+  if (!rm) {
+    IT.forEach(function (o) { o.ln.style.strokeDasharray = '1'; o.ln.style.strokeDashoffset = '1'; o.c2.style.opacity = 0; o.t2.style.opacity = 0; });
+    var drawn = false;
+    var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting || drawn) return; drawn = true; io.disconnect();
+      IT.forEach(function (o, i) {
+        var d = 200 + i * 110;
+        o.ln.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 520, delay: d, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).onfinish = function () { o.ln.style.strokeDasharray = ''; o.ln.style.strokeDashoffset = ''; };
+        o.c2.animate([{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 300, delay: d + 460, fill: 'forwards' });
+        o.t2.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: d + 460, fill: 'forwards' });
+      });
+    }) : null;
+    if (io) io.observe(root); else IT.forEach(function (o) { o.ln.style.strokeDasharray = ''; o.ln.style.strokeDashoffset = ''; o.c2.style.opacity = ''; o.t2.style.opacity = ''; });
+  }
+})();
+</script>

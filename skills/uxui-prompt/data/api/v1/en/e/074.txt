@@ -1,0 +1,119 @@
+<!-- Lucian UX/UI Prompt #074 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#074 -->
+<!--
+Element: Notification bell dropdown
+ID: 074 · Category: Alerts & Feedback · Tags: bell, notification, badge, dropdown, read-state
+What it does: When a new notification arrives the bell shakes, the badge count pops, and a new row pushes in at the top of the open list. Clicking an item clears its unread dot, and “Mark all read” clears the dots one by one. The bell folds the list into itself and back out.
+How to use it: Wait a moment for a new notification. Click items to mark them read, then try “Mark all read” and fold the list with the bell. Esc closes it too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#074
+-->
+<style>
+.u074{position:relative;width:340px;height:500px}
+.u074-top{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 4px 0 8px}
+.u074-top b{font-size:18px;font-weight:850;letter-spacing:-.04em}
+.u074-bell{position:relative;width:48px;height:48px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 10px 20px -14px var(--ux-shadow-strong);transition:transform .3s var(--ux-spring)}
+.u074-bell:active{transform:scale(.9)}
+.u074-bell:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u074-bell svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transform-origin:50% 15%}
+.u074-bell.ring svg{animation:u074-ring .9s var(--ux-ease)}
+@keyframes u074-ring{10%{transform:rotate(18deg)}25%{transform:rotate(-16deg)}40%{transform:rotate(12deg)}55%{transform:rotate(-8deg)}70%{transform:rotate(4deg)}}
+.u074-badge{position:absolute;right:4px;top:4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#FF5A6E;color:#fff;font-size:11px;font-weight:850;line-height:20px;text-align:center;box-shadow:0 0 0 2.5px var(--ux-surface);font-variant-numeric:tabular-nums;transition:transform .4s var(--ux-spring)}
+.u074-badge.zero{transform:scale(0)}
+.u074-pan{position:absolute;left:0;right:0;top:62px;bottom:0;display:flex;flex-direction:column;border-radius:24px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 50px -30px var(--ux-shadow-strong);transform-origin:calc(100% - 28px) -10px;transition:transform .45s var(--ux-spring),opacity .25s}
+.u074-pan::before{content:"";position:absolute;right:22px;top:-6px;width:14px;height:14px;border-radius:3px;background:var(--ux-surface);transform:rotate(45deg);box-shadow:-1px -1px 0 0 var(--ux-line)}
+.u074.is-closed .u074-pan{transform:scale(.4);opacity:0;pointer-events:none;transition:transform .3s var(--ux-ease),opacity .2s}
+.u074-ph{display:flex;align-items:center;gap:6px;padding:14px 14px 10px}
+.u074-tab{height:32px;padding:0 12px;border:0;border-radius:999px;background:none;font-size:13px;font-weight:750;color:var(--ux-ink-3);transition:background-color .25s,color .25s}
+.u074-tab[aria-selected="true"]{background:var(--ux-ink);color:var(--ux-page)}
+.u074-tab:focus-visible,.u074-all:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u074-all{margin-left:auto;border:0;padding:4px 6px;background:none;font-size:12.5px;font-weight:750;color:var(--ux-accent)}
+.u074-all:disabled{color:var(--ux-ink-3);cursor:default}
+.u074-list{position:relative;flex:1;margin:0;padding:0 8px 10px;list-style:none;overflow:hidden}
+.u074-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease)}
+.u074-it.new{grid-template-rows:0fr}
+.u074-it.hide{display:none}
+.u074-it>div{min-height:0;overflow:hidden}
+.u074-row{position:relative;display:flex;gap:12px;width:100%;padding:11px 26px 11px 10px;border:0;border-radius:14px;background:none;text-align:left;transition:background-color .2s}
+.u074-row:hover{background:var(--ux-surface-2)}
+.u074-row:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px}
+.u074-it.new .u074-row{transform:translateY(-30px);opacity:0}
+.u074-row{transition:background-color .2s,transform .5s var(--ux-spring),opacity .3s}
+.u074-av{position:relative;width:38px;height:38px;flex:none;border-radius:50%;background:var(--g)}
+.u074-av em{position:absolute;right:-3px;bottom:-3px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface);font-style:normal;font-size:10px}
+.u074-tx{flex:1;min-width:0;font-size:13px;line-height:1.45;color:var(--ux-ink-2)}
+.u074-tx b{color:var(--ux-ink);font-weight:780}
+.u074-tx small{display:block;margin-top:2px;font-size:11.5px;font-weight:650;color:var(--ux-ink-3)}
+.u074-dot{position:absolute;right:10px;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:var(--ux-accent);transition:transform .35s var(--ux-spring),opacity .25s}
+.u074-row.read .u074-dot{transform:scale(0);opacity:0}
+.u074-row.read .u074-tx{color:var(--ux-ink-3)}
+</style>
+<div class="ux u074">
+  <div class="u074-top"><b>Workspace</b><button class="u074-bell" type="button" aria-expanded="true" aria-label="Notifications"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M5.5 15V10a5.5 5.5 0 0 1 11 0v5l1.5 1.5h-14zM9 18.5a2 2 0 0 0 4 0"/></svg><span class="u074-badge" aria-hidden="true">0</span></button></div>
+  <div class="u074-pan" role="region" aria-label="Notification list">
+    <div class="u074-ph" role="tablist" aria-label="Notification type"><button class="u074-tab" type="button" role="tab" aria-selected="true">All</button><button class="u074-tab" type="button" role="tab" aria-selected="false">Mentions</button><button class="u074-all" type="button">Mark all read</button></div>
+    <ul class="u074-list" aria-live="polite"></ul>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bell = root.querySelector('.u074-bell'), badge = root.querySelector('.u074-badge'), list = root.querySelector('.u074-list'), allB = root.querySelector('.u074-all');
+  var tabs = root.querySelectorAll('.u074-tab');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [
+    ['Doyun Han', ' mentioned you: “@Seoyeon could you check this transition?”', 'Just now', 'linear-gradient(140deg,#8B6CFF,#5B8CFF)', '💬', 1],
+    ['Harin Yoon', ' approved the “Spring campaign” draft', '12 min ago', 'linear-gradient(140deg,#22C3A6,#0EA5E9)', '✅', 0],
+    ['Mina Jung', ' invited you to the “QA” channel', '1 hr ago', 'linear-gradient(140deg,#FF7A93,#B04FD0)', '👋', 0],
+    ['Lumen', ' Your October usage report is ready', 'Yesterday', 'linear-gradient(140deg,#FFB547,#FF7A45)', '📊', 0]
+  ];
+  var NEW = ['Jiho Park', ' replied to your comment: “Sounds good, let’s do it!”', 'Just now', 'linear-gradient(140deg,#3D8BFF,#22C3A6)', '↩', 1];
+  var rows = [], mention = false;
+  function item(d, isNew) {
+    var li = document.createElement('li');
+    li.className = 'u074-it' + (isNew ? ' new' : '');
+    li.setAttribute('data-m', d[5]);
+    li.innerHTML = '<div><button class="u074-row" type="button"><span class="u074-av" style="--g:' + d[3] + '" aria-hidden="true"><em>' + d[4] + '</em></span><span class="u074-tx"><b></b><span></span><small>' + d[2] + '</small></span><span class="u074-dot" aria-hidden="true"></span></button></div>';
+    li.querySelector('b').textContent = d[0]; li.querySelector('.u074-tx>span').textContent = d[1];
+    var row = li.querySelector('.u074-row');
+    row.addEventListener('click', function () { row.classList.add('read'); count(); });
+    return li;
+  }
+  function count() {
+    var n = list.querySelectorAll('.u074-row:not(.read)').length, prev = badge.textContent;
+    badge.textContent = n;
+    badge.classList.toggle('zero', !n);
+    bell.setAttribute('aria-label', 'Notifications, ' + n + ' unread');
+    allB.disabled = !n;
+    list.querySelectorAll('.u074-row').forEach(function (r) { r.setAttribute('aria-label', r.textContent.replace(/\s+/g, ' ').trim() + (r.classList.contains('read') ? '' : ', unread')); });
+    if (n > Number(prev) && !rm) badge.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 450, easing: 'cubic-bezier(.34,1.5,.64,1)' });
+  }
+  D.forEach(function (d, i) { var li = item(d); if (i > 1) li.querySelector('.u074-row').classList.add('read'); list.appendChild(li); });
+  count();
+  function filter() { list.querySelectorAll('.u074-it').forEach(function (li) { li.classList.toggle('hide', mention && li.getAttribute('data-m') !== '1'); }); }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { mention = i === 1; tabs.forEach(function (x, k) { x.setAttribute('aria-selected', String(k === i)); }); filter(); });
+  });
+  allB.addEventListener('click', function () {
+    list.querySelectorAll('.u074-row:not(.read)').forEach(function (r, i) { setTimeout(function () { if (!root.isConnected) return; r.classList.add('read'); count(); }, i * 110); });
+  });
+  function setOpen(v) {
+    root.classList.toggle('is-closed', !v);
+    bell.setAttribute('aria-expanded', String(v));
+    root.querySelector('.u074-pan').inert = !v;
+  }
+  bell.addEventListener('click', function () { setOpen(root.classList.contains('is-closed')); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !root.classList.contains('is-closed')) { setOpen(false); bell.focus(); } });
+  setTimeout(function () {
+    if (!root.isConnected) return;
+    var li = item(NEW, true);
+    list.insertBefore(li, list.firstChild);
+    filter();
+    void li.offsetWidth;
+    li.classList.remove('new');
+    bell.classList.remove('ring'); void bell.offsetWidth; bell.classList.add('ring');
+    count();
+  }, rm ? 400 : 2400);
+  bell.addEventListener('animationend', function () { bell.classList.remove('ring'); });
+})();
+</script>

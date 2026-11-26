@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #386 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#386 -->
+<!--
+Element: Glowing unlockable badges
+ID: 386 · Category: Promos & Rewards · Tags: badges, achievement, unlock, gamification, flip
+What it does: Of six achievement medals, locked ones sit as gray discs with a padlock and a progress bar showing how far along you are. Press Unlock and the next medal's bar fills to the end, the medal shakes, the padlock pops off, and it regains its color as a ray of light sweeps across and sparks scatter. Press an unlocked medal and it flips over to show the achievement and the date it was earned, then flips back with another press.
+How to use it: Press Unlock to earn a badge, then press an unlocked badge to flip it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#386
+-->
+<style>
+.u386{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:linear-gradient(165deg,#F8F9FA,#EDF0F3);background:linear-gradient(165deg,light-dark(#F8F9FA,#0F1016),light-dark(#EDF0F3,#08090D));box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#212529;color:light-dark(#212529,#F1F3F5)}
+.u386-hd{position:absolute;left:20px;right:20px;top:20px;display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:900;letter-spacing:-.02em}
+.u386-hd span{padding:3px 9px;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px rgba(33,37,41,.08);box-shadow:inset 0 0 0 1px light-dark(rgba(33,37,41,.08),rgba(255,255,255,.1));font-size:10.5px;font-weight:850;color:#495057;color:light-dark(#495057,#C4C9D1);letter-spacing:0;font-variant-numeric:tabular-nums}
+.u386-gd{position:absolute;left:16px;right:16px;top:54px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;perspective:800px}
+.u386-b{position:relative;height:104px;border:0;padding:0;background:none;cursor:pointer;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,1.3,.5,1);font:inherit;color:inherit}
+.u386-b.is-flip{transform:rotateY(180deg)}
+.u386-b:focus-visible{outline:2px solid #212529;outline:2px solid light-dark(#212529,#F1F3F5);outline-offset:3px;border-radius:16px}
+.u386-f,.u386-k{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+.u386-f{background:var(--ux-surface);box-shadow:0 6px 16px -10px rgba(33,37,41,.4),inset 0 0 0 1px rgba(33,37,41,.06);box-shadow:0 6px 16px -10px light-dark(rgba(33,37,41,.4),rgba(0,0,0,.8)),inset 0 0 0 1px light-dark(rgba(33,37,41,.06),rgba(255,255,255,.08))}
+.u386-m{position:relative;width:52px;height:52px}
+.u386-m svg{position:absolute;inset:0;width:100%;height:100%}
+.u386-md{transition:filter .5s,opacity .5s}
+.u386-lk{transition:transform .45s cubic-bezier(.3,1.6,.5,1),opacity .3s}
+.u386-f b{margin-top:7px;font-size:11.5px;font-weight:850;letter-spacing:-.01em;transition:color .4s}
+.u386-pg{display:none;align-items:center;gap:5px;margin-top:5px}
+.u386-pg i{position:relative;width:38px;height:4px;border-radius:2px;background:#E9ECEF;background:light-dark(#E9ECEF,#2A2C37);overflow:hidden}
+.u386-pg i::after{content:"";position:absolute;inset:0;border-radius:2px;background:#ADB5BD;background:light-dark(#ADB5BD,#7C8290);transform:scaleX(var(--p));transform-origin:0 50%;transition:transform .35s ease-out}
+.u386-pg small{font-size:9px;font-weight:800;color:#ADB5BD;color:light-dark(#ADB5BD,#6C717E);font-variant-numeric:tabular-nums}
+.u386-b.is-lock{cursor:default}
+.u386-b.is-lock .u386-md{filter:grayscale(1);opacity:.28}
+.u386-b:not(.is-lock) .u386-lk{transform:translateY(-14px) scale(1.4) rotate(-20deg);opacity:0}
+.u386-b.is-lock .u386-f b{color:#ADB5BD;color:light-dark(#ADB5BD,#6C717E)}
+.u386-b.is-lock .u386-pg{display:flex}
+.u386-b.is-lock .u386-f b{margin-top:6px}
+.u386-f::after{content:"";position:absolute;inset:-20%;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.95) 50%,transparent 65%);background:linear-gradient(110deg,transparent 35%,light-dark(rgba(255,255,255,.95),rgba(255,255,255,.28)) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.u386-b.is-new .u386-f::after{animation:u386-shine .9s ease-out .35s}
+@keyframes u386-shine{to{transform:translateX(120%)}}
+.u386-b.is-new .u386-m{animation:u386-pop .75s cubic-bezier(.3,1.6,.5,1)}
+@keyframes u386-pop{0%{transform:none}12%{transform:rotate(-10deg)}24%{transform:rotate(10deg)}36%{transform:rotate(-6deg) scale(.9)}70%{transform:scale(1.16)}100%{transform:none}}
+.u386-k{transform:rotateY(180deg);gap:3px;padding:10px 8px;background:linear-gradient(150deg,#343A40,#1A1D20);color:#F8F9FA;text-align:center;box-sizing:border-box}
+.u386-k b{font-size:12px;font-weight:900;color:var(--c)}
+.u386-k span{font-size:10.5px;font-weight:700;line-height:1.35;word-break:keep-all}
+.u386-k small{margin-top:3px;font-size:9px;font-weight:700;color:#ADB5BD;font-variant-numeric:tabular-nums}
+.u386-go{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:6px;border:0;padding:0 18px;height:38px;border-radius:999px;background:#212529;background:light-dark(#212529,#F1F3F5);color:#fff;color:light-dark(#fff,#16151B);font:inherit;font-size:12.5px;font-weight:850;cursor:pointer;box-shadow:0 8px 18px -10px rgba(33,37,41,.8);box-shadow:0 8px 18px -10px light-dark(rgba(33,37,41,.8),rgba(0,0,0,.9))}
+.u386-go:disabled{opacity:.35;cursor:default}
+.u386-go:focus-visible{outline:2px solid #212529;outline:2px solid light-dark(#212529,#F1F3F5);outline-offset:3px}
+.u386-sp{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;animation:u386-sp .8s ease-out forwards}
+@keyframes u386-sp{to{transform:translate(var(--dx),var(--dy)) scale(.4);opacity:0}}
+@media (prefers-reduced-motion: reduce){.u386-b,.u386-md,.u386-lk,.u386-pg i::after{transition:none}.u386-b.is-new .u386-m,.u386-b.is-new .u386-f::after{animation:none}}
+</style>
+<div class="ux u386">
+  <div class="u386-hd"><b>My badges</b><span class="u386-n" aria-live="polite"></span></div>
+  <div class="u386-gd"></div>
+  <button type="button" class="u386-go">Unlock</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u386-gd'), num = root.querySelector('.u386-n'), go = root.querySelector('.u386-go');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BD = [['First step', 'Signed in for the first time'], ['Steady', 'Visited 7 days in a row'], ['Chatterbox', 'Left 50 comments'], ['Explorer', 'Visited every menu'], ['Helper', '10 accepted answers'], ['Legend', 'Reached level 30']];
+  var PG = [[1, 1], [7, 7], [50, 50], [9, 12], [6, 10], [21, 30]];
+  var CL = [['#74C0FC', '#1C7ED6'], ['#FFA94D', '#E8590C'], ['#B197FC', '#6741D9'], ['#63E6BE', '#0CA678'], ['#FF8787', '#E03131'], ['#FFE066', '#F08C00']];
+  var IC = ['<path d="M6 21V4M6 4h11l-2.5 4.5L17 13H6"/>', '<rect x="4" y="5.5" width="16" height="14.5" rx="3"/><path d="M4 10h16M9 3.5v4M15 3.5v4M9.2 15l2 2 3.8-3.8"/>', '<path d="M5 5.5h14a2 2 0 0 1 2 2V15a2 2 0 0 1-2 2h-7l-4.5 3.2V17H5a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2z"/><path d="M8.5 11.3h.01M12 11.3h.01M15.5 11.3h.01" stroke-width="2.8"/>', '<circle cx="12" cy="12" r="8.5"/><path d="M15.2 8.8l-2 5.4-5.4 2 2-5.4z" fill="#fff"/>', '<path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/>', '<path d="M4 8l4.2 4L12 5.5 15.8 12 20 8l-1.8 9.5H5.8z"/><path d="M6 20.5h12"/>'];
+  var DATE = ['2026.03.02', '2026.04.18', '2026.06.09', '2026.08.21', '2026.10.15', '2026.10.15'];
+  var uid = Math.random().toString(36).slice(2, 7), unlocked = 3, B = [];
+  BD.forEach(function (d, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u386-b';
+    b.innerHTML = '<span class="u386-f"><span class="u386-m"><svg class="u386-md" viewBox="0 0 56 56" aria-hidden="true"><defs><linearGradient id="u386' + uid + i + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="' + CL[i][0] + '"/><stop offset="1" stop-color="' + CL[i][1] + '"/></linearGradient></defs><circle cx="28" cy="28" r="26" fill="url(#u386' + uid + i + ')"/><circle cx="28" cy="28" r="21.5" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.4"/><ellipse cx="20" cy="15" rx="10" ry="5" fill="#fff" opacity=".22" transform="rotate(-25 20 15)"/><g transform="translate(16 16)" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">' + IC[i] + '</g></svg><svg class="u386-lk" viewBox="0 0 56 56" aria-hidden="true"><g fill="none" stroke="#868E96" stroke-width="2.6" stroke-linecap="round"><path d="M22.5 27v-4a5.5 5.5 0 0 1 11 0v4"/></g><rect x="19.5" y="26.5" width="17" height="13" rx="3.5" fill="#868E96"/><circle cx="28" cy="32" r="1.8" fill="#fff"/></svg></span><b></b><span class="u386-pg"><i></i><small></small></span></span><span class="u386-k"><b></b><span></span><small></small></span>';
+    b.querySelector('.u386-f b').textContent = d[0]; b.querySelector('.u386-k b').textContent = d[0]; b.querySelector('.u386-k span').textContent = d[1]; b.querySelector('.u386-k small').textContent = 'Earned ' + DATE[i];
+    b.querySelector('.u386-k').style.setProperty('--c', CL[i][0]);
+    b.addEventListener('click', function () { if (i >= unlocked) return; b.classList.remove('is-new'); b.classList.toggle('is-flip'); });
+    gd.appendChild(b); B.push(b);
+  });
+  function prog(b, i, v) { var pg = b.querySelector('.u386-pg'); pg.querySelector('i').style.setProperty('--p', (v / PG[i][1]).toFixed(3)); pg.querySelector('small').textContent = v + '/' + PG[i][1]; }
+  function info() {
+    B.forEach(function (b, i) { var lock = i >= unlocked; b.classList.toggle('is-lock', lock); b.setAttribute('aria-label', BD[i][0] + (lock ? ' badge, locked' : ' badge, flip')); if (lock) prog(b, i, PG[i][0]); });
+    num.textContent = unlocked + '/6 ' + ' earned'; go.disabled = unlocked >= 6;
+  }
+  function burst(b, i) {
+    var rb = root.getBoundingClientRect(), k = root.offsetWidth / (rb.width || 1), r = b.querySelector('.u386-m').getBoundingClientRect(), cx0 = (r.left - rb.left + r.width / 2) * k, cy0 = (r.top - rb.top + r.height / 2) * k;
+    for (var s = 0; s < 14; s++) { var p = document.createElement('span'); p.className = 'u386-sp'; p.style.left = (cx0 - 3) + 'px'; p.style.top = (cy0 - 3) + 'px'; p.style.background = CL[i][s % 2]; var a = s / 14 * 6.28, d = 34 + Math.random() * 26; p.style.setProperty('--dx', (Math.cos(a) * d).toFixed(0) + 'px'); p.style.setProperty('--dy', (Math.sin(a) * d).toFixed(0) + 'px'); p.style.animationDelay = '.3s'; root.appendChild(p); setTimeout(function (n) { n.remove(); }.bind(null, p), 1200); }
+  }
+  var busy = false;
+  go.addEventListener('click', function () {
+    if (unlocked >= 6 || busy) return;
+    var i = unlocked, b = B[i]; busy = true;
+    prog(b, i, PG[i][1]);
+    setTimeout(function () {
+      busy = false; unlocked++; info();
+      b.classList.remove('is-new'); void b.offsetWidth; b.classList.add('is-new');
+      if (!rm) burst(b, i);
+    }, rm ? 0 : 420);
+  });
+  root.addEventListener('animationend', function (e) { if (e.target.classList && e.target.classList.contains('u386-m')) e.target.closest('.u386-b').classList.remove('is-new'); });
+  info();
+})();
+</script>

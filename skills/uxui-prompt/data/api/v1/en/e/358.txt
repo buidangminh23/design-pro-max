@@ -1,0 +1,185 @@
+<!-- Lucian UX/UI Prompt #358 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#358 -->
+<!--
+Element: Long-press message peek
+ID: 358 · Category: App Screens · Tags: long-press, peek, context-menu, haptic-touch, list
+What it does: Long-press a row in the conversation list and it sinks in slightly, then the screen behind blurs as a conversation preview card pops out of that spot and grows, with a quick-action menu unfolding below one item at a time. Keep holding, slide onto an action and let go to run it, or press the preview to expand it to full screen. Pinning slides that row up to the top.
+How to use it: Long-press a conversation row. A short press opens it straight away
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#358
+-->
+<style>
+.u358{position:relative;width:300px;height:500px;border-radius:36px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;color:var(--ux-ink)}
+.u358-hd{display:flex;align-items:flex-end;justify-content:space-between;height:64px;padding:0 18px 8px}
+.u358-hd b{font-size:24px;font-weight:880;letter-spacing:-.04em}
+.u358-hd span{font-size:13px;font-weight:700;color:var(--ux-accent)}
+.u358-ls{list-style:none;margin:0;padding:0 8px}
+.u358-ls li{transition:height .35s var(--ux-ease),opacity .25s}
+.u358-it{position:relative;width:100%;height:66px;display:flex;align-items:center;gap:11px;padding:0 10px;border:0;border-radius:16px;background:none;text-align:left;color:var(--ux-ink);user-select:none;-webkit-user-select:none;touch-action:manipulation;transition:transform .45s cubic-bezier(.2,.8,.2,1),background-color .3s}
+.u358-it:hover{background:var(--ux-surface-2)}
+.u358-it.press{transform:scale(.95);background:var(--ux-surface-2)}
+.u358-it:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px}
+.u358-av{flex:none;width:44px;height:44px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-size:16px;font-weight:850}
+.u358-tx{flex:1;min-width:0}
+.u358-tx b{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:800}
+.u358-tx b svg{width:13px;height:13px;fill:none;stroke:var(--ux-ink-3);stroke-width:1.8;stroke-linejoin:round;stroke-linecap:round;display:none}
+.u358-it.pin .u358-tx b svg{display:block}
+.u358-tx small{display:block;margin-top:2px;font-size:12.5px;color:var(--ux-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u358-mt{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:11px;color:var(--ux-ink-3)}
+.u358-mt i{width:9px;height:9px;border-radius:50%;background:var(--ux-accent);transition:transform .3s var(--ux-spring)}
+.u358-it:not(.un) .u358-mt i{transform:scale(0)}
+.u358-bd{position:absolute;inset:0;background:color-mix(in srgb,var(--ux-surface) 35%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.2);backdrop-filter:blur(14px) saturate(1.2);opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s .3s}
+.u358.is-peek .u358-bd{opacity:1;visibility:visible;transition:opacity .3s}
+.u358-cd{position:absolute;left:16px;top:58px;width:268px;height:204px;padding:14px;box-sizing:border-box;border-radius:22px;background:var(--ux-surface);box-shadow:0 24px 50px -16px rgba(0,0,0,.45);transform-origin:0 0;visibility:hidden;cursor:pointer}
+.u358.is-peek .u358-cd{visibility:visible}
+.u358-cd:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u358-ch{display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:1px solid var(--ux-line)}
+.u358-ch .u358-av{width:32px;height:32px;font-size:13px}
+.u358-ch b{font-size:14px;font-weight:850}
+.u358-th{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.u358-th span{max-width:80%;align-self:flex-start;padding:8px 11px;border-radius:15px;border-bottom-left-radius:5px;background:var(--ux-surface-2);font-size:12.5px;line-height:1.35}
+.u358-th span:nth-child(even){align-self:flex-end;background:var(--ux-accent);color:#fff;border-radius:15px;border-bottom-right-radius:5px}
+.u358-mn{position:absolute;left:16px;top:274px;width:210px;border-radius:16px;background:color-mix(in srgb,var(--ux-surface) 92%,transparent);box-shadow:0 18px 40px -14px rgba(0,0,0,.4);overflow:hidden;visibility:hidden}
+.u358.is-peek .u358-mn{visibility:visible}
+.u358-ac{width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border:0;border-top:1px solid var(--ux-line);background:none;color:var(--ux-ink);font-size:13.5px;font-weight:650;opacity:0;transform:translateY(-8px) scale(.96);transition:opacity .2s,transform .35s var(--ux-spring),background-color .15s}
+.u358-ac:first-child{border-top:0}
+.u358-ac svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u358-ac.del{color:#E03131}
+.u358-ac.hl,.u358-ac:hover{background:var(--ux-surface-2)}
+.u358.is-peek .u358-ac{opacity:1;transform:none}
+.u358.is-peek .u358-ac:nth-child(2){transition-delay:.04s}.u358.is-peek .u358-ac:nth-child(3){transition-delay:.08s}.u358.is-peek .u358-ac:nth-child(4){transition-delay:.12s}
+.u358-ac:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px}
+.u358-fv{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--ux-surface);visibility:hidden;transform-origin:0 0}
+.u358.is-full .u358-fv{visibility:visible}
+.u358-fh{display:flex;align-items:center;gap:10px;height:64px;padding:12px 14px 0;border-bottom:1px solid var(--ux-line)}
+.u358-bk{width:34px;height:34px;border:0;border-radius:10px;background:var(--ux-surface-2);color:var(--ux-ink);font-size:18px;font-weight:800}
+.u358-bk:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u358-fv .u358-th{flex:1;padding:6px 16px;justify-content:flex-end}
+.u358-in{margin:10px 14px 16px;height:42px;display:flex;align-items:center;padding:0 16px;border-radius:999px;background:var(--ux-surface-2);font-size:13px;color:var(--ux-ink-3)}
+.u358-ts{position:absolute;left:50%;bottom:22px;transform:translate(-50%,16px);padding:9px 14px;border-radius:999px;background:var(--ux-ink);color:var(--ux-surface);font-size:12.5px;font-weight:750;white-space:nowrap;opacity:0;transition:opacity .25s,transform .4s var(--ux-spring);pointer-events:none}
+.u358-ts.on{opacity:1;transform:translate(-50%,0)}
+</style>
+<div class="ux u358">
+  <div class="u358-hd"><b>Messages</b><span>Edit</span></div>
+  <ul class="u358-ls" aria-label="Conversations"></ul>
+  <div class="u358-bd"></div>
+  <div class="u358-cd" role="button" tabindex="-1"><div class="u358-ch"><span class="u358-av"></span><b></b></div><div class="u358-th"></div></div>
+  <div class="u358-mn" role="menu" aria-label="Quick actions"></div>
+  <div class="u358-fv"><div class="u358-fh"><button class="u358-bk" type="button" aria-label="Back">‹</button><span class="u358-av"></span><b></b></div><div class="u358-th"></div><div class="u358-in">Message</div></div>
+  <div class="u358-ts" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ls = root.querySelector('.u358-ls'), cd = root.querySelector('.u358-cd'), mn = root.querySelector('.u358-mn'), fv = root.querySelector('.u358-fv'), bd = root.querySelector('.u358-bd'), ts = root.querySelector('.u358-ts');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var MSG = [['Seoyeon', 'Shared the slides for tomorrow', '9:41 AM', '#20C997', 1, ['Shared the slides for tomorrow', 'Just check the chart on page 3!']], ['Minho', 'The photo came out so well lol', '8:12 AM', '#339AF0', 1, ['The photo came out so well lol', 'Can you send me the original?']], ['Jisoo', 'Hiking this weekend?', 'Yesterday', '#F06595', 0, ['Hiking this weekend?', 'How about Saturday at 7?']], ['Hajun', 'Got the package, thank you', 'Yesterday', '#FAB005', 0, ['Got the package, thank you', 'It was packed so carefully 🙏']], ['Yuna', 'Dinner ideas for tonight?', 'Tuesday', '#7950F2', 1, ['Dinner ideas for tonight?', 'Nothing spicy!']], ['Doyun', 'Left a code review', 'Monday', '#FD7E14', 0, ['Left a code review', 'Just two spots to fix, I think']]];
+  var ACT = [['Reply', 'M3 9l5-5v3c6 0 9 3 9 9-2-3-5-4-9-4v3z'], ['Pin', 'M12.5 2.5l5 5-2.5 1-3 3 .5 3.5-1.5 1.5-7-7L5.5 7l3.5.5 3-3zM6.5 13.5 2.5 17.5'], ['Mark as read', 'M3 10l4 4 10-10'], ['Delete', 'M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11']];
+  var cur = null, tsT = 0;
+  var rows = MSG.map(function (m) {
+    var li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'u358-it' + (m[4] ? ' un' : '');
+    b.innerHTML = '<span class="u358-av" style="--c:' + m[3] + '"></span><span class="u358-tx"><b><span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 2.5l5 5-2.5 1-3 3 .5 3.5-1.5 1.5-7-7L5.5 7l3.5.5 3-3zM6.5 13.5 2.5 17.5"/></svg></b><small></small></span><span class="u358-mt"><span></span><i></i></span>';
+    b.querySelector('.u358-av').textContent = m[0].charAt(0);
+    b.querySelector('.u358-tx b span').textContent = m[0];
+    b.querySelector('small').textContent = m[1];
+    b.querySelector('.u358-mt span').textContent = m[2];
+    b.setAttribute('aria-label', m[0] + ': ' + m[1] + ', long-press to preview');
+    li.appendChild(b); ls.appendChild(li);
+    var o = { li: li, el: b, m: m };
+    bind(o);
+    return o;
+  });
+  var acts = ACT.map(function (a, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u358-ac' + (i === 3 ? ' del' : ''); b.setAttribute('role', 'menuitem');
+    b.innerHTML = '<span></span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="' + a[1] + '"/></svg>';
+    b.querySelector('span').textContent = a[0];
+    b.addEventListener('click', function () { act(i); });
+    mn.appendChild(b);
+    return b;
+  });
+  function toast(t) { ts.textContent = t; ts.classList.add('on'); clearTimeout(tsT); tsT = setTimeout(function () { ts.classList.remove('on'); }, 1600); }
+  function rel(el) { var r = el.getBoundingClientRect(), rr = root.getBoundingClientRect(), k = root.offsetWidth / (rr.width || 1); return { x: (r.left - rr.left) * k, y: (r.top - rr.top) * k, w: r.width * k, h: r.height * k }; }
+  function fill(box, o) {
+    var av = box.querySelector('.u358-av'); av.style.setProperty('--c', o.m[3]); av.textContent = o.m[0].charAt(0);
+    box.querySelector('b').textContent = o.m[0];
+    var th = box.querySelector('.u358-th'); th.innerHTML = '';
+    o.m[5].forEach(function (t) { var s = document.createElement('span'); s.textContent = t; th.appendChild(s); });
+  }
+  function peek(o) {
+    cur = o;
+    fill(cd, o);
+    acts[1].querySelector('span').textContent = o.el.classList.contains('pin') ? 'Unpin' : ACT[1][0];
+    acts[2].querySelector('span').textContent = o.el.classList.contains('un') ? ACT[2][0] : 'Mark as unread';
+    root.classList.add('is-peek');
+    var r = rel(o.el), sx = r.w / 268, sy = r.h / 204;
+    if (!rm && cd.animate) cd.animate([{ transform: 'translate(' + (r.x - 16) + 'px,' + (r.y - 58) + 'px) scale(' + sx + ',' + sy + ')', opacity: 0.6 }, { transform: 'none', opacity: 1 }], { duration: 440, easing: 'cubic-bezier(.3,1.3,.5,1)' });
+    cd.tabIndex = 0; acts.forEach(function (a) { a.tabIndex = 0; });
+    acts[0].focus({ preventScroll: true });
+  }
+  function close() {
+    root.classList.remove('is-peek'); cd.tabIndex = -1;
+    acts.forEach(function (a) { a.classList.remove('hl'); a.tabIndex = -1; });
+    if (cur) cur.el.focus({ preventScroll: true });
+  }
+  function moveTop(o) {
+    var before = rows.map(function (q) { return q.li.getBoundingClientRect().top; });
+    ls.insertBefore(o.li, ls.firstChild);
+    rows.forEach(function (q, i) {
+      var d = before[i] - q.li.getBoundingClientRect().top;
+      if (d && !rm && q.li.animate) q.li.animate([{ transform: 'translateY(' + d + 'px)' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.3,1.2,.4,1)' });
+    });
+  }
+  function act(i) {
+    var o = cur;
+    close();
+    if (!o) return;
+    if (i === 0) toast('Opened a reply');
+    if (i === 1) { var on = !o.el.classList.contains('pin'); o.el.classList.toggle('pin', on); if (on) moveTop(o); toast(o.m[0] + (on ? ' pinned to the top' : ' unpinned')); }
+    if (i === 2) o.el.classList.toggle('un');
+    if (i === 3) { o.li.style.height = o.li.offsetHeight + 'px'; void o.li.offsetWidth; o.li.style.height = '0px'; o.li.style.opacity = '0'; setTimeout(function () { o.li.remove(); }, rm ? 0 : 360); toast(o.m[0] + ' deleted'); }
+  }
+  function full(o, fromEl) {
+    fill(fv, o);
+    var r = rel(fromEl);
+    o.el.classList.remove('un');
+    root.classList.remove('is-peek'); root.classList.add('is-full');
+    if (!rm && fv.animate) fv.animate([{ transform: 'translate(' + r.x + 'px,' + r.y + 'px) scale(' + r.w / 300 + ',' + r.h / 500 + ')', borderRadius: '40px', opacity: 0.4 }, { transform: 'none', borderRadius: '36px', opacity: 1 }], { duration: 480, easing: 'cubic-bezier(.3,1.1,.4,1)' });
+    root.querySelector('.u358-bk').focus({ preventScroll: true });
+  }
+  cd.addEventListener('click', function () { if (cur) full(cur, cd); });
+  cd.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cd.click(); } });
+  bd.addEventListener('click', close);
+  root.querySelector('.u358-bk').addEventListener('click', function () {
+    var done = function () { root.classList.remove('is-full'); if (cur) cur.el.focus({ preventScroll: true }); };
+    if (!rm && fv.animate) fv.animate([{ transform: 'none', opacity: 1 }, { transform: 'translateX(60px)', opacity: 0 }], { duration: 260, easing: 'ease-in' }).onfinish = done; else done();
+  });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-peek')) { e.preventDefault(); close(); } });
+  function bind(o) {
+    var timer = 0, sx = 0, sy = 0, opened = false, skipClick = false;
+    o.el.addEventListener('pointerdown', function (e) {
+      sx = e.clientX; sy = e.clientY; opened = false; skipClick = false;
+      o.el.classList.add('press');
+      clearTimeout(timer);
+      timer = setTimeout(function () { opened = true; skipClick = true; o.el.classList.remove('press'); peek(o); }, 480);
+      try { o.el.setPointerCapture(e.pointerId); } catch (er) {  }
+    });
+    o.el.addEventListener('pointermove', function (e) {
+      if (!opened) { if (Math.hypot(e.clientX - sx, e.clientY - sy) > 8) { clearTimeout(timer); o.el.classList.remove('press'); } return; }
+      acts.forEach(function (a) { var r = a.getBoundingClientRect(); a.classList.toggle('hl', e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom); });
+    });
+    function up() {
+      clearTimeout(timer); o.el.classList.remove('press');
+      if (!opened) return;
+      opened = false;
+      var hl = acts.filter(function (a) { return a.classList.contains('hl'); })[0];
+      if (hl) act(acts.indexOf(hl));
+    }
+    o.el.addEventListener('pointerup', up);
+    o.el.addEventListener('pointercancel', up);
+    o.el.addEventListener('click', function () { if (skipClick) { skipClick = false; return; } cur = o; full(o, o.el); });
+    o.el.addEventListener('keydown', function (e) { if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) { e.preventDefault(); peek(o); } });
+    o.el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  }
+})();
+</script>

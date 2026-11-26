@@ -1,0 +1,146 @@
+<!-- Lucian UX/UI Prompt #057 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#057 -->
+<!--
+Element: Face-picker testimonial carousel
+ID: 057 · Category: Cards & Content · Tags: carousel, testimonial, autoplay, swipe, avatars
+What it does: Reviews advance every few seconds; in the row of faces below, the current speaker grows and a ring around them fills with the time left. The quote fades in word by word, and you can drag sideways or press a face to jump.
+How to use it: Press a face below or drag the review sideways. Hovering pauses the auto-advance. With a keyboard, use the left and right arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#057
+-->
+<style>
+.u057{position:relative;width:350px;height:370px;display:flex;flex-direction:column;padding:26px 24px 22px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;outline:none}
+.u057:focus-visible{box-shadow:0 0 0 2px var(--ux-accent),0 30px 60px -36px var(--ux-shadow-strong)}
+.u057-mark{position:absolute;right:20px;top:-6px;font-size:150px;line-height:1;font-weight:900;font-family:Georgia,serif;background:linear-gradient(160deg,var(--c1,#FFB547),var(--c2,#FF6B8B));-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.22;transition:opacity .4s;pointer-events:none}
+.u057-stars{display:flex;gap:3px;color:#FFB547}
+.u057-stars svg{width:16px;height:16px;fill:currentColor}
+.u057-view{position:relative;flex:1;margin-top:14px;touch-action:pan-y;cursor:grab}
+.u057-view.drag{cursor:grabbing}
+.u057-q{position:absolute;inset:0;margin:0;font-size:24px;line-height:1.42;font-weight:760;letter-spacing:-.045em;transition:transform .5s var(--ux-ease),opacity .3s}
+.u057-q span{display:inline-block;opacity:0;transform:translateY(10px);filter:blur(4px);transition:opacity .45s var(--ux-ease),transform .6s var(--ux-spring),filter .45s;transition-delay:calc(var(--i) * 32ms)}
+.u057-q.on span{opacity:1;transform:none;filter:none}
+.u057-q.on mark{background:linear-gradient(transparent 62%,color-mix(in srgb,var(--c1,#FFB547) 40%,transparent) 62%);color:inherit}
+.u057-q mark{background:none;color:inherit;transition:background .4s .5s}
+.u057-who{display:flex;align-items:baseline;gap:8px;margin-bottom:14px;height:22px}
+.u057-who b{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.u057-who small{font-size:12.5px;font-weight:600;color:var(--ux-ink-3)}
+.u057-faces{display:flex;align-items:center;gap:10px}
+.u057-f{position:relative;width:40px;height:40px;flex:none;border:0;padding:0;border-radius:50%;background:none;transition:width .5s var(--ux-spring),height .5s var(--ux-spring)}
+.u057-f i{position:absolute;inset:4px;border-radius:50%;background:var(--g);filter:grayscale(.7);opacity:.6;transition:filter .4s,opacity .4s,inset .4s}
+.u057-f:hover i{opacity:.9}
+.u057-f[aria-current="true"]{width:54px;height:54px}
+.u057-f[aria-current="true"] i{filter:none;opacity:1;inset:5px}
+.u057-f svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);opacity:0;transition:opacity .3s}
+.u057-f[aria-current="true"] svg{opacity:1}
+.u057-f circle{fill:none;stroke-width:2.5}
+.u057-f .tr{stroke:var(--ux-line)}
+.u057-f .pr{stroke:var(--ux-accent);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0) * 100)}
+.u057-f:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u057-n{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u057" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Customer reviews">
+  <span class="u057-mark" aria-hidden="true">“</span>
+  <div class="u057-stars" role="img" aria-label="Rated 5 out of 5"><svg viewBox="0 0 16 16"><path d="M8 1.5l2 4.2 4.5.6-3.3 3.1.8 4.5L8 11.7l-4 2.2.8-4.5L1.5 6.3l4.5-.6z"/></svg><svg viewBox="0 0 16 16"><path d="M8 1.5l2 4.2 4.5.6-3.3 3.1.8 4.5L8 11.7l-4 2.2.8-4.5L1.5 6.3l4.5-.6z"/></svg><svg viewBox="0 0 16 16"><path d="M8 1.5l2 4.2 4.5.6-3.3 3.1.8 4.5L8 11.7l-4 2.2.8-4.5L1.5 6.3l4.5-.6z"/></svg><svg viewBox="0 0 16 16"><path d="M8 1.5l2 4.2 4.5.6-3.3 3.1.8 4.5L8 11.7l-4 2.2.8-4.5L1.5 6.3l4.5-.6z"/></svg><svg viewBox="0 0 16 16"><path d="M8 1.5l2 4.2 4.5.6-3.3 3.1.8 4.5L8 11.7l-4 2.2.8-4.5L1.5 6.3l4.5-.6z"/></svg></div>
+  <div class="u057-view" aria-live="polite"></div>
+  <div class="u057-who"><b></b><small></small></div>
+  <div class="u057-faces" role="group" aria-label="Choose a review"><span class="u057-n" aria-hidden="true"></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var view = root.querySelector('.u057-view'), who = root.querySelector('.u057-who'), faces = root.querySelector('.u057-faces'), num = root.querySelector('.u057-n');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [
+    ['The code matches our mockups, so build time was *cut in half.*', 'Doyun Park', 'Frontend lead', 'linear-gradient(140deg,#B7A4FF,#6A57F2)', '#B7A4FF', '#6A57F2'],
+    ['The motion never overdoes it and fits our tone. *User response* clearly improved.', 'Harin Choi', 'Product designer', 'linear-gradient(140deg,#A5F2D3,#17A077)', '#A5F2D3', '#17A077'],
+    ['I pasted the prompt and it slotted into our old button *seamlessly.*', 'Seojun Yoon', 'Startup founder', 'linear-gradient(140deg,#FFD08A,#D2702A)', '#FFD08A', '#FF6B8B'],
+    ['Dark mode came out right too, so *QA time* just vanished.', 'Mina Jung', 'QA manager', 'linear-gradient(140deg,#7DB4FF,#3D5BFF)', '#7DB4FF', '#3D5BFF']
+  ];
+  var DUR = 5200, cur = -1, t0 = 0, paused = false, raf = 0, acc = 0;
+  var btns = D.map(function (d, i) {
+    var b = document.createElement('button');
+    b.className = 'u057-f'; b.type = 'button';
+    b.setAttribute('aria-label', 'Review ' + (i + 1) + ', ' + d[1]);
+    b.style.setProperty('--g', d[3]);
+    b.innerHTML = '<i></i><svg viewBox="0 0 40 40" aria-hidden="true"><circle class="tr" cx="20" cy="20" r="18.5"/><circle class="pr" cx="20" cy="20" r="18.5" pathLength="100"/></svg>';
+    b.addEventListener('click', function () { show(i); });
+    faces.insertBefore(b, num);
+    return b;
+  });
+  function quote(d) {
+    var p = document.createElement('p');
+    p.className = 'u057-q';
+    var k = 0;
+    p.innerHTML = d[0].split(/(\*[^*]+\*)/).map(function (part) {
+      var hi = part.charAt(0) === '*';
+      var w = (hi ? part.slice(1, -1) : part).split(' ').filter(Boolean).map(function (x) { return '<span style="--i:' + (k++) + '">' + x + '</span>'; }).join(' ');
+      return hi ? ' <mark>' + w + '</mark> ' : w;
+    }).join('');
+    return p;
+  }
+  function show(i, dir) {
+    i = (i + D.length) % D.length;
+    if (i === cur) return;
+    dir = dir || (i > cur ? 1 : -1);
+    var old = view.querySelector('.u057-q.on');
+    cur = i;
+    var d = D[i];
+    root.style.setProperty('--c1', d[4]); root.style.setProperty('--c2', d[5]);
+    var q = quote(d);
+    view.appendChild(q);
+    void q.offsetWidth;
+    q.classList.add('on');
+    if (old) {
+      old.classList.remove('on');
+      old.style.transform = 'translateX(' + (-dir * 30) + 'px)'; old.style.opacity = '0';
+      setTimeout(function () { old.remove(); }, 500);
+    }
+    who.querySelector('b').textContent = d[1];
+    who.querySelector('small').textContent = d[2];
+    if (!rm && old) who.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'ease-out' });
+    btns.forEach(function (b, k) { b.setAttribute('aria-current', String(k === i)); b.style.setProperty('--p', 0); });
+    num.textContent = (i + 1) + ' / ' + D.length;
+    acc = 0; t0 = performance.now();
+  }
+  function loop(now) {
+    if (!root.isConnected) return;
+    if (!paused && !rm) {
+      var p = Math.min(1, (acc + now - t0) / DUR);
+      btns[cur].style.setProperty('--p', p.toFixed(3));
+      if (p >= 1) show(cur + 1, 1);
+    }
+    raf = requestAnimationFrame(loop);
+  }
+  function pause(v) {
+    if (v === paused) return;
+    if (v) acc += performance.now() - t0; else t0 = performance.now();
+    paused = v;
+  }
+  root.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') pause(true); });
+  root.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && !root.contains(document.activeElement)) pause(false); });
+  root.addEventListener('focusin', function () { pause(true); });
+  root.addEventListener('focusout', function (e) { if (!root.contains(e.relatedTarget)) pause(false); });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { e.preventDefault(); show(cur + 1, 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); show(cur - 1, -1); }
+  });
+  var sx = 0, dragging = false;
+  view.addEventListener('pointerdown', function (e) { dragging = true; sx = e.clientX; view.setPointerCapture(e.pointerId); view.classList.add('drag'); });
+  view.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var q = view.querySelector('.u057-q.on');
+    if (q) { q.style.transition = 'none'; q.style.transform = 'translateX(' + (e.clientX - sx) * 0.6 + 'px)'; }
+  });
+  function end(e) {
+    if (!dragging) return;
+    dragging = false; view.classList.remove('drag');
+    var dx = e.clientX - sx, q = view.querySelector('.u057-q.on');
+    if (q) { q.style.transition = ''; q.style.transform = ''; }
+    if (Math.abs(dx) > 50) show(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  }
+  view.addEventListener('pointerup', end);
+  view.addEventListener('pointercancel', end);
+  show(0);
+  raf = requestAnimationFrame(loop);
+})();
+</script>

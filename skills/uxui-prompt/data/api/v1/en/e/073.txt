@@ -1,0 +1,106 @@
+<!-- Lucian UX/UI Prompt #073 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#073 -->
+<!--
+Element: Rolling announcement banner
+ID: 073 · Category: Alerts & Feedback · Tags: banner, announcement, rolling, dismiss, autoplay
+What it does: Announcements roll upward in the strip at the top of the page while short bars on the right fill with the time left. Hovering pauses it; closing folds the strip away and the page below moves up. After closing, a small bell button brings it back.
+How to use it: Watch the announcements roll, or advance them with the arrow. Close it with ×, then reopen it with the bell in the top right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#073
+-->
+<style>
+.u073{position:relative;width:350px;height:340px;border-radius:26px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u073-ban{display:grid;grid-template-rows:1fr;transition:grid-template-rows .5s var(--ux-ease)}
+.u073.is-closed .u073-ban{grid-template-rows:0fr}
+.u073-ban>div{min-height:0;overflow:hidden}
+.u073-bar{position:relative;display:flex;align-items:center;gap:6px;height:56px;padding:0 6px 0 12px;background:linear-gradient(100deg,#5B3FD9,#7B61FF 40%,#FF6B8B);color:#fff;overflow:hidden}
+.u073-bar::after{content:"";position:absolute;top:0;bottom:0;width:80px;left:-100px;background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent);animation:u073-shine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes u073-shine{0%,60%{transform:translateX(0)}100%{transform:translateX(560px)}}
+.u073-tag{height:22px;padding:0 7px;border-radius:7px;flex:none;display:inline-flex;align-items:center;background:rgba(255,255,255,.22);font-size:10.5px;font-weight:850;letter-spacing:.06em}
+.u073-msgs{position:relative;flex:1;height:100%;overflow:hidden}
+.u073-m{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;transform:translateY(100%);opacity:0;transition:transform .55s var(--ux-ease),opacity .4s}
+.u073-m.on{transform:none;opacity:1}
+.u073-m.up{transform:translateY(-100%);opacity:0}
+.u073-m b{font-size:13.5px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u073-m span{font-size:11.5px;font-weight:600;opacity:.82;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u073-segs{display:flex;gap:3px;flex:none}
+.u073-segs i{width:12px;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden}
+.u073-segs i::after{content:"";display:block;height:100%;background:#fff;transform-origin:0 50%;transform:scaleX(var(--f,0))}
+.u073-b{width:30px;height:30px;flex:none;border:0;padding:0;border-radius:9px;display:grid;place-items:center;background:none;color:#fff;transition:background-color .2s,transform .3s var(--ux-spring)}
+.u073-b:hover{background:rgba(255,255,255,.18)}
+.u073-b:active{transform:scale(.88)}
+.u073-b:focus-visible{outline:2px solid #fff;outline-offset:-2px}
+.u073-b svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u073-nav{display:flex;align-items:center;gap:14px;height:56px;padding:0 18px;border-bottom:1px solid var(--ux-line)}
+.u073-logo{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:850;letter-spacing:-.03em}
+.u073-logo i{width:20px;height:20px;border-radius:7px;background:var(--ux-grad)}
+.u073-nav span{font-size:12.5px;font-weight:650;color:var(--ux-ink-3)}
+.u073-bell{margin-left:auto;width:34px;height:34px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink);opacity:0;transform:scale(.5);pointer-events:none;transition:opacity .3s,transform .45s var(--ux-spring)}
+.u073.is-closed .u073-bell{opacity:1;transform:none;pointer-events:auto;transition-delay:.25s}
+.u073-bell svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u073-bell:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u073-page{padding:18px}
+.u073-page h4{margin:0;font-size:22px;line-height:1.2;font-weight:850;letter-spacing:-.045em}
+.u073-page p{margin:6px 0 14px;font-size:13px;color:var(--ux-ink-3)}
+.u073-cards{display:flex;gap:8px}
+.u073-cards i{flex:1;height:96px;border-radius:16px;background:var(--g)}
+</style>
+<div class="ux u073">
+  <div class="u073-ban"><div>
+    <div class="u073-bar" role="region" aria-label="Announcements" aria-roledescription="rotating banner">
+      <span class="u073-tag">NEW</span>
+      <div class="u073-msgs" aria-live="polite"></div>
+      <span class="u073-segs" aria-hidden="true"></span>
+      <button class="u073-b u073-nx" type="button" aria-label="Next announcement"><svg viewBox="0 0 14 14"><path d="M5 3l4 4-4 4"/></svg></button>
+      <button class="u073-b u073-x" type="button" aria-label="Close announcements"><svg viewBox="0 0 14 14"><path d="M3.5 3.5l7 7M10.5 3.5l-7 7"/></svg></button>
+    </div>
+  </div></div>
+  <nav class="u073-nav" aria-label="Site"><span class="u073-logo"><i aria-hidden="true"></i>Lumen</span><span>Product</span><span>Pricing</span><button class="u073-bell" type="button" tabindex="-1" aria-label="Show announcements"><svg viewBox="0 0 17 17"><path d="M4 11.5V8a4.5 4.5 0 0 1 9 0v3.5l1 1H3zM7 14.5a1.6 1.6 0 0 0 3 0"/></svg></button></nav>
+  <div class="u073-page" aria-hidden="true"><h4>Interfaces that<br>explain with motion</h4><p>One small transition shows the way</p><div class="u073-cards"><i style="--g:linear-gradient(140deg,#FFB547,#FF6B8B)"></i><i style="--g:linear-gradient(140deg,#7B61FF,#3D8BFF)"></i><i style="--g:linear-gradient(140deg,#22C3A6,#0EA5E9)"></i></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var msgs = root.querySelector('.u073-msgs'), segs = root.querySelector('.u073-segs'), bar = root.querySelector('.u073-bar');
+  var bell = root.querySelector('.u073-bell'), x = root.querySelector('.u073-x'), nx = root.querySelector('.u073-nx');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [['Command palette', 'Find any command with ⌘K'], ['Crisper dark mode', 'Both themes look sharper'], ['October meetup', 'Signups open · first 50']];
+  var els = D.map(function (d) { var m = document.createElement('div'); m.className = 'u073-m'; m.innerHTML = '<b></b><span></span>'; m.firstChild.textContent = d[0]; m.lastChild.textContent = d[1]; msgs.appendChild(m); return m; });
+  var bars = D.map(function () { var i = document.createElement('i'); segs.appendChild(i); return i; });
+  var cur = 0, el = 0, last = performance.now(), paused = false, closed = false, DUR = 3800;
+  function show(i) {
+    var prev = els[cur];
+    cur = (i + D.length) % D.length;
+    els.forEach(function (m, k) { m.classList.toggle('on', k === cur); m.classList.toggle('up', m === prev && k !== cur); m.setAttribute('aria-hidden', String(k !== cur)); });
+    setTimeout(function () { prev.classList.remove('up'); }, 600);
+    bars.forEach(function (b, k) { b.style.setProperty('--f', k < cur ? 1 : 0); });
+    el = 0;
+  }
+  (function loop(now) {
+    if (!root.isConnected) return;
+    var dt = now - last; last = now;
+    if (!paused && !closed && !rm) {
+      el += dt;
+      bars[cur].style.setProperty('--f', Math.min(1, el / DUR).toFixed(3));
+      if (el >= DUR) show(cur + 1);
+    }
+    requestAnimationFrame(loop);
+  })(last);
+  bar.addEventListener('pointerenter', function () { paused = true; });
+  bar.addEventListener('pointerleave', function () { paused = bar.contains(document.activeElement); });
+  bar.addEventListener('focusin', function () { paused = true; });
+  bar.addEventListener('focusout', function (e) { if (!bar.contains(e.relatedTarget)) paused = false; });
+  nx.addEventListener('click', function () { show(cur + 1); });
+  x.addEventListener('click', function () {
+    closed = true; root.classList.add('is-closed');
+    root.querySelector('.u073-ban').inert = true; bell.tabIndex = 0;
+    setTimeout(function () { if (root.isConnected && closed) bell.focus({ preventScroll: true }); }, 300);
+  });
+  bell.addEventListener('click', function () {
+    closed = false; root.classList.remove('is-closed');
+    root.querySelector('.u073-ban').inert = false; bell.tabIndex = -1;
+    show(0); x.focus({ preventScroll: true });
+  });
+  show(0);
+})();
+</script>

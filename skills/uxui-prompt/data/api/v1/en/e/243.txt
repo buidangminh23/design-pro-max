@@ -1,0 +1,68 @@
+<!-- Lucian UX/UI Prompt #243 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#243 -->
+<!--
+Element: Tap-to-verify security badges
+ID: 243 · Category: Social Proof · Tags: trust, security, badges, compliance, saas
+What it does: A row of security and compliance badges at the bottom of a product page gets a passing sheen now and then. Press a badge and the card flips to show the certifying body, scope and validity; press Verify and a ring spins before a green check stamps the time it was checked. Press again to flip back.
+How to use it: Press a badge to flip it, then press Verify
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#243
+-->
+<style>
+.u243{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u243-hd{position:absolute;left:20px;right:20px;top:24px}
+.u243-hd b{display:block;font-size:17px;font-weight:900;letter-spacing:-.03em}
+.u243-hd small{display:block;margin-top:4px;font-size:11px;font-weight:650;color:var(--ux-ink-3)}
+.u243-gd{position:absolute;left:14px;right:14px;top:84px;bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;perspective:700px}
+.u243-bg{position:relative;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,1.2,.4,1)}
+.u243-bg.is-flip{transform:rotateY(180deg)}
+.u243-bg:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px;border-radius:16px}
+.u243-f,.u243-b{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.u243-f{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u243-f::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(105deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-12deg);animation:u243-sh 5.5s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes u243-sh{0%,70%{left:-60%}90%,100%{left:130%}}
+.u243-sd{width:42px;height:46px;display:grid;place-items:center;color:var(--c)}
+.u243-sd svg{width:42px;height:46px}
+.u243-f b{font-size:13px;font-weight:900;letter-spacing:-.01em}
+.u243-f small{font-size:9.5px;font-weight:750;color:var(--ux-ink-3)}
+.u243-b{transform:rotateY(180deg);display:flex;flex-direction:column;padding:11px 12px;text-align:left;background:var(--ux-surface);box-shadow:inset 0 0 0 1.5px var(--c)}
+.u243-b b{font-size:12px;font-weight:900}
+.u243-b span{margin-top:3px;font-size:10px;line-height:1.4;font-weight:700;color:var(--ux-ink-2)}
+.u243-b small{margin-top:2px;font-size:9.5px;font-weight:650;color:var(--ux-ink-3)}
+.u243-vf{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;height:26px;margin-top:auto;padding:0 10px;border:0;border-radius:8px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:10px;font-weight:850;cursor:pointer}
+.u243-vf i{display:none;width:11px;height:11px;border-radius:50%;border:2px solid color-mix(in srgb,var(--ux-surface) 35%,transparent);border-top-color:var(--ux-surface);animation:u243-sp .7s linear infinite}
+.u243-vf.is-busy i{display:block}
+.u243-vf.is-ok{background:#059669}
+@keyframes u243-sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.u243-bg{transition:none}.u243-f::after,.u243-vf i{animation:none}}
+</style>
+<div class="ux u243">
+  <div class="u243-hd"><b>Why you can trust us</b><small>Customer data is protected to international standards</small></div>
+  <div class="u243-gd"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u243-gd');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BG = [['ISO 27001', 'Info security', 'Certified by ISO', 'All services · until Mar 2027'], ['SOC 2', 'Security & uptime', 'Type II audit report', 'Audited externally every year'], ['GDPR', 'Privacy', 'EU privacy rules', 'DPA available'], ['ISMS-P', 'Korean infosec', 'Certified by KISA', 'Until Nov 2026']];
+  var COL = ['#2563EB', '#7C3AED', '#0D9488', '#E11D48'];
+  var SHIELD = '<svg viewBox="0 0 42 46" aria-hidden="true"><path d="M21 3l15 5.5v11.5c0 11-6.6 18.8-15 22.5C12.6 38.8 6 31 6 20V8.5z" fill="color-mix(in srgb,currentColor 14%,transparent)" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M14.5 22.5l4.5 4.5 9-9.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  BG.forEach(function (g, i) {
+    var b = document.createElement('div'); b.className = 'u243-bg'; b.style.setProperty('--c', COL[i]); b.style.setProperty('--d', (i * 1.1) + 's'); b.tabIndex = 0; b.setAttribute('role', 'button'); b.setAttribute('aria-pressed', 'false'); b.setAttribute('aria-label', g[0] + ' — details');
+    b.innerHTML = '<div class="u243-f"><span class="u243-sd">' + SHIELD + '</span><b></b><small></small></div><div class="u243-b"><b></b><span></span><small></small><button type="button" class="u243-vf" tabindex="-1"><i aria-hidden="true"></i><em style="font-style:normal"></em></button></div>';
+    b.querySelector('.u243-f b').textContent = g[0]; b.querySelector('.u243-f small').textContent = g[1];
+    b.querySelector('.u243-b b').textContent = g[0]; b.querySelector('.u243-b span').textContent = g[2]; b.querySelector('.u243-b small').textContent = g[3];
+    var vf = b.querySelector('.u243-vf'), vl = vf.querySelector('em'); vl.textContent = 'Verify';
+    function flip() { var on = !b.classList.contains('is-flip'); b.classList.toggle('is-flip', on); b.setAttribute('aria-pressed', on); vf.tabIndex = on ? 0 : -1; }
+    b.addEventListener('click', function (e) { if (e.target.closest('.u243-vf')) return; flip(); });
+    b.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target === b) { e.preventDefault(); flip(); } });
+    vf.addEventListener('click', function (e) {
+      e.stopPropagation(); if (vf.classList.contains('is-busy') || vf.classList.contains('is-ok')) return;
+      vf.classList.add('is-busy'); vl.textContent = 'Checking…';
+      setTimeout(function () { vf.classList.remove('is-busy'); vf.classList.add('is-ok'); vl.textContent = 'Valid · just checked'; }, rm ? 0 : 900);
+    });
+    gd.appendChild(b);
+  });
+})();
+</script>

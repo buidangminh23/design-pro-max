@@ -1,0 +1,111 @@
+<!-- Lucian UX/UI Prompt #398 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#398 -->
+<!--
+Element: Drag-to-refit regression line
+ID: 398 · Category: Data Motion · Tags: regression, scatter, statistics, drag, data
+What it does: A scatter of study hours against scores carries a regression line and a confidence band; drag any point and the line tilts after it like a spring as the band widens or narrows, while the equation and R² above update instantly. Press an empty spot to add a point, and turn on Residuals to show each point's distance to the line as a vertical stroke, revealing how far-off points pull the line.
+How to use it: Drag points up and down, then turn on Residuals
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#398
+-->
+<style>
+.u398{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u398-hd{position:absolute;left:20px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:flex-start}
+.u398-hd b{font-size:13.5px;font-weight:900}
+.u398-eq{text-align:right;font-variant-numeric:tabular-nums}
+.u398-eq b{display:block;font-size:12.5px;font-weight:900;color:#4F46E5}
+.u398-eq span{font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u398-sv{position:absolute;left:0;top:0;width:340px;height:340px;touch-action:none}
+.u398-bg{fill:transparent;cursor:copy}
+.u398-gl{stroke:var(--ux-line);stroke-width:1}
+.u398-tk{font-size:8.5px;font-weight:700;fill:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u398-al{font-size:9px;font-weight:800;fill:var(--ux-ink-2)}
+.u398-bd{fill:#6366F1;fill-opacity:.14}
+.u398-ln{stroke:#4F46E5;stroke-width:2.6;stroke-linecap:round}
+.u398-rs{stroke:#F43F5E;stroke-width:1.5;stroke-dasharray:2 2;opacity:0;transition:opacity .25s}
+.u398.is-res .u398-rs{opacity:.85}
+.u398-pt{fill:var(--ux-surface);stroke:#4F46E5;stroke-width:2.4;cursor:grab;transition:r .15s}
+.u398-pt.is-drag{r:8.5;fill:#4F46E5;cursor:grabbing}
+.u398-pt:focus{outline:none}
+.u398-pt:focus-visible{stroke:#F59E0B;stroke-width:3}
+.u398-bs{position:absolute;left:20px;right:20px;bottom:14px;display:flex;gap:6px;justify-content:center}
+.u398-bt{border:0;padding:7px 14px;border-radius:999px;background:var(--ux-surface-2);color:var(--ux-ink);font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;box-shadow:inset 0 0 0 1px var(--ux-line);transition:background .2s,color .2s}
+.u398-bt[aria-pressed="true"]{background:#F43F5E;color:#fff;box-shadow:none}
+.u398-bt:focus-visible{outline:2px solid #4F46E5;outline-offset:2px}
+</style>
+<div class="ux u398">
+  <svg class="u398-sv" viewBox="0 0 340 340"><rect class="u398-bg" x="44" y="62" width="274" height="200" aria-label="Scatter plot, press an empty spot to add a point"/><g class="u398-ax" aria-hidden="true"></g><path class="u398-bd" aria-hidden="true"/><g class="u398-rss" aria-hidden="true"></g><line class="u398-ln" aria-hidden="true"/><g class="u398-pts"></g></svg>
+  <div class="u398-hd"><b>Study hours vs score</b><div class="u398-eq" aria-live="polite"><b></b><span></span></div></div>
+  <div class="u398-bs"><button type="button" class="u398-bt" aria-pressed="false">Residuals</button><button type="button" class="u398-bt">Reset</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sv = root.querySelector('.u398-sv'), bg = root.querySelector('.u398-bg'), ax = root.querySelector('.u398-ax'), bd = root.querySelector('.u398-bd'), rss = root.querySelector('.u398-rss'), ln = root.querySelector('.u398-ln'), pts = root.querySelector('.u398-pts'), eqB = root.querySelector('.u398-eq b'), eqS = root.querySelector('.u398-eq span'), bts = root.querySelectorAll('.u398-bt');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PL = 44, PR = 318, PT = 62, PB = 262, XM = 10, Y0 = 30, Y1 = 100, MAXN = 24;
+  var START = [[1, 45], [1.5, 52], [2, 48], [2.5, 58], [3, 55], [3.5, 63], [4, 60], [4.5, 68], [5, 72], [6, 70], [6.5, 79], [7, 76], [8, 85], [9, 88]];
+  var D = [], EL = [], RS = [], fit = { a: 0, b: 0, se: 0, mx: 0, sxx: 1, n: 0 }, show = null, dragI = -1;
+  function X(h) { return PL + h / XM * (PR - PL); }
+  function Y(s) { return PB - (s - Y0) / (Y1 - Y0) * (PB - PT); }
+  function invX(x) { return Math.max(0, Math.min(XM, (x - PL) / (PR - PL) * XM)); }
+  function invY(y) { return Math.max(Y0, Math.min(Y1, Y0 + (PB - y) / (PB - PT) * (Y1 - Y0))); }
+  var a = '';
+  for (var h = 0; h <= 10; h += 2) a += '<line class="u398-gl" x1="' + X(h) + '" y1="' + PT + '" x2="' + X(h) + '" y2="' + PB + '"/><text class="u398-tk" x="' + X(h) + '" y="' + (PB + 12) + '" text-anchor="middle">' + h + '</text>';
+  for (var s = 40; s <= 100; s += 20) a += '<line class="u398-gl" x1="' + PL + '" y1="' + Y(s) + '" x2="' + PR + '" y2="' + Y(s) + '"/><text class="u398-tk" x="' + (PL - 6) + '" y="' + (Y(s) + 3) + '" text-anchor="end">' + s + '</text>';
+  a += '<text class="u398-al" x="' + PR + '" y="' + (PB + 25) + '" text-anchor="end">Study hours</text><text class="u398-al" x="' + (PL - 6) + '" y="' + (PT - 8) + '" text-anchor="end">Score</text>';
+  ax.innerHTML = a;
+  function refit() {
+    var n = D.length, sx = 0, sy = 0; D.forEach(function (p) { sx += p[0]; sy += p[1]; });
+    var mx = sx / n, my = sy / n, sxx = 0, sxy = 0, syy = 0; D.forEach(function (p) { sxx += (p[0] - mx) * (p[0] - mx); sxy += (p[0] - mx) * (p[1] - my); syy += (p[1] - my) * (p[1] - my); });
+    var b = sxx ? sxy / sxx : 0, a0 = my - b * mx, sse = 0; D.forEach(function (p) { var e = p[1] - (a0 + b * p[0]); sse += e * e; });
+    fit = { a: a0, b: b, se: Math.sqrt(sse / Math.max(1, n - 2)), mx: mx, sxx: sxx || 1, n: n, r2: syy ? 1 - sse / syy : 0 };
+    eqB.textContent = 'y = ' + b.toFixed(1) + 'x ' + (a0 < 0 ? '− ' : '+ ') + Math.abs(a0).toFixed(1);
+    eqS.textContent = n + 'pts, ' + 'R² ' + fit.r2.toFixed(2);
+    if (!show || rm) show = { a: fit.a, b: fit.b, w: 1 };
+    run();
+  }
+  function paint() {
+    var x0 = 0, x1 = XM;
+    ln.setAttribute('x1', X(x0)); ln.setAttribute('y1', Y(show.a + show.b * x0).toFixed(1)); ln.setAttribute('x2', X(x1)); ln.setAttribute('y2', Y(show.a + show.b * x1).toFixed(1));
+    var up = [], dn = [];
+    for (var k = 0; k <= 20; k++) { var h = k / 20 * XM, yh = show.a + show.b * h, w = 1.96 * fit.se * Math.sqrt(1 / fit.n + (h - fit.mx) * (h - fit.mx) / fit.sxx); up.push(X(h).toFixed(1) + ' ' + Y(Math.min(Y1 + 20, yh + w)).toFixed(1)); dn.unshift(X(h).toFixed(1) + ' ' + Y(Math.max(Y0 - 20, yh - w)).toFixed(1)); }
+    bd.setAttribute('d', 'M' + up.join(' L') + ' L' + dn.join(' L') + ' Z');
+    D.forEach(function (p, i) {
+      EL[i].setAttribute('cx', X(p[0]).toFixed(1)); EL[i].setAttribute('cy', Y(p[1]).toFixed(1));
+      RS[i].setAttribute('x1', X(p[0]).toFixed(1)); RS[i].setAttribute('x2', X(p[0]).toFixed(1)); RS[i].setAttribute('y1', Y(p[1]).toFixed(1)); RS[i].setAttribute('y2', Y(show.a + show.b * p[0]).toFixed(1));
+      EL[i].setAttribute('aria-valuetext', p[0].toFixed(1) + 'h' + ', ' + Math.round(p[1]));
+    });
+  }
+  var raf = 0, last = 0;
+  function frame(now) {
+    raf = 0;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+    var k = Math.min(1, dt * 9); show.a += (fit.a - show.a) * k; show.b += (fit.b - show.b) * k;
+    paint();
+    if (Math.abs(fit.a - show.a) > 0.01 || Math.abs(fit.b - show.b) > 0.0005) raf = requestAnimationFrame(frame);
+    else { show.a = fit.a; show.b = fit.b; paint(); }
+  }
+  function run() { if (!raf && root.isConnected) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function add(p) {
+    var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('class', 'u398-pt'); c.setAttribute('r', 6); c.setAttribute('tabindex', '0'); c.setAttribute('role', 'slider'); c.setAttribute('aria-label', 'Data point');
+    var r = document.createElementNS('http://www.w3.org/2000/svg', 'line'); r.setAttribute('class', 'u398-rs'); rss.appendChild(r);
+    pts.appendChild(c); D.push(p); EL.push(c); RS.push(r);
+    c.addEventListener('pointerdown', function (e) { e.preventDefault(); e.stopPropagation(); grab(EL.indexOf(c), e); });
+    c.addEventListener('keydown', function (e) {
+      var i = EL.indexOf(c), d = { ArrowUp: [0, 2], ArrowDown: [0, -2], ArrowLeft: [-0.25, 0], ArrowRight: [0.25, 0] }[e.key];
+      if (!d) return; e.preventDefault(); D[i] = [Math.max(0, Math.min(XM, D[i][0] + d[0])), Math.max(Y0, Math.min(Y1, D[i][1] + d[1]))]; refit();
+    });
+  }
+  function loc(e) { var r = sv.getBoundingClientRect(), k = 340 / r.width; return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; }
+  function grab(i, e) { dragI = i; EL[i].classList.add('is-drag'); try { sv.setPointerCapture(e.pointerId); } catch (er) {} }
+  sv.addEventListener('pointermove', function (e) { if (dragI < 0) return; var p = loc(e); D[dragI] = [invX(p[0]), invY(p[1])]; refit(); });
+  function up() { if (dragI < 0) return; EL[dragI].classList.remove('is-drag'); dragI = -1; }
+  sv.addEventListener('pointerup', up); sv.addEventListener('pointercancel', up);
+  bg.addEventListener('pointerdown', function (e) { if (D.length >= MAXN) return; var p = loc(e); add([invX(p[0]), invY(p[1])]); refit(); grab(D.length - 1, e); });
+  function reset() { pts.innerHTML = ''; rss.innerHTML = ''; D = []; EL = []; RS = []; START.forEach(function (p) { add(p.slice()); }); refit(); }
+  bts[0].addEventListener('click', function () { var on = !root.classList.contains('is-res'); root.classList.toggle('is-res', on); bts[0].setAttribute('aria-pressed', on); });
+  bts[1].addEventListener('click', reset);
+  reset(); paint();
+})();
+</script>

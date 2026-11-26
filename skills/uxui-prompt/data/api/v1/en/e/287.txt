@@ -1,0 +1,94 @@
+<!-- Lucian UX/UI Prompt #287 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#287 -->
+<!--
+Element: Filmstrip page speed audit
+ID: 287 · Category: Site Builder Tools · Tags: lighthouse, performance, audit, web-vitals, builder
+What it does: Press Run audit and a filmstrip below captures the page drawing itself in time order, from blank to skeleton to finished, frame by frame, with a marker dropped at the moment the largest image appears. When the audit finishes, the Performance, Accessibility, Best practices and SEO rings above draw to their scores as the numbers climb, colored green, orange or red by score. The metric bars below fill alongside their thresholds too.
+How to use it: Press Run again to watch the filmstrip and score rings fill
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#287
+-->
+<style>
+.u287{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u287-sc{position:absolute;left:12px;right:12px;top:16px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.u287-rg{position:relative;width:54px;height:54px;margin:0 auto}
+.u287-rg svg{width:54px;height:54px;transform:rotate(-90deg)}
+.u287-rg circle{fill:none;stroke-width:5}
+.u287-rg .t{stroke:var(--ux-surface-3)}
+.u287-rg .f{stroke:var(--c);stroke-linecap:round;stroke-dasharray:144.5;stroke-dashoffset:144.5;transition:stroke .3s}
+.u287-rg b{position:absolute;inset:0;display:grid;place-items:center;font-size:15px;font-weight:900;color:var(--c);font-variant-numeric:tabular-nums}
+.u287-rg::before{content:"";position:absolute;inset:5px;border-radius:50%;background:color-mix(in srgb,var(--c) 10%,transparent)}
+.u287-sc small{display:block;margin-top:5px;font-size:9px;font-weight:800;color:var(--ux-ink-2);white-space:nowrap}
+.u287-fs{position:absolute;left:12px;right:12px;top:100px;height:86px;padding:8px;border-radius:14px;background:var(--ux-surface-2)}
+.u287-fr{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;height:56px}
+.u287-fm{position:relative;border-radius:6px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);overflow:hidden;opacity:0;transform:translateY(6px);transition:opacity .25s,transform .35s cubic-bezier(.3,1.5,.5,1)}
+.u287-fm.is-on{opacity:1;transform:none}
+.u287-fm i{position:absolute;left:4px;right:4px;border-radius:2px;background:var(--ux-surface-3)}
+.u287-fm.k2 i,.u287-fm.k3 i{background:color-mix(in srgb,var(--ux-ink) 18%,transparent)}
+.u287-fm.k3 .im{background:linear-gradient(135deg,#818CF8,#F472B6)}
+.u287-tl{position:relative;height:14px;margin-top:6px;border-top:1px solid var(--ux-line)}
+.u287-tl span{position:absolute;top:3px;font-size:8px;font-weight:800;color:var(--ux-ink-3);transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.u287-lc{position:absolute;top:4px;bottom:20px;width:2px;margin-left:-1px;background:#10B981;opacity:0;transition:opacity .3s}
+.u287-lc.is-on{opacity:1}
+.u287-lc em{position:absolute;top:-2px;left:3px;padding:1px 5px;border-radius:4px;background:#10B981;color:#fff;font-style:normal;font-size:8px;font-weight:850;white-space:nowrap}
+.u287-mt{position:absolute;left:14px;right:14px;top:196px}
+.u287-m{display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:8px;height:24px;font-size:10px;font-weight:750;color:var(--ux-ink-2)}
+.u287-m b{text-align:right;font-weight:900;color:var(--c);font-variant-numeric:tabular-nums}
+.u287-br{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,color-mix(in srgb,#10B981 25%,transparent) 0 40%,color-mix(in srgb,#F59E0B 25%,transparent) 40% 70%,color-mix(in srgb,#E11D48 25%,transparent) 70%)}
+.u287-br i{position:absolute;top:-3px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--ux-surface);left:0;transition:left .8s cubic-bezier(.3,1.2,.5,1)}
+.u287-go{position:absolute;left:14px;right:14px;bottom:14px;height:40px;border:0;border-radius:12px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:12px;font-weight:850;cursor:pointer;transition:opacity .2s}
+.u287-go:disabled{opacity:.5;cursor:default}
+.u287-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u287-fm,.u287-br i,.u287-lc{transition:none}}
+</style>
+<div class="ux u287">
+  <div class="u287-sc"></div>
+  <div class="u287-fs" aria-hidden="true"><div class="u287-fr"></div><div class="u287-tl"></div><span class="u287-lc"><em>LCP</em></span></div>
+  <div class="u287-mt"></div>
+  <button type="button" class="u287-go"></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u287-sc'), fr = root.querySelector('.u287-fr'), tl = root.querySelector('.u287-tl'), lc = root.querySelector('.u287-lc'), mt = root.querySelector('.u287-mt'), go = root.querySelector('.u287-go');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CAT = [['Performance', 92], ['Accessibility', 100], ['Best practices', 83], ['SEO', 64]];
+  var MT = [['Largest paint', '1.2 s', .3, 0], ['Layout shift', '0.02', .1, 0], ['Input delay', '310 ms', .72, 1]];
+  function col(v) { return v >= 90 ? '#10B981' : v >= 50 ? '#F59E0B' : '#E11D48'; }
+  var R = CAT.map(function (c) {
+    var d = document.createElement('div'); d.innerHTML = '<div class="u287-rg"><svg viewBox="0 0 54 54" aria-hidden="true"><circle class="t" cx="27" cy="27" r="23"/><circle class="f" cx="27" cy="27" r="23"/></svg><b>0</b></div><small></small>';
+    d.querySelector('small').textContent = c[0]; d.style.setProperty('--c', col(c[1])); d.setAttribute('role', 'img');
+    sc.appendChild(d); return { el: d, f: d.querySelector('.f'), b: d.querySelector('b'), v: c[1], n: c[0] };
+  });
+  var K = [0, 1, 1, 2, 3, 3], F = K.map(function (k, i) {
+    var d = document.createElement('div'); d.className = 'u287-fm k' + k;
+    if (k >= 1) d.innerHTML = '<i style="top:5px;height:4px;width:40%"></i><i style="top:13px;height:3px"></i><i style="top:19px;height:3px;right:12px"></i>';
+    if (k >= 2) d.innerHTML += '<i class="im" style="top:27px;height:22px"></i>';
+    fr.appendChild(d);
+    var t = document.createElement('span'); t.style.left = ((i + .5) / 6 * 100) + '%'; t.textContent = (0.3 + i * 0.3).toFixed(1) + ' s'; tl.appendChild(t);
+    return d;
+  });
+  var M = MT.map(function (m) {
+    var d = document.createElement('div'); d.className = 'u287-m'; d.innerHTML = '<span></span><div class="u287-br"><i></i></div><b></b>'; d.querySelector('span').textContent = m[0]; d.querySelector('b').textContent = m[1]; d.style.setProperty('--c', m[3] ? '#F59E0B' : '#10B981');
+    mt.appendChild(d); return { i: d.querySelector('i'), p: m[2] };
+  });
+  lc.style.left = 'calc(8px + ' + (4.5 / 6) + ' * (100% - 16px))';
+  var gen = 0;
+  function later(g, ms, fn) { setTimeout(function () { if (g === gen && root.isConnected) fn(); }, rm ? 0 : ms); }
+  function run() {
+    var g = ++gen; go.disabled = true; go.textContent = 'Auditing…';
+    R.forEach(function (r) { r.f.style.transition = 'none'; r.f.style.strokeDashoffset = 144.5; r.b.textContent = '0'; });
+    F.forEach(function (f) { f.classList.remove('is-on'); }); lc.classList.remove('is-on'); M.forEach(function (m) { m.i.style.left = '0'; });
+    F.forEach(function (f, i) { later(g, 300 + i * 330, function () { f.classList.add('is-on'); if (i === 4) lc.classList.add('is-on'); }); });
+    later(g, 2400, function () {
+      var t0 = performance.now();
+      R.forEach(function (r, k) { r.f.style.transition = rm ? 'none' : 'stroke-dashoffset 1.1s cubic-bezier(.3,.9,.3,1) ' + (k * .1) + 's'; r.f.style.strokeDashoffset = (144.5 * (1 - r.v / 100)).toFixed(1); r.el.setAttribute('aria-label', r.n + ' ' + r.v); });
+      (function f(now) { if (g !== gen) return; var q = rm ? 1 : Math.min(1, (now - t0) / 1200), e = 1 - Math.pow(1 - q, 3); R.forEach(function (r) { r.b.textContent = Math.round(r.v * e); }); if (q < 1) requestAnimationFrame(f); })(t0);
+      M.forEach(function (m) { m.i.style.left = (m.p * 100) + '%'; });
+      go.disabled = false; go.textContent = 'Run again';
+    });
+  }
+  go.addEventListener('click', run);
+  if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); run(); } }); io.observe(root); } else run();
+})();
+</script>

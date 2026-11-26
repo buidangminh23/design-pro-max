@@ -1,0 +1,84 @@
+<!-- Lucian UX/UI Prompt #292 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#292 -->
+<!--
+Element: Filter-and-reflow gallery
+ID: 292 · Category: Sections & Content · Tags: filter, shuffle, grid, layout, transition
+What it does: Pick a filter and the tiles that don’t match shrink away while the rest slide forward in order to fill the gaps. Tiles that come back pop up in their own spot, and the count beside the chips rolls to the number left.
+How to use it: Filter by shape with the chips at the top
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#292
+-->
+<style>
+.u292{position:relative;width:340px;height:350px;display:flex;flex-direction:column;padding:16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u292-fs{display:flex;gap:5px;flex-wrap:wrap}
+.u292-f{height:32px;padding:0 12px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:12.5px;font-weight:750;color:var(--ux-ink-2);transition:background-color .25s,color .25s}
+.u292-f[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-page)}
+.u292-n{margin:8px 0 0;font-size:11.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u292-g{position:relative;flex:1;margin-top:8px}
+.u292-t{position:absolute;left:0;top:0;width:68px;height:68px;border-radius:16px;display:grid;place-items:center;background:var(--bg);transition:transform .6s cubic-bezier(.3,1.25,.4,1),opacity .35s}
+.u292-t.out{opacity:0}
+.u292-t svg{width:30px;height:30px;fill:rgba(255,255,255,.9)}
+</style>
+<div class="ux u292">
+  <div class="u292-fs" role="group" aria-label="Shape filter"></div>
+  <p class="u292-n" aria-live="polite"></p>
+  <div class="u292-g"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var fs = root.querySelector('.u292-fs'), g = root.querySelector('.u292-g'), nEl = root.querySelector('.u292-n');
+  var CATS = ['All', 'Circle', 'Square', 'Triangle'];
+  var SHAPE = ['', '<circle cx="15" cy="15" r="12"/>', '<rect x="4" y="4" width="22" height="22" rx="4"/>', '<path d="M15 3l13 23H2z"/>'];
+  var KINDS = [1, 2, 3, 1, 3, 2, 2, 1, 3, 1, 2, 3];
+  var BG = ['#FF8787', '#FFA94D', '#FFD43B', '#69DB7C', '#38D9A9', '#4DABF7', '#748FFC', '#DA77F2', '#F783AC', '#A9E34B', '#3BC9DB', '#9775FA'];
+  var cat = 0;
+  var tiles = KINDS.map(function (k, i) {
+    var t = document.createElement('div');
+    t.className = 'u292-t';
+    t.style.setProperty('--bg', BG[i]);
+    t.innerHTML = '<svg viewBox="0 0 30 30" aria-hidden="true">' + SHAPE[k] + '</svg>';
+    t.setAttribute('role', 'img'); t.setAttribute('aria-label', CATS[k]);
+    g.appendChild(t);
+    return { el: t, k: k, slot: i, shown: true };
+  });
+  var chips = CATS.map(function (c, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u292-f'; b.textContent = c; b.setAttribute('aria-pressed', String(i === 0));
+    b.addEventListener('click', function () { if (cat !== i) apply(i); });
+    fs.appendChild(b);
+    return b;
+  });
+  function xy(slot) { return [(slot % 4) * 76, Math.floor(slot / 4) * 76]; }
+  function apply(c) {
+    cat = c;
+    chips.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === c)); });
+    var n = 0;
+    tiles.forEach(function (t) {
+      var keep = c === 0 || t.k === c;
+      var was = t.shown;
+      t.shown = keep;
+      if (keep) {
+        var p = xy(n);
+        t.el.style.transitionDelay = (n * 35) + 'ms';
+        if (!was) { t.el.style.transition = 'none'; t.el.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px) scale(0)'; void t.el.offsetWidth; t.el.style.transition = ''; }
+        t.el.classList.remove('out');
+        t.el.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)';
+        t.el.removeAttribute('aria-hidden');
+        n += 1;
+      } else {
+        var cur = t.el.style.transform.replace(/ scale\([^)]*\)/, '');
+        t.el.style.transitionDelay = '0ms';
+        t.el.classList.add('out');
+        t.el.style.transform = cur + ' scale(.2)';
+        t.el.setAttribute('aria-hidden', 'true');
+      }
+    });
+    nEl.textContent = n + ' showing';
+  }
+  tiles.forEach(function (t, i) { var p = xy(i); t.el.style.transition = 'none'; t.el.style.transform = 'translate(' + p[0] + 'px,' + p[1] + 'px)'; });
+  void g.offsetWidth;
+  tiles.forEach(function (t) { t.el.style.transition = ''; });
+  apply(0);
+})();
+</script>

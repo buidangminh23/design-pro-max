@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #106 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#106 -->
+<!--
+Element: Theater seat map
+ID: 106 · Category: Layout, Schedule & Design · Tags: seat-map, native, spatial
+What it does: A seat map from a ticketing screen. Press an open seat to select it and press again to release it; your seats and the total appear below.
+How to use it: Press open seats to pick them, and press again to release them. Booked seats (×) can’t be chosen
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#106
+-->
+<style>
+.u106{width:100%;max-width:400px;min-width:0;font-size:13px}.u106 button{font:inherit;color:inherit;cursor:pointer}.u106 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u106 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u106{max-width:360px;padding:10px 9px}.u106 .screen{height:28px;border-top:4px solid var(--ux-ink-3);border-radius:60% 60% 0 0;margin:0 25px 14px}.u106 .seats{display:grid;grid-template-columns:18px repeat(6,1fr);gap:6px}.u106 .seat{min-height:38px;padding:0;border:1px solid var(--ux-line-2);border-radius:7px 7px 3px 3px;background:var(--ux-surface-3);font-size:12px;border-bottom:4px solid var(--ux-line-2)}.u106 .seat[aria-pressed=true]{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:var(--ux-accent)}.u106 .seat:disabled{background:var(--ux-line);color:var(--ux-ink-3);cursor:default}.u106 .row{align-self:center;font-size:12px;color:var(--ux-ink-2)}.u106 output{display:block;text-align:center;font-size:13px;min-height:25px;margin-top:18px;color:var(--ux-ink-2)}
+</style>
+<div class="ux u106"><div class="screen" aria-label="Screen"></div><div class="seats"></div><output aria-live="polite">—</output></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const taken=['A3','B4','B5','C2','D6'];let chosen=new Set();q('.seats').innerHTML=['A','B','C','D'].map(r=>`<span class="row">${r}</span>`+Array.from({length:6},(_,i)=>{const s=r+(i+1);return `<button class="seat" data-seat="${s}" aria-label="${s} ${taken.includes(s)?'booked':'available'}" aria-pressed="false" ${taken.includes(s)?'disabled':''}>${taken.includes(s)?'×':i+1}</button>`}).join('')).join('');function paint(){qa('.seat').forEach(b=>b.setAttribute('aria-pressed',chosen.has(b.dataset.seat)));q('output').textContent=chosen.size?[...chosen].sort().join(' · ')+' / '+'$'+(chosen.size*12):'—'}qa('.seat:not(:disabled)').forEach(b=>b.onclick=()=>{const s=b.dataset.seat;chosen.has(s)?chosen.delete(s):chosen.add(s);paint()});root.onkeydown=e=>{if(e.key==='Escape'){chosen.clear();paint()}};})();
+</script>

@@ -1,0 +1,213 @@
+<!-- Lucian UX/UI Prompt #092 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#092 -->
+<!--
+Element: Empty search that loosens filters
+ID: 092 · Category: Empty & Error States · Tags: no-results, search, filter, suggestion, empty-state
+What it does: With no results, a magnifier sweeps the empty shelves, and the screen works out how many items each filter would give if removed and offers that as a button. Press the button or a chip’s × and the chip folds away while only the newly matching products float up one by one.
+How to use it: Press a “N results” button on the empty screen or the × on a filter chip. Change the search to a misspelling like “runer” to get a spelling suggestion
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#092
+-->
+<style>
+.u092{position:relative;width:340px;height:480px;display:flex;flex-direction:column;padding:16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u092-q{display:flex;align-items:center;gap:8px;height:46px;flex:none;padding:0 6px 0 14px;border-radius:15px;background:var(--ux-surface-2);transition:box-shadow .2s}
+.u092-q:focus-within{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u092-q>svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--ux-ink-3);stroke-width:2.2;stroke-linecap:round}
+.u092-in{flex:1;min-width:0;height:100%;border:0;padding:0;background:transparent;font:inherit;font-size:15px;font-weight:650;color:var(--ux-ink)}
+.u092-in:focus-visible{outline:none}
+.u092-in::placeholder{color:var(--ux-ink-3)}
+.u092-x{width:34px;height:34px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:transparent;color:var(--ux-ink-3);transition:opacity .2s,transform .3s var(--ux-spring)}
+.u092-x:hover{color:var(--ux-ink);background:var(--ux-surface-3)}
+.u092-x[hidden]{display:grid;opacity:0;transform:scale(.6);pointer-events:none}
+.u092-x svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.u092-fs{display:flex;align-items:center;gap:6px;height:34px;flex:none;margin-top:10px}
+.u092-ch{display:inline-flex;align-items:center;gap:4px;max-width:140px;height:32px;padding:0 6px 0 12px;border:0;border-radius:999px;background:var(--ux-ink);color:var(--ux-page);font-size:12.5px;font-weight:750;white-space:nowrap;overflow:hidden;transition:max-width .32s var(--ux-ease),padding .32s var(--ux-ease),margin .32s var(--ux-ease),opacity .2s,transform .3s var(--ux-spring)}
+.u092-ch svg{width:16px;height:16px;flex:none;padding:3px;border-radius:50%;background:color-mix(in srgb,var(--ux-page) 18%,transparent);fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u092-ch:hover{transform:translateY(-1px)}
+.u092-ch:active{transform:scale(.94)}
+.u092-ch.out{max-width:0;padding:0;margin-right:-6px;opacity:0}
+.u092-ch.in{animation:u092-chin .4s var(--ux-spring) backwards}
+@keyframes u092-chin{from{opacity:0;transform:scale(.7)}}
+.u092-rs{margin-left:auto;height:32px;padding:0 10px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:5px;background:transparent;font-size:12px;font-weight:750;color:var(--ux-ink-3);white-space:nowrap;transition:opacity .25s,color .2s}
+.u092-rs:hover{color:var(--ux-ink)}
+.u092-rs svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u092-rs[hidden]{display:inline-flex;opacity:0;visibility:hidden}
+.u092-meta{display:flex;align-items:center;justify-content:space-between;height:30px;flex:none;margin-top:6px;font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u092-meta b{display:inline-block;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u092-typo{border:0;padding:0;background:transparent;font-size:12.5px;font-weight:750;color:var(--ux-accent);text-decoration:underline;text-underline-offset:3px;animation:u092-chin .4s var(--ux-spring)}
+.u092-typo[hidden]{display:none}
+.u092-area{position:relative;flex:1;min-height:0}
+.u092-grid,.u092-none{position:absolute;inset:0;transition:opacity .3s,transform .4s var(--ux-ease),visibility 0s}
+.u092-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;gap:10px;align-content:start}
+.u092.empty .u092-grid,.u092:not(.empty) .u092-none{opacity:0;visibility:hidden;transform:scale(.97);transition:opacity .2s,transform .3s,visibility 0s .3s}
+.u092-tile{padding:8px 8px 10px;border-radius:18px;background:var(--ux-surface-2);transition:transform .3s var(--ux-spring)}
+.u092-tile:hover{transform:translateY(-2px)}
+.u092-tile.new{animation:u092-up .5s var(--ux-spring) backwards;animation-delay:calc(var(--i) * 70ms)}
+@keyframes u092-up{from{opacity:0;transform:translateY(14px) scale(.95)}}
+.u092-sw{display:grid;place-items:center;height:62px;border-radius:13px;background:var(--g)}
+.u092-sw svg{width:46px;height:28px}
+.u092-tile b{display:block;margin:8px 2px 0;font-size:13px;font-weight:780;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u092-tile small{display:block;margin:1px 2px 0;font-size:11.5px;font-weight:650;color:var(--ux-ink-3)}
+.u092-more{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--ux-ink-3);text-align:center}
+.u092-none{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:4px}
+.u092-art{width:150px;height:92px}
+.u092-art svg{width:100%;height:100%;overflow:visible}
+.u092-shelf{stroke:var(--ux-line-2);stroke-width:3;stroke-linecap:round;stroke-dasharray:2 9}
+.u092-lens{animation:u092-scan 3.6s ease-in-out infinite}
+@keyframes u092-scan{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(46px,10px) rotate(8deg)}50%{transform:translate(78px,-4px) rotate(-4deg)}75%{transform:translate(30px,-8px) rotate(-10deg)}}
+.u092-lens circle{fill:color-mix(in srgb,var(--ux-accent) 12%,transparent);stroke:var(--ux-ink);stroke-width:5}
+.u092-lens path{stroke:var(--ux-ink);stroke-width:7;stroke-linecap:round}
+.u092-lens .gl{fill:none;stroke:#fff;stroke-opacity:.7;stroke-width:3}
+.u092-nt{margin:10px 0 0;font-size:16.5px;font-weight:850;letter-spacing:-.035em}
+.u092-ns{margin:4px 0 0;font-size:12.5px;font-weight:600;color:var(--ux-ink-3)}
+.u092-sgs{display:flex;flex-direction:column;gap:6px;width:100%;margin-top:14px}
+.u092-sg{display:flex;align-items:center;gap:8px;width:100%;height:46px;padding:0 12px 0 8px;border:0;border-radius:14px;background:var(--ux-surface-2);font-size:13px;font-weight:700;color:var(--ux-ink-2);text-align:left;animation:u092-up .45s var(--ux-spring) backwards;animation-delay:calc(var(--i) * 80ms + .1s);transition:background-color .2s,transform .3s var(--ux-spring)}
+.u092-sg:hover{background:var(--ux-surface-3);color:var(--ux-ink)}
+.u092-sg:active{transform:scale(.97)}
+.u092-sg s{height:28px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line-2);text-decoration:line-through;text-decoration-color:var(--ux-danger);font-size:12.5px;font-weight:750;color:var(--ux-ink)}
+.u092-sg span{flex:1}
+.u092-sg b{color:var(--ux-accent)}
+.u092-sg svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ux-spring)}
+.u092-sg:hover svg{transform:translateX(3px)}
+.u092-sgs.pop{flex-direction:row;justify-content:center;flex-wrap:wrap}
+.u092-sgs.pop .u092-sg{width:auto;height:36px;padding:0 14px;border-radius:999px}
+</style>
+<div class="ux u092">
+  <label class="u092-q"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M12.2 12.2L16 16"/></svg><input class="u092-in" type="search" value="runner" placeholder="Search products" aria-label="Search products" autocomplete="off"><button class="u092-x" type="button" aria-label="Clear search"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8"/></svg></button></label>
+  <div class="u092-fs" role="group" aria-label="Active filters"><button class="u092-rs" type="button" hidden><svg viewBox="0 0 13 13" aria-hidden="true"><path d="M2.5 6.5a4 4 0 1 0 1.2-2.9M2.5 1.8v2.4h2.4"/></svg>Reset filters</button></div>
+  <div class="u092-meta"><span role="status"><b>0</b> results</span><button class="u092-typo" type="button" hidden></button></div>
+  <div class="u092-area">
+    <div class="u092-grid" aria-label="Search results"></div>
+    <div class="u092-none">
+      <div class="u092-art" aria-hidden="true"><svg viewBox="0 0 150 92"><path class="u092-shelf" d="M8 30h134M8 56h134M8 82h134"/><g class="u092-lens"><circle cx="34" cy="38" r="20"/><path class="gl" d="M24 30a12 12 0 0 1 8-5"/><path d="M48 52l14 14"/></g></svg></div>
+      <p class="u092-nt"></p>
+      <p class="u092-ns"></p>
+      <div class="u092-sgs"></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var inp = root.querySelector('.u092-in'), x = root.querySelector('.u092-x'), fs = root.querySelector('.u092-fs'), rs = root.querySelector('.u092-rs');
+  var cnt = root.querySelector('.u092-meta b'), typo = root.querySelector('.u092-typo'), grid = root.querySelector('.u092-grid');
+  var nt = root.querySelector('.u092-nt'), ns = root.querySelector('.u092-ns'), sgs = root.querySelector('.u092-sgs');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var G = { 'Red': 'linear-gradient(140deg,#FF7A7F,#E5484D)', 'Green': 'linear-gradient(140deg,#4FD8B8,#13A886)', 'Blue': 'linear-gradient(140deg,#6FA6FF,#3D6BFF)', 'Black': 'linear-gradient(140deg,#4A4D59,#1C1E25)' };
+  var P = [
+    ['Daily Runner', 'Red', [250, 260], 45000], ['Cushion Runner 2', 'Red', [270, 280], 119000], ['Lite Runner', 'Blue', [270], 39000],
+    ['Road Runner', 'Black', [260, 270], 49000], ['Trail Runner', 'Green', [270, 280], 72000], ['Speed Runner', 'Red', [270], 95000],
+    ['Race Runner', 'Red', [240, 250], 48000], ['Tempo Runner', 'Green', [270], 46000], ['Slip-on Sneakers', 'Red', [270], 42000],
+    ['Canvas Sneakers', 'Black', [260, 270], 35000], ['Recovery Sandals', 'Blue', [270, 280], 29000]
+  ].map(function (p, k) { return { k: k, n: p[0], c: p[1], s: p[2], p: p[3] }; });
+  var F = {
+    size: ['Size 270', function (p) { return p.s.indexOf(270) >= 0; }],
+    price: ['Under ₩50k', function (p) { return p.p <= 50000; }],
+    color: ['Red', function (p) { return p.c === 'Red'; }]
+  };
+  var ALL = ['size', 'price', 'color'], active = ALL.slice(), shown = -1;
+  var SHOE = '<svg viewBox="0 0 46 28" aria-hidden="true"><path d="M3 20c0-4 1.5-10 4.5-11.5l6 4.2c3 1.6 7.5 1.6 10.5 0l4.2-2.7c4 3 8.5 4.4 12.6 5.6 2.6.8 3.2 3 3.2 6.4H6c-1.6 0-3-.9-3-2z" fill="#fff" fill-opacity=".92"/><path d="M3.5 22.5h39.5" stroke="#000" stroke-opacity=".18" stroke-width="2.4"/></svg>';
+  function norm(s) { return s.replace(/\s+/g, '').toLowerCase(); }
+  function jo(w, a, b, rieul) { var c = w.charCodeAt(w.length - 1) - 0xAC00; if (c < 0 || c > 11171) return a + '(' + b + ')'; var t = c % 28; return t === 0 || (rieul && t === 8) ? b : a; }
+  function find(q, fl) { return P.filter(function (p) { return (!q || norm(p.n).indexOf(q) >= 0) && fl.every(function (f) { return F[f][1](p); }); }); }
+  function chip(f, anim) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'u092-ch' + (anim ? ' in' : ''); b.dataset.f = f;
+    b.setAttribute('aria-label', 'Remove ' + F[f][0] + ' filter');
+    b.innerHTML = '<span></span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 5l6 6M11 5l-6 6"/></svg>';
+    b.firstChild.textContent = F[f][0];
+    b.addEventListener('click', function () { drop(f); });
+    fs.insertBefore(b, rs);
+  }
+  function drop(f) {
+    var i = active.indexOf(f);
+    if (i < 0) return;
+    active.splice(i, 1);
+    var b = fs.querySelector('.u092-ch[data-f="' + f + '"]'), had = b && b === document.activeElement;
+    if (b) {
+      b.classList.add('out'); b.disabled = true;
+      setTimeout(function () { b.remove(); }, rm ? 0 : 330);
+      if (had || root.querySelector('.u092-none').contains(document.activeElement)) {
+        var nx = fs.querySelector('.u092-ch:not(.out)');
+        (nx || inp).focus({ preventScroll: true });
+      }
+    }
+    render();
+  }
+  function count(n) {
+    if (n === shown) return;
+    var up = n > shown; shown = n; cnt.textContent = n;
+    if (!rm) cnt.animate([{ transform: 'translateY(' + (up ? 8 : -8) + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  }
+  function render() {
+    var raw = inp.value.trim(), q = norm(raw), res = find(q, active);
+    x.hidden = !raw;
+    rs.hidden = active.length === ALL.length;
+    var fix = q.indexOf('runer') >= 0 ? raw.replace(/runer/gi, 'runner') : '';
+    typo.hidden = !fix || !find(norm(fix), active).length && !find(norm(fix), []).length;
+    if (fix) typo.textContent = 'Search for ‘' + fix + '’';
+    typo.dataset.v = fix;
+    count(res.length);
+    root.classList.toggle('empty', !res.length);
+    if (res.length) {
+      var keep = {};
+      grid.querySelectorAll('.u092-tile').forEach(function (t) { keep[t.dataset.k] = t; });
+      var out = [], j = 0;
+      res.slice(0, 4).forEach(function (p) {
+        var t = keep[p.k];
+        if (!t) {
+          t = document.createElement('div');
+          t.className = 'u092-tile new'; t.dataset.k = p.k; t.style.setProperty('--i', j++);
+          t.innerHTML = '<span class="u092-sw" style="--g:' + G[p.c] + '">' + SHOE + '</span><b></b><small></small>';
+          t.querySelector('b').textContent = p.n;
+          t.querySelector('small').textContent = '₩' + p.p.toLocaleString('ko-KR') + ' · ' + p.c;
+          t.addEventListener('animationend', function () { t.classList.remove('new'); });
+        }
+        out.push(t);
+      });
+      if (res.length > 4) { var m = document.createElement('p'); m.className = 'u092-more'; m.textContent = '+' + (res.length - 4) + ' more'; out.push(m); }
+      grid.replaceChildren.apply(grid, out);
+      return;
+    }
+    sgs.innerHTML = ''; sgs.classList.remove('pop');
+    var opts = active.map(function (f) { return [f, find(q, active.filter(function (g) { return g !== f; })).length]; })
+      .filter(function (o) { return o[1] > 0; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 2);
+    if (opts.length) {
+      var w = raw || 'items';
+      nt.textContent = 'No “' + w + '” with these filters';
+      ns.textContent = 'Remove just one filter to see results';
+      opts.forEach(function (o, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'u092-sg'; b.style.setProperty('--i', i);
+        b.innerHTML = '<s></s><span><b>' + o[1] + (o[1] === 1 ? ' result' : ' results') + '</b></span><svg viewBox="0 0 15 15" aria-hidden="true"><path d="M3 7.5h9M8.5 4l3.5 3.5L8.5 11"/></svg>';
+        b.querySelector('s').textContent = F[o[0]][0];
+        b.setAttribute('aria-label', 'Remove ' + F[o[0]][0] + ' for ' + o[1] + (o[1] === 1 ? ' result' : ' results'));
+        b.addEventListener('click', function () { drop(o[0]); });
+        sgs.appendChild(b);
+      });
+    } else {
+      nt.textContent = 'Nothing matches ‘' + raw + '’';
+      ns.textContent = 'Try another search or a popular one';
+      sgs.classList.add('pop');
+      ['runner', 'sneakers', 'sandals'].forEach(function (w, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'u092-sg'; b.style.setProperty('--i', i); b.textContent = w;
+        b.addEventListener('click', function () { inp.value = w; render(); inp.focus({ preventScroll: true }); });
+        sgs.appendChild(b);
+      });
+    }
+  }
+  inp.addEventListener('input', render);
+  x.addEventListener('click', function () { inp.value = ''; render(); inp.focus({ preventScroll: true }); });
+  typo.addEventListener('click', function () { inp.value = typo.dataset.v; render(); inp.focus({ preventScroll: true }); });
+  rs.addEventListener('click', function () {
+    ALL.forEach(function (f) { if (active.indexOf(f) < 0) { active.push(f); chip(f, true); } });
+    active.sort(function (a, b) { return ALL.indexOf(a) - ALL.indexOf(b); });
+    ALL.forEach(function (f) { var c = fs.querySelector('.u092-ch[data-f="' + f + '"]:not(.out)'); if (c) fs.insertBefore(c, rs); });
+    render();
+    var first = fs.querySelector('.u092-ch:not(.out)'); if (first) first.focus({ preventScroll: true });
+  });
+  ALL.forEach(function (f) { chip(f, false); });
+  render();
+})();
+</script>

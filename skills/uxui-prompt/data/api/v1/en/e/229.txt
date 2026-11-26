@@ -1,0 +1,90 @@
+<!-- Lucian UX/UI Prompt #229 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#229 -->
+<!--
+Element: Self-typing terminal demo
+ID: 229 · Category: Site Builder Tools · Tags: terminal, cli, typing, onboarding, landing
+What it does: In a landing page's terminal window, an install command types itself out one character at a time as if by hand; at Enter, download and setup lines spin in turn before turning into checks while a progress bar fills. Next a run command types in, the server starts and a local address lights up, and clicking that address pops a small browser preview out beside it. Replay starts it over.
+How to use it: Watch to the end, then click the address on the last line
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#229
+-->
+<style>
+.u229{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 70% at 50% 0%,color-mix(in srgb,#22C55E 10%,transparent),transparent 70%),var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u229-tm{position:absolute;left:14px;right:14px;top:16px;bottom:62px;border-radius:16px;background:#0B0D12;box-shadow:0 0 0 1px #232733,0 20px 40px -20px rgba(0,0,0,.6);overflow:hidden;color:#D1D5DB;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;line-height:1.75}
+.u229-bar{display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-bottom:1px solid #1E222C}
+.u229-bar i{width:9px;height:9px;border-radius:50%;background:#2E3340}
+.u229-bar i:nth-child(1){background:#F87171}.u229-bar i:nth-child(2){background:#FBBF24}.u229-bar i:nth-child(3){background:#34D399}
+.u229-bar span{margin-left:auto;color:#6B7280;font-size:9.5px}
+.u229-bd{padding:8px 12px}
+.u229-l{white-space:pre;overflow:hidden}
+.u229-l .p{color:#34D399}
+.u229-l .d{color:#6B7280}
+.u229-l .ok{color:#34D399}
+.u229-l .sp{display:inline-block;width:1ch;color:#A78BFA}
+.u229-cu{display:inline-block;width:6px;height:12px;margin-left:1px;vertical-align:-2px;background:#E5E7EB;animation:u229-bl 1s steps(1) infinite}
+@keyframes u229-bl{50%{opacity:0}}
+.u229-pb{display:inline-block;width:110px;height:6px;margin:0 6px;border-radius:3px;background:#1F2430;vertical-align:1px;overflow:hidden}
+.u229-pb i{display:block;height:100%;width:0;background:linear-gradient(90deg,#34D399,#A78BFA);transition:width .25s}
+.u229-lk{padding:0;border:0;background:none;color:#60A5FA;font:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer;animation:u229-gw 1.4s ease}
+@keyframes u229-gw{0%{text-shadow:0 0 0 transparent}30%{text-shadow:0 0 10px #60A5FA}100%{text-shadow:0 0 0 transparent}}
+.u229-lk:focus-visible{outline:2px solid #60A5FA;outline-offset:2px}
+.u229-bw{position:absolute;right:20px;bottom:74px;width:150px;border-radius:12px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 20px 40px -14px rgba(0,0,0,.5);overflow:hidden;transform-origin:20% 100%;transform:scale(.4) translateY(30px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.3,1.5,.5,1),opacity .25s}
+.u229.is-bw .u229-bw{transform:none;opacity:1}
+.u229-bw header{display:flex;gap:4px;padding:6px 8px;background:var(--ux-surface-2)}
+.u229-bw header i{width:6px;height:6px;border-radius:50%;background:var(--ux-surface-3)}
+.u229-bw div{padding:10px}
+.u229-bw b{display:block;font-size:12px;font-weight:900}
+.u229-bw div i{display:block;height:5px;margin-top:6px;border-radius:3px;background:var(--ux-surface-3)}
+.u229-bw div em{display:inline-block;margin-top:8px;padding:4px 8px;border-radius:999px;background:var(--ux-ink);color:var(--ux-surface);font-style:normal;font-size:8.5px;font-weight:850}
+.u229-re{position:absolute;left:14px;bottom:16px;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px;border:0;border-radius:11px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:11.5px;font-weight:850;cursor:pointer}
+.u229-re svg{width:12px;height:12px}
+.u229-re:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u229-cu,.u229-lk{animation:none}.u229-bw,.u229-pb i{transition:none}}
+</style>
+<div class="ux u229">
+  <div class="u229-tm" role="log" aria-label="Terminal demo"><div class="u229-bar" aria-hidden="true"><i></i><i></i><i></i><span>~/projects</span></div><div class="u229-bd"></div></div>
+  <div class="u229-bw" aria-hidden="true"><header><i></i><i></i><i></i></header><div><b>My first page</b><i style="width:90%"></i><i style="width:70%"></i><em>Get started</em></div></div>
+  <button type="button" class="u229-re"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M10 4.6A4.2 4.2 0 1 0 10.4 7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10.5 1.8v3H7.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bd = root.querySelector('.u229-bd'), re = root.querySelector('.u229-re'), bw = root.querySelector('.u229-bw');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STEP = ['Downloading template', 'Installing packages', 'Writing config'];
+  var SPIN = '⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏', gen = 0, started = false;
+  function line(html) { var d = document.createElement('div'); d.className = 'u229-l'; d.innerHTML = html || ''; bd.appendChild(d); return d; }
+  function wait(g, ms) { return new Promise(function (res, rej) { setTimeout(function () { if (g === gen && root.isConnected) res(); else rej(); }, rm ? 0 : ms); }); }
+  function type(g, el, text) {
+    return new Promise(function (res, rej) {
+      var cu = document.createElement('span'); cu.className = 'u229-cu'; el.appendChild(cu); var i = 0;
+      (function step() { if (g !== gen) { rej(); return; } if (i >= text.length || rm) { if (rm) cu.insertAdjacentText('beforebegin', text); cu.remove(); res(); return; } cu.insertAdjacentText('beforebegin', text[i++]); setTimeout(step, 28 + Math.random() * 50); })();
+    });
+  }
+  function spin(g, el, label, ms) {
+    return new Promise(function (res, rej) {
+      el.innerHTML = '<span class="sp"></span> '; el.appendChild(document.createTextNode(label)); var sp = el.firstChild, k = 0, t0 = performance.now();
+      (function f() { if (g !== gen) { rej(); return; } sp.textContent = SPIN[k++ % SPIN.length]; if (rm || performance.now() - t0 > ms) { el.innerHTML = '<span class="ok">✔</span> '; el.appendChild(document.createTextNode(label)); res(); return; } setTimeout(f, 80); })();
+    });
+  }
+  function run() {
+    var g = ++gen; bd.innerHTML = ''; root.classList.remove('is-bw'); started = true;
+    var l1 = line('<span class="p">❯</span> ');
+    wait(g, 300).then(function () { return type(g, l1, 'npx create-lucian@latest my-app'); })
+      .then(function () { return wait(g, 250); })
+      .then(function () {
+        var pl = line('<span class="d">  </span><span class="u229-pb"><i></i></span><span class="d">0%</span>'), pi = pl.querySelector('i'), pt = pl.querySelectorAll('.d')[1];
+        var chain = Promise.resolve();
+        STEP.forEach(function (s, i) { chain = chain.then(function () { var l = line(); bd.insertBefore(l, pl); return spin(g, l, s, 520 + i * 160); }).then(function () { var p = Math.round((i + 1) / STEP.length * 100); pi.style.width = p + '%'; pt.textContent = p + '%'; }); });
+        return chain.then(function () { pl.remove(); var d = line('<span class="d"></span>'); d.firstChild.textContent = '  Done · 4.2s'; });
+      })
+      .then(function () { return wait(g, 350); })
+      .then(function () { var l = line('<span class="p">❯</span> '); return type(g, l, 'cd my-app && npm run dev'); })
+      .then(function () { return wait(g, 450); })
+      .then(function () { var l = line('<span class="ok">▲</span> '); l.appendChild(document.createTextNode('Ready on ')); var a = document.createElement('button'); a.type = 'button'; a.className = 'u229-lk'; a.textContent = 'http://localhost:3000'; a.addEventListener('click', function () { root.classList.toggle('is-bw'); }); l.appendChild(a); })
+      .catch(function () {});
+  }
+  re.addEventListener('click', run);
+  if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting && !started) { io.disconnect(); run(); } }); io.observe(root); } else run();
+})();
+</script>

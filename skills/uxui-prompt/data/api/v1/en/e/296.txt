@@ -1,0 +1,87 @@
+<!-- Lucian UX/UI Prompt #296 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#296 -->
+<!--
+Element: Scrubbable contact index
+ID: 296 · Category: Navigation · Tags: index, scrubber, contacts, list, magnify
+What it does: Scrub up and down the letter index at the right of a contact list and a large letter bubble follows to the left of your fingertip as the list jumps straight to that letter group. Index letters near the fingertip bow out to the left and grow so you can see exactly where you are, and when you let go the bubble fades while the group header stays pinned at the top.
+How to use it: Drag up and down the index bar on the right. Hovering works too
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#296
+-->
+<style>
+.u296{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#1F2330;color:light-dark(#1F2330,#ECEEF5)}
+.u296-hd{position:absolute;left:0;right:0;top:0;height:56px;padding:22px 20px 0;font-size:20px;font-weight:850;letter-spacing:-.02em;background:var(--ux-surface);z-index:3}
+.u296-vp{position:absolute;left:0;right:30px;top:56px;bottom:0;overflow:hidden}
+.u296-ls{position:absolute;left:0;right:0;top:0;transition:transform .28s cubic-bezier(.3,.9,.3,1)}
+.u296-ls.is-fast{transition:transform .12s ease-out}
+.u296-gh{height:26px;padding:6px 20px 0;font-size:11px;font-weight:850;color:#5C7CFA;color:light-dark(#5C7CFA,#93A8FF);background:#F4F6FB;background:light-dark(#F4F6FB,#1B1E2C)}
+.u296-p{height:46px;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid #F1F3F5;border-bottom:1px solid light-dark(#F1F3F5,rgba(255,255,255,.06));font-size:14px;font-weight:650}
+.u296-p i{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#fff}
+.u296-pin{position:absolute;left:0;right:30px;top:56px;height:26px;padding:6px 20px 0;font-size:11px;font-weight:850;color:#5C7CFA;color:light-dark(#5C7CFA,#93A8FF);background:rgba(244,246,251,.96);background:light-dark(rgba(244,246,251,.96),rgba(27,30,44,.96));z-index:2;box-shadow:0 4px 8px -6px rgba(31,35,48,.3);box-shadow:0 4px 8px -6px light-dark(rgba(31,35,48,.3),rgba(0,0,0,.7))}
+.u296-ix{position:absolute;right:4px;top:64px;bottom:14px;width:26px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;touch-action:none;cursor:ns-resize;z-index:4}
+.u296-k{display:block;width:22px;height:22px;padding:0;border:0;background:none;font:inherit;font-size:10.5px;font-weight:800;color:#5C7CFA;color:light-dark(#5C7CFA,#93A8FF);line-height:22px;text-align:center;transform:translateX(var(--dx,0)) scale(var(--sc,1));cursor:inherit;border-radius:50%}
+.u296-k.is-on{background:#5C7CFA;color:#fff}
+.u296-k:focus-visible{outline:2px solid #1F2330;outline:2px solid light-dark(#1F2330,#ECEEF5)}
+.u296-bub{position:absolute;right:66px;top:0;width:62px;height:62px;margin-top:-31px;border-radius:50% 50% 8px 50%;transform:rotate(-45deg) scale(.4);background:#5C7CFA;color:#fff;display:grid;place-items:center;opacity:0;transition:opacity .2s,transform .3s cubic-bezier(.3,1.6,.5,1);pointer-events:none;z-index:5;box-shadow:0 10px 24px -8px rgba(92,124,250,.6)}
+.u296-bub b{transform:rotate(45deg);font-size:28px;font-weight:900}
+.u296-bub.is-on{opacity:1;transform:rotate(-45deg) scale(1)}
+@media (prefers-reduced-motion: reduce){.u296-ls{transition:none}}
+</style>
+<div class="ux u296">
+  <div class="u296-hd">Contacts</div>
+  <div class="u296-vp"><div class="u296-ls"></div></div>
+  <div class="u296-pin" aria-hidden="true"></div>
+  <div class="u296-ix" role="group" aria-label="Index"></div>
+  <div class="u296-bub" aria-hidden="true"><b></b></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ls = root.querySelector('.u296-ls'), ix = root.querySelector('.u296-ix'), bub = root.querySelector('.u296-bub'), pin = root.querySelector('.u296-pin');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var IX = ['A', 'B', 'C', 'D', 'E', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'S'];
+  var PEOPLE = [['Aaron Kim', 'Ada Park', 'Alex Han', 'Amy Lee'], ['Ben Cho', 'Bora Yun'], ['Chloe Do', 'Chris Seo'], ['Dami Ryu', 'Daniel Ra'], ['Eli Moon', 'Emma Min', 'Evan Ma'], ['Grace Park', 'Gwen Bae', 'Gyu Baek'], ['Hana Seo', 'Harin Song', 'Hugo Shin'], ['Jay Oh', 'Jia Yun', 'Jin Lee', 'June Lim'], ['Kai Jang', 'Kate Jung', 'Kevin Jo'], ['Lena Cha', 'Leo Choi'], ['Mia Koo', 'Milo Kang'], ['Nate Tae', 'Nora Tak'], ['Paul Pyo', 'Penny Pyeon'], ['Sam Han', 'Sofia Hong', 'Sora Heo']];
+  var COL = ['#FF8787', '#FFA94D', '#FFD43B', '#69DB7C', '#38D9A9', '#4DABF7', '#748FFC', '#B197FC', '#F783AC'];
+  var TOPS = [], y = 0, ci = 0;
+  PEOPLE.forEach(function (g, i) {
+    var h = document.createElement('div'); h.className = 'u296-gh'; h.textContent = IX[i]; ls.appendChild(h); TOPS.push(y); y += 26;
+    g.forEach(function (n) { var p = document.createElement('div'); p.className = 'u296-p'; p.innerHTML = '<i style="background:' + COL[ci++ % COL.length] + '">' + n.charAt(0) + '</i>' + n; ls.appendChild(p); y += 46; });
+  });
+  var MAXY = Math.max(0, y - 424), K = IX.map(function (l, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u296-k'; b.textContent = l; b.setAttribute('aria-label', l + ' group, jump');
+    b.addEventListener('click', function () { go(i, false); });
+    ix.appendChild(b); return b;
+  });
+  var cur = -1;
+  function go(i, fast) {
+    i = Math.max(0, Math.min(IX.length - 1, i));
+    if (i === cur) return;
+    cur = i;
+    ls.classList.toggle('is-fast', !!fast);
+    ls.style.transform = 'translateY(' + (-Math.min(MAXY, TOPS[i])) + 'px)';
+    K.forEach(function (b, j) { b.classList.toggle('is-on', j === i); });
+    pin.textContent = IX[i];
+    bub.querySelector('b').textContent = IX[i];
+  }
+  function scrub(e, on) {
+    var r = ix.getBoundingClientRect(), k = ix.offsetHeight / (r.height || 1), yy = (e.clientY - r.top) * k, h = ix.offsetHeight;
+    var f = Math.max(0, Math.min(0.9999, yy / h)), i = Math.floor(f * IX.length);
+    go(i, true);
+    var rb = root.getBoundingClientRect(), kk = root.offsetWidth / (rb.width || 1);
+    bub.style.top = ((e.clientY - rb.top) * kk).toFixed(1) + 'px'; bub.classList.toggle('is-on', on);
+    K.forEach(function (b, j) {
+      var cy = (j + 0.5) / IX.length * h, d = Math.abs(cy - yy), w = on ? Math.max(0, 1 - d / 70) : 0, s = Math.sin(w * Math.PI / 2);
+      b.style.setProperty('--dx', (-s * 26).toFixed(1) + 'px'); b.style.setProperty('--sc', (1 + s * 0.6).toFixed(2));
+    });
+  }
+  function rest() { bub.classList.remove('is-on'); K.forEach(function (b) { b.style.setProperty('--dx', '0px'); b.style.setProperty('--sc', 1); }); }
+  var down = false;
+  ix.addEventListener('pointerdown', function (e) { down = true; try { ix.setPointerCapture(e.pointerId); } catch (_) {} scrub(e, true); });
+  ix.addEventListener('pointermove', function (e) { scrub(e, true); });
+  function up() { down = false; rest(); }
+  ix.addEventListener('pointerup', up); ix.addEventListener('pointercancel', up);
+  ix.addEventListener('pointerleave', function () { if (!down) rest(); });
+  if (rm) K.forEach(function (b) { b.style.transition = 'none'; });
+  go(0, false);
+})();
+</script>

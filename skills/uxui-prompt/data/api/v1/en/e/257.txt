@@ -1,0 +1,84 @@
+<!-- Lucian UX/UI Prompt #257 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#257 -->
+<!--
+Element: Drag-to-resize responsive preview
+ID: 257 · Category: Site Builder Tools · Tags: responsive, preview, breakpoints, builder, container-query
+What it does: In a site builder's preview, choose desktop, tablet or mobile, or drag the handle on the right, and the frame's width changes smoothly while the ruler above shows the current width. As it narrows, the page's three-column cards rearrange into two columns and then one, the menu folds into a hamburger button, and the ruler mark flashes each time you cross a breakpoint.
+How to use it: Switch the device buttons or drag the handle on the right of the preview
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#257
+-->
+<style>
+.u257{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface-2);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u257-tb{position:absolute;left:14px;right:14px;top:14px;display:flex;align-items:center;gap:6px}
+.u257-sg{display:flex;padding:3px;border-radius:11px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u257-dv{width:36px;height:28px;border:0;border-radius:8px;background:none;color:var(--ux-ink-3);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s}
+.u257-dv[aria-pressed="true"]{background:var(--ux-ink);color:var(--ux-surface)}
+.u257-dv svg{width:15px;height:15px}
+.u257-px{margin-left:auto;padding:4px 9px;border-radius:8px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:800;font-variant-numeric:tabular-nums}
+.u257-ru{position:absolute;left:14px;right:14px;top:54px;height:16px}
+.u257-ru i{position:absolute;top:0;height:16px;border-left:1.5px solid var(--ux-ink-3);font-style:normal;font-size:8.5px;font-weight:800;color:var(--ux-ink-3);padding-left:3px;line-height:10px;transition:color .2s,border-color .2s}
+.u257-ru i.is-flash{animation:u257-fl .7s ease}
+@keyframes u257-fl{30%{color:var(--ux-accent);border-color:var(--ux-accent);transform:scaleY(1.3)}}
+.u257-st{position:absolute;left:14px;top:74px;bottom:14px;right:14px}
+.u257-fr{position:relative;height:100%;border-radius:12px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 12px 24px -16px var(--ux-shadow-strong);overflow:hidden;container-type:inline-size;transition:width .5s cubic-bezier(.3,1.1,.4,1)}
+.u257-fr.is-drag{transition:none}
+.u257-hd{position:absolute;top:50%;width:14px;height:44px;margin:-22px 0 0 2px;border-radius:7px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 2px 6px -2px var(--ux-shadow-strong);cursor:ew-resize;touch-action:none;display:grid;place-items:center;transition:left .5s cubic-bezier(.3,1.1,.4,1)}
+.u257-hd.is-drag{transition:none}
+.u257-hd::before{content:"";width:4px;height:18px;border-left:1.5px solid var(--ux-ink-3);border-right:1.5px solid var(--ux-ink-3)}
+.u257-hd:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u257-pg{padding:10px 12px}
+.u257-nv{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:800;color:var(--ux-ink-2)}
+.u257-nv b{margin-right:auto;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:900;color:var(--ux-ink)}
+.u257-nv b i{width:10px;height:10px;border-radius:3px;background:var(--ux-grad)}
+.u257-hb{display:none;width:20px;height:16px;border-radius:5px;background:var(--ux-surface-2);position:relative}
+.u257-hb::before{content:"";position:absolute;left:5px;right:5px;top:5px;height:6px;border-top:1.5px solid var(--ux-ink-2);border-bottom:1.5px solid var(--ux-ink-2)}
+.u257-hr{margin-top:14px}
+.u257-hr h4{margin:0;font-size:17px;line-height:1.2;font-weight:900;letter-spacing:-.03em;transition:font-size .3s}
+.u257-hr span{display:inline-block;margin-top:8px;padding:5px 10px;border-radius:999px;background:var(--ux-ink);color:var(--ux-surface);font-size:9px;font-weight:850}
+.u257-gd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.u257-gd i{display:block;height:64px;border-radius:9px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);transition:height .3s}
+.u257-gd i:nth-child(1){background:linear-gradient(135deg,#C7D2FE,#E0E7FF)}
+.u257-gd i:nth-child(2){background:linear-gradient(135deg,#FBCFE8,#FCE7F3)}
+.u257-gd i:nth-child(3){background:linear-gradient(135deg,#A7F3D0,#D1FAE5)}
+@container (max-width:200px){.u257-gd{grid-template-columns:1fr 1fr}.u257-gd i:nth-child(3){grid-column:span 2;height:40px}.u257-nv>span{display:none}.u257-hb{display:block}}
+@container (max-width:140px){.u257-gd{grid-template-columns:1fr}.u257-gd i{height:34px}.u257-gd i:nth-child(3){grid-column:auto;height:34px}.u257-hr h4{font-size:13px}}
+.u257 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u257-fr,.u257-hd,.u257-hr h4,.u257-gd i{transition:none}.u257-ru i.is-flash{animation:none}}
+</style>
+<div class="ux u257">
+  <div class="u257-tb"><div class="u257-sg" role="group" aria-label="Device"></div><span class="u257-px" aria-live="polite"></span></div>
+  <div class="u257-ru" aria-hidden="true"></div>
+  <div class="u257-st"><div class="u257-fr"><div class="u257-pg"><div class="u257-nv"><b><i></i>Orbit</b><span>Features</span><span>Pricing</span><span>Contact</span><em class="u257-hb"></em></div><div class="u257-hr"><h4>A site that looks good anywhere</h4><span>Get started</span></div><div class="u257-gd"><i></i><i></i><i></i></div></div></div><span class="u257-hd" role="slider" tabindex="0" aria-label="Preview width" aria-valuemin="320" aria-valuemax="1440"></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sg = root.querySelector('.u257-sg'), px = root.querySelector('.u257-px'), ru = root.querySelector('.u257-ru'), st = root.querySelector('.u257-st'), fr = root.querySelector('.u257-fr'), hd = root.querySelector('.u257-hd');
+  var DV = [['Desktop', 1280], ['Tablet', 768], ['Mobile', 390]];
+  var IC = ['<rect x="1.5" y="2.5" width="12" height="8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 13.5h5M7.5 10.5v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>', '<rect x="3" y="1.5" width="9" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 11.5h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>', '<rect x="4.5" y="1.5" width="6" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.8 11.5h1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>'];
+  var MIN = 320, MAX = 1440, W = 312 - 18, WMIN = 108, BP = [[640, 'sm'], [768, 'md'], [1024, 'lg'], [1280, 'xl']];
+  function toPx(v) { return WMIN + (v - MIN) / (MAX - MIN) * (W - WMIN); }
+  function toV(p) { return MIN + (p - WMIN) / (W - WMIN) * (MAX - MIN); }
+  var B = DV.map(function (d, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u257-dv'; b.setAttribute('aria-label', d[0]); b.innerHTML = '<svg viewBox="0 0 15 15" aria-hidden="true">' + IC[i] + '</svg>'; b.addEventListener('click', function () { set(d[1]); }); sg.appendChild(b); return b; });
+  var R = BP.map(function (b) { var t = document.createElement('i'); t.style.left = toPx(b[0]) + 'px'; t.textContent = b[1]; ru.appendChild(t); return t; });
+  var v = 1280, zone = -1;
+  function zoneOf(x) { var z = 0; BP.forEach(function (b, i) { if (x >= b[0]) z = i + 1; }); return z; }
+  function set(nv) {
+    v = Math.max(MIN, Math.min(MAX, Math.round(nv))); var p = toPx(v);
+    fr.style.width = p + 'px'; hd.style.left = p + 'px';
+    px.textContent = v + 'px'; hd.setAttribute('aria-valuenow', v);
+    B.forEach(function (b, i) { b.setAttribute('aria-pressed', DV[i][1] === v); });
+    var z = zoneOf(v);
+    if (zone >= 0 && z !== zone) { var t = R[Math.min(z, zone)]; if (t) { t.classList.remove('is-flash'); void t.offsetWidth; t.classList.add('is-flash'); } }
+    zone = z;
+  }
+  var drag = null;
+  hd.addEventListener('pointerdown', function (e) { var r = st.getBoundingClientRect(); drag = { k: st.offsetWidth / r.width, left: r.left }; fr.classList.add('is-drag'); hd.classList.add('is-drag'); try { hd.setPointerCapture(e.pointerId); } catch (er) {} });
+  hd.addEventListener('pointermove', function (e) { if (!drag) return; set(toV((e.clientX - drag.left) * drag.k)); });
+  function up() { drag = null; fr.classList.remove('is-drag'); hd.classList.remove('is-drag'); }
+  hd.addEventListener('pointerup', up); hd.addEventListener('pointercancel', up);
+  hd.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 40 : e.key === 'ArrowLeft' ? -40 : 0; if (d) { e.preventDefault(); set(v + d); } });
+  set(1280);
+})();
+</script>

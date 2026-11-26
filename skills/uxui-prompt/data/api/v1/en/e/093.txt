@@ -1,0 +1,167 @@
+<!-- Lucian UX/UI Prompt #093 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#093 -->
+<!--
+Element: Celebration when every task is done
+ID: 093 · Category: Empty & Error States · Tags: success, confetti, checklist, celebration, streak
+What it does: Each time you check a task, small dots burst from the box, the text is struck through and the bar at the top fills. Check the last one and confetti bursts upward and drifts down as a celebration sheet rises and the badge and streak number roll up.
+How to use it: Check the two remaining tasks. “Try again” on the celebration screen brings back the starting state
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#093
+-->
+<style>
+.u093{position:relative;width:340px;height:450px;display:flex;flex-direction:column;padding:20px 16px 16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u093-h{display:flex;align-items:flex-end;justify-content:space-between;padding:0 4px}
+.u093-h small{display:block;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u093-h b{display:block;margin-top:2px;font-size:22px;font-weight:850;letter-spacing:-.045em}
+.u093-c{font-size:14px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u093-c b{display:inline-block;font-size:inherit;color:var(--ux-ink)}
+.u093-bar{height:8px;margin:12px 4px 14px;border-radius:4px;background:var(--ux-surface-3);overflow:hidden}
+.u093-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#22C3A6,#10B981 60%,#FFB547);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .6s var(--ux-spring)}
+.u093-list{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.u093-t{display:flex;align-items:center;gap:12px;width:100%;height:58px;padding:0 14px;border:0;border-radius:17px;background:var(--ux-surface-2);text-align:left;transition:background-color .25s,transform .3s var(--ux-spring)}
+.u093-t:hover{background:var(--ux-surface-3)}
+.u093-t:active{transform:scale(.98)}
+.u093-bx{position:relative;width:26px;height:26px;flex:none;border-radius:9px;box-shadow:inset 0 0 0 2px var(--ux-line-2);background:var(--ux-surface);transition:background-color .25s,box-shadow .25s,transform .4s var(--ux-spring)}
+.u093-bx svg{position:absolute;inset:0;width:26px;height:26px;fill:none;stroke:var(--ux-accent-ink);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .3s var(--ux-ease) .08s}
+.u093-t[aria-checked="true"] .u093-bx{background:var(--ux-mint);box-shadow:inset 0 0 0 2px var(--ux-mint);transform:scale(1.08)}
+.u093-t[aria-checked="true"] .u093-bx svg{stroke-dashoffset:0}
+.u093-tx{position:relative;font-size:14.5px;font-weight:720;letter-spacing:-.02em;color:var(--ux-ink);transition:color .3s}
+.u093-tx::after{content:"";position:absolute;left:-2px;right:-2px;top:52%;height:2px;border-radius:1px;background:var(--ux-ink-3);transform:scaleX(0);transform-origin:0 50%;transition:transform .35s var(--ux-ease)}
+.u093-t[aria-checked="true"] .u093-tx{color:var(--ux-ink-3)}
+.u093-t[aria-checked="true"] .u093-tx::after{transform:none}
+.u093-p{position:absolute;z-index:3;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;pointer-events:none}
+.u093-win{position:absolute;left:0;right:0;bottom:0;top:96px;z-index:2;display:flex;flex-direction:column;align-items:center;padding:30px 20px 16px;border-radius:28px 28px 0 0;background:var(--ux-surface);box-shadow:0 -1px 0 var(--ux-line),0 -24px 40px -28px var(--ux-shadow-strong);text-align:center;transform:translateY(105%);visibility:hidden;transition:transform .6s var(--ux-spring),visibility 0s .6s}
+.u093.done .u093-win{transform:none;visibility:visible;transition:transform .7s var(--ux-spring)}
+.u093-bdg{position:relative;width:86px;height:86px;border-radius:30px;display:grid;place-items:center;background:linear-gradient(140deg,#22C3A6,#10B981 55%,#FFB547);color:#fff;transform:scale(.3) rotate(-25deg);opacity:0;transition:transform .7s var(--ux-spring) .2s,opacity .2s .2s}
+.u093.done .u093-bdg{transform:none;opacity:1}
+.u093-bdg svg{width:42px;height:42px;fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.u093-bdg::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 color-mix(in srgb,#10B981 50%,transparent);opacity:0}
+.u093.done .u093-bdg::after{animation:u093-wave 1.1s .45s var(--ux-ease)}
+@keyframes u093-wave{0%{opacity:1;box-shadow:0 0 0 0 color-mix(in srgb,#10B981 50%,transparent)}100%{opacity:0;box-shadow:0 0 0 26px color-mix(in srgb,#10B981 0%,transparent)}}
+.u093-wt{margin:18px 0 0;font-size:19px;font-weight:850;letter-spacing:-.04em}
+.u093-ws{margin:5px 0 0;font-size:13px;font-weight:600;color:var(--ux-ink-3)}
+.u093-st{display:inline-flex;align-items:center;gap:6px;height:40px;margin-top:18px;padding:0 16px 0 12px;border-radius:999px;background:color-mix(in srgb,#FFB547 16%,transparent);font-size:14px;font-weight:800;color:var(--ux-ink)}
+.u093-st svg{width:18px;height:18px}
+.u093-od{display:inline-block;height:20px;overflow:hidden;line-height:20px;vertical-align:-4px}
+.u093-od>span{display:flex;flex-direction:column;transform:translateY(calc(var(--v,0) * -20px));transition:transform .7s cubic-bezier(.5,-.3,.3,1.4) .8s}
+.u093-again{margin-top:auto;width:100%;height:48px;border:0;border-radius:15px;background:var(--ux-ink);color:var(--ux-page);font-size:14.5px;font-weight:760;transition:transform .3s var(--ux-spring)}
+.u093-again:active{transform:scale(.97)}
+.u093-cf{position:absolute;inset:0;z-index:4;width:100%;height:100%;pointer-events:none}
+.u093-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.u093-t:focus-visible,.u093-again:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u093">
+  <div class="u093-h"><div><small>Friday, October 10</small><b>Today</b></div><span class="u093-c" aria-hidden="true"><b>2</b> / 4</span></div>
+  <div class="u093-bar" aria-hidden="true"><i></i></div>
+  <ul class="u093-list" aria-label="Today’s tasks"></ul>
+  <div class="u093-win" aria-hidden="true">
+    <span class="u093-bdg" aria-hidden="true"><svg viewBox="0 0 42 42"><path d="M10 22l7.5 7.5L32 14"/></svg></span>
+    <p class="u093-wt">All done for today</p>
+    <p class="u093-ws">Keep the streak going tomorrow</p>
+    <span class="u093-st"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 1.5c.6 3-2.8 4.4-2.8 7.6a2.8 2.8 0 0 0 5.6 0c0-1-.4-1.8-.9-2.5 2.2.9 3.6 3 3.6 5.2a5.5 5.5 0 0 1-11 0C3.5 7.6 8.3 6 9 1.5z" fill="#FF8A3D"/></svg><span><span class="u093-od"><span><span>4</span><span>5</span></span></span>-day streak</span></span>
+    <button class="u093-again" type="button">Try again</button>
+  </div>
+  <canvas class="u093-cf" aria-hidden="true"></canvas>
+  <span class="u093-sr" role="status"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var list = root.querySelector('.u093-list'), bar = root.querySelector('.u093-bar i'), cnt = root.querySelector('.u093-c b'), win = root.querySelector('.u093-win');
+  var od = root.querySelector('.u093-od>span'), again = root.querySelector('.u093-again'), cv = root.querySelector('.u093-cf'), live = root.querySelector('.u093-sr');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TASKS = [['10-minute morning stretch', true], ['Tidy up design review notes', true], ['Drink 2 liters of water', false], ['Send tomorrow’s meeting agenda', false]];
+  var COLORS = ['#22C3A6', '#10B981', '#FFB547', '#FF6B8B', '#7B61FF', '#3D8BFF'];
+  var items = TASKS.map(function (t) {
+    var li = document.createElement('li');
+    li.innerHTML = '<button class="u093-t" type="button" role="checkbox" aria-checked="' + t[1] + '"><span class="u093-bx" aria-hidden="true"><svg viewBox="0 0 26 26"><path d="M7.5 13.5l3.8 3.8L18.8 9"/></svg></span><span class="u093-tx"></span></button>';
+    li.querySelector('.u093-tx').textContent = t[0];
+    list.appendChild(li);
+    return li.firstChild;
+  });
+  var ts = [], raf = 0;
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function done() { return items.filter(function (b) { return b.getAttribute('aria-checked') === 'true'; }).length; }
+  function update() {
+    var n = done();
+    bar.style.setProperty('--p', n / items.length);
+    if (cnt.textContent !== String(n)) {
+      cnt.textContent = n;
+      if (!rm) cnt.animate([{ transform: 'translateY(8px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }
+    return n;
+  }
+  function pop(b) {
+    if (rm) return;
+    var rr = root.getBoundingClientRect(), s = root.offsetWidth / rr.width, br = b.querySelector('.u093-bx').getBoundingClientRect();
+    var cx = (br.left + br.width / 2 - rr.left) * s, cy = (br.top + br.height / 2 - rr.top) * s;
+    for (var i = 0; i < 8; i++) {
+      var p = document.createElement('span'), a = i / 8 * Math.PI * 2 + 0.3, d = 20 + Math.random() * 8;
+      p.className = 'u093-p'; p.style.left = cx + 'px'; p.style.top = cy + 'px'; p.style.background = COLORS[i % COLORS.length];
+      root.appendChild(p);
+      p.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + Math.cos(a) * d + 'px,' + Math.sin(a) * d + 'px) scale(0)', opacity: 1 }], { duration: 520, easing: 'cubic-bezier(.2,.7,.3,1)' }).onfinish = function (e) { e.target.effect.target.remove(); };
+    }
+  }
+  function confetti() {
+    if (rm) return;
+    var dpr = Math.min(2, window.devicePixelRatio || 1), W = root.offsetWidth, H = root.offsetHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    var c = cv.getContext('2d'), ps = [];
+    for (var i = 0; i < 90; i++) {
+      var a = -Math.PI / 2 + (Math.random() - 0.5) * 1.9, v = 380 + Math.random() * 420;
+      ps.push({ x: W / 2 + (Math.random() - 0.5) * 40, y: 180, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: Math.random() * 6, vr: (Math.random() - 0.5) * 14, w: 5 + Math.random() * 5, h: 8 + Math.random() * 6, col: COLORS[i % COLORS.length], t: 0, life: 1.6 + Math.random() * 0.9 });
+    }
+    var last = performance.now();
+    cancelAnimationFrame(raf);
+    (function f(now) {
+      if (!root.isConnected) return;
+      var dt = Math.min(0.033, (now - last) / 1000), alive = 0; last = now;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+      ps.forEach(function (p) {
+        p.t += dt;
+        if (p.t > p.life || p.y > H + 20) return;
+        alive++;
+        p.vy += 900 * dt; p.vx *= 0.985; p.vy *= 0.985;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.r += p.vr * dt;
+        c.save(); c.translate(p.x, p.y); c.rotate(p.r);
+        c.globalAlpha = Math.min(1, (p.life - p.t) / 0.4);
+        c.scale(1, Math.cos(p.t * 9 + p.w));
+        c.fillStyle = p.col; c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        c.restore();
+      });
+      if (alive) raf = requestAnimationFrame(f); else c.clearRect(0, 0, W, H);
+    })(last);
+  }
+  function celebrate() {
+    var had = list.contains(document.activeElement);
+    root.classList.add('done');
+    win.removeAttribute('aria-hidden');
+    items.forEach(function (b) { b.tabIndex = -1; });
+    od.style.setProperty('--v', 1);
+    live.textContent = 'All done for today. That’s a 5-day streak';
+    confetti();
+    if (had) later(function () { again.focus({ preventScroll: true }); }, 400);
+  }
+  items.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (root.classList.contains('done')) return;
+      var on = b.getAttribute('aria-checked') !== 'true';
+      b.setAttribute('aria-checked', String(on));
+      if (on) pop(b);
+      var n = update();
+      live.textContent = b.textContent + (on ? ' done' : ' not done') + ' · ' + n + ' of ' + items.length + ' finished';
+      if (n === items.length) later(celebrate, rm ? 0 : 450);
+    });
+  });
+  again.addEventListener('click', function () {
+    ts.forEach(clearTimeout); ts = [];
+    root.classList.remove('done');
+    win.setAttribute('aria-hidden', 'true');
+    od.style.setProperty('--v', 0);
+    items.forEach(function (b) { b.tabIndex = 0; });
+    [3, 2].forEach(function (i, k) { later(function () { items[i].setAttribute('aria-checked', 'false'); update(); }, rm ? 0 : 350 + k * 140); });
+    items[2].focus({ preventScroll: true });
+  });
+  update();
+})();
+</script>

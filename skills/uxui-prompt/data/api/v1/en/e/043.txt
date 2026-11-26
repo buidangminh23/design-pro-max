@@ -1,0 +1,128 @@
+<!-- Lucian UX/UI Prompt #043 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#043 -->
+<!--
+Element: Stretching pagination
+ID: 043 · Category: Menus & Tabs · Tags: pagination, pager, elastic, indicator, rolling-number
+What it does: Change pages and the highlight pill stretches out from the leading edge, then catches up from behind as it arrives. The big page number rolls up or down, and the artwork tiles above come in one after another from the direction you moved.
+How to use it: Press a number or an arrow to change pages — the farther you jump, the longer the pill stretches. Left and right arrow keys work too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#043
+-->
+<style>
+.u043{position:relative;width:350px;height:340px;display:flex;flex-direction:column;gap:14px}
+.u043-head{display:flex;align-items:flex-end;justify-content:space-between;padding:0 4px}
+.u043-head small{display:block;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u043-head b{display:block;margin-top:2px;font-size:17px;font-weight:780;letter-spacing:-.03em}
+.u043-cnt{display:flex;align-items:baseline;gap:4px;font-variant-numeric:tabular-nums}
+.u043-num{position:relative;width:64px;height:42px;overflow:hidden}
+.u043-num span{position:absolute;inset:0;font-size:38px;line-height:42px;font-weight:800;letter-spacing:-.05em;text-align:right;transition:transform .5s var(--ux-spring),opacity .3s}
+.u043-cnt em{font-style:normal;font-size:14px;font-weight:700;color:var(--ux-ink-3)}
+.u043-grid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:8px}
+.u043-tile{position:relative;border-radius:16px;overflow:hidden;background:var(--g);box-shadow:0 10px 20px -16px var(--ux-shadow-strong)}
+.u043-tile::before{content:"";position:absolute;width:70%;aspect-ratio:1;left:var(--bx);top:var(--by);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),transparent 65%)}
+.u043-tile::after{content:attr(data-n);position:absolute;left:9px;bottom:7px;font-size:11px;font-weight:800;color:rgba(255,255,255,.9);letter-spacing:.02em}
+.u043-pager{position:relative;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 30px -24px var(--ux-shadow-strong)}
+.u043-ind{position:absolute;top:5px;bottom:5px;left:var(--l,0);right:var(--r,0);border-radius:999px;background:var(--ux-ink);pointer-events:none}
+.u043-pager.go-r .u043-ind{transition:right .32s var(--ux-ease),left .55s var(--ux-spring) .08s}
+.u043-pager.go-l .u043-ind{transition:left .32s var(--ux-ease),right .55s var(--ux-spring) .08s}
+.u043-pg{position:relative;flex:1;height:40px;border:0;padding:0;border-radius:999px;background:none;font-size:14.5px;font-weight:700;color:var(--ux-ink-2);font-variant-numeric:tabular-nums;transition:color .3s}
+.u043-pg:hover{color:var(--ux-ink)}
+.u043-pg[aria-current="page"]{color:var(--ux-page)}
+.u043-ar{position:relative;width:40px;height:40px;flex:none;border:0;padding:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink);display:grid;place-items:center;transition:transform .35s var(--ux-spring),opacity .3s}
+.u043-ar:active{transform:scale(.88)}
+.u043-ar[aria-disabled="true"]{opacity:.3}
+.u043-ar svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u043-pg:focus-visible,.u043-ar:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+</style>
+<div class="ux u043">
+  <div class="u043-head">
+    <div><small>This week’s collection</small><b>Light & color studies</b></div>
+    <div class="u043-cnt" aria-hidden="true"><span class="u043-num"><span>01</span><span style="opacity:0">01</span></span><em>/ 07</em></div>
+  </div>
+  <div class="u043-grid" aria-live="polite"></div>
+  <nav class="u043-pager" aria-label="Pages">
+    <span class="u043-ind" aria-hidden="true"></span>
+    <button class="u043-ar" type="button" data-d="-1" aria-label="Previous page"><svg viewBox="0 0 16 16"><path d="M10 3.5L5.5 8l4.5 4.5"/></svg></button>
+    <button class="u043-pg" type="button">1</button><button class="u043-pg" type="button">2</button><button class="u043-pg" type="button">3</button><button class="u043-pg" type="button">4</button><button class="u043-pg" type="button">5</button><button class="u043-pg" type="button">6</button><button class="u043-pg" type="button">7</button>
+    <button class="u043-ar" type="button" data-d="1" aria-label="Next page"><svg viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></svg></button>
+  </nav>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var pager = root.querySelector('.u043-pager'), ind = root.querySelector('.u043-ind');
+  var pgs = Array.prototype.slice.call(root.querySelectorAll('.u043-pg'));
+  var ars = root.querySelectorAll('.u043-ar');
+  var grid = root.querySelector('.u043-grid');
+  var nums = root.querySelectorAll('.u043-num span');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = 0, front = 0, tiles = [];
+  for (var k = 0; k < 6; k++) { var t = document.createElement('span'); t.className = 'u043-tile'; grid.appendChild(t); tiles.push(t); }
+  function tile(t, k, p) {
+    var h = (p * 52 + k * 19 + 250) % 360;
+    t.style.setProperty('--g', 'linear-gradient(' + (120 + k * 30) + 'deg,hsl(' + h + ' 88% 70%),hsl(' + ((h + 50) % 360) + ' 78% 52%))');
+    t.style.setProperty('--bx', ((k * 37 + p * 23) % 60 - 10) + '%');
+    t.style.setProperty('--by', ((k * 29 + p * 41) % 50 - 15) + '%');
+    t.setAttribute('data-n', 'No.' + (p * 6 + k + 1));
+  }
+  function paint(p) {
+    tiles.forEach(function (t, k) { tile(t, k, p); });
+    grid.setAttribute('aria-label', 'Page ' + (p + 1) + ', 6 works');
+  }
+  function placeInd(dir) {
+    var b = pgs[cur], w = pager.clientWidth;
+    pager.classList.toggle('go-r', dir > 0);
+    pager.classList.toggle('go-l', dir < 0);
+    ind.style.setProperty('--l', b.offsetLeft + 'px');
+    ind.style.setProperty('--r', (w - b.offsetLeft - b.offsetWidth) + 'px');
+  }
+  function roll(p, dir) {
+    var txt = (p < 9 ? '0' : '') + (p + 1);
+    var out = nums[front], inn = nums[1 - front];
+    front = 1 - front;
+    inn.textContent = txt;
+    if (rm) { out.style.opacity = '0'; inn.style.opacity = '1'; inn.style.transform = 'none'; return; }
+    inn.style.transition = 'none'; inn.style.transform = 'translateY(' + (dir * 100) + '%)'; inn.style.opacity = '0';
+    void inn.offsetWidth;
+    inn.style.transition = ''; inn.style.transform = 'none'; inn.style.opacity = '1';
+    out.style.transform = 'translateY(' + (-dir * 100) + '%)'; out.style.opacity = '0';
+  }
+  function mark(p) {
+    pgs.forEach(function (b, k) { if (k === p) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); b.setAttribute('aria-label', 'Page ' + (k + 1)); });
+    ars[0].setAttribute('aria-disabled', String(p === 0));
+    ars[1].setAttribute('aria-disabled', String(p === 6));
+  }
+  function go(p, focus) {
+    if (p < 0 || p > 6 || p === cur) return;
+    var dir = p > cur ? 1 : -1;
+    cur = p;
+    mark(p);
+    if (focus) pgs[p].focus();
+    placeInd(dir);
+    roll(p, dir);
+    if (rm) { paint(p); return; }
+    grid.setAttribute('aria-label', 'Page ' + (p + 1) + ', 6 works');
+    tiles.forEach(function (t, k) {
+      var d = (dir > 0 ? k % 3 : 2 - k % 3) * 40 + (k > 2 ? 30 : 0);
+      t.animate([
+        { opacity: 1, transform: 'none', easing: 'ease-in' },
+        { opacity: 0, transform: 'translateX(' + (-dir * 18) + 'px) scale(.92)', offset: .25, easing: 'steps(1,end)' },
+        { opacity: 0, transform: 'translateX(' + (dir * 26) + 'px) scale(.92)', offset: .26, easing: 'cubic-bezier(.34,1.4,.64,1)' },
+        { opacity: 1, transform: 'none' }
+      ], { duration: 640, delay: d, easing: 'linear' });
+      clearTimeout(t.u043t);
+      t.u043t = setTimeout(function () { tile(t, k, cur); }, d + 165);
+    });
+  }
+  pgs.forEach(function (b, k) { b.addEventListener('click', function () { go(k); }); });
+  Array.prototype.forEach.call(ars, function (a) { a.addEventListener('click', function () { go(cur + Number(a.getAttribute('data-d')), true); }); });
+  pager.addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+    if (d) { e.preventDefault(); go(cur + d, true); }
+  });
+  paint(0);
+  mark(0);
+  placeInd(0);
+  if (window.ResizeObserver) new ResizeObserver(function () { var c = pager.className; pager.className = 'u043-pager'; placeInd(0); void ind.offsetWidth; pager.className = c; }).observe(pager);
+})();
+</script>

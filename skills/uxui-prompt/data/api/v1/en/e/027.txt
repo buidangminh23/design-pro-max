@@ -1,0 +1,144 @@
+<!-- Lucian UX/UI Prompt #027 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#027 -->
+<!--
+Element: Expanding top-bar search
+ID: 027 · Category: Inputs & Search · Tags: search, expand, combobox, suggestions, header
+What it does: Press the magnifier in the top bar and the menu steps aside while the search field stretches across the bar. Recent searches and suggestions unfold below; as you type, results filter and the matching letters are highlighted.
+How to use it: Press the magnifier and type “Motion” or “Color”. Use the up and down arrows to choose and Esc to close
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#027
+-->
+<style>
+.u027{position:relative;width:350px;height:360px}
+.u027-bar{position:absolute;left:0;right:0;top:0;height:62px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 36px -26px var(--ux-shadow-strong)}
+.u027-logo{position:absolute;left:18px;top:50%;display:flex;align-items:center;gap:8px;transform:translateY(-50%);font-size:16px;font-weight:780;letter-spacing:-.03em;transition:opacity .3s var(--ux-ease),transform .5s var(--ux-ease)}
+.u027-logo i{width:22px;height:22px;border-radius:7px;background:var(--ux-grad)}
+.u027-nav{position:absolute;left:112px;top:50%;display:flex;gap:4px;transform:translateY(-50%);transition:opacity .25s var(--ux-ease),transform .5s var(--ux-ease)}
+.u027-nav a{padding:7px 10px;border-radius:10px;font-size:14px;font-weight:620;color:var(--ux-ink-2);text-decoration:none}
+.u027-nav a:hover{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u027.is-open .u027-logo{opacity:0;transform:translate(-20px,-50%)}
+.u027.is-open .u027-nav{opacity:0;transform:translate(-30px,-50%);pointer-events:none}
+.u027-field{position:absolute;right:9px;top:9px;height:44px;width:44px;border-radius:14px;background:var(--ux-surface-2);overflow:hidden;transition:width .6s var(--ux-spring),background-color .3s,box-shadow .3s}
+.u027.is-open .u027-field{width:332px;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u027-go{position:absolute;left:0;top:0;width:44px;height:44px;border:0;padding:0;border-radius:14px;background:none;color:var(--ux-ink);display:grid;place-items:center;z-index:1}
+.u027-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u027-go svg,.u027-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.u027-in{position:absolute;left:44px;right:44px;top:0;height:44px;border:0;outline:0;background:none;padding:0 4px;font-size:15.5px;color:var(--ux-ink);opacity:0;transition:opacity .3s var(--ux-ease) .15s}
+.u027-in::placeholder{color:var(--ux-ink-3)}
+.u027.is-open .u027-in{opacity:1}
+.u027-x{position:absolute;right:4px;top:4px;width:36px;height:36px;border:0;padding:0;border-radius:10px;background:var(--ux-surface-2);color:var(--ux-ink-2);display:grid;place-items:center;opacity:0;transform:scale(.6) rotate(-90deg);transition:opacity .25s,transform .5s var(--ux-spring)}
+.u027.is-open .u027-x{opacity:1;transform:none}
+.u027-x:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u027-pop{position:absolute;left:0;right:0;top:72px;padding:14px 10px 10px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -30px var(--ux-shadow-strong);
+  transform-origin:90% 0;opacity:0;transform:translateY(-10px) scale(.96);pointer-events:none;visibility:hidden;transition:opacity .25s var(--ux-ease),transform .45s var(--ux-spring),visibility 0s .45s}
+.u027.is-open .u027-pop{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .3s var(--ux-ease) .1s,transform .55s var(--ux-spring) .1s}
+.u027-sec{margin:0 8px 8px;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ux-ink-3)}
+.u027-recent{display:flex;gap:6px;flex-wrap:wrap;margin:0 6px 12px}
+.u027-recent button{height:32px;padding:0 12px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:620;color:var(--ux-ink-2)}
+.u027-recent button:hover{color:var(--ux-ink)}
+.u027-list{margin:0;padding:0;list-style:none;height:150px;overflow:hidden}
+.u027-opt{display:flex;align-items:center;gap:12px;padding:8px;border-radius:12px;cursor:pointer;opacity:0;transform:translateY(6px);transition:background-color .2s var(--ux-ease),opacity .3s var(--ux-ease),transform .45s var(--ux-spring)}
+.u027.is-open .u027-opt{opacity:1;transform:none}
+.u027-opt[aria-selected="true"]{background:var(--ux-surface-2)}
+.u027-opt i{width:34px;height:34px;flex:none;border-radius:10px;background:var(--c)}
+.u027-opt b{display:block;font-size:14.5px;font-weight:650}
+.u027-opt b mark{background:none;color:var(--ux-accent);font-weight:800}
+.u027-opt small{display:block;font-size:12px;color:var(--ux-ink-3)}
+.u027-empty{padding:30px 8px;text-align:center;font-size:14px;color:var(--ux-ink-3)}
+.u027-in:focus-visible{outline:none}
+</style>
+<div class="ux u027">
+  <div class="u027-bar">
+    <span class="u027-logo"><i aria-hidden="true"></i>Lumen</span>
+    <nav class="u027-nav" aria-label="Main menu"><a href="#">Home</a><a href="#">Explore</a><a href="#">Saved</a></nav>
+    <div class="u027-field">
+      <button class="u027-go" type="button" aria-label="Open search" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.2 4.2"/></svg></button>
+      <input class="u027-in" type="text" role="combobox" aria-expanded="false" aria-autocomplete="list" placeholder="Search templates, colors, people" tabindex="-1" autocomplete="off">
+      <button class="u027-x" type="button" aria-label="Close search" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+    </div>
+  </div>
+  <div class="u027-pop">
+    <p class="u027-sec">Recent</p>
+    <div class="u027-recent"><button type="button">Dashboard</button><button type="button">Motion</button><button type="button">Dark theme</button></div>
+    <p class="u027-sec">Suggested</p>
+    <ul class="u027-list" role="listbox" aria-label="Search results"></ul>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var go = root.querySelector('.u027-go');
+  var input = root.querySelector('.u027-in');
+  var x = root.querySelector('.u027-x');
+  var list = root.querySelector('.u027-list');
+  var uid = 'u027-' + Math.random().toString(36).slice(2, 7);
+  list.id = uid;
+  input.setAttribute('aria-controls', uid);
+  var DATA = [
+    ['Motion guide 2026', 'Doc', 'linear-gradient(140deg,#8B6CFF,#5B8CFF)'],
+    ['Color palette · Dawn', 'Collection', 'linear-gradient(140deg,#FF8A65,#FF5A6E)'],
+    ['Mobile onboarding screens', 'Template', 'linear-gradient(140deg,#22C3A6,#0EA5E9)'],
+    ['Seoyeon Kim · Motion designer', 'Person', 'linear-gradient(140deg,#FFC24B,#FF8A3D)'],
+    ['Color contrast checklist', 'Doc', 'linear-gradient(140deg,#A796E8,#6A57F2)'],
+    ['Checkout screen kit', 'Template', 'linear-gradient(140deg,#3D8BFF,#22C3A6)']
+  ];
+  var shown = [], act = -1;
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function render() {
+    var q = input.value.trim();
+    shown = DATA.filter(function (d) { return !q || d[0].indexOf(q) >= 0 || d[1].indexOf(q) >= 0; }).slice(0, 3);
+    act = shown.length ? 0 : -1;
+    if (!shown.length) { list.innerHTML = '<li class="u027-empty">No results for ‘' + esc(q) + '’</li>'; input.removeAttribute('aria-activedescendant'); return; }
+    list.innerHTML = shown.map(function (d, i) {
+      var t = esc(d[0]);
+      if (q) t = t.split(esc(q)).join('<mark>' + esc(q) + '</mark>');
+      return '<li class="u027-opt" role="option" id="' + uid + '-' + i + '" aria-selected="' + (i === act) + '" style="transition-delay:' + (i * 40) + 'ms"><i style="--c:' + d[2] + '" aria-hidden="true"></i><span><b>' + t + '</b><small>' + d[1] + '</small></span></li>';
+    }).join('');
+    mark();
+  }
+  function mark() {
+    Array.prototype.forEach.call(list.children, function (li, i) { if (li.setAttribute) li.setAttribute('aria-selected', String(i === act)); });
+    if (act >= 0) input.setAttribute('aria-activedescendant', uid + '-' + act); else input.removeAttribute('aria-activedescendant');
+  }
+  function open(focus) {
+    root.classList.add('is-open');
+    go.setAttribute('aria-expanded', 'true');
+    input.setAttribute('aria-expanded', 'true');
+    input.tabIndex = 0; x.tabIndex = 0;
+    render();
+    if (focus !== false) setTimeout(function () { input.focus(); }, 120);
+  }
+  function close() {
+    root.classList.remove('is-open');
+    go.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-expanded', 'false');
+    input.tabIndex = -1; x.tabIndex = -1;
+    input.value = '';
+    go.focus();
+  }
+  go.addEventListener('click', function () { root.classList.contains('is-open') ? input.focus() : open(); });
+  x.addEventListener('click', close);
+  input.addEventListener('input', render);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); close(); }
+    if (e.key === 'ArrowDown' && shown.length) { e.preventDefault(); act = (act + 1) % shown.length; mark(); }
+    if (e.key === 'ArrowUp' && shown.length) { e.preventDefault(); act = (act - 1 + shown.length) % shown.length; mark(); }
+    if (e.key === 'Enter' && act >= 0 && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); input.value = shown[act][0]; render(); }
+  });
+  list.addEventListener('click', function (e) {
+    var li = e.target.closest('.u027-opt');
+    if (!li) return;
+    var i = Array.prototype.indexOf.call(list.children, li);
+    input.value = shown[i][0];
+    render();
+    input.focus();
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.u027-recent button'), function (b) {
+    b.addEventListener('click', function () { input.value = b.textContent; render(); input.focus(); });
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.u027-nav a'), function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); });
+  });
+  open(false);
+})();
+</script>

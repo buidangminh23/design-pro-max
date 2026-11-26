@@ -4,6 +4,7 @@
 skills/apple/.vendor/** -text linguist-vendored
 skills/design-spacing-rhythm/** -text linguist-vendored
 skills/icons-pro-max/** -text linguist-vendored
+skills/uxui-prompt/data/** -text linguist-vendored
 /.github export-ignore
 /.claude-plugin export-ignore
 /.codex-plugin export-ignore

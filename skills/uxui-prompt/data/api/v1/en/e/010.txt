@@ -1,0 +1,145 @@
+<!-- Lucian UX/UI Prompt #010 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#010 -->
+<!--
+Element: Split action button
+ID: 010 · Category: Buttons · Tags: button, split, menu, deploy, progress
+What it does: The main action and its options sit in one control. Press the arrow and the menu unfolds from the button’s corner; the option you pick rolls into the main label. Run it and a progress bar flows inside the button before it turns into done.
+How to use it: Pick a method with the arrow on the right, then press the main button
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#010
+-->
+<style>
+.u010{position:relative;width:320px;height:310px}
+.u010-grp{position:absolute;left:20px;top:124px;display:flex;height:62px;border-radius:19px;background:var(--ux-ink);color:var(--ux-page);box-shadow:0 22px 38px -22px var(--ux-shadow-strong);transition:background-color .5s var(--ux-ease),transform .6s var(--ux-spring)}
+.u010[data-open="1"] .u010-grp{transform:translateY(-96px)}
+.u010-main{position:relative;display:flex;align-items:center;gap:12px;width:222px;height:100%;padding:0 20px;border:0;border-radius:19px 0 0 19px;background:none;color:inherit;overflow:hidden;transition:transform .45s var(--ux-spring)}
+.u010-main:active{transform:scale(.97)}
+.u010-main:focus-visible,.u010-caret:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u010-ic{position:relative;width:30px;height:30px;flex:none;border-radius:10px;display:grid;place-items:center;background:var(--ux-grad);color:#fff}
+.u010-ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:opacity .3s var(--ux-ease),transform .5s var(--ux-spring)}
+.u010-ic .u010-spin,.u010-ic .u010-ok{position:absolute;opacity:0;transform:scale(.4)}
+.u010-spin{animation:u010-rot .9s linear infinite}
+@keyframes u010-rot{to{rotate:360deg}}
+.u010-labs{position:relative;height:24px;overflow:hidden;flex:1;text-align:left}
+.u010-labs span{display:block;font-size:16.5px;font-weight:700;line-height:24px;letter-spacing:-.02em;white-space:nowrap;transition:transform .5s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u010-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--ux-grad);transform-origin:0 50%;transform:scaleX(0);opacity:0}
+.u010[data-state="busy"] .u010-bar{opacity:1;animation:u010-fill 1.5s cubic-bezier(.4,.1,.3,1) forwards}
+@keyframes u010-fill{to{transform:scaleX(1)}}
+.u010[data-state="busy"] .u010-main{cursor:progress}
+.u010[data-state="busy"] .u010-ic .u010-go{opacity:0;transform:translate(6px,-6px) scale(.6)}
+.u010[data-state="busy"] .u010-ic .u010-spin{opacity:1;transform:none}
+.u010[data-state="done"] .u010-grp{background:var(--ux-mint)}
+.u010[data-state="done"] .u010-main{color:var(--ux-accent-ink)}
+.u010[data-state="done"] .u010-ic{background:color-mix(in srgb,var(--ux-accent-ink) 16%,transparent);color:var(--ux-accent-ink)}
+.u010[data-state="done"] .u010-ic .u010-go{opacity:0}
+.u010[data-state="done"] .u010-ic .u010-ok{opacity:1;transform:none}
+.u010-div{width:1px;margin:14px 0;background:color-mix(in srgb,var(--ux-page) 22%,transparent)}
+.u010-caret{width:58px;height:100%;border:0;border-radius:0 19px 19px 0;background:none;color:inherit;display:grid;place-items:center;transition:background-color .3s var(--ux-ease)}
+.u010-caret:hover{background:color-mix(in srgb,var(--ux-page) 9%,transparent)}
+.u010-caret svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .5s var(--ux-spring)}
+.u010[data-open="1"] .u010-caret svg{transform:rotate(180deg)}
+.u010-menu{position:absolute;left:20px;top:102px;width:281px;margin:0;padding:6px;list-style:none;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -28px var(--ux-shadow-strong);
+  transform-origin:88% 0;opacity:0;transform:translateY(40px) scale(.92);pointer-events:none;visibility:hidden;transition:opacity .2s var(--ux-ease),transform .45s var(--ux-spring),visibility 0s linear .45s}
+.u010[data-open="1"] .u010-menu{opacity:1;transform:none;pointer-events:auto;visibility:visible;transition:opacity .3s var(--ux-ease) .06s,transform .6s var(--ux-spring)}
+.u010-opt{display:flex;align-items:center;gap:12px;width:100%;padding:10px;border:0;border-radius:14px;background:none;text-align:left;color:var(--ux-ink);opacity:0;transform:translateY(-6px);transition:background-color .25s var(--ux-ease),opacity .3s var(--ux-ease),transform .45s var(--ux-spring)}
+.u010[data-open="1"] .u010-opt{opacity:1;transform:none}
+.u010[data-open="1"] li:nth-child(2) .u010-opt{transition-delay:.04s}
+.u010[data-open="1"] li:nth-child(3) .u010-opt{transition-delay:.08s}
+.u010-opt:hover,.u010-opt:focus-visible{background:var(--ux-surface-2);outline:none}
+.u010-oi{width:38px;height:38px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff}
+.u010-oi svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u010-opt b{display:block;font-size:14.5px;font-weight:680}
+.u010-opt small{display:block;margin-top:2px;font-size:12.5px;color:var(--ux-ink-3)}
+.u010-chk{margin-left:auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--ux-accent);color:var(--ux-accent-ink);transform:scale(0);transition:transform .45s var(--ux-spring)}
+.u010-chk svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u010-opt[aria-checked="true"] .u010-chk{transform:none}
+.u010-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+<div class="ux u010" data-state="idle" data-open="0">
+  <div class="u010-grp">
+    <button class="u010-main" type="button">
+      <span class="u010-ic" aria-hidden="true">
+        <svg class="u010-go" viewBox="0 0 24 24"><path d="M12 15l-3-3c1.5-4.5 4.5-7.5 10-8-.5 5.5-3.5 8.5-8 10zM9 12H5l2.5-3.5H11M12 15v4l3.5-2.5V13M6.5 17.5l-2 2"/></svg>
+        <svg class="u010-spin" viewBox="0 0 24 24"><path d="M12 4a8 8 0 1 0 8 8"/></svg>
+        <svg class="u010-ok" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2L18.5 8"/></svg>
+      </span>
+      <span class="u010-labs"><span class="u010-lab">Deploy now</span></span>
+      <span class="u010-bar" aria-hidden="true"></span>
+    </button>
+    <span class="u010-div" aria-hidden="true"></span>
+    <button class="u010-caret" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Choose how to deploy">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"/></svg>
+    </button>
+  </div>
+  <ul class="u010-menu" role="menu" aria-label="Deploy options">
+    <li role="none"><button class="u010-opt" type="button" role="menuitemradio" aria-checked="true" data-mode="Deploy now" data-busy="Deploying" data-done="Deployed"><span class="u010-oi" style="background:linear-gradient(140deg,#8B6CFF,#5B8CFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/></svg></span><span><b>Deploy now</b><small>Ships straight to production</small></span><span class="u010-chk" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2L9.5 3.6"/></svg></span></button></li>
+    <li role="none"><button class="u010-opt" type="button" role="menuitemradio" aria-checked="false" data-mode="Scheduled deploy" data-busy="Scheduling" data-done="Set for 6:00 PM"><span class="u010-oi" style="background:linear-gradient(140deg,#FFB547,#FF7A59)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4.5l3 2"/></svg></span><span><b>Scheduled deploy</b><small>Ships when traffic is low</small></span><span class="u010-chk" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2L9.5 3.6"/></svg></span></button></li>
+    <li role="none"><button class="u010-opt" type="button" role="menuitemradio" aria-checked="false" data-mode="Preview deploy" data-busy="Building preview" data-done="Preview ready"><span class="u010-oi" style="background:linear-gradient(140deg,#22C3A6,#3D8BFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg></span><span><b>Preview deploy</b><small>Creates a link only your team sees</small></span><span class="u010-chk" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="M2.5 6.2l2.2 2.2L9.5 3.6"/></svg></span></button></li>
+  </ul>
+  <span class="u010-live" aria-live="polite"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var main = root.querySelector('.u010-main');
+  var labs = root.querySelector('.u010-labs');
+  var caret = root.querySelector('.u010-caret');
+  var live = root.querySelector('.u010-live');
+  var opts = Array.prototype.slice.call(root.querySelectorAll('.u010-opt'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var cur = opts[0];
+  var timers = [];
+  function later(fn, ms) { timers.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+
+  function roll(text) {
+    var old = labs.lastElementChild;
+    if (old.textContent === text) return;
+    var s = document.createElement('span');
+    s.textContent = text;
+    s.style.position = 'absolute'; s.style.left = '0'; s.style.top = '0';
+    s.style.transform = 'translateY(100%)'; s.style.opacity = '0';
+    labs.appendChild(s);
+    void s.offsetWidth;
+    s.style.transform = 'none'; s.style.opacity = '1';
+    old.style.transform = 'translateY(-100%)'; old.style.opacity = '0';
+    setTimeout(function () { old.remove(); s.style.position = ''; }, rm ? 0 : 520);
+  }
+  function setOpen(v, focusFirst) {
+    root.dataset.open = v ? '1' : '0';
+    caret.setAttribute('aria-expanded', String(v));
+    opts.forEach(function (o) { o.tabIndex = v ? 0 : -1; });
+    if (v && focusFirst) setTimeout(function () { cur.focus({ preventScroll: true }); }, 30);
+  }
+  setOpen(false);
+  caret.addEventListener('click', function () { setOpen(root.dataset.open !== '1', true); });
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () {
+      cur = o;
+      opts.forEach(function (x) { x.setAttribute('aria-checked', String(x === o)); });
+      roll(o.dataset.mode);
+      setOpen(false);
+      caret.focus({ preventScroll: true });
+    });
+    o.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+      if (d) { e.preventDefault(); opts[(i + d + opts.length) % opts.length].focus(); }
+    });
+  });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && root.dataset.open === '1') { e.preventDefault(); setOpen(false); caret.focus({ preventScroll: true }); }
+  });
+  document.addEventListener('pointerdown', function (e) {
+    if (root.dataset.open === '1' && root.isConnected && !root.contains(e.target)) setOpen(false);
+  });
+
+  main.addEventListener('click', function () {
+    if (root.dataset.state !== 'idle') return;
+    setOpen(false);
+    root.dataset.state = 'busy';
+    roll(cur.dataset.busy);
+    live.textContent = cur.dataset.busy;
+    later(function () { root.dataset.state = 'done'; roll(cur.dataset.done); live.textContent = cur.dataset.done; }, rm ? 100 : 1600);
+    later(function () { root.dataset.state = 'idle'; roll(cur.dataset.mode); live.textContent = ''; }, rm ? 800 : 3400);
+  });
+})();
+</script>

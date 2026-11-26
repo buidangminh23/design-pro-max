@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #110 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#110 -->
+<!--
+Element: Schedule conflict fixer
+ID: 110 · Category: Layout, Schedule & Design · Tags: conflict, native, spatial
+What it does: A timeline showing two overlapping meetings. One button moves the later meeting into free time, and pressing it again puts it back.
+How to use it: Press “Move to 15:00”
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#110
+-->
+<style>
+.u110{width:100%;max-width:400px;min-width:0;font-size:13px}.u110 button{font:inherit;color:inherit;cursor:pointer}.u110 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u110 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u110{padding:14px 4px}.u110 .timeline{position:relative;height:170px;background:repeating-linear-gradient(90deg,transparent 0 calc(25% - 1px),var(--ux-line) calc(25% - 1px) 25%)}.u110 .ticks{display:flex;justify-content:space-between;font-size:12px;color:var(--ux-ink-2)}.u110 .event{position:absolute;height:42px;border-radius:5px;padding:12px;font-size:13px;white-space:nowrap}.u110 .fixed{top:43px;left:0;width:50%;background:color-mix(in srgb,var(--ux-accent) 15%,var(--ux-surface));border-left:3px solid var(--ux-accent)}.u110 .move{top:100px;left:25%;width:50%;background:#ad7654;color:#fff;transition:left .4s}.u110 .overlap{position:absolute;left:25%;width:25%;top:33px;height:120px;background:repeating-linear-gradient(135deg,#d6604820 0 5px,#d6604840 5px 7px);pointer-events:none}.u110[data-clear=true] .overlap{display:none}.u110 .resolve{display:block;min-height:44px;margin:15px auto 0;padding:10px 20px;border:1px solid var(--ux-line-2);border-radius:25px;background:var(--ux-surface);color:var(--ux-accent)}
+</style>
+<div class="ux u110"><div class="timeline"><div class="ticks"><span>14:00</span><span>15:00</span><span>16:00</span></div><div class="overlap"></div><div class="event fixed">Team review</div><div class="event move">1:1 meeting</div></div><button class="resolve" aria-pressed="false">Move to 15:00 →</button><output class="sr" aria-live="polite">30 min overlap</output></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let clear=false;function set(v){clear=v;root.dataset.clear=v;q(".move").style.left=v?"50%":"25%";q(".resolve").setAttribute("aria-pressed",v);q(".resolve").textContent=v?"✓ Resolved · Undo":"Move to 15:00 →";q("output").textContent=v?"15:00–16:00, resolved":"14:30–15:30, 30 min overlap"}q(".resolve").onclick=()=>set(!clear);})();
+</script>

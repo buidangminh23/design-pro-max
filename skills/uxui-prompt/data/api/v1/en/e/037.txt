@@ -1,0 +1,115 @@
+<!-- Lucian UX/UI Prompt #037 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#037 -->
+<!--
+Element: Account switcher menu
+ID: 037 · Category: Menus & Tabs · Tags: dropdown, menu, account, stagger, workspace
+What it does: Press the account chip at the bottom and the menu grows upward out of it while the items float in one by one. A highlight bar follows the cursor, and picking another workspace updates the chip’s name and color as the menu folds away.
+How to use it: Press the account chip below to close and reopen the menu, then pick another workspace
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#037
+-->
+<style>
+.u037{position:relative;width:320px;height:440px}
+.u037-menu{position:absolute;left:0;right:0;bottom:84px;padding:8px;border-radius:22px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 34px 64px -30px var(--ux-shadow-strong);
+  transform-origin:30px 100%;opacity:0;transform:translateY(10px) scale(.9);visibility:hidden;transition:opacity .2s var(--ux-ease),transform .45s var(--ux-spring),visibility 0s .45s}
+.u037.is-open .u037-menu{opacity:1;transform:none;visibility:visible;transition:opacity .2s var(--ux-ease),transform .5s var(--ux-spring)}
+.u037-sec{margin:6px 10px 6px;font-size:11.5px;font-weight:750;letter-spacing:.06em;color:var(--ux-ink-3)}
+.u037-list{position:relative;margin:0;padding:0;list-style:none}
+.u037-hl{position:absolute;left:0;right:0;top:0;height:var(--h,52px);border-radius:14px;background:var(--ux-surface-2);transform:translateY(var(--y,0));opacity:0;transition:transform .3s var(--ux-spring),height .3s var(--ux-spring),opacity .2s;pointer-events:none}
+.u037-list.is-hl .u037-hl{opacity:1}
+.u037-it{position:relative;display:flex;align-items:center;gap:12px;width:100%;height:52px;padding:0 10px;border:0;border-radius:14px;background:none;color:var(--ux-ink);font-size:14.5px;font-weight:630;text-align:left;
+  opacity:0;transform:translateY(8px);transition:opacity .25s var(--ux-ease),transform .45s var(--ux-spring)}
+.u037.is-open .u037-it{opacity:1;transform:none;transition-delay:calc(var(--i) * 32ms)}
+.u037-it:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-2px}
+.u037-ws{width:32px;height:32px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:800;color:#fff;background:var(--c)}
+.u037-it small{display:block;font-size:12px;font-weight:500;color:var(--ux-ink-3)}
+.u037-ck{margin-left:auto;width:18px;height:18px;fill:none;stroke:var(--ux-accent);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:scale(.4);transition:opacity .2s,transform .4s var(--ux-spring)}
+.u037-it[aria-checked="true"] .u037-ck{opacity:1;transform:none}
+.u037-ico{width:32px;height:32px;flex:none;display:grid;place-items:center;color:var(--ux-ink-2)}
+.u037-ico svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.u037-kbd{margin-left:auto;padding:3px 7px;border-radius:7px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:11.5px;font-weight:700;color:var(--ux-ink-3)}
+.u037-it.out{color:var(--ux-danger)}
+.u037-it.out .u037-ico{color:var(--ux-danger)}
+.u037-sep{height:1px;margin:6px 10px;background:var(--ux-line)}
+.u037-chip{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:12px;height:68px;padding:0 14px 0 12px;border:0;border-radius:22px;background:var(--ux-surface);color:var(--ux-ink);text-align:left;
+  box-shadow:0 0 0 1px var(--ux-line),0 18px 36px -24px var(--ux-shadow-strong);transition:transform .4s var(--ux-spring),box-shadow .3s}
+.u037-chip:hover{box-shadow:0 0 0 1px var(--ux-line-2),0 18px 36px -24px var(--ux-shadow-strong)}
+.u037-chip:active{transform:scale(.98)}
+.u037-chip:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u037-chip .u037-ws{width:42px;height:42px;border-radius:13px;font-size:16px;transition:background .4s var(--ux-ease)}
+.u037-chip b{display:block;font-size:15.5px;font-weight:720}
+.u037-chip small{display:block;margin-top:1px;font-size:12.5px;color:var(--ux-ink-3)}
+.u037-car{margin-left:auto;width:20px;height:20px;fill:none;stroke:var(--ux-ink-3);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .45s var(--ux-spring)}
+.u037.is-open .u037-car{transform:rotate(180deg)}
+</style>
+<div class="ux u037 is-open">
+  <div class="u037-menu" role="menu" aria-label="Account menu">
+    <p class="u037-sec">Workspaces</p>
+    <ul class="u037-list">
+      <li class="u037-hl" role="presentation"></li>
+      <li role="none"><button class="u037-it" type="button" role="menuitemradio" aria-checked="true" style="--i:0" data-ws="L" data-name="Lumen Design" data-sub="12 members · Pro" data-c="linear-gradient(140deg,#8B6CFF,#5B8CFF)"><span class="u037-ws" style="--c:linear-gradient(140deg,#8B6CFF,#5B8CFF)">L</span><span>Lumen Design<small>12 members · Pro</small></span><svg class="u037-ck" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.5 3.5L14 6"/></svg></button></li>
+      <li role="none"><button class="u037-it" type="button" role="menuitemradio" aria-checked="false" style="--i:1" data-ws="N" data-name="Northwind Studio" data-sub="4 members · Team" data-c="linear-gradient(140deg,#FFB547,#FF7A45)"><span class="u037-ws" style="--c:linear-gradient(140deg,#FFB547,#FF7A45)">N</span><span>Northwind Studio<small>4 members · Team</small></span><svg class="u037-ck" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.5 3.5L14 6"/></svg></button></li>
+    </ul>
+    <div class="u037-sep" role="separator"></div>
+    <ul class="u037-list">
+      <li class="u037-hl" role="presentation"></li>
+      <li role="none"><button class="u037-it" type="button" role="menuitem" style="--i:2"><span class="u037-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7.6 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3.6 14H3.5a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 7.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 10 3.6V3.5a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.6 1.6 0 0 0 20.4 10h.1a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1 1z"/></svg></span>Settings<span class="u037-kbd">⌘ ,</span></button></li>
+      <li role="none"><button class="u037-it" type="button" role="menuitem" style="--i:3"><span class="u037-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V7a4 4 0 0 1 8 0v4"/><rect x="5" y="11" width="14" height="9" rx="2.5"/></svg></span>Security & sign-in</button></li>
+      <li role="none"><button class="u037-it out" type="button" role="menuitem" style="--i:4"><span class="u037-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10"/></svg></span>Sign out</button></li>
+    </ul>
+  </div>
+  <button class="u037-chip" type="button" aria-haspopup="menu" aria-expanded="true">
+    <span class="u037-ws" style="--c:linear-gradient(140deg,#8B6CFF,#5B8CFF)" aria-hidden="true">L</span>
+    <span><b>Lumen Design</b><small>Seoyeon · seoyeon@example.com</small></span>
+    <svg class="u037-car" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 12l4-4 4 4"/></svg>
+  </button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var chip = root.querySelector('.u037-chip');
+  var items = Array.prototype.slice.call(root.querySelectorAll('.u037-it'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setOpen(v, focusFirst) {
+    root.classList.toggle('is-open', v);
+    chip.setAttribute('aria-expanded', String(v));
+    items.forEach(function (it) { it.tabIndex = v ? 0 : -1; });
+    if (v && focusFirst) setTimeout(function () { items[0].focus(); }, 60);
+  }
+  function hl(it) {
+    var list = it.closest('.u037-list');
+    Array.prototype.forEach.call(root.querySelectorAll('.u037-list'), function (l) { if (l !== list) l.classList.remove('is-hl'); });
+    var bar = list.querySelector('.u037-hl');
+    bar.style.setProperty('--y', it.parentNode.offsetTop + 'px');
+    bar.style.setProperty('--h', it.offsetHeight + 'px');
+    list.classList.add('is-hl');
+  }
+  items.forEach(function (it, i) {
+    it.addEventListener('pointerenter', function () { hl(it); });
+    it.addEventListener('focus', function () { hl(it); });
+    it.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+      if (d) { e.preventDefault(); items[(i + d + items.length) % items.length].focus(); }
+    });
+    it.addEventListener('click', function () {
+      if (it.dataset.ws) {
+        items.forEach(function (x) { if (x.dataset.ws) x.setAttribute('aria-checked', String(x === it)); });
+        var ws = chip.querySelector('.u037-ws');
+        ws.textContent = it.dataset.ws;
+        ws.style.setProperty('--c', it.dataset.c);
+        chip.querySelector('b').textContent = it.dataset.name;
+        if (ws.animate && !rm) ws.animate([{ transform: 'scale(.6) rotate(-20deg)' }, { transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.34,1.45,.64,1)' });
+      }
+      setOpen(false);
+      chip.focus({ preventScroll: true });
+    });
+  });
+  root.querySelector('.u037-menu').addEventListener('pointerleave', function () {
+    Array.prototype.forEach.call(root.querySelectorAll('.u037-list'), function (l) { l.classList.remove('is-hl'); });
+  });
+  chip.addEventListener('click', function () { setOpen(!root.classList.contains('is-open'), false); });
+  chip.addEventListener('keydown', function (e) { if (e.key === 'ArrowUp') { e.preventDefault(); setOpen(true, true); } });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) { e.preventDefault(); setOpen(false); chip.focus(); } });
+  setOpen(true, false);
+})();
+</script>

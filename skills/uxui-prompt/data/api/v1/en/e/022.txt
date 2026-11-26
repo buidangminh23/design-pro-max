@@ -1,0 +1,97 @@
+<!-- Lucian UX/UI Prompt #022 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#022 -->
+<!--
+Element: Heart burst like
+ID: 022 · Category: Toggles & Pickers · Tags: like, heart, burst, toggle, counter
+What it does: The heart crouches, fills with red and leaps, while a ring and little dots burst out around it. The like count rolls up by one; press again and it quietly goes back.
+How to use it: Press the heart
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#022
+-->
+<style>
+.u022{position:relative;width:280px;height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.u022-btn{position:relative;width:112px;height:112px;border:0;padding:0;border-radius:50%;background:var(--ux-surface);color:var(--ux-ink-2);
+  box-shadow:0 0 0 1px var(--ux-line),0 24px 40px -24px var(--ux-shadow-strong);transition:transform .45s var(--ux-spring),box-shadow .5s var(--ux-ease)}
+.u022-btn:hover{transform:scale(1.05)}
+.u022-btn:active{transform:scale(.9)}
+.u022-btn:focus-visible{outline:2px solid #FF4D6D;outline-offset:5px}
+.u022.is-on .u022-btn{box-shadow:0 0 0 1px color-mix(in srgb,#FF4D6D 30%,transparent),0 24px 44px -22px rgba(255,77,109,.65)}
+.u022-heart{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-24px 0 0 -26px}
+.u022-heart svg{width:100%;height:100%;overflow:visible}
+.u022-o{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linejoin:round}
+.u022-f{fill:url(#u022-g);transform-origin:50% 55%;transform:scale(0);transition:transform .2s var(--ux-ease)}
+.u022.is-on .u022-f{transform:scale(1)}
+.u022.is-pop .u022-heart{animation:u022-beat .7s var(--ux-ease)}
+@keyframes u022-beat{0%{transform:scale(1)}18%{transform:scale(.72)}48%{transform:scale(1.24)}70%{transform:scale(.94)}100%{transform:scale(1)}}
+.u022.is-pop .u022-f{animation:u022-fill .7s var(--ux-ease)}
+@keyframes u022-fill{0%,18%{transform:scale(0)}48%{transform:scale(1)}}
+.u022-ring{position:absolute;left:50%;top:50%;width:140px;height:140px;margin:-70px;border-radius:50%;border:12px solid #FF7A93;transform:scale(0);opacity:0;pointer-events:none}
+.u022.is-pop .u022-ring{animation:u022-ring .6s var(--ux-ease) .1s}
+@keyframes u022-ring{0%{transform:scale(.3);opacity:1;border-width:22px}100%{transform:scale(1);opacity:0;border-width:0}}
+.u022-dot{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none;transform:rotate(var(--a))}
+.u022-dot i{position:absolute;width:9px;height:9px;margin:-4.5px;border-radius:50%;background:var(--c);opacity:0}
+.u022-dot i+i{width:6px;height:6px;margin:-3px;background:var(--c2)}
+.u022.is-pop .u022-dot i{animation:u022-fly .7s var(--ux-ease) .18s}
+.u022.is-pop .u022-dot i+i{animation-name:u022-fly2}
+@keyframes u022-fly{0%{opacity:1;transform:translate(0,-46px) scale(1)}100%{opacity:0;transform:translate(0,-84px) scale(.2)}}
+@keyframes u022-fly2{0%{opacity:1;transform:translate(9px,-40px) scale(1)}100%{opacity:0;transform:translate(16px,-74px) scale(.2)}}
+.u022-meta{margin:0;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:680;color:var(--ux-ink-2)}
+.u022-roll{position:relative;display:inline-block;height:22px;overflow:hidden;font-variant-numeric:tabular-nums;color:var(--ux-ink)}
+.u022-roll span{display:block;line-height:22px;transition:transform .5s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u022-roll span+span{position:absolute;left:0;top:0}
+</style>
+<div class="ux u022">
+  <button class="u022-btn" type="button" aria-pressed="false" aria-label="Like">
+    <span class="u022-ring" aria-hidden="true"></span>
+    <span class="u022-dot" style="--a:0deg;--c:#FF4D6D;--c2:#FFB26B" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:51deg;--c:#8B6CFF;--c2:#FF7A93" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:103deg;--c:#FFB547;--c2:#22C3A6" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:154deg;--c:#FF4D6D;--c2:#8B6CFF" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:206deg;--c:#22C3A6;--c2:#FFB547" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:257deg;--c:#FF7A93;--c2:#3D8BFF" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-dot" style="--a:309deg;--c:#3D8BFF;--c2:#FF4D6D" aria-hidden="true"><i></i><i></i></span>
+    <span class="u022-heart" aria-hidden="true">
+      <svg viewBox="0 0 52 52">
+        <defs><linearGradient id="u022-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF7A93"/><stop offset="1" stop-color="#F0264D"/></linearGradient></defs>
+        <path class="u022-f" d="M26 45S5 33 5 18.5C5 11.6 10.4 7 16.4 7c4.3 0 7.6 2.3 9.6 5.6C28 9.3 31.3 7 35.6 7 41.6 7 47 11.6 47 18.5 47 33 26 45 26 45z"/>
+        <path class="u022-o" d="M26 45S5 33 5 18.5C5 11.6 10.4 7 16.4 7c4.3 0 7.6 2.3 9.6 5.6C28 9.3 31.3 7 35.6 7 41.6 7 47 11.6 47 18.5 47 33 26 45 26 45z"/>
+      </svg>
+    </span>
+  </button>
+  <p class="u022-meta"><span class="u022-roll" aria-live="polite"><span>842</span><span></span></span> people like this</p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u022-btn');
+  var roll = root.querySelector('.u022-roll');
+  var outline = root.querySelector('.u022-o');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var gid = 'u022-g-' + Math.random().toString(36).slice(2, 7);
+  root.querySelector('linearGradient').id = gid;
+  root.querySelector('.u022-f').style.fill = 'url(#' + gid + ')';
+  var n = 842, on = false, ci = 0, t = 0;
+  function rollTo(v, up) {
+    var cur = roll.children[ci], nxt = roll.children[1 - ci];
+    nxt.style.transition = 'none';
+    nxt.textContent = v;
+    nxt.style.transform = 'translateY(' + (up ? 100 : -100) + '%)'; nxt.style.opacity = '0';
+    void nxt.offsetWidth;
+    nxt.style.transition = '';
+    nxt.style.transform = 'none'; nxt.style.opacity = '1';
+    cur.style.transform = 'translateY(' + (up ? -100 : 100) + '%)'; cur.style.opacity = '0';
+    ci = 1 - ci;
+  }
+  btn.addEventListener('click', function () {
+    on = !on;
+    n += on ? 1 : -1;
+    root.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    outline.style.stroke = on ? 'transparent' : '';
+    rollTo(n, on);
+    root.classList.remove('is-pop');
+    clearTimeout(t);
+    if (on && !rm) { void root.offsetWidth; root.classList.add('is-pop'); t = setTimeout(function () { root.classList.remove('is-pop'); }, 900); }
+  });
+})();
+</script>

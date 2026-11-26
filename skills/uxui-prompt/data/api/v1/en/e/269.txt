@@ -1,0 +1,108 @@
+<!-- Lucian UX/UI Prompt #269 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#269 -->
+<!--
+Element: Type-the-name delete confirmation
+ID: 269 · Category: App Screens · Tags: delete, confirm, destructive, modal, saas
+What it does: Press Delete in a project's danger zone and a warning dialog appears; the delete button only turns on once you type the project name exactly. The name above the field fills in red as you type it correctly, and a wrong letter shakes the field. Deleting scatters the project card behind into fragments as it vanishes, leaving a notice with an Undo button whose remaining time shrinks.
+How to use it: Press Delete, type the project name and delete it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#269
+-->
+<style>
+.u269{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u269-pg{position:absolute;inset:0;padding:20px 18px}
+.u269-pg h3{margin:0;font-size:16px;font-weight:900}
+.u269-pc{position:relative;display:flex;align-items:center;gap:11px;margin-top:12px;padding:13px;border-radius:16px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);height:66px;box-sizing:border-box}
+.u269-pc i{flex:none;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#38BDF8,#6366F1)}
+.u269-pc b{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;font-weight:800}
+.u269-pc small{display:block;margin-top:2px;font-size:10px;font-weight:700;color:var(--ux-ink-3)}
+.u269.is-gone .u269-pc{visibility:hidden}
+.u269-em{position:absolute;left:18px;right:18px;top:52px;height:66px;display:grid;place-items:center;border-radius:16px;border:1.5px dashed var(--ux-line);font-size:11px;font-weight:750;color:var(--ux-ink-3);opacity:0;transition:opacity .4s .5s}
+.u269.is-gone .u269-em{opacity:1}
+.u269-fr{position:absolute;left:18px;top:52px;width:304px;height:66px;pointer-events:none}
+.u269-fr span{position:absolute;border-radius:3px;background:var(--ux-surface-3)}
+.u269-dg{margin-top:16px;padding:13px;border-radius:16px;box-shadow:inset 0 0 0 1px color-mix(in srgb,#E11D48 35%,transparent)}
+.u269-dg b{display:block;font-size:12px;font-weight:850;color:#BE123C}
+.u269-dg div{display:flex;align-items:center;gap:10px;margin-top:6px}
+.u269-dg span{flex:1;font-size:10.5px;line-height:1.4;font-weight:650;color:var(--ux-ink-2)}
+.u269-dz{height:32px;padding:0 13px;border:0;border-radius:9px;background:#E11D48;color:#fff;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer}
+.u269-dim{position:absolute;inset:0;background:rgba(10,10,20,.42);opacity:0;pointer-events:none;transition:opacity .3s}
+.u269.is-m .u269-dim{opacity:1;pointer-events:auto}
+.u269-md{position:absolute;left:16px;right:16px;top:50%;margin-top:-118px;padding:18px;border-radius:20px;background:var(--ux-surface);box-shadow:0 30px 60px -20px rgba(0,0,0,.45);transform:translateY(16px) scale(.96);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.3,1.3,.5,1),opacity .2s}
+.u269.is-m .u269-md{transform:none;opacity:1;pointer-events:auto}
+.u269-md h4{display:flex;align-items:center;gap:8px;margin:0;font-size:15px;font-weight:900}
+.u269-md h4 i{width:24px;height:24px;border-radius:8px;background:color-mix(in srgb,#E11D48 15%,transparent);color:#E11D48;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:900}
+.u269-md p{margin:8px 0 0;font-size:11px;line-height:1.5;font-weight:650;color:var(--ux-ink-2)}
+.u269-nm{display:inline-flex;margin-top:12px;padding:5px 9px;border-radius:8px;background:var(--ux-surface-2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;font-weight:800;color:var(--ux-ink-3)}
+.u269-nm span{transition:color .15s}
+.u269-nm span.is-ok{color:#E11D48}
+.u269-in{display:block;width:100%;height:42px;margin-top:8px;padding:0 12px;border:0;border-radius:11px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;font-weight:700;outline:none;box-sizing:border-box}
+.u269-in:focus{box-shadow:inset 0 0 0 2px #E11D48}
+.u269-in.is-shake{animation:u269-sh .35s}
+@keyframes u269-sh{25%,75%{transform:translateX(-4px)}50%{transform:translateX(4px)}}
+.u269-bs{display:flex;gap:6px;margin-top:14px}
+.u269-bs button{flex:1;height:40px;border:0;border-radius:11px;font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.u269-cx{background:var(--ux-surface-2);color:var(--ux-ink-2)}
+.u269-go{background:#E11D48;color:#fff;transition:opacity .2s}
+.u269-go:disabled{opacity:.3;cursor:not-allowed}
+.u269-tt{position:absolute;left:14px;right:14px;bottom:14px;display:flex;align-items:center;gap:10px;height:46px;padding:0 6px 0 14px;border-radius:14px;background:var(--ux-ink);color:var(--ux-surface);font-size:11.5px;font-weight:750;overflow:hidden;transform:translateY(140%);transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.u269-tt.is-on{transform:none}
+.u269-tt span{flex:1}
+.u269-un{height:34px;padding:0 12px;border:0;border-radius:10px;background:color-mix(in srgb,var(--ux-surface) 16%,transparent);color:var(--ux-surface);font:inherit;font-size:11.5px;font-weight:850;cursor:pointer}
+.u269-tt i{position:absolute;left:0;bottom:0;height:3px;width:100%;background:#F43F5E;transform-origin:0 50%}
+.u269 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u269-md,.u269-dim,.u269-tt,.u269-em{transition:none}.u269-in.is-shake{animation:none}}
+</style>
+<div class="ux u269">
+  <div class="u269-pg"><h3>Project settings</h3>
+    <div class="u269-pc"><i aria-hidden="true"></i><div><b>my-landing</b><small>Deployed 3 min ago · 12k visits</small></div></div>
+    <div class="u269-dg"><b>Danger zone</b><div><span>Removes the project and every deployment</span><button type="button" class="u269-dz">Delete</button></div></div>
+  </div>
+  <div class="u269-em" aria-hidden="true">Nothing here yet</div>
+  <div class="u269-fr" aria-hidden="true"></div>
+  <div class="u269-dim" aria-hidden="true"></div>
+  <div class="u269-md" role="alertdialog" aria-modal="true" aria-hidden="true"><h4 class="u269-ht"><i aria-hidden="true">!</i>Delete this project?</h4><p>This can’t be undone. Type the name below to confirm.</p><div class="u269-nm" aria-hidden="true"></div><input class="u269-in" aria-label="Type the project name" autocomplete="off" spellcheck="false"><div class="u269-bs"><button type="button" class="u269-cx">Cancel</button><button type="button" class="u269-go" disabled>Delete forever</button></div></div>
+  <div class="u269-tt" role="status"><span>Project deleted</span><button type="button" class="u269-un" tabindex="-1">Undo</button><i aria-hidden="true"></i></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var dz = root.querySelector('.u269-dz'), md = root.querySelector('.u269-md'), nm = root.querySelector('.u269-nm'), inp = root.querySelector('.u269-in'), go = root.querySelector('.u269-go'), cx = root.querySelector('.u269-cx'), fr = root.querySelector('.u269-fr'), tt = root.querySelector('.u269-tt'), bar = tt.querySelector('i'), un = root.querySelector('.u269-un'), dim = root.querySelector('.u269-dim');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var uid = 'u269' + Math.random().toString(36).slice(2, 7); root.querySelector('.u269-ht').id = uid; md.setAttribute('aria-labelledby', uid);
+  var NAME = 'my-landing', L = NAME.split('').map(function (ch) { var s = document.createElement('span'); s.textContent = ch; nm.appendChild(s); return s; });
+  function open(v) { root.classList.toggle('is-m', v); md.setAttribute('aria-hidden', !v); if (v) { inp.value = ''; sync(); setTimeout(function () { inp.focus({ preventScroll: true }); }, rm ? 0 : 200); } else dz.focus({ preventScroll: true }); }
+  var lastLen = 0;
+  function sync() {
+    var v = inp.value, k = 0; while (k < v.length && v[k] === NAME[k]) k++;
+    L.forEach(function (s, i) { s.classList.toggle('is-ok', i < k); });
+    if (v.length > lastLen && k < v.length && !rm) { inp.classList.remove('is-shake'); void inp.offsetWidth; inp.classList.add('is-shake'); }
+    lastLen = v.length; go.disabled = v !== NAME;
+  }
+  function shatter() {
+    fr.innerHTML = '';
+    if (rm) return;
+    for (var y = 0; y < 66; y += 11) for (var x = 0; x < 304; x += 16) {
+      var s = document.createElement('span'); s.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:16px;height:11px';
+      fr.appendChild(s);
+      s.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + ((Math.random() - .3) * 90).toFixed(0) + 'px,' + (40 + Math.random() * 120).toFixed(0) + 'px) rotate(' + ((Math.random() - .5) * 200).toFixed(0) + 'deg) scale(.4)', opacity: 0 }], { duration: 700 + Math.random() * 300, delay: (x / 304) * 220 + Math.random() * 80, easing: 'cubic-bezier(.5,0,.8,.6)', fill: 'forwards' });
+    }
+    setTimeout(function () { fr.innerHTML = ''; }, 1400);
+  }
+  var tm = 0, anim = null;
+  go.addEventListener('click', function () {
+    if (go.disabled) return;
+    open(false); shatter(); root.classList.add('is-gone');
+    tt.classList.add('is-on'); un.tabIndex = 0;
+    if (anim) anim.cancel();
+    if (bar.animate) anim = bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: 6000, fill: 'forwards' });
+    clearTimeout(tm); tm = setTimeout(function () { tt.classList.remove('is-on'); un.tabIndex = -1; }, 6000);
+  });
+  un.addEventListener('click', function () { clearTimeout(tm); tt.classList.remove('is-on'); un.tabIndex = -1; root.classList.remove('is-gone'); dz.focus({ preventScroll: true }); });
+  dz.addEventListener('click', function () { if (!root.classList.contains('is-gone')) open(true); });
+  cx.addEventListener('click', function () { open(false); });
+  dim.addEventListener('click', function () { open(false); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-m')) open(false); if (e.key === 'Enter' && document.activeElement === inp && !go.disabled) go.click(); });
+  inp.addEventListener('input', sync);
+})();
+</script>

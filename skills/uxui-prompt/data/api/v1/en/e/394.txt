@@ -1,0 +1,66 @@
+<!-- Lucian UX/UI Prompt #394 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#394 -->
+<!--
+Element: Scroll-driven marquee rows
+ID: 394 · Category: Scroll Motion · Tags: scroll, marquee, velocity, typography, banner
+What it does: Three rows of big text drift slowly in opposite directions, then speed up with your scroll and lean slightly toward the motion. Scroll up and the direction flips; stop and they ease back to a lazy drift.
+How to use it: Scroll quickly up and down inside the card
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#394
+-->
+<style>
+.u394{--fg:var(--ux-page);--fg:light-dark(var(--ux-page),var(--ux-ink));position:relative;width:340px;height:330px;border-radius:28px;background:var(--ux-ink);background:light-dark(var(--ux-ink),var(--ux-surface-2));box-shadow:0 30px 60px -36px var(--ux-shadow-strong);box-shadow:0 0 0 1px light-dark(transparent,var(--ux-line)),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;color:var(--ux-page);color:var(--fg)}
+.u394-sc{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;outline:none}
+.u394-sc::-webkit-scrollbar{display:none}
+.u394-run{height:2400px}
+.u394-st{position:sticky;top:0;height:330px;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:hidden}
+.u394-row{display:flex;white-space:nowrap;will-change:transform}
+.u394-row span{flex:none;padding-right:.3em;font-size:52px;line-height:1.05;font-weight:900;letter-spacing:-.04em}
+.u394-row:nth-child(2) span{font-size:30px;font-weight:800;color:var(--ux-accent);letter-spacing:-.03em}
+.u394-row:nth-child(3) span{color:transparent;-webkit-text-stroke:1.5px color-mix(in srgb,var(--fg) 70%,transparent)}
+.u394-hint{position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:11.5px;font-weight:750;color:color-mix(in srgb,var(--fg) 50%,transparent)}
+</style>
+<div class="ux u394">
+  <div class="u394-sc" tabindex="0" aria-label="Moving text rows, scroll to change their speed"><div class="u394-run"><div class="u394-st" aria-hidden="true"></div></div></div>
+  <span class="u394-hint" aria-hidden="true">Scroll to change the speed</span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u394-sc'), st = root.querySelector('.u394-st');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ROWS = ['DESIGN · MOTION · CODE · ', 'Interfaces that speak in motion · ', 'LUCIAN LABS · 2026 · '];
+  var rows = ROWS.map(function (t, i) {
+    var r = document.createElement('div');
+    r.className = 'u394-row';
+    for (var k = 0; k < 4; k++) { var s = document.createElement('span'); s.textContent = t; r.appendChild(s); }
+    st.appendChild(r);
+    return { el: r, x: -Math.random() * 200, dir: i % 2 ? 1 : -1, w: 0 };
+  });
+  st.setAttribute('aria-label', ROWS.join(' '));
+  var lastY = 0, boost = 0, sign = 1, last = 0, vis = true, skew = 0;
+  sc.addEventListener('scroll', function () {
+    var dy = sc.scrollTop - lastY;
+    lastY = sc.scrollTop;
+    boost = Math.min(40, boost + Math.abs(dy) * 0.25);
+    if (dy) sign = dy > 0 ? 1 : -1;
+  }, { passive: true });
+  function frame(now) {
+    if (!root.isConnected) return;
+    var dt = Math.max(0, Math.min(50, now - (last || now))) / 16.7;
+    last = now;
+    boost *= Math.pow(0.92, dt);
+    skew += ((boost > 1 ? sign * Math.min(8, boost * 0.35) : 0) - skew) * 0.15 * dt;
+    rows.forEach(function (r) {
+      if (!r.w) r.w = r.el.firstChild.offsetWidth;
+      r.x += r.dir * sign * (0.5 + boost) * dt;
+      if (r.x < -r.w) r.x += r.w;
+      if (r.x > 0) r.x -= r.w;
+      r.el.style.transform = 'translateX(' + r.x.toFixed(1) + 'px) skewX(' + (-skew * r.dir).toFixed(2) + 'deg)';
+    });
+    if (vis && !rm) requestAnimationFrame(frame);
+  }
+  new IntersectionObserver(function (en) { var was = vis; vis = en[0].isIntersecting; if (vis && !was) requestAnimationFrame(frame); }).observe(root);
+  requestAnimationFrame(frame);
+})();
+</script>

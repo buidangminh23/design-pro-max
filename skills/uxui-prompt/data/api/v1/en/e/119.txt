@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #119 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#119 -->
+<!--
+Element: Layered shadows
+ID: 119 · Category: Layout, Schedule & Design · Tags: shadow, native, spatial
+What it does: A card sample that pairs a tight contact shadow with a wide ambient one. Raise the elevation and the card lifts while both shadows change in proportion.
+How to use it: Move the elevation slider
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#119
+-->
+<style>
+.u119{width:100%;max-width:400px;min-width:0;font-size:13px}.u119 button{font:inherit;color:inherit;cursor:pointer}.u119 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u119 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u119{max-width:340px;padding:15px 8px}.u119 .stage{height:195px;display:grid;place-items:center;overflow:visible;background:var(--ux-surface-2);border-radius:70px 5px 5px 5px}.u119 .tile{width:115px;height:85px;background:var(--ux-surface);border:1px solid var(--ux-line);border-radius:14px;display:grid;place-items:center;font-size:35px;color:var(--ux-accent);box-shadow:0 6px 12px var(--ux-shadow),0 14px 30px var(--ux-shadow);transition:box-shadow .3s,transform .3s}.u119 label{display:flex;gap:14px;align-items:center;margin-top:24px;color:var(--ux-ink-2)}.u119 input{flex:1;height:26px}.u119 output{font-size:13px;min-width:31px;font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u119"><div class="stage"><div class="tile" aria-label="Layered shadow sample">✦</div></div><label>Elevation<input class="depth" type="range" min="0" max="24" value="6" aria-label="Shadow elevation"><output aria-live="polite">6px</output></label></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];function paint(){const v=+q('.depth').value;q('.tile').style.boxShadow=`0 ${v}px ${v*2}px var(--ux-shadow),0 ${v*2+2}px ${v*4+6}px var(--ux-shadow)`;q('.tile').style.transform=`translateY(${-v/3}px)`;q('output').textContent=v+'px'}q('.depth').oninput=paint;paint();})();
+</script>

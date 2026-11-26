@@ -1,0 +1,85 @@
+<!-- Lucian UX/UI Prompt #050 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#050 -->
+<!--
+Element: Spotlight-tilt news card
+ID: 050 · Category: Cards & Content · Tags: news, card, tilt, glare, read-state
+What it does: The card tilts toward the cursor while the surface glare and the border light gather at the same spot. Press “Mark as read” and the unread dot drops away, the headline quiets down and the button turns into a check.
+How to use it: Move the cursor over the card. Use the button below to mark it read, and press again to undo
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#050
+-->
+<style>
+.u050{--mx:50%;--my:30%;--rx:0deg;--ry:0deg;position:relative;width:340px;height:400px;perspective:1000px}
+.u050-card{position:relative;width:100%;height:100%;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 50px -30px var(--ux-shadow-strong);transform:rotateX(var(--rx)) rotateY(var(--ry));transition:transform .6s var(--ux-ease),box-shadow .5s;overflow:hidden;isolation:isolate}
+.u050.is-live .u050-card{transition:transform .12s linear,box-shadow .5s}
+.u050-card::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:radial-gradient(200px circle at var(--mx) var(--my),var(--ux-accent),transparent 70%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);opacity:0;transition:opacity .4s;pointer-events:none;z-index:3}
+.u050-glare{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.28),transparent 60%);mix-blend-mode:soft-light;opacity:0;transition:opacity .4s}
+.u050.is-live .u050-card::after,.u050.is-live .u050-glare{opacity:1}
+.u050-img{position:relative;height:178px;overflow:hidden;background:linear-gradient(160deg,#5B8CFF,#7B61FF 45%,#FF6B8B)}
+.u050-img i{position:absolute;border-radius:50%;transition:transform .6s var(--ux-ease)}
+.u050-img i:nth-child(1){width:150px;height:150px;left:-30px;top:40px;background:radial-gradient(circle at 40% 35%,#A5F2D3,#22C3A6 70%);transform:translate(calc(var(--tx,0) * -16px),calc(var(--ty,0) * -12px))}
+.u050-img i:nth-child(2){width:90px;height:90px;right:40px;top:24px;background:radial-gradient(circle at 40% 35%,#FFE2B8,#FFB547 70%);transform:translate(calc(var(--tx,0) * -30px),calc(var(--ty,0) * -20px))}
+.u050-img i:nth-child(3){width:220px;height:220px;right:-80px;bottom:-130px;background:radial-gradient(circle at 40% 30%,#B7A4FF,#5B3FD9 70%)}
+.u050-img b{position:absolute;left:16px;top:16px;height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;background:rgba(255,255,255,.22);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#fff;font-size:11.5px;font-weight:800;letter-spacing:.06em}
+.u050-body{padding:16px 20px 0}
+.u050-src{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--ux-ink-2)}
+.u050-src i{width:20px;height:20px;border-radius:6px;background:var(--ux-ink);position:relative}
+.u050-src i::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--ux-page)}
+.u050-dot{width:8px;height:8px;margin-left:auto;border-radius:50%;background:var(--ux-accent);box-shadow:0 0 0 4px var(--ux-accent-soft);transition:transform .45s var(--ux-spring),opacity .3s}
+.u050-h{margin:10px 0 0;font-size:19px;line-height:1.32;font-weight:780;letter-spacing:-.035em;transition:color .5s}
+.u050-p{margin:6px 0 0;font-size:13px;line-height:1.55;color:var(--ux-ink-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.u050-foot{position:absolute;left:20px;right:16px;bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--ux-ink-3)}
+.u050-btn{position:relative;height:38px;padding:0 14px 0 12px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:var(--ux-ink);color:var(--ux-page);font-size:13px;font-weight:720;transition:background-color .4s,color .4s,transform .35s var(--ux-spring)}
+.u050-btn:active{transform:scale(.94)}
+.u050-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u050-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u050-btn path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .4s var(--ux-ease) .1s}
+.u050-btn circle{transition:opacity .2s}
+.u050-card.is-read .u050-btn{background:color-mix(in srgb,var(--ux-mint) 16%,transparent);color:var(--ux-mint)}
+.u050-card.is-read .u050-btn path{stroke-dashoffset:0}
+.u050-card.is-read .u050-btn circle{opacity:0}
+.u050-card.is-read .u050-dot{transform:scale(0);opacity:0}
+.u050-card.is-read .u050-h{color:var(--ux-ink-3)}
+</style>
+<article class="ux u050">
+  <div class="u050-card">
+    <span class="u050-glare" aria-hidden="true"></span>
+    <div class="u050-img" aria-hidden="true"><i></i><i></i><i></i><b>DESIGN</b></div>
+    <div class="u050-body">
+      <div class="u050-src"><i aria-hidden="true"></i>Design Weekly<span class="u050-dot" role="img" aria-label="Unread"></span></div>
+      <h3 class="u050-h">Why mobile tab bars are back</h3>
+      <p class="u050-p">Thumb-reach navigation is back. Here’s how five big apps changed.</p>
+    </div>
+    <div class="u050-foot"><span>Today 9:20 AM · 8 min</span><button class="u050-btn" type="button" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="2.4" fill="currentColor" stroke="none"/><path d="M3.5 8.3l3 3 6-6.3"/></svg><span>Mark as read</span></button></div>
+  </div>
+</article>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var card = root.querySelector('.u050-card'), btn = root.querySelector('.u050-btn'), dot = root.querySelector('.u050-dot');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  root.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'touch') return;
+    var r = root.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    root.classList.add('is-live');
+    root.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+    root.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+    if (rm) return;
+    root.style.setProperty('--tx', (x - 0.5).toFixed(3)); root.style.setProperty('--ty', (y - 0.5).toFixed(3));
+    root.style.setProperty('--ry', ((x - 0.5) * 14).toFixed(2) + 'deg');
+    root.style.setProperty('--rx', ((0.5 - y) * 10).toFixed(2) + 'deg');
+  });
+  root.addEventListener('pointerleave', function () {
+    root.classList.remove('is-live');
+    ['--rx', '--ry'].forEach(function (k) { root.style.setProperty(k, '0deg'); });
+    ['--tx', '--ty'].forEach(function (k) { root.style.setProperty(k, 0); });
+  });
+  btn.addEventListener('click', function () {
+    var on = !card.classList.contains('is-read');
+    card.classList.toggle('is-read', on);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.lastChild.textContent = on ? 'Marked read' : 'Mark as read';
+    dot.setAttribute('aria-label', on ? 'Read' : 'Unread');
+  });
+})();
+</script>

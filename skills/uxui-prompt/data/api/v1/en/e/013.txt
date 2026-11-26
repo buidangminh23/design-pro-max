@@ -1,0 +1,105 @@
+<!-- Lucian UX/UI Prompt #013 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#013 -->
+<!--
+Element: Stretchy switch
+ID: 013 · Category: Toggles & Pickers · Tags: switch, toggle, squash, drag, stretch
+What it does: While it travels, the knob stretches like rubber and then snaps back into place. The symbol inside the knob is redrawn from ✕ to ✓ and the caption below changes with the state. You can also drag the knob.
+How to use it: Press the switch or drag the knob left and right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#013
+-->
+<style>
+.u013{--on:linear-gradient(135deg,#2FD8A8,#14B8A6 55%,#0EA5E9);position:relative;width:300px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.u013-sw{position:relative;width:140px;height:76px;border:0;padding:0;border-radius:999px;background:var(--ux-surface-3);touch-action:none;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.12),inset 0 0 0 1px var(--ux-line);transition:box-shadow .5s var(--ux-ease)}
+.u013-sw::before{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--on);opacity:0;transition:opacity .45s var(--ux-ease)}
+.u013-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u013.is-on .u013-sw::before{opacity:1}
+.u013.is-on .u013-sw{box-shadow:inset 0 2px 6px rgba(0,0,0,.12),0 16px 30px -16px rgba(20,184,166,.8)}
+
+.u013-knob{position:absolute;top:8px;left:8px;width:60px;height:60px;border-radius:999px;background:#fff;display:grid;place-items:center;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 6px 14px -4px rgba(0,0,0,.28),0 0 0 .5px rgba(0,0,0,.06);
+  transition:left .5s var(--ux-spring),width .32s var(--ux-ease)}
+.u013.is-on .u013-knob{left:72px}
+.u013.is-stretch .u013-knob{width:84px;transition:left .5s var(--ux-spring),width .18s var(--ux-ease)}
+.u013.is-on.is-stretch .u013-knob{left:48px}
+.u013.is-drag .u013-knob{transition:width .2s var(--ux-ease)}
+.u013-knob svg{width:24px;height:24px;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u013-x{stroke:#A3A0AA;stroke-dasharray:14;stroke-dashoffset:0;transition:stroke-dashoffset .3s var(--ux-ease) .1s}
+.u013-v{stroke:#14B8A6;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u013.is-on .u013-x{stroke-dashoffset:14;transition-delay:0s}
+.u013.is-on .u013-v{stroke-dashoffset:0;transition-delay:.18s}
+.u013-txt{width:260px;text-align:center}
+.u013-txt b{display:block;font-size:18px;font-weight:740;letter-spacing:-.03em}
+.u013-sub{position:relative;display:block;height:20px;margin-top:5px;overflow:hidden;font-size:14px;color:var(--ux-ink-3)}
+.u013-sub span{display:block;line-height:20px;transition:transform .5s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u013-sub span+span{position:absolute;left:0;right:0;top:0;transform:translateY(100%);opacity:0;color:var(--ux-mint);font-weight:620}
+.u013.is-on .u013-sub span:first-child{transform:translateY(-100%);opacity:0}
+.u013.is-on .u013-sub span+span{transform:none;opacity:1}
+</style>
+<div class="ux u013">
+  <button class="u013-sw" type="button" role="switch" aria-checked="false">
+    <span class="u013-knob" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path class="u013-x" d="M7.5 7.5l9 9M16.5 7.5l-9 9"/><path class="u013-v" d="M5.5 12.5l4.5 4.5 8.5-9"/></svg>
+    </span>
+  </button>
+  <div class="u013-txt">
+    <b class="u013-lab">Do Not Disturb</b>
+    <span class="u013-sub" aria-live="polite"><span>Notifications ring as usual</span><span>Silenced until 8 AM tomorrow</span></span>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sw = root.querySelector('.u013-sw');
+  var knob = root.querySelector('.u013-knob');
+  var lab = root.querySelector('.u013-lab');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var id = 'u013-l-' + Math.random().toString(36).slice(2, 7);
+  lab.id = id;
+  sw.setAttribute('aria-labelledby', id);
+  var on = false, t = 0;
+
+  function set(v) {
+    on = v;
+    root.classList.toggle('is-on', v);
+    sw.setAttribute('aria-checked', String(v));
+    if (!rm) {
+      root.classList.add('is-stretch');
+      clearTimeout(t);
+      t = setTimeout(function () { root.classList.remove('is-stretch'); }, 170);
+    }
+  }
+  var drag = null;
+  sw.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    drag = { x: e.clientX, moved: false, start: on ? 72 : 8 };
+    sw.setPointerCapture(e.pointerId);
+  });
+  sw.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var k = sw.getBoundingClientRect().width / sw.offsetWidth || 1;
+    var dx = (e.clientX - drag.x) / k;
+    if (Math.abs(dx) > 4) drag.moved = true;
+    if (!drag.moved) return;
+    root.classList.add('is-drag');
+    var x = Math.max(8, Math.min(72, drag.start + dx));
+    knob.style.left = x + 'px';
+    knob.style.width = (60 + Math.min(18, Math.abs(dx) * 0.25)) + 'px';
+  });
+  function end(e) {
+    if (!drag) return;
+    var d = drag; drag = null;
+    root.classList.remove('is-drag');
+    var x = parseFloat(knob.style.left || (on ? 72 : 8));
+    knob.style.left = ''; knob.style.width = '';
+    if (d.moved) { set(x > 40); sw._skip = true; }
+  }
+  sw.addEventListener('pointerup', end);
+  sw.addEventListener('pointercancel', end);
+  sw.addEventListener('click', function () {
+    if (sw._skip) { sw._skip = false; return; }
+    set(!on);
+  });
+})();
+</script>

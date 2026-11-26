@@ -1,0 +1,106 @@
+<!-- Lucian UX/UI Prompt #293 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#293 -->
+<!--
+Element: Product compare tray
+ID: 293 · Category: Commerce & Pricing · Tags: compare, tray, ecommerce, specs, table
+What it does: Press the compare check on products in a list and a compare tray rises from below as the chosen items pop into its empty slots. With two or more in it, Compare turns on; press it and a comparison table unfolds from below, with a Best badge on the top value for weight, battery and price. Try to add more than three and the tray shakes to show the limit.
+How to use it: Check compare on two or three products, then press Compare
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#293
+-->
+<style>
+.u293{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u293-hd{position:absolute;left:20px;top:18px;font-size:16px;font-weight:900;letter-spacing:-.03em}
+.u293-gd{position:absolute;left:14px;right:14px;top:52px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.u293-pd{position:relative;padding:8px;border-radius:14px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);transition:box-shadow .2s}
+.u293-pd.is-on{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u293-im{position:relative;height:50px;border-radius:10px;display:grid;place-items:center}
+.u293-im i{width:50px;height:30px;border-radius:5px 5px 2px 2px;background:#1E293B;box-shadow:0 0 0 3px rgba(255,255,255,.75);position:relative}
+.u293-im i::after{content:"";position:absolute;left:-10px;right:-10px;bottom:-7px;height:5px;border-radius:0 0 4px 4px;background:rgba(255,255,255,.85)}
+.u293-pd b{display:block;margin-top:6px;font-size:11.5px;font-weight:850}
+.u293-pd small{font-size:10px;font-weight:750;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u293-ck{position:absolute;right:6px;top:6px;display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 7px 0 5px;border:0;border-radius:999px;background:rgba(255,255,255,.85);color:#334155;font:inherit;font-size:9.5px;font-weight:850;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.u293-ck i{width:12px;height:12px;border-radius:4px;box-shadow:inset 0 0 0 1.5px #94A3B8;display:grid;place-items:center;transition:background .2s,box-shadow .2s}
+.u293-ck[aria-pressed="true"] i{background:var(--ux-accent);box-shadow:none}
+.u293-ck[aria-pressed="true"] i::after{content:"";width:3px;height:6px;margin-top:-2px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.u293-tr{position:absolute;left:10px;right:10px;bottom:10px;display:flex;align-items:center;gap:6px;height:58px;padding:0 8px;border-radius:18px;background:var(--ux-ink);color:var(--ux-surface);transform:translateY(120%);transition:transform .45s cubic-bezier(.3,1.3,.5,1)}
+.u293.is-tray .u293-tr{transform:none}
+.u293-tr.is-shake{animation:u293-sh .45s}
+@keyframes u293-sh{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.u293-sl{flex:none;width:40px;height:40px;border-radius:11px;border:1.5px dashed color-mix(in srgb,var(--ux-surface) 35%,transparent);display:grid;place-items:center;overflow:hidden}
+.u293-sl i{width:28px;height:17px;border-radius:3px;background:#1E293B;box-shadow:0 0 0 2px rgba(255,255,255,.8);transform:scale(.2);opacity:0;transition:transform .4s cubic-bezier(.3,1.7,.5,1),opacity .2s}
+.u293-sl.is-on{border-style:solid;border-color:transparent}
+.u293-sl.is-on i{transform:none;opacity:1}
+.u293-tx{flex:1;min-width:0;font-size:10px;font-weight:750;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u293-go{flex:none;height:38px;padding:0 13px;border:0;border-radius:11px;background:var(--ux-accent);color:#fff;font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;transition:opacity .2s}
+.u293-go:disabled{opacity:.35;cursor:not-allowed}
+.u293-cm{position:absolute;inset:0;padding:18px 16px;background:var(--ux-surface);transform:translateY(102%);transition:transform .5s cubic-bezier(.3,1,.3,1);display:flex;flex-direction:column}
+.u293.is-cmp .u293-cm{transform:none}
+.u293-ch{display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:900}
+.u293-bk{width:30px;height:30px;border:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink-2);display:grid;place-items:center;cursor:pointer}
+.u293-bk svg{width:11px;height:11px}
+.u293-tb{margin-top:14px;display:grid;gap:0}
+.u293-r{display:grid;align-items:center;min-height:46px;border-bottom:1px solid var(--ux-line);font-size:11.5px;font-weight:800;text-align:center;font-variant-numeric:tabular-nums;opacity:0;transform:translateY(10px);transition:opacity .35s,transform .45s cubic-bezier(.3,1.3,.5,1)}
+.u293.is-cmp .u293-r{opacity:1;transform:none}
+.u293-r>span:first-child{text-align:left;font-size:10.5px;color:var(--ux-ink-3)}
+.u293-r.is-h{font-size:12px;font-weight:900}
+.u293-best{position:relative}
+.u293-best::after{content:attr(data-b);display:block;width:max-content;margin:3px auto 0;padding:1px 6px;border-radius:999px;background:#10B981;color:#fff;font-size:8.5px;font-weight:850;transform:scale(0);transition:transform .4s cubic-bezier(.3,1.7,.5,1) .5s}
+.u293.is-cmp .u293-best::after{transform:none}
+.u293 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u293-tr,.u293-cm,.u293-r,.u293-sl i,.u293-best::after{transition:none}.u293-tr.is-shake{animation:none}}
+</style>
+<div class="ux u293">
+  <div class="u293-hd">Laptops</div>
+  <div class="u293-gd"></div>
+  <div class="u293-tr" aria-live="polite"><span class="u293-sl"><i></i></span><span class="u293-sl"><i></i></span><span class="u293-sl"><i></i></span><span class="u293-tx"></span><button type="button" class="u293-go" disabled>Compare</button></div>
+  <div class="u293-cm" role="dialog" aria-hidden="true"><div class="u293-ch">Comparison<button type="button" class="u293-bk" aria-label="Close comparison"><svg viewBox="0 0 11 11" aria-hidden="true"><path d="M2 2l7 7M9 2L2 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div><div class="u293-tb"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u293-gd'), tr = root.querySelector('.u293-tr'), SL = root.querySelectorAll('.u293-sl'), tx = root.querySelector('.u293-tx'), go = root.querySelector('.u293-go'), cm = root.querySelector('.u293-cm'), tb = root.querySelector('.u293-tb'), bk = root.querySelector('.u293-bk');
+  var P = [['Air 13', 1.24, 18, 1390, '#CBD5E1'], ['Pro 14', 1.55, 22, 2390, '#94A3B8'], ['Slim 15', 1.48, 15, 1190, '#A5B4FC'], ['Ultra 16', 1.92, 24, 2990, '#FBCFE8']];
+  var ROW = [['Weight', 'kg', 1], ['Battery', 'h', 2], ['Price', '', 3]];
+  function price(n) { return '$' + (n >= 10000 ? (n / 10000).toLocaleString() + '' : n.toLocaleString()); }
+  var pick = [];
+  var B = P.map(function (p, i) {
+    var d = document.createElement('div'); d.className = 'u293-pd';
+    d.innerHTML = '<div class="u293-im" style="background:linear-gradient(150deg,' + p[4] + ',color-mix(in srgb,' + p[4] + ' 60%,#fff))"><i></i></div><b></b><small></small><button type="button" class="u293-ck" aria-pressed="false"><i></i>Compare</button>';
+    d.querySelector('b').textContent = p[0]; d.querySelector('small').textContent = price(p[3]);
+    var ck = d.querySelector('.u293-ck'); ck.setAttribute('aria-label', p[0] + ' — add to compare');
+    ck.addEventListener('click', function () { toggle(i); });
+    gd.appendChild(d); return { el: d, ck: ck };
+  });
+  function sync() {
+    B.forEach(function (b, i) { var on = pick.indexOf(i) >= 0; b.el.classList.toggle('is-on', on); b.ck.setAttribute('aria-pressed', on); });
+    Array.prototype.forEach.call(SL, function (s, k) { s.classList.toggle('is-on', k < pick.length); if (k < pick.length) s.style.background = P[pick[k]][4]; else s.style.background = ''; });
+    root.classList.toggle('is-tray', pick.length > 0); go.disabled = pick.length < 2;
+    tx.textContent = pick.length + ' selected';
+  }
+  function toggle(i) {
+    var k = pick.indexOf(i);
+    if (k >= 0) pick.splice(k, 1);
+    else if (pick.length >= 3) { tx.textContent = 'You can compare up to 3'; tr.classList.remove('is-shake'); void tr.offsetWidth; tr.classList.add('is-shake'); return; }
+    else pick.push(i);
+    sync();
+  }
+  function table() {
+    tb.innerHTML = ''; var cols = '62px repeat(' + pick.length + ',1fr)';
+    var h = document.createElement('div'); h.className = 'u293-r is-h'; h.style.gridTemplateColumns = cols; h.innerHTML = '<span></span>';
+    pick.forEach(function (i) { var c = document.createElement('span'); c.textContent = P[i][0]; h.appendChild(c); }); tb.appendChild(h);
+    ROW.forEach(function (r, n) {
+      var row = document.createElement('div'); row.className = 'u293-r'; row.style.gridTemplateColumns = cols; row.style.transitionDelay = (0.12 + n * 0.08) + 's';
+      row.innerHTML = '<span></span>'; row.firstChild.textContent = r[0];
+      var vals = pick.map(function (i) { return P[i][r[2]]; }), best = r[2] === 2 ? Math.max.apply(null, vals) : Math.min.apply(null, vals);
+      pick.forEach(function (i, k) { var c = document.createElement('span'); c.textContent = r[2] === 3 ? price(vals[k]) : vals[k] + r[1]; if (vals[k] === best) { c.className = 'u293-best'; c.dataset.b = 'Best'; } row.appendChild(c); });
+      tb.appendChild(row);
+    });
+  }
+  function open(v) { root.classList.toggle('is-cmp', v); cm.setAttribute('aria-hidden', !v); (v ? bk : go).focus({ preventScroll: true }); }
+  go.addEventListener('click', function () { table(); requestAnimationFrame(function () { open(true); }); });
+  bk.addEventListener('click', function () { open(false); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-cmp')) open(false); });
+  sync();
+})();
+</script>

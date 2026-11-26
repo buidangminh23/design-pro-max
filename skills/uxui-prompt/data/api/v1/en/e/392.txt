@@ -1,0 +1,107 @@
+<!-- Lucian UX/UI Prompt #392 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#392 -->
+<!--
+Element: Hand-drawn annotations
+ID: 392 · Category: Text Motion · Tags: text, annotation, sketch, svg, emphasis
+What it does: Draw sketchy underlines, circles, boxes and strike-throughs onto the key words of a sentence. Each mark is drawn twice, slightly wobbly, so it feels like a pen, and the words are marked one after another. Pick another style and the old marks are erased in reverse before the new ones are drawn.
+How to use it: Pick a mark style below. Press the same style again to redraw it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#392
+-->
+<style>
+.u392{position:relative;width:340px;height:300px;display:flex;flex-direction:column;padding:22px 22px 16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u392-k{margin:0;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u392-bx{position:relative;margin-top:14px}
+.u392-p{position:relative;z-index:1;margin:0;font-size:20px;line-height:1.75;font-weight:700;letter-spacing:-.03em;color:var(--ux-ink)}
+.u392-p b{font-weight:850}
+.u392-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
+.u392-svg path{fill:none;stroke:var(--ux-danger);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u392-svg path.b{stroke-width:1.6;opacity:.7}
+.u392-ft{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px;border-radius:14px;background:var(--ux-surface-2)}
+.u392-ty{height:34px;border:0;border-radius:10px;background:none;font-size:12.5px;font-weight:700;color:var(--ux-ink-3);transition:background-color .25s,color .25s}
+.u392-ty[aria-pressed="true"]{background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 4px 10px -6px var(--ux-shadow-strong)}
+</style>
+<div class="ux u392">
+  <p class="u392-k">Quarter plan memo</p>
+  <div class="u392-bx">
+    <p class="u392-p">This quarter we want to <b>double</b> the <b>sign-up rate</b> and cut first-week <b>churn</b> in half.</p>
+    <svg class="u392-svg" aria-hidden="true"></svg>
+  </div>
+  <div class="u392-ft" role="group" aria-label="Mark style">
+    <button class="u392-ty" type="button" aria-pressed="true">Underline</button>
+    <button class="u392-ty" type="button" aria-pressed="false">Circle</button>
+    <button class="u392-ty" type="button" aria-pressed="false">Box</button>
+    <button class="u392-ty" type="button" aria-pressed="false">Strike</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var NS = 'http://www.w3.org/2000/svg';
+  var bx = root.querySelector('.u392-bx'), svg = root.querySelector('.u392-svg');
+  var words = Array.prototype.slice.call(root.querySelectorAll('.u392-p b'));
+  var tys = Array.prototype.slice.call(root.querySelectorAll('.u392-ty'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var kind = 0, run = 0;
+  function j(n) { return (Math.random() - 0.5) * 2 * n; }
+  function shape(r, type, pass) {
+    var x = r.x, y = r.y, w = r.w, h = r.h, d = '', s = pass ? 1.6 : 1;
+    if (type === 0) d = 'M' + (x - 2) + ' ' + (y + h - 1 + j(1.5)) + ' Q' + (x + w / 2) + ' ' + (y + h + 3 * s + j(2)) + ' ' + (x + w + 3) + ' ' + (y + h - 2 + j(1.5));
+    if (type === 3) d = 'M' + (x - 3) + ' ' + (y + h * 0.55 + j(2)) + ' Q' + (x + w / 2) + ' ' + (y + h * 0.45 + j(3)) + ' ' + (x + w + 3) + ' ' + (y + h * 0.52 + j(2));
+    if (type === 2) {
+      var pts = [[x - 4 + j(1.5), y - 1 + j(1.5)], [x + w + 4 + j(1.5), y - 2 + j(1.5)], [x + w + 3 + j(1.5), y + h + 2 + j(1.5)], [x - 3 + j(1.5), y + h + 1 + j(1.5)], [x - 4 + j(1), y - 3 + j(1)]];
+      d = 'M' + pts.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' L');
+    }
+    if (type === 1) {
+      var cx = x + w / 2, cy = y + h / 2, rx = w / 2 + 9, ry = h / 2 + 5, a0 = -2.2 + j(0.3), out = [];
+      for (var i = 0; i <= 26; i++) {
+        var a = a0 + (i / 26) * (Math.PI * 2 + 0.6), k = 1 + j(0.05) + i * 0.004 * s;
+        out.push((cx + Math.cos(a) * rx * k).toFixed(1) + ' ' + (cy + Math.sin(a) * ry * k).toFixed(1));
+      }
+      d = 'M' + out.join(' L');
+    }
+    return d;
+  }
+  function rectOf(b) {
+    var br = bx.getBoundingClientRect(), k = bx.offsetWidth / (br.width || 1), rs = b.getClientRects()[0] || b.getBoundingClientRect();
+    return { x: (rs.left - br.left) * k, y: (rs.top - br.top) * k + 4, w: rs.width * k, h: rs.height * k - 8 };
+  }
+  function animate(p, from, to, dur, delay, done) {
+    if (rm || !p.animate) { p.style.strokeDashoffset = to; if (done) done(); return; }
+    var a = p.animate([{ strokeDashoffset: from }, { strokeDashoffset: to }], { duration: dur, delay: delay, easing: 'cubic-bezier(.55,.1,.35,1)', fill: 'both' });
+    a.onfinish = function () { p.style.strokeDashoffset = to; if (done) done(); };
+  }
+  function draw(type) {
+    run += 1;
+    var me = run;
+    var old = Array.prototype.slice.call(svg.querySelectorAll('path')), left = old.length;
+    var go = function () {
+      if (me !== run || !root.isConnected) return;
+      svg.textContent = '';
+      words.forEach(function (b, wi) {
+        var r = rectOf(b);
+        [0, 1].forEach(function (pass) {
+          var p = document.createElementNS(NS, 'path');
+          p.setAttribute('d', shape(r, type, pass));
+          if (pass) p.setAttribute('class', 'b');
+          svg.appendChild(p);
+          var len = p.getTotalLength();
+          p.style.strokeDasharray = len + ' ' + len;
+          p._len = len;
+          animate(p, len, 0, 380 + len * 1.4, wi * 420 + pass * 200);
+        });
+      });
+    };
+    if (!left) { go(); return; }
+    old.forEach(function (p) { animate(p, 0, p._len || 200, 260, 0, function () { if (--left === 0) go(); }); });
+  }
+  tys.forEach(function (b, i) {
+    b.addEventListener('click', function () {
+      kind = i;
+      tys.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      draw(i);
+    });
+  });
+  requestAnimationFrame(function () { draw(0); });
+})();
+</script>

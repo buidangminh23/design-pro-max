@@ -1,0 +1,76 @@
+<!-- Lucian UX/UI Prompt #249 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#249 -->
+<!--
+Element: Live search result preview
+ID: 249 · Category: Site Builder Tools · Tags: seo, meta-tags, og-preview, search-snippet, builder
+What it does: Type a title and description in page settings and the search result preview below follows each keystroke, while the bar under each field fills toward the recommended length. Make the title too long and its bar overflows in red as the preview title is cut off with an ellipsis. Press the Link share tab above to switch to the card you'd see when pasting the link into a messenger.
+How to use it: Add more text to the title, then switch to the Link share tab
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#249
+-->
+<style>
+.u249{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u249-fm{position:absolute;left:16px;right:16px;top:14px}
+.u249-lb{display:flex;justify-content:space-between;margin-top:8px;font-size:10px;font-weight:850;color:var(--ux-ink-2)}
+.u249-lb:first-child{margin-top:0}
+.u249-lb span{font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u249-lb span.is-over{color:#E11D48}
+.u249-ti,.u249-ds{display:block;width:100%;margin-top:4px;padding:0 10px;border:0;border-radius:9px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:11px;font-weight:700;outline:none;box-sizing:border-box}
+.u249-ti{height:32px}
+.u249-ds{height:44px;padding:6px 10px;line-height:1.4;resize:none;font-weight:600}
+.u249-ti:focus,.u249-ds:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u249-br{height:3px;margin-top:4px;border-radius:2px;background:var(--ux-surface-3);overflow:hidden}
+.u249-br i{display:block;height:100%;border-radius:2px;background:#10B981;transition:width .2s,background .2s}
+.u249-br i.is-mid{background:#F59E0B}
+.u249-br i.is-over{background:#E11D48}
+.u249-tl{position:absolute;left:16px;top:160px;display:flex;gap:4px}
+.u249-tb{height:26px;padding:0 10px;border:0;border-radius:8px;background:none;color:var(--ux-ink-3);font:inherit;font-size:10.5px;font-weight:850;cursor:pointer}
+.u249-tb[aria-selected="true"]{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u249-pv{position:absolute;left:12px;right:12px;top:190px;bottom:12px}
+.u249-gs,.u249-og{position:absolute;inset:0;border-radius:16px;transition:opacity .3s,transform .4s cubic-bezier(.3,1.3,.5,1)}
+.u249-gs{padding:12px 14px;background:#fff;background:light-dark(#fff,#1F2023);box-shadow:0 0 0 1px rgba(0,0,0,.08);box-shadow:0 0 0 1px light-dark(rgba(0,0,0,.08),rgba(255,255,255,.09));color:#202124;color:light-dark(#202124,#E8EAED);font-family:Arial,system-ui,sans-serif}
+.u249-gs header{display:flex;align-items:center;gap:8px}
+.u249-gs header i{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#FBBF24,#F472B6);box-shadow:0 0 0 1px rgba(0,0,0,.06)}
+.u249-gs header b{display:block;font-size:11px;font-weight:600;color:#202124;color:light-dark(#202124,#DADCE0)}
+.u249-gs header small{display:block;font-size:10px;color:#4d5156;color:light-dark(#4d5156,#BDC1C6)}
+.u249-gs h4{margin:8px 0 0;font-size:14.5px;line-height:1.3;font-weight:400;color:#1a0dab;color:light-dark(#1a0dab,#99C3FF);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u249-gs p{margin:4px 0 0;font-size:11px;line-height:1.45;color:#4d5156;color:light-dark(#4d5156,#BDC1C6);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.u249-og{display:flex;overflow:hidden;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);opacity:0;transform:translateY(10px);pointer-events:none}
+.u249.is-og .u249-gs{opacity:0;transform:translateY(-10px);pointer-events:none}
+.u249.is-og .u249-og{opacity:1;transform:none}
+.u249-og i{flex:none;width:118px;background:linear-gradient(135deg,#6366F1,#EC4899);position:relative}
+.u249-og i::after{content:"Lumen";position:absolute;left:12px;bottom:10px;color:#fff;font-size:15px;font-weight:900;font-style:normal}
+.u249-og div{flex:1;min-width:0;padding:12px}
+.u249-og b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.35;font-weight:850}
+.u249-og p{margin:5px 0 0;font-size:10px;line-height:1.4;font-weight:600;color:var(--ux-ink-3);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.u249-og small{display:block;margin-top:6px;font-size:9.5px;font-weight:800;color:var(--ux-ink-3)}
+.u249 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u249-gs,.u249-og,.u249-br i{transition:none}}
+</style>
+<div class="ux u249">
+  <div class="u249-fm">
+    <div class="u249-lb">Title<span class="u249-tc"></span></div><input class="u249-ti" value="Lumen site builder" aria-label="Page title" autocomplete="off"><div class="u249-br"><i class="u249-tbr"></i></div>
+    <div class="u249-lb">Description<span class="u249-dc"></span></div><textarea class="u249-ds" aria-label="Page description">Build a brand site in 10 minutes without code, and finish domains and SEO in one go.</textarea><div class="u249-br"><i class="u249-dbr"></i></div>
+  </div>
+  <div class="u249-tl" role="tablist" aria-label="Preview type"></div>
+  <div class="u249-pv"><div class="u249-gs" role="tabpanel"><header><i aria-hidden="true"></i><div><b>Lumen</b><small>https://lumen.app › builder</small></div></header><h4></h4><p></p></div><div class="u249-og" role="tabpanel"><i aria-hidden="true"></i><div><b></b><p></p><small>lumen.app</small></div></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ti = root.querySelector('.u249-ti'), ds = root.querySelector('.u249-ds'), tc = root.querySelector('.u249-tc'), dc = root.querySelector('.u249-dc'), tbr = root.querySelector('.u249-tbr'), dbr = root.querySelector('.u249-dbr'), tl = root.querySelector('.u249-tl');
+  var gh = root.querySelector('.u249-gs h4'), gp = root.querySelector('.u249-gs p'), ob = root.querySelector('.u249-og b'), op = root.querySelector('.u249-og p');
+  var TABS = ['Search result', 'Link share'], TMAX = 60, DMAX = 155;
+  function w(s) { var n = 0; for (var i = 0; i < s.length; i++) { var c = s.charCodeAt(i); n += c >= 0x3131 && c <= 0xD79D ? 1.8 : 1; } return Math.round(n); }
+  function bar(el, cnt, n, max) { var p = n / max; el.style.width = Math.min(100, p * 100) + '%'; el.classList.toggle('is-mid', p > .85 && p <= 1); el.classList.toggle('is-over', p > 1); cnt.textContent = n + ' / ' + max + ''; cnt.classList.toggle('is-over', p > 1); }
+  function sync() {
+    var t = ti.value, d = ds.value, tn = w(t), dn = w(d);
+    bar(tbr, tc, tn, TMAX); bar(dbr, dc, dn, DMAX);
+    gh.textContent = t; gp.textContent = d; ob.textContent = t; op.textContent = d;
+  }
+  var T = TABS.map(function (n, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u249-tb'; b.setAttribute('role', 'tab'); b.textContent = n; b.addEventListener('click', function () { tab(i); }); tl.appendChild(b); return b; });
+  function tab(i) { root.classList.toggle('is-og', i === 1); T.forEach(function (b, k) { b.setAttribute('aria-selected', k === i); b.tabIndex = k === i ? 0 : -1; }); }
+  ti.addEventListener('input', sync); ds.addEventListener('input', sync);
+  sync(); tab(0);
+})();
+</script>

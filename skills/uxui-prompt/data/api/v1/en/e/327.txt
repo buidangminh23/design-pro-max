@@ -1,0 +1,101 @@
+<!-- Lucian UX/UI Prompt #327 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#327 -->
+<!--
+Element: Glitching signal title
+ID: 327 · Category: Text Motion · Tags: text, glitch, rgb, noise, title
+What it does: Tap the title and the letters are sliced into horizontal bands that slip out of line, while red and cyan channels split apart and snap back together. Turn on ‘Unstable’ and it jitters at irregular intervals; the strength slider sets how far the slices drift.
+How to use it: Tap the title for one glitch, or turn on ‘Unstable’ and raise the strength
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#327
+-->
+<style>
+.u327{position:relative;width:340px;height:300px;display:flex;flex-direction:column;padding:18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u327-scr{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:18px;background:#0B0C12;overflow:hidden}
+.u327-scr::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 1px,transparent 1px 3px),radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.55))}
+.u327-cap{position:absolute;left:14px;top:12px;margin:0;font:600 10.5px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;color:rgba(255,255,255,.5)}
+.u327-cap i{display:inline-block;width:6px;height:6px;margin-right:6px;border-radius:50%;background:#FF4D6A;vertical-align:1px;animation:u327-rec 1.2s steps(2) infinite}
+@keyframes u327-rec{50%{opacity:.2}}
+.u327-t{position:relative;padding:6px 10px;border:0;background:none;font:900 46px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:-.04em;color:#F4F0E8;cursor:pointer}
+.u327-t span{display:block;white-space:nowrap}
+.u327-ch{position:absolute;inset:6px 10px;pointer-events:none;opacity:.85;transform:translateX(var(--d,0px))}
+.u327-ch.r{color:#FF2E63;mix-blend-mode:screen}
+.u327-ch.c{color:#08F7FE;mix-blend-mode:screen;transform:translateX(calc(var(--d,0px) * -1))}
+.u327-m{position:relative;mix-blend-mode:screen}
+.u327-sl{position:absolute;inset:0 0;padding:6px 10px;pointer-events:none;background:#0B0C12;color:#F4F0E8;display:none;clip-path:inset(var(--a,0%) 0 var(--b,100%) 0);transform:translateX(var(--x,0px))}
+.u327.is-g .u327-sl{display:block}
+.u327-sub{margin:10px 0 0;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;color:rgba(255,255,255,.42)}
+.u327-ft{display:flex;align-items:center;gap:12px;margin-top:12px}
+.u327-sw{display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 6px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:700;color:var(--ux-ink-2)}
+.u327-sw i{position:relative;width:34px;height:22px;border-radius:999px;background:var(--ux-surface-3);transition:background-color .3s}
+.u327-sw i::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .4s var(--ux-spring)}
+.u327-sw[aria-pressed="true"] i{background:#FF2E63}
+.u327-sw[aria-pressed="true"] i::after{transform:translateX(12px)}
+.u327-ft label{flex:1;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u327-r{flex:1;min-width:0;margin:0;accent-color:#FF2E63}
+</style>
+<div class="ux u327">
+  <div class="u327-scr">
+    <p class="u327-cap" aria-hidden="true"><i></i>REC</p>
+    <button class="u327-t" type="button" aria-label="Trigger a glitch">
+      <span class="u327-ch r" aria-hidden="true">NO SIGNAL</span>
+      <span class="u327-ch c" aria-hidden="true">NO SIGNAL</span>
+      <span class="u327-m">NO SIGNAL</span>
+    </button>
+    <p class="u327-sub">CH 07 · STANDBY</p>
+  </div>
+  <div class="u327-ft">
+    <button class="u327-sw" type="button" aria-pressed="false"><i aria-hidden="true"></i>Unstable</button>
+    <label>Strength<input class="u327-r" type="range" min="10" max="100" value="50" aria-label="Glitch strength"></label>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var t = root.querySelector('.u327-t'), sw = root.querySelector('.u327-sw'), range = root.querySelector('.u327-r');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var power = 0.5, iv = 0, end = 0, auto = 0, unstable = false;
+  var slices = [0, 1, 2, 3].map(function () {
+    var s = document.createElement('span');
+    s.className = 'u327-sl'; s.textContent = 'NO SIGNAL'; s.setAttribute('aria-hidden', 'true');
+    t.appendChild(s);
+    return s;
+  });
+  function frame() {
+    if (!root.isConnected) { clearInterval(iv); return; }
+    if (performance.now() > end) { stop(); return; }
+    t.style.setProperty('--d', ((Math.random() * 0.6 + 0.4) * power * 9).toFixed(1) + 'px');
+    slices.forEach(function (s) {
+      var a = Math.random() * 82, h = 5 + Math.random() * 18;
+      s.style.setProperty('--a', a.toFixed(1) + '%');
+      s.style.setProperty('--b', Math.max(0, 100 - a - h).toFixed(1) + '%');
+      s.style.setProperty('--x', ((Math.random() - 0.5) * 2 * power * 30).toFixed(1) + 'px');
+    });
+  }
+  function stop() {
+    clearInterval(iv); iv = 0;
+    root.classList.remove('is-g');
+    t.style.setProperty('--d', '0px');
+  }
+  function glitch(ms) {
+    end = performance.now() + (rm ? 120 : ms);
+    root.classList.add('is-g');
+    frame();
+    if (!iv && !rm) iv = setInterval(frame, 48);
+    if (rm) setTimeout(stop, 120);
+  }
+  function schedule() {
+    clearTimeout(auto);
+    if (!unstable) return;
+    auto = setTimeout(function () { if (!root.isConnected) return; glitch(150 + Math.random() * 250); schedule(); }, 500 + Math.random() * 1100);
+  }
+  t.addEventListener('click', function () { glitch(380); });
+  sw.addEventListener('click', function () {
+    unstable = !unstable;
+    sw.setAttribute('aria-pressed', String(unstable));
+    if (unstable) glitch(200); else stop();
+    schedule();
+  });
+  range.addEventListener('input', function () { power = range.value / 100; });
+  power = range.value / 100;
+})();
+</script>

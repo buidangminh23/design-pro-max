@@ -1,0 +1,86 @@
+<!-- Lucian UX/UI Prompt #267 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#267 -->
+<!--
+Element: Language switch with text swap
+ID: 267 · Category: Navigation · Tags: i18n, language, locale, dropdown, website
+What it does: Press the globe button in the site header and a language list drops down; choose Korean, English or Japanese and the menu, headline, description and button text slide up and out from top to bottom, swapped for the new language. Buttons whose labels change length widen and narrow smoothly, and the list shows a check next to the chosen language.
+How to use it: Press the globe button in the top right and pick another language
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#267
+-->
+<style>
+.u267{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:radial-gradient(90% 60% at 80% 0%,color-mix(in srgb,#22C55E 14%,transparent),transparent 70%),var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u267-nv{position:absolute;left:18px;right:16px;top:16px;z-index:3;display:flex;align-items:center;gap:12px;font-size:11px;font-weight:750;color:var(--ux-ink-2)}
+.u267-nv b{margin-right:auto;font-size:13px;font-weight:900;color:var(--ux-ink)}
+.u267-gb{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 9px;border:0;border-radius:10px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+.u267-gb svg{width:14px;height:14px}
+.u267-gb:focus-visible,.u267-op:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u267-dd{position:absolute;right:0;top:36px;width:150px;padding:5px;border-radius:14px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 34px -14px var(--ux-shadow-strong);transform-origin:90% 0;transform:scale(.9) translateY(-4px);opacity:0;pointer-events:none;transition:transform .25s cubic-bezier(.3,1.5,.5,1),opacity .15s}
+.u267.is-open .u267-dd{transform:none;opacity:1;pointer-events:auto}
+.u267-op{display:flex;align-items:center;gap:8px;width:100%;height:34px;padding:0 9px;border:0;border-radius:9px;background:none;color:var(--ux-ink);font:inherit;font-size:12px;font-weight:750;cursor:pointer;text-align:left}
+.u267-op:hover{background:var(--ux-surface-2)}
+.u267-op em{font-style:normal;font-size:14px}
+.u267-op svg{margin-left:auto;width:13px;height:13px;color:#16A34A;opacity:0}
+.u267-op.is-on svg{opacity:1}
+.u267-sw{display:inline-block;vertical-align:top;overflow:hidden}
+.u267-sw>span{display:block}
+.u267-sw.is-go>span{animation:u267-out .26s ease-in forwards}
+.u267-sw.is-in>span{animation:u267-in .38s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes u267-out{to{transform:translateY(-100%);opacity:0}}
+@keyframes u267-in{from{transform:translateY(100%);opacity:0}}
+.u267-hr{position:absolute;left:22px;right:22px;top:92px}
+.u267-hr h3{margin:0;font-size:28px;line-height:1.16;font-weight:900;letter-spacing:-.04em}
+.u267-hr h3 .u267-sw{display:block}
+.u267-hr p{margin:12px 0 0;font-size:12px;line-height:1.55;font-weight:600;color:var(--ux-ink-2)}
+.u267-hr p .u267-sw{display:block}
+.u267-ct{margin-top:18px;display:inline-flex;align-items:center;height:36px;padding:0 16px;border-radius:999px;background:#16A34A;color:#fff;font-size:12px;font-weight:850;transition:width .35s cubic-bezier(.3,1.3,.5,1);white-space:nowrap;overflow:hidden}
+@media (prefers-reduced-motion: reduce){.u267-sw>span{animation:none!important}}
+</style>
+<div class="ux u267">
+  <div class="u267-nv"><b>Sprout</b><span data-k="nav1"></span><span data-k="nav2"></span><span data-k="nav3"></span>
+    <div style="position:relative"><button type="button" class="u267-gb" aria-haspopup="listbox" aria-expanded="false"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M1.5 7h11M7 1.5c1.8 1.6 1.8 9.4 0 11M7 1.5c-1.8 1.6-1.8 9.4 0 11" fill="none" stroke="currentColor" stroke-width="1.3"/></svg><span class="u267-cd">KO</span></button><div class="u267-dd" role="listbox" aria-label="Choose language"></div></div>
+  </div>
+  <div class="u267-hr" lang="ko"><h3 data-k="h"></h3><p data-k="p"></p><span class="u267-ct" data-k="cta"></span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gb = root.querySelector('.u267-gb'), dd = root.querySelector('.u267-dd'), cd = root.querySelector('.u267-cd'), hr = root.querySelector('.u267-hr'), ct = root.querySelector('.u267-ct');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var L = [
+    { code: 'KO', lang: 'ko', name: '한국어', flag: '🇰🇷', t: { nav1: '제품', nav2: '요금', nav3: '고객 사례', h: '함께 만드는<br>더 나은 하루', p: '기록하고, 나누고, 함께 자라는 팀을 위한 공간입니다.', cta: '무료로 시작' } },
+    { code: 'EN', lang: 'en', name: 'English', flag: '🇺🇸', t: { nav1: 'Product', nav2: 'Pricing', nav3: 'Customers', h: 'A better day,<br>made together', p: 'A place for teams that write, share and grow together.', cta: 'Start for free' } },
+    { code: 'JA', lang: 'ja', name: '日本語', flag: '🇯🇵', t: { nav1: '製品', nav2: '料金', nav3: '導入事例', h: 'みんなで作る、<br>よりよい毎日', p: '記録し、共有し、ともに成長するチームのための場所です。', cta: '無料ではじめる' } }
+  ];
+  var cur = 0, K = Array.prototype.slice.call(root.querySelectorAll('[data-k]')), O = [];
+  K.forEach(function (el) { el.innerHTML = '<span class="u267-sw"><span></span></span>'; });
+  function fill(i) { K.forEach(function (el) { el.querySelector('.u267-sw>span').innerHTML = L[i].t[el.dataset.k]; }); hr.lang = L[i].lang; cd.textContent = L[i].code; }
+  L.forEach(function (l, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u267-op'; b.setAttribute('role', 'option');
+    b.innerHTML = '<em aria-hidden="true">' + l.flag + '</em><span></span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    b.querySelector('span').textContent = l.name; b.lang = l.lang;
+    b.addEventListener('click', function () { pick(i); });
+    dd.appendChild(b); O.push(b);
+  });
+  function mark() { O.forEach(function (b, k) { b.classList.toggle('is-on', k === cur); b.setAttribute('aria-selected', k === cur); }); gb.setAttribute('aria-label', L[cur].name + ' selected'); }
+  function setOpen(v) { root.classList.toggle('is-open', v); gb.setAttribute('aria-expanded', v); }
+  function pick(i) {
+    setOpen(false);
+    if (i === cur) return;
+    cur = i; mark();
+    if (rm) { fill(i); return; }
+    var w0 = ct.offsetWidth;
+    K.forEach(function (el, n) {
+      var sw = el.querySelector('.u267-sw');
+      setTimeout(function () {
+        sw.classList.remove('is-in'); sw.classList.add('is-go');
+        setTimeout(function () { sw.querySelector('span').innerHTML = L[i].t[el.dataset.k]; sw.classList.remove('is-go'); void sw.offsetWidth; sw.classList.add('is-in'); }, 260);
+      }, n * 45);
+    });
+    setTimeout(function () { ct.style.width = w0 + 'px'; var tmp = ct.cloneNode(true); tmp.style.cssText = 'position:absolute;visibility:hidden;width:auto'; root.appendChild(tmp); tmp.querySelector('.u267-sw>span').innerHTML = L[i].t.cta; var w1 = tmp.offsetWidth; tmp.remove(); requestAnimationFrame(function () { ct.style.width = w1 + 'px'; }); hr.lang = L[i].lang; cd.textContent = L[i].code; }, 5 * 45 + 260);
+  }
+  gb.addEventListener('click', function () { setOpen(!root.classList.contains('is-open')); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+  fill(0); mark();
+})();
+</script>

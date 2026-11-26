@@ -1,0 +1,94 @@
+<!-- Lucian UX/UI Prompt #291 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#291 -->
+<!--
+Element: Link shortener that folds long URLs
+ID: 291 · Category: Site Builder Tools · Tags: url-shortener, links, copy, analytics, marketing
+What it does: Paste a long address and press Shorten: its characters get pulled toward the middle and fold away, and a short link pops out in their place. Press Copy and the link field flashes as the button turns into a check. The new link slots in at the top of the recent links list below, where each row grows a small bar chart of its clicks over the last 7 days.
+How to use it: Press Shorten, then copy the short link
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#291
+-->
+<style>
+.u291{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u291-hd{position:absolute;left:18px;top:18px;font-size:15px;font-weight:900}
+.u291-bx{position:absolute;left:14px;right:14px;top:48px;display:flex;align-items:center;gap:6px;height:46px;padding:0 5px 0 12px;border-radius:14px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);overflow:hidden;transition:box-shadow .3s}
+.u291-bx.is-fl{animation:u291-fl .8s ease}
+@keyframes u291-fl{25%{box-shadow:inset 0 0 0 2px var(--ux-accent);background:var(--ux-accent-soft)}}
+.u291-ul{position:relative;flex:1;min-width:0;height:100%;display:flex;align-items:center;overflow:hidden}
+.u291-in{width:100%;border:0;background:none;color:var(--ux-ink-2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;font-weight:600;outline:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u291-fx{position:absolute;inset:0;display:flex;align-items:center;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;font-weight:600;color:var(--ux-ink-2);pointer-events:none}
+.u291-fx span{display:inline-block;transition:transform .5s cubic-bezier(.6,0,.3,1),opacity .4s}
+.u291-sh{position:absolute;inset:0;display:flex;align-items:center;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;font-weight:850;color:var(--ux-accent);opacity:0;transform:scale(.6);transition:opacity .3s,transform .45s cubic-bezier(.3,1.7,.5,1)}
+.u291.is-short .u291-sh{opacity:1;transform:none}
+.u291.is-short .u291-in{visibility:hidden}
+.u291-go,.u291-cp{flex:none;display:inline-flex;align-items:center;gap:5px;height:36px;padding:0 13px;border:0;border-radius:10px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:11.5px;font-weight:850;cursor:pointer;transition:background .3s}
+.u291-cp{display:none;background:var(--ux-accent)}
+.u291.is-short .u291-go{display:none}
+.u291.is-short .u291-cp{display:inline-flex}
+.u291-cp.is-ok{background:#059669}
+.u291-cp svg{width:12px;height:12px}
+.u291-rc{position:absolute;left:14px;right:14px;top:108px}
+.u291-rc>small{font-size:10px;font-weight:850;color:var(--ux-ink-3)}
+.u291-ls{margin:6px 0 0;padding:0;list-style:none}
+.u291-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s cubic-bezier(.3,1,.4,1),opacity .3s}
+.u291-it>div{min-height:0;overflow:hidden}
+.u291-it.is-new{grid-template-rows:0fr;opacity:0}
+.u291-rw{display:flex;align-items:center;gap:10px;height:60px;margin-bottom:6px;padding:0 12px;border-radius:13px;background:var(--ux-surface-2)}
+.u291-rw div:first-child{flex:1;min-width:0}
+.u291-rw b{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;font-weight:800;color:var(--ux-accent)}
+.u291-rw small{display:block;margin-top:2px;font-size:10px;font-weight:650;color:var(--ux-ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u291-sp{flex:none;display:flex;align-items:flex-end;gap:2px;height:28px}
+.u291-sp i{width:5px;border-radius:2px 2px 1px 1px;background:color-mix(in srgb,var(--ux-accent) 55%,transparent);height:var(--h);transform:scaleY(0);transform-origin:50% 100%;transition:transform .5s cubic-bezier(.3,1.5,.5,1)}
+.u291-sp i:last-child{background:var(--ux-accent)}
+.u291-rw.is-in .u291-sp i{transform:none}
+.u291-nm{flex:none;width:44px;text-align:right;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+.u291-nm em{display:block;font-style:normal;font-size:8.5px;font-weight:800;color:var(--ux-ink-3)}
+.u291 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u291-fx span,.u291-sh,.u291-it,.u291-sp i{transition:none}.u291-bx.is-fl{animation:none}}
+</style>
+<div class="ux u291">
+  <div class="u291-hd">Shorten a link</div>
+  <div class="u291-bx"><div class="u291-ul"><input class="u291-in" value="https://shop.example.com/campaign/newsletter-october?utm_source=mail&utm_medium=email" aria-label="Long URL" spellcheck="false"><span class="u291-fx" aria-hidden="true"></span><span class="u291-sh" aria-live="polite"></span></div><button type="button" class="u291-go">Shorten</button><button type="button" class="u291-cp"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M2 8V2.8C2 2.4 2.4 2 2.8 2H8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><span>Copy</span></button></div>
+  <div class="u291-rc"><small>Recent links</small><ul class="u291-ls"></ul></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var inp = root.querySelector('.u291-in'), fx = root.querySelector('.u291-fx'), sh = root.querySelector('.u291-sh'), go = root.querySelector('.u291-go'), cp = root.querySelector('.u291-cp'), cpl = cp.querySelector('span'), bx = root.querySelector('.u291-bx'), ls = root.querySelector('.u291-ls');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var RC = [['lnk.to/sale24', 'Spring sale banner', 1284], ['lnk.to/hire', 'Job posting', 432]];
+  var COPYI = cp.querySelector('svg').innerHTML, CHK = '<path d="M2.5 6.3l2.3 2.3L9.5 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
+  function row(r, fresh) {
+    var li = document.createElement('li'); li.className = 'u291-it' + (fresh ? ' is-new' : '');
+    var H = [], s = 0; for (var i = 0; i < 7; i++) { var v = fresh ? (i < 6 ? 0 : 1) : 20 + Math.random() * 80; H.push(v); s = Math.max(s, v); }
+    li.innerHTML = '<div><div class="u291-rw"><div><b></b><small></small></div><span class="u291-sp" aria-hidden="true">' + H.map(function (v, i) { return '<i style="--h:' + Math.max(8, v / s * 100) + '%;transition-delay:' + (i * .05) + 's"></i>'; }).join('') + '</span><span class="u291-nm"></span></div></div>';
+    li.querySelector('b').textContent = r[0]; li.querySelector('small').textContent = r[1];
+    var nm = li.querySelector('.u291-nm'); nm.innerHTML = '<span></span><em></em>'; nm.firstChild.textContent = r[2].toLocaleString('en-US'); nm.lastChild.textContent = 'Clicks ' + '7d';
+    return li;
+  }
+  RC.forEach(function (r) { var li = row(r); ls.appendChild(li); });
+  requestAnimationFrame(function () { Array.prototype.forEach.call(ls.querySelectorAll('.u291-rw'), function (w) { w.classList.add('is-in'); }); });
+  go.addEventListener('click', function () {
+    var v = inp.value, code = 'lnk.to/' + Math.random().toString(36).slice(2, 7);
+    fx.innerHTML = ''; var W = fx.offsetWidth;
+    v.slice(0, 64).split('').forEach(function (ch) { var s = document.createElement('span'); s.textContent = ch; fx.appendChild(s); });
+    inp.style.visibility = 'hidden';
+    var S = fx.children;
+    requestAnimationFrame(function () { Array.prototype.forEach.call(S, function (s) { var dx = W / 2 - (s.offsetLeft + s.offsetWidth / 2); s.style.transform = 'translateX(' + dx.toFixed(1) + 'px) scale(.2)'; s.style.opacity = 0; s.style.transitionDelay = (Math.abs(dx) / W * .25).toFixed(3) + 's'; }); });
+    setTimeout(function () {
+      sh.textContent = code; root.classList.add('is-short'); fx.innerHTML = '';
+      var li = row([code, 'October newsletter', 1], true); ls.insertBefore(li, ls.firstChild); void li.offsetWidth; li.classList.remove('is-new');
+      setTimeout(function () { li.querySelector('.u291-rw').classList.add('is-in'); }, 200);
+      while (ls.children.length > 3) ls.lastChild.remove();
+      cp.focus({ preventScroll: true });
+    }, rm ? 0 : 700);
+  });
+  var T = 0;
+  cp.addEventListener('click', function () {
+    try { navigator.clipboard && navigator.clipboard.writeText('https://' + sh.textContent).catch(function () {}); } catch (e) {}
+    bx.classList.remove('is-fl'); void bx.offsetWidth; bx.classList.add('is-fl');
+    cp.classList.add('is-ok'); cpl.textContent = 'Copied'; cp.querySelector('svg').innerHTML = CHK;
+    clearTimeout(T); T = setTimeout(function () { cp.classList.remove('is-ok'); cpl.textContent = 'Copy'; cp.querySelector('svg').innerHTML = COPYI; }, 1600);
+  });
+})();
+</script>

@@ -1,0 +1,96 @@
+<!-- Lucian UX/UI Prompt #238 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#238 -->
+<!--
+Element: Status page with uptime bars
+ID: 238 · Category: App Screens · Tags: status-page, uptime, incidents, monitoring, saas
+What it does: At the top of a service status page, “All systems operational” sits beside a green pulse, and below it API, Dashboard, Payments and Webhooks each show the last 30 days as a row of 30 small bars. The bars grow in from the left as the page opens, and resting the pointer on one shows that day's uptime and any incident in a bubble. Press a component to unfold its past incidents below.
+How to use it: Rest the pointer on the bars, then press a component name to open its history
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#238
+-->
+<style>
+.u238{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u238-hd{position:absolute;left:14px;right:14px;top:14px;display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:15px;background:color-mix(in srgb,#10B981 12%,transparent)}
+.u238-pu{position:relative;flex:none;width:12px;height:12px;border-radius:50%;background:#10B981}
+.u238-pu::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid #10B981;animation:u238-p 1.8s ease-out infinite}
+@keyframes u238-p{from{transform:scale(.5);opacity:1}to{transform:scale(1.5);opacity:0}}
+.u238-hd div{flex:1}
+.u238-hd b{display:block;font-size:13px;font-weight:900;color:#047857}
+.u238-hd small{display:block;font-size:9.5px;font-weight:700;color:var(--ux-ink-3)}
+.u238-hd>span:last-child{height:26px;padding:0 10px;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:10.5px;font-weight:850;line-height:26px}
+.u238-ls{position:absolute;left:14px;right:14px;top:76px;bottom:8px;overflow-y:auto;scrollbar-width:none}
+.u238-ls::-webkit-scrollbar{display:none}
+.u238-it{padding:9px 2px 8px;border-bottom:1px solid var(--ux-line)}
+.u238-tp{display:flex;align-items:center;gap:6px}
+.u238-nm{display:flex;align-items:center;gap:5px;padding:0;border:0;background:none;color:var(--ux-ink);font:inherit;font-size:11.5px;font-weight:850;cursor:pointer}
+.u238-nm svg{width:9px;height:9px;color:var(--ux-ink-3);transition:transform .25s}
+.u238-it.is-open .u238-nm svg{transform:rotate(90deg)}
+.u238-tp em{margin-left:auto;font-style:normal;font-size:10px;font-weight:800;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u238-bar{position:relative;display:flex;gap:2px;height:24px;margin-top:6px;align-items:flex-end}
+.u238-bar i{flex:1;height:100%;border-radius:2px;background:#10B981;transform:scaleY(0);transform-origin:50% 100%;transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .15s}
+.u238.is-in .u238-bar i{transform:none}
+.u238-bar i.w{background:#F59E0B}
+.u238-bar i.e{background:#E11D48}
+.u238-bar i.is-hl{opacity:.6}
+.u238-ax{display:flex;justify-content:space-between;margin-top:3px;font-size:8.5px;font-weight:700;color:var(--ux-ink-3)}
+.u238-tt{position:absolute;bottom:30px;z-index:3;width:max-content;max-width:180px;padding:6px 9px;border-radius:9px;background:var(--ux-ink);color:var(--ux-surface);font-size:9.5px;line-height:1.4;font-weight:700;transform:translateX(-50%);opacity:0;pointer-events:none;transition:opacity .12s}
+.u238-tt.is-on{opacity:1}
+.u238-tt b{display:block;font-size:10px;font-weight:850}
+.u238-hx{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s cubic-bezier(.3,1,.4,1)}
+.u238-hx>div{min-height:0;overflow:hidden}
+.u238-it.is-open .u238-hx{grid-template-rows:1fr}
+.u238-hx p{display:flex;align-items:center;gap:7px;margin:7px 0 0;padding:7px 9px;border-radius:9px;background:var(--ux-surface-2);font-size:10px;font-weight:700;color:var(--ux-ink-2)}
+.u238-hx p i{flex:none;width:7px;height:7px;border-radius:50%}
+.u238-hx p span{flex:1}
+.u238-hx p small{font-size:9px;font-weight:800;color:#059669}
+.u238 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u238-pu::after{animation:none}.u238-bar i,.u238-hx{transition:none}}
+</style>
+<div class="ux u238">
+  <div class="u238-hd"><span class="u238-pu" aria-hidden="true"></span><div><b>All systems operational</b><small>Checked 1 min ago</small></div><span>Subscribe</span></div>
+  <div class="u238-ls"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ls = root.querySelector('.u238-ls');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var S = [['API', 99.98], ['Dashboard', 100], ['Payments', 99.71], ['Webhooks', 99.95]];
+  var INC = {0: [[11, 'Slow responses', '12 min']], 2: [[18, 'Some card payments failed', '41 min'], [26, 'Payment confirmation delayed', '9 min']], 3: [[22, 'Retry delays', '15 min']]};
+  var tt = document.createElement('div'); tt.className = 'u238-tt'; tt.setAttribute('role', 'tooltip'); root.appendChild(tt);
+  S.forEach(function (s, si) {
+    var it = document.createElement('div'); it.className = 'u238-it';
+    it.innerHTML = '<div class="u238-tp"><button type="button" class="u238-nm" aria-expanded="false"><svg viewBox="0 0 9 9" aria-hidden="true"><path d="M3 1.5l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></button><em></em></div><div class="u238-bar"></div><div class="u238-ax"><span></span><span></span></div><div class="u238-hx"><div></div></div>';
+    it.querySelector('.u238-nm span').textContent = s[0]; it.querySelector('em').textContent = s[1] + '%';
+    var ax = it.querySelectorAll('.u238-ax span'); ax[0].textContent = '30 days ago'; ax[1].textContent = 'Today';
+    var bar = it.querySelector('.u238-bar'), inc = INC[si] || [], B = [];
+    for (var d = 0; d < 30; d++) {
+      var hit = inc.filter(function (x) { return x[0] === d; })[0], b = document.createElement('i');
+      if (hit) b.className = parseInt(hit[2], 10) > 30 ? 'e' : 'w';
+      b.style.transitionDelay = (d * 0.018 + si * 0.06) + 's'; b._hit = hit; b._d = d;
+      bar.appendChild(b); B.push(b);
+    }
+    function show(x) {
+      var r = bar.getBoundingClientRect(), d = Math.max(0, Math.min(29, Math.floor((x - r.left) / r.width * 30))), b = B[d];
+      B.forEach(function (o) { o.classList.toggle('is-hl', o !== b); });
+      var ago = 29 - d, up = b._hit ? (100 - parseInt(b._hit[2], 10) / 14.4).toFixed(2) : '100.00';
+      tt.innerHTML = '<b></b><span></span>'; tt.firstChild.textContent = ago ? ago + ' days ago' : 'Today';
+      tt.lastChild.textContent = b._hit ? b._hit[1] + ' · ' + b._hit[2] : 'Uptime ' + up + '%' + ' · No incidents';
+      var rr = root.getBoundingClientRect(), k = 340 / (rr.width || 340), br = b.getBoundingClientRect();
+      tt.style.left = Math.max(70, Math.min(270, (br.left + br.width / 2 - rr.left) * k)) + 'px'; tt.style.top = ((br.top - rr.top) * k - 8) + 'px'; tt.style.bottom = 'auto'; tt.style.transform = 'translate(-50%,-100%)';
+      tt.classList.add('is-on');
+    }
+    bar.addEventListener('pointermove', function (e) { show(e.clientX); });
+    bar.addEventListener('pointerover', function (e) { show(e.clientX); });
+    bar.addEventListener('pointerleave', function () { tt.classList.remove('is-on'); B.forEach(function (o) { o.classList.remove('is-hl'); }); });
+    var hx = it.querySelector('.u238-hx>div');
+    if (!inc.length) { var p0 = document.createElement('p'); p0.innerHTML = '<i style="background:#10B981"></i><span></span>'; p0.lastChild.textContent = 'No incidents in the last 30 days'; hx.appendChild(p0); }
+    inc.slice().reverse().forEach(function (x) { var p = document.createElement('p'); p.innerHTML = '<i style="background:' + (parseInt(x[2], 10) > 30 ? '#E11D48' : '#F59E0B') + '"></i><span></span><small></small>'; p.querySelector('span').textContent = (29 - x[0]) + ' days ago · ' + x[1] + ' (' + x[2] + ')'; p.querySelector('small').textContent = 'Resolved'; hx.appendChild(p); });
+    var nm = it.querySelector('.u238-nm');
+    nm.addEventListener('click', function () { var o = !it.classList.contains('is-open'); it.classList.toggle('is-open', o); nm.setAttribute('aria-expanded', o); });
+    ls.appendChild(it);
+  });
+  if (rm || !('IntersectionObserver' in window)) root.classList.add('is-in');
+  else { var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); requestAnimationFrame(function () { root.classList.add('is-in'); }); } }); io.observe(root); }
+})();
+</script>

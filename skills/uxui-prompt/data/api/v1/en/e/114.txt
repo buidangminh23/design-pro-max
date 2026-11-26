@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #114 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#114 -->
+<!--
+Element: Vector pen path
+ID: 114 · Category: Layout, Schedule & Design · Tags: path-pen, native, spatial
+What it does: A pen tool for shaping a curve with two control points. Drag a handle at the end of a dotted line and the curve bends with it; the points also move from the keyboard.
+How to use it: Drag a round control point. With it focused, ↑/↓ move it too, and Esc resets
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#114
+-->
+<style>
+.u114{width:100%;max-width:400px;min-width:0;font-size:13px}.u114 button{font:inherit;color:inherit;cursor:pointer}.u114 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u114 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u114 .art{height:220px;background:var(--ux-surface-2);border:1px solid var(--ux-line-2);border-radius:4px;position:relative}.u114 svg{width:100%;height:100%}.u114 .path{fill:none;stroke:var(--ux-accent);stroke-width:4;stroke-linecap:round}.u114 .guide{fill:none;stroke:var(--ux-ink-2);stroke-width:1;stroke-dasharray:4 4}.u114 rect{fill:var(--ux-accent)}.u114 .handle{position:absolute;left:calc(var(--cx) - 22px);top:calc(var(--cy) - 22px);width:44px;height:44px;border:0;padding:0;background:transparent;touch-action:none;cursor:ns-resize}.u114 .handle:after{content:"";position:absolute;width:13px;height:13px;border-radius:50%;border:2px solid var(--ux-accent);background:var(--ux-surface);left:15px;top:15px}
+</style>
+<div class="ux u114"><div class="art"><svg viewBox="0 0 360 210" preserveAspectRatio="none" aria-label="Vector curve"><path class="guide"/><path class="path"/><rect x="32" y="102" width="10" height="10"/><rect x="314" y="102" width="10" height="10"/></svg><button class="handle a" data-i="0" style="--cx:31.94%;--cy:19.05%" aria-label="First control point" role="slider" aria-valuemin="25" aria-valuemax="185" aria-valuenow="40"></button><button class="handle b" data-i="1" style="--cx:68.06%;--cy:76.19%" aria-label="Second control point" role="slider" aria-valuemin="25" aria-valuemax="185" aria-valuenow="160"></button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let v=[40,160];function paint(){q('.path').setAttribute('d',`M37 107 C115 ${v[0]} 245 ${v[1]} 319 107`);q('.guide').setAttribute('d',`M37 107L115 ${v[0]}M319 107L245 ${v[1]}`);qa('.handle').forEach((b,i)=>{b.style.setProperty('--cy',v[i]/210*100+'%');b.setAttribute('aria-valuenow',v[i])})}function set(i,n){v[i]=Math.max(25,Math.min(185,Math.round(n/5)*5));paint()}qa('.handle').forEach((b,i)=>{b.onkeydown=e=>{if(['ArrowUp','ArrowDown','Home','End','Escape'].includes(e.key)){e.preventDefault();if(e.key==='Escape'){v=[40,160];paint();return}set(i,e.key==='Home'?25:e.key==='End'?185:v[i]+(e.key==='ArrowDown'?5:-5))}};b.onpointerdown=e=>b.setPointerCapture(e.pointerId);b.onpointermove=e=>{if(b.hasPointerCapture(e.pointerId)){const r=q('.art').getBoundingClientRect();set(i,(e.clientY-r.top)/r.height*210)}}});paint();})();
+</script>

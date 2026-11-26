@@ -1,0 +1,89 @@
+<!-- Lucian UX/UI Prompt #271 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#271 -->
+<!--
+Element: Filterable changelog
+ID: 271 · Category: Sections & Content · Tags: changelog, release-notes, filter, timeline, saas
+What it does: A product's changelog page. Versions and dates run down a vertical timeline, and the newest entry at the top has a blinking new dot. Choose the New, Improved or Fixed chip at the top and the highlight pill slides over to it, while entries that don't match fold away and the rest close up.
+How to use it: Press a chip at the top to filter by type, then scroll the list
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#271
+-->
+<style>
+.u271{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u271-hd{position:absolute;left:0;right:0;top:0;z-index:2;padding:24px 18px 12px;background:linear-gradient(var(--ux-surface) 82%,transparent)}
+.u271-hd h3{margin:0;font-size:20px;font-weight:900;letter-spacing:-.035em}
+.u271-hd p{margin:3px 0 0;font-size:10.5px;font-weight:650;color:var(--ux-ink-3)}
+.u271-cs{position:relative;display:flex;gap:2px;margin-top:14px;padding:3px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u271-pl{position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 12px) / 4);border-radius:999px;background:var(--ux-surface);box-shadow:0 2px 6px -2px var(--ux-shadow-strong),0 0 0 1px var(--ux-line);transition:transform .4s cubic-bezier(.3,1.3,.5,1)}
+.u271-ch{position:relative;flex:1;height:28px;border:0;border-radius:999px;background:none;color:var(--ux-ink-3);font:inherit;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;transition:color .25s;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.u271-ch.is-on{color:var(--ux-ink)}
+.u271-ch:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u271-ch i{font-style:normal;font-size:9px;font-weight:850;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u271-sc{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;padding:128px 16px 24px 10px}
+.u271-sc::-webkit-scrollbar{display:none}
+.u271-sc:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-4px;border-radius:32px}
+.u271-tl{position:relative}
+.u271-tl::before{content:"";position:absolute;left:15px;top:12px;bottom:6px;width:2px;border-radius:1px;background:var(--ux-line)}
+.u271-en{display:grid;grid-template-rows:1fr;opacity:1;transition:grid-template-rows .45s cubic-bezier(.3,.8,.3,1),opacity .3s,transform .45s cubic-bezier(.3,.8,.3,1)}
+.u271-en.is-off{grid-template-rows:0fr;opacity:0;transform:translateX(10px)}
+.u271-en>div{min-height:0;overflow:hidden}
+
+.u271-in{position:relative;padding:6px 0 10px 32px}
+.u271-dt{position:absolute;left:10px;top:10px;width:12px;height:12px;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--c)}
+.u271-dt.is-new{background:var(--c)}
+.u271-dt.is-new::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--c);animation:u271-p 1.8s ease-out infinite}
+@keyframes u271-p{from{transform:scale(.6);opacity:.9}to{transform:scale(1.5);opacity:0}}
+.u271-mt{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u271-mt b{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;color:var(--ux-ink-2)}
+.u271-tg{padding:2px 7px;border-radius:999px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);font-size:9.5px;font-weight:850}
+.u271-nw{margin-left:auto;padding:2px 6px;border-radius:5px;background:var(--ux-ink);color:var(--ux-surface);font-size:9px;font-weight:850}
+.u271-in h4{margin:6px 0 0;font-size:13.5px;font-weight:850;letter-spacing:-.02em;line-height:1.3}
+.u271-in p{margin:4px 0 0;font-size:11px;line-height:1.5;font-weight:600;color:var(--ux-ink-2)}
+.u271-im{position:relative;height:74px;margin-top:9px;border-radius:12px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u271-im.k1{background:linear-gradient(135deg,#EEF2FF,#FAE8FF)}
+.u271-im.k2{background:linear-gradient(135deg,#1E1B4B,#0F172A)}
+.u271-im i{position:absolute;left:12px;height:7px;border-radius:4px}
+.u271-im.k1 i{background:#A5B4FC}.u271-im.k2 i{background:#475569}
+.u271-im i:nth-child(1){top:14px;width:46%}.u271-im i:nth-child(2){top:28px;width:70%;opacity:.7}.u271-im i:nth-child(3){top:42px;width:58%;opacity:.7}
+.u271-im em{position:absolute;right:12px;bottom:10px;width:34px;height:34px;border-radius:10px;background:var(--ux-grad)}
+@media (prefers-reduced-motion: reduce){.u271-en,.u271-pl{transition:none}.u271-dt.is-new::after{animation:none}}
+</style>
+<div class="ux u271">
+  <div class="u271-hd"><h3>What's new</h3><p>A new version ships every Tuesday</p><div class="u271-cs" role="radiogroup" aria-label="Update type"><span class="u271-pl" aria-hidden="true"></span></div></div>
+  <div class="u271-sc" tabindex="0" aria-label="Update list"><div class="u271-tl"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cs = root.querySelector('.u271-cs'), pl = root.querySelector('.u271-pl'), tl = root.querySelector('.u271-tl');
+  var CH = ['All', 'New', 'Improved', 'Fixed'], CC = ['', '#7C3AED', '#2563EB', '#EA580C'];
+  var E = [[1, 'v3.2', 'Oct 14', 'AI now summarizes meeting notes', 'When a meeting ends, decisions and to-dos are boiled down to three lines.', 1], [3, 'v3.1.2', 'Oct 9', 'Cursor jumping while typing Korean', 'Fixed final consonants being typed twice in Safari.'], [2, 'v3.1', 'Oct 2', 'Search is twice as fast', 'Results show up instantly even for teams with thousands of docs.'], [1, 'v3.0', 'Sep 24', 'Dark mode', 'Turn it on in Settings › Display. It can follow your system, too.', 2], [3, 'v2.9.4', 'Sep 18', 'Duplicate notifications', 'Removed the double alerts that appeared when reopening the mobile app.'], [2, 'v2.9', 'Sep 10', 'Shared link previews', 'Paste a link and its title and thumbnail appear with it.']];
+  var B = CH.map(function (c, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u271-ch'; b.setAttribute('role', 'radio');
+    var n = i ? E.filter(function (e) { return e[0] === i; }).length : E.length;
+    b.innerHTML = '<span></span><i>' + n + '</i>'; b.firstChild.textContent = c;
+    b.addEventListener('click', function () { pick(i); });
+    b.addEventListener('keydown', function (e) { var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (d) { e.preventDefault(); var k = (i + d + CH.length) % CH.length; pick(k); B[k].focus(); } });
+    cs.appendChild(b); return b;
+  });
+  var R = E.map(function (e, i) {
+    var w = document.createElement('div'); w.className = 'u271-en';
+    w.innerHTML = '<div><div class="u271-in" style="--c:' + CC[e[0]] + '"><span class="u271-dt' + (i ? '' : ' is-new') + '"></span><div class="u271-mt"><b></b><span></span><span class="u271-tg"></span></div><h4></h4><p></p>' + (e[5] ? '<div class="u271-im k' + e[5] + '" aria-hidden="true"><i></i><i></i><i></i><em></em></div>' : '') + '</div></div>';
+    var mt = w.querySelector('.u271-mt');
+    mt.children[0].textContent = e[1]; mt.children[1].textContent = '· ' + e[2]; mt.children[2].textContent = CH[e[0]];
+    if (!i) { var nw = document.createElement('span'); nw.className = 'u271-nw'; nw.textContent = 'New'; mt.appendChild(nw); }
+    w.querySelector('h4').textContent = e[3]; w.querySelector('p').textContent = e[4];
+    tl.appendChild(w); return w;
+  });
+  var cur = -1;
+  function pill() { pl.style.transform = 'translateX(calc(' + cur * 100 + '% + ' + cur * 2 + 'px))'; }
+  function pick(i) {
+    if (i === cur) return;
+    cur = i;
+    B.forEach(function (b, k) { b.classList.toggle('is-on', k === i); b.setAttribute('aria-checked', k === i); b.tabIndex = k === i ? 0 : -1; });
+    pill();
+    R.forEach(function (w, k) { var off = i && E[k][0] !== i; w.classList.toggle('is-off', off); w.setAttribute('aria-hidden', off); });
+  }
+  pick(0);
+})();
+</script>

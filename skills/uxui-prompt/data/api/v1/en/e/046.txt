@@ -1,0 +1,154 @@
+<!-- Lucian UX/UI Prompt #046 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#046 -->
+<!--
+Element: Command palette
+ID: 046 · Category: Menus & Tabs · Tags: command-palette, combobox, search, keyboard, filter
+What it does: The search pill unfolds downward into a palette; as you type, results filter with the matching letters highlighted. The highlight bar glides to the chosen item, and running it folds the palette back into a pill.
+How to use it: Type to filter commands. Choose with the up and down arrows, run with Enter and fold it with Esc. Click the folded pill or press Ctrl/⌘+K to reopen it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#046
+-->
+<style>
+.u046{position:relative;width:360px;height:460px}
+.u046-pal{position:absolute;left:0;right:0;top:0;height:100%;display:flex;flex-direction:column;border-radius:24px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 34px 60px -34px var(--ux-shadow-strong);clip-path:inset(0 0 0 0 round 24px);transition:clip-path .6s var(--ux-ease),box-shadow .5s}
+.u046.is-closed .u046-pal{clip-path:inset(0 0 calc(100% - 56px) 0 round 28px);box-shadow:0 0 0 1px var(--ux-line-2),0 14px 26px -18px var(--ux-shadow-strong);transition:clip-path .5s var(--ux-ease),box-shadow .5s}
+.u046-field{position:relative;display:flex;align-items:center;gap:10px;height:56px;flex:none;padding:0 14px 0 18px;border-bottom:1px solid var(--ux-line);cursor:text;transition:border-color .3s}
+.u046.is-closed .u046-field{border-color:transparent;cursor:pointer}
+.u046-field svg{width:19px;height:19px;flex:none;fill:none;stroke:var(--ux-ink-3);stroke-width:2;stroke-linecap:round}
+.u046-in{flex:1;min-width:0;height:100%;border:0;padding:0;background:none;font:inherit;font-size:15.5px;font-weight:560;color:var(--ux-ink);outline:none}
+.u046-in:focus-visible{outline:none}
+.u046-in::placeholder{color:var(--ux-ink-3)}
+.u046-kbd{display:inline-flex;align-items:center;height:24px;padding:0 7px;border-radius:7px;background:var(--ux-surface-2);box-shadow:inset 0 -1px 0 var(--ux-line-2);font-size:11.5px;font-weight:700;color:var(--ux-ink-3);font-family:inherit;white-space:nowrap}
+.u046-field:focus-within{border-bottom-color:var(--ux-line)}
+.u046-field:has(.u046-in:focus-visible){box-shadow:inset 0 -2px 0 var(--ux-accent)}
+.u046-body{position:relative;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain;padding:6px 8px;transition:opacity .3s}
+.u046-body::-webkit-scrollbar{display:none}
+.u046.is-closed .u046-body,.u046.is-closed .u046-foot{opacity:0}
+.u046-hl{position:absolute;left:8px;right:8px;top:0;height:46px;border-radius:13px;background:var(--ux-accent-soft);box-shadow:inset 3px 0 0 var(--ux-accent);transform:translateY(var(--y,0));transition:transform .4s var(--ux-spring),opacity .2s;pointer-events:none}
+.u046-list{position:relative;margin:0;padding:0;list-style:none}
+.u046-g{padding:10px 10px 6px;font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--ux-ink-3)}
+.u046-op{display:flex;align-items:center;gap:12px;height:46px;padding:0 10px;border-radius:13px;font-size:14.5px;font-weight:620;color:var(--ux-ink-2);cursor:pointer;animation:u046-in .45s var(--ux-spring) backwards;animation-delay:calc(var(--i) * 28ms)}
+.u046-op[aria-selected="true"]{color:var(--ux-ink)}
+.u046-op mark{background:none;color:var(--ux-accent);font-weight:800}
+.u046-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--c,var(--ux-surface-2));color:#fff}
+.u046-ic svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u046-ic.plain{color:var(--ux-ink-2)}
+.u046-op .u046-kbd{margin-left:auto}
+.u046-empty{padding:40px 0;text-align:center;font-size:14px;color:var(--ux-ink-3)}
+.u046-empty b{display:block;margin-bottom:4px;font-size:15px;color:var(--ux-ink)}
+@keyframes u046-in{from{opacity:0;transform:translateY(8px)}}
+.u046-foot{display:flex;align-items:center;gap:14px;height:44px;flex:none;padding:0 16px;border-top:1px solid var(--ux-line);font-size:12px;font-weight:600;color:var(--ux-ink-3);transition:opacity .3s}
+.u046-foot .u046-kbd{height:20px;padding:0 5px;margin-right:4px;font-size:11px}
+.u046-done{margin-left:auto;color:var(--ux-mint);font-weight:700;opacity:0;transform:translateY(4px);transition:opacity .3s,transform .4s var(--ux-spring)}
+.u046-done.show{opacity:1;transform:none}
+</style>
+<div class="ux u046">
+  <div class="u046-pal">
+    <label class="u046-field">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <input class="u046-in" type="text" role="combobox" aria-expanded="true" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search or type a command" aria-label="Search commands">
+      <kbd class="u046-kbd u046-key">esc</kbd>
+    </label>
+    <div class="u046-body"><span class="u046-hl" aria-hidden="true"></span><ul class="u046-list" role="listbox" aria-label="Commands"></ul></div>
+    <div class="u046-foot" aria-hidden="true"><span><kbd class="u046-kbd">↑↓</kbd>Move</span><span><kbd class="u046-kbd">↵</kbd>Run</span><span class="u046-done"></span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var input = root.querySelector('.u046-in'), list = root.querySelector('.u046-list');
+  var hl = root.querySelector('.u046-hl'), key = root.querySelector('.u046-key');
+  var done = root.querySelector('.u046-done'), field = root.querySelector('.u046-field');
+  var body = root.querySelector('.u046-body');
+  var uid = 'u046-' + Math.random().toString(36).slice(2, 7);
+  var mac = /Mac|iPhone|iPad/.test(navigator.platform || '');
+  var I = {
+    doc: '<path d="M7 3.5h7l4 4V20a.5.5 0 0 1-.5.5h-10A.5.5 0 0 1 7 20z"/><path d="M14 3.5v4h4"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    moon: '<path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/>',
+    user: '<circle cx="10" cy="8.5" r="3.5"/><path d="M3.5 19.5c.8-3.4 3.4-5 6.5-5 1.6 0 3 .4 4.2 1.3M18 14v6M15 17h6"/>',
+    out: '<path d="M12 15V4M8 8l4-4 4 4M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/>'
+  };
+  var DATA = [
+    { g: 'Recent files', n: 'Brand guide 2026', ic: 'doc', c: 'linear-gradient(140deg,#8B6CFF,#5B8CFF)' },
+    { g: 'Recent files', n: 'Spring campaign landing', ic: 'doc', c: 'linear-gradient(140deg,#FFB547,#FF7A45)' },
+    { g: 'Recent files', n: 'Quarterly report draft', ic: 'doc', c: 'linear-gradient(140deg,#22C3A6,#0EA5E9)' },
+    { g: 'Commands', n: 'Create new document', ic: 'plus', k: mac ? '⌘N' : 'Ctrl N' },
+    { g: 'Commands', n: 'Toggle dark mode', ic: 'moon', k: mac ? '⌘⇧L' : 'Ctrl ⇧L' },
+    { g: 'Commands', n: 'Invite teammates', ic: 'user' },
+    { g: 'Commands', n: 'Export as PDF', ic: 'out', k: mac ? '⌘E' : 'Ctrl E' }
+  ];
+  var opts = [], act = 0, closed = false, doneT = 0;
+  function esc(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function hit(name, q) {
+    if (!q) return esc(name);
+    var i = name.toLowerCase().indexOf(q);
+    return esc(name.slice(0, i)) + '<mark>' + esc(name.slice(i, i + q.length)) + '</mark>' + esc(name.slice(i + q.length));
+  }
+  function render() {
+    var q = input.value.trim().toLowerCase();
+    var found = DATA.filter(function (d) { return !q || d.n.toLowerCase().indexOf(q) >= 0; });
+    var html = '', g = '', n = 0;
+    found.forEach(function (d) {
+      if (d.g !== g) { g = d.g; html += '<li class="u046-g" role="presentation">' + g + '</li>'; }
+      html += '<li class="u046-op" role="option" id="' + uid + '-' + n + '" data-n="' + esc(d.n) + '" style="--i:' + n + '" aria-selected="false"><span class="u046-ic' + (d.c ? '' : ' plain') + '"' + (d.c ? ' style="--c:' + d.c + '"' : '') + ' aria-hidden="true"><svg viewBox="0 0 24 24">' + I[d.ic] + '</svg></span><span>' + hit(d.n, q) + '</span>' + (d.k ? '<kbd class="u046-kbd">' + d.k + '</kbd>' : '') + '</li>';
+      n++;
+    });
+    if (!n) html = '<li class="u046-empty" role="presentation"><b>No results for ‘' + esc(input.value.trim()) + '’</b>Try another word</li>';
+    list.innerHTML = html;
+    opts = Array.prototype.slice.call(list.querySelectorAll('.u046-op'));
+    opts.forEach(function (o, i) {
+      o.addEventListener('pointermove', function () { if (act !== i) mark(i); });
+      o.addEventListener('click', function () { mark(i); run(); });
+    });
+    hl.style.opacity = n ? '1' : '0';
+    mark(0, true);
+  }
+  function mark(i, instant) {
+    if (!opts.length) { input.removeAttribute('aria-activedescendant'); return; }
+    act = (i + opts.length) % opts.length;
+    opts.forEach(function (o, k) { o.setAttribute('aria-selected', String(k === act)); });
+    input.setAttribute('aria-activedescendant', opts[act].id);
+    if (instant) { hl.style.transition = 'none'; }
+    var o = opts[act], top = o.offsetTop + 6;
+    hl.style.setProperty('--y', top + 'px');
+    if (instant) { void hl.offsetWidth; hl.style.transition = ''; }
+    if (top + o.offsetHeight > body.scrollTop + body.clientHeight) body.scrollTo({ top: top + o.offsetHeight - body.clientHeight + 6, behavior: instant ? 'auto' : 'smooth' });
+    else if (top < body.scrollTop + 30) body.scrollTo({ top: act === 0 ? 0 : top - 30, behavior: instant ? 'auto' : 'smooth' });
+  }
+  function run() {
+    if (!opts[act]) return;
+    var name = opts[act].getAttribute('data-n');
+    opts[act].animate([{ transform: 'scale(.97)' }, { transform: 'none' }], { duration: 260, easing: 'ease-out' });
+    done.textContent = 'Ran ‘' + name + '’';
+    done.classList.add('show');
+    clearTimeout(doneT);
+    doneT = setTimeout(function () { if (root.isConnected) setClosed(true); }, 650);
+  }
+  function setClosed(v) {
+    closed = v;
+    root.classList.toggle('is-closed', v);
+    input.setAttribute('aria-expanded', String(!v));
+    key.textContent = v ? (mac ? '⌘K' : 'Ctrl K') : 'esc';
+    if (v) { input.value = ''; input.blur(); setTimeout(function () { if (closed) { done.classList.remove('show'); render(); } }, 500); }
+    else { done.classList.remove('show'); input.focus(); }
+  }
+  input.addEventListener('input', function () { if (closed) setClosed(false); render(); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (closed) setClosed(false); else mark(act + (e.key === 'ArrowDown' ? 1 : -1)); }
+    else if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); if (closed) setClosed(false); else run(); }
+    else if (e.key === 'Escape' && !closed) { e.preventDefault(); e.stopPropagation(); setClosed(true); }
+  });
+  field.addEventListener('pointerdown', function () { if (closed) { clearTimeout(doneT); setClosed(false); } });
+  function onKey(e) {
+    if (!root.isConnected) { document.removeEventListener('keydown', onKey); return; }
+    if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+      var a = document.activeElement;
+      if (a && a !== document.body && !root.contains(a)) return;
+      e.preventDefault(); setClosed(!closed);
+    }
+  }
+  document.addEventListener('keydown', onKey);
+  render();
+})();
+</script>

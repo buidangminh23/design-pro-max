@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #190 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#190 -->
+<!--
+Element: Scheduled outbox
+ID: 190 · Category: Workflow & Systems · Tags: scheduled-outbox, new-century
+What it does: An outbox holding a scheduled email. Press the scheduled time to change it, or press the arrow to send it right away.
+How to use it: Press “Today · 14:30” to change the time
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#190
+-->
+<style>
+.u190 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u190 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u190 button:active{transform:translateY(1px)}.u190 button:disabled{opacity:.4;cursor:default}.u190 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u190 .muted{color:var(--ux-ink-2);font-size:12px}.u190 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u190 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u190 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u190 input,.u190 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u190 output{font-variant-numeric:tabular-nums}.u190 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u190 *,.u190 *::before,.u190 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u190 .outbox{border-left:1px solid var(--ux-line-2);padding-left:22px;margin:18px 0 16px;position:relative}.u190 .time{font:12px ui-monospace;color:var(--ux-ink-2);margin-bottom:13px;display:block}.u190 .mail{padding:18px;border:1px solid var(--ux-line-2);border-radius:3px 12px 12px 3px;background:var(--ux-surface);position:relative;transition:transform .5s,opacity .5s}.u190 .mail::before{content:'';position:absolute;width:10px;height:10px;border-radius:50%;background:var(--ux-accent);left:-28px;top:21px;box-shadow:0 0 0 5px var(--ux-page)}.u190 .mail b{font-size:17px;display:block;margin-bottom:7px}.u190 .stamp{display:inline-block;margin-top:10px;font:10px ui-monospace;border:1px solid var(--ux-line-2);padding:3px 6px;border-radius:4px;color:var(--ux-ink-2)}.u190.sent .mail{transform:translateX(8px);opacity:.55}.u190 .schedule{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.u190 .schedule label{font-size:11px;color:var(--ux-ink-2)}.u190 .schedule input{width:138px}.u190 .schedule button{font-size:11px;padding:7px 10px}.u190 .actions button{flex:1;font-size:12px}.u190 .status{font-size:12px;min-height:20px;color:var(--ux-ink-2);margin-top:14px}
+
+/* Focused composition */
+.u190{max-width:320px}.u190 .mail{padding:21px 22px;background:var(--ux-surface);border:1px solid var(--ux-line-2);border-radius:4px 14px 14px 4px}.u190 .mail::before{display:none}.u190 .mail b{font-size:17px;font-weight:550;margin:21px 0 16px}.u190 .mail-bottom{display:flex;justify-content:space-between;align-items:center;gap:12px}.u190 .recipient{font-size:11px;color:var(--ux-ink-2)}.u190 .send{border:0;background:none;font-size:23px;padding:0;min-width:32px;min-height:32px}.u190 .schedule{display:block}.u190 summary{cursor:pointer;list-style:none;font-size:11px;margin:0}.u190 summary::-webkit-details-marker{display:none}.u190 .schedule-edit{display:flex;gap:8px;margin-top:13px}.u190 .schedule input{font-size:12px;width:138px;padding:5px}.u190 .schedule button{font-size:11px;min-height:31px;padding:5px 10px}.u190.sent .mail{transform:translateX(5px);opacity:.7}</style>
+<div class="ux u190" data-state="initial"><div class="mail"><details class="schedule"><summary class="time">Today · 14:30 ⌄</summary><div class="schedule-edit"><input aria-label="Scheduled time" type="time" value="14:30"><button class="reschedule">Change</button></div></details><b>Friday design review</b><div class="mail-bottom"><span class="recipient">design@example.com</span><button class="send" aria-label="Send now (demo)">↗</button></div></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};const details=q('details');details.ontoggle=()=>{if(!root.classList.contains('sent'))state(details.open?'editing-time':'scheduled')};q('.reschedule').onclick=()=>{const t=q('input').value;if(!t)return;q('.time').textContent='Today · '+t+' ⌄';details.open=false;pulse(q('.mail'),[{transform:'translateY(-6px)'},{transform:'none'}])};q('.send').onclick=()=>{details.open=false;root.classList.add('sent');q('.time').textContent='Sent';q('.send').textContent='✓';q('.send').disabled=true;q('summary').style.pointerEvents='none';q('summary').tabIndex=-1;state('sent')};})();
+</script>

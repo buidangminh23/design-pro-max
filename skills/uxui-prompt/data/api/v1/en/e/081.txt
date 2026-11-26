@@ -1,0 +1,107 @@
+<!-- Lucian UX/UI Prompt #081 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#081 -->
+<!--
+Element: Payment ring and check
+ID: 081 · Category: Loading & Progress · Tags: ring, payment, progress, check, receipt
+What it does: Press pay and the button shrinks into a circle as a ring draws itself once around, lighting up the steps below in turn. When the ring fills it turns green and draws a check, and the receipt slides up from below.
+How to use it: Press “Pay ₩32,000”. After the receipt appears, press “Start over” to watch it again
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#081
+-->
+<style>
+.u081{position:relative;width:340px;height:460px;display:flex;flex-direction:column;align-items:center;padding:26px 22px 22px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u081-sum{width:100%;padding:16px;border-radius:20px;background:var(--ux-surface-2);transition:opacity .4s,transform .5s var(--ux-ease)}
+.u081-sum div{display:flex;justify-content:space-between;font-size:13.5px;font-weight:650;color:var(--ux-ink-2);padding:3px 0}
+.u081-sum div.t{margin-top:6px;padding-top:10px;border-top:1px dashed var(--ux-line-2);font-size:16px;font-weight:850;color:var(--ux-ink)}
+.u081-card{display:flex;align-items:center;gap:10px;width:100%;margin-top:12px;padding:12px 14px;border-radius:16px;box-shadow:inset 0 0 0 1.5px var(--ux-line-2);font-size:13.5px;font-weight:700}
+.u081-card i{width:34px;height:24px;border-radius:5px;background:linear-gradient(135deg,#2B1B6B,#5B3FD9 50%,#1E7BD9)}
+.u081-card small{margin-left:auto;font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u081-opt{display:flex;justify-content:space-between;width:100%;padding:12px 4px 0;font-size:13px;font-weight:650;color:var(--ux-ink-3)}
+.u081-opt b{color:var(--ux-ink);font-weight:750}
+.u081-opt b.m{color:var(--ux-mint)}
+.u081-stage{position:relative;width:100%;flex:1;display:flex;align-items:flex-end;justify-content:center}
+.u081-go{position:relative;width:100%;height:56px;border:0;border-radius:18px;background:var(--ux-ink);color:var(--ux-page);font-size:15.5px;font-weight:800;transition:width .5s var(--ux-spring),border-radius .5s var(--ux-spring),transform .3s var(--ux-spring),background-color .4s;overflow:hidden}
+.u081-go:active{transform:scale(.97)}
+.u081-go:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u081-go span{transition:opacity .2s}
+.u081.is-run .u081-go,.u081.is-ok .u081-go{width:56px;border-radius:50%;pointer-events:none}
+.u081.is-run .u081-go span,.u081.is-ok .u081-go span{opacity:0}
+.u081-ring{pointer-events:none;position:absolute;left:50%;bottom:-12px;width:80px;height:80px;margin-left:-40px;transform:rotate(-90deg);opacity:0;transition:opacity .3s}
+.u081.is-run .u081-ring,.u081.is-ok .u081-ring{opacity:1;transition-delay:.25s}
+.u081-ring circle{fill:none;stroke-width:5;stroke-linecap:round}
+.u081-ring .t{stroke:var(--ux-surface-3)}
+.u081-ring .p{stroke:var(--ux-accent);stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0) * 100);transition:stroke .4s}
+.u081.is-ok .u081-ring .p{stroke:var(--ux-mint)}
+.u081-ck{position:absolute;left:50%;bottom:16px;width:24px;height:24px;margin-left:-12px;fill:none;stroke:var(--ux-page);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.u081-ck path{stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .45s var(--ux-ease) .2s}
+.u081.is-ok .u081-go{background:var(--ux-mint)}
+.u081.is-ok .u081-ck{stroke:var(--ux-accent-ink)}
+.u081.is-ok .u081-ck path{stroke-dashoffset:0}
+.u081-steps{display:flex;gap:6px;justify-content:center;margin:22px 0 4px;height:24px;font-size:12px;font-weight:700;color:var(--ux-ink-3);opacity:0;transition:opacity .3s}
+.u081.is-run .u081-steps,.u081.is-ok .u081-steps{opacity:1}
+.u081-steps span{display:inline-flex;align-items:center;gap:5px;transition:color .3s}
+.u081-steps span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ux-line-2);transition:background-color .3s,transform .4s var(--ux-spring)}
+.u081-steps span.on{color:var(--ux-ink)}
+.u081-steps span.on::before{background:var(--ux-accent);transform:scale(1.3)}
+.u081.is-ok .u081-steps span.on::before{background:var(--ux-mint)}
+.u081-sr{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0)}
+.u081-rec{position:absolute;left:16px;right:16px;bottom:16px;top:64px;display:flex;flex-direction:column;justify-content:flex-end;padding:20px 18px 16px;border-radius:22px;background:var(--ux-surface-2);transform:translateY(110%);transition:transform .6s var(--ux-spring);text-align:center}
+.u081.is-rec .u081-rec{transform:none}
+.u081.is-rec .u081-sum,.u081.is-rec .u081-card,.u081.is-rec .u081-opt,.u081.is-rec .u081-steps{opacity:0;transform:translateY(-20px);transition:opacity .4s,transform .5s var(--ux-ease)}
+.u081.is-rec .u081-stage{opacity:0;transition:opacity .3s}
+.u081-stage{transition:opacity .3s}
+.u081-rec i{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 8px color-mix(in srgb,var(--ux-mint) 16%,transparent)}
+.u081-rec i svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u081-rec::before{content:"";position:absolute;left:0;right:0;top:-8px;height:16px;background:radial-gradient(circle 8px at 8px 0,transparent 98%,var(--ux-surface-2)) 0 8px/16px 8px repeat-x}
+.u081-rec b{display:block;font-size:20px;font-weight:850;letter-spacing:-.04em}
+.u081-rec p{margin:6px 0 14px;font-size:13px;color:var(--ux-ink-3)}
+.u081-rec dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:0 0 16px;text-align:left;font-size:12.5px}
+.u081-rec dt{color:var(--ux-ink-3);font-weight:650}
+.u081-rec dd{margin:0;text-align:right;font-weight:750;font-variant-numeric:tabular-nums}
+.u081-rec button{width:100%;height:46px;border:0;border-radius:14px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:750}
+.u081-rec button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u081">
+  <div class="u081-sum"><div><span>Daily Bottle 500 · Coral</span><span>₩29,000</span></div><div><span>Shipping</span><span>₩3,000</span></div><div class="t"><span>Total</span><span>₩32,000</span></div></div>
+  <div class="u081-card"><i aria-hidden="true"></i>Lumen Card<small>•••• 0818</small></div>
+  <div class="u081-opt"><span>Installments</span><b>Pay in full</b></div>
+  <div class="u081-opt"><span>Points to earn</span><b class="m">+ 960P</b></div>
+  <div class="u081-steps" aria-hidden="true"><span>Requesting</span><span>Bank check</span><span>Done</span></div>
+  <div class="u081-stage">
+    <button class="u081-go" type="button"><span>Pay ₩32,000</span></button>
+    <svg class="u081-ring" viewBox="0 0 80 80" aria-hidden="true"><circle class="t" cx="40" cy="40" r="36"/><circle class="p" cx="40" cy="40" r="36" pathLength="100"/></svg>
+    <svg class="u081-ck" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+  </div>
+  <p class="u081-sr" role="status" aria-live="polite"></p>
+  <div class="u081-rec" aria-hidden="true"><i aria-hidden="true"><svg viewBox="0 0 30 30"><path d="M8 15.5l5 5L23 10"/></svg></i><b>Payment complete</b><p>We emailed your receipt</p><dl><dt>Order no.</dt><dd>LM-20261010-0428</dd><dt>Paid on</dt><dd>Oct 10, 6:42 PM</dd><dt>Amount</dt><dd>₩32,000</dd></dl><button type="button" tabindex="-1">Start over</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var go = root.querySelector('.u081-go'), ring = root.querySelector('.u081-ring'), steps = root.querySelectorAll('.u081-steps span');
+  var rec = root.querySelector('.u081-rec'), back = rec.querySelector('button'), sr = root.querySelector('.u081-sr');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var raf = 0, ts = [];
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function run() {
+    root.classList.add('is-run'); sr.textContent = 'Processing your payment';
+    var t0 = performance.now(), DUR = rm ? 600 : 2600, delay = rm ? 0 : 350;
+    (function step(now) {
+      if (!root.isConnected) return;
+      var k = Math.max(0, Math.min(1, (now - t0 - delay) / DUR)), e = 1 - Math.pow(1 - k, 2.2);
+      ring.style.setProperty('--p', e.toFixed(4));
+      steps.forEach(function (s, i) { s.classList.toggle('on', e >= [0.02, 0.45, 0.999][i]); });
+      if (k < 1) { raf = requestAnimationFrame(step); return; }
+      root.classList.remove('is-run'); root.classList.add('is-ok'); sr.textContent = 'Payment complete';
+      later(function () { root.classList.add('is-rec'); rec.setAttribute('aria-hidden', 'false'); back.tabIndex = 0; back.focus({ preventScroll: true }); }, rm ? 0 : 900);
+    })(t0);
+  }
+  go.addEventListener('click', run);
+  back.addEventListener('click', function () {
+    cancelAnimationFrame(raf); ts.forEach(clearTimeout); ts = [];
+    root.classList.remove('is-run', 'is-ok', 'is-rec'); rec.setAttribute('aria-hidden', 'true'); back.tabIndex = -1;
+    ring.style.setProperty('--p', 0); steps.forEach(function (s) { s.classList.remove('on'); });
+    go.focus({ preventScroll: true });
+  });
+})();
+</script>

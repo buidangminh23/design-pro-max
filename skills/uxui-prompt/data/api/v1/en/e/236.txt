@@ -1,0 +1,67 @@
+<!-- Lucian UX/UI Prompt #236 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#236 -->
+<!--
+Element: Curtain-reveal footer
+ID: 236 · Category: Navigation · Tags: footer, reveal, scroll, newsletter, layout
+What it does: Scroll to the end of the page and the content rises like a curtain to reveal a dark footer fixed beneath it. As it's revealed the footer grows slightly and brightens, and the big brand wordmark at the bottom floats up. Enter an address in the footer's newsletter field and press Subscribe to turn the button into a check.
+How to use it: Scroll to the bottom inside the card to reveal the footer
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#236
+-->
+<style>
+.u236{position:relative;width:300px;height:480px;border-radius:32px;overflow:hidden;background:#0E0F14;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u236-ft{position:absolute;left:0;right:0;bottom:0;height:300px;padding:22px 20px;color:#E8E9F2;transform-origin:50% 100%;transform:scale(calc(.94 + .06 * var(--r,0)));opacity:calc(.35 + .65 * var(--r,0))}
+.u236-nl small{font-size:10px;font-weight:850;letter-spacing:.08em;color:#8B8FA8}
+.u236-nl b{display:block;margin:4px 0 10px;font-size:15px;font-weight:850}
+.u236-fm{display:flex;gap:6px}
+.u236-fm input{flex:1;min-width:0;height:36px;padding:0 12px;border:0;border-radius:11px;background:rgba(255,255,255,.08);color:#fff;font:inherit;font-size:12px;font-weight:600;outline:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.u236-fm input:focus{box-shadow:inset 0 0 0 1.5px #818CF8}
+.u236-go{height:36px;padding:0 14px;border:0;border-radius:11px;background:#fff;color:#0E0F14;font:inherit;font-size:12px;font-weight:850;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:background .25s,color .25s}
+.u236-go svg{width:13px;height:13px;display:none}
+.u236-go.is-ok{background:#34D399;color:#05261A}
+.u236-go.is-ok svg{display:block}
+.u236-go:focus-visible{outline:2px solid #818CF8;outline-offset:2px}
+.u236-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:22px;font-size:11px;font-weight:650;color:#8B8FA8}
+.u236-cols b{display:block;margin-bottom:6px;font-size:11px;font-weight:850;color:#E8E9F2}
+.u236-cols span{display:block;margin-top:4px}
+.u236-wm{position:absolute;left:14px;right:14px;bottom:8px;font-size:68px;line-height:.9;font-weight:950;letter-spacing:-.06em;background:linear-gradient(180deg,#fff,rgba(255,255,255,.08));-webkit-background-clip:text;background-clip:text;color:transparent;transform:translateY(calc(26px * (1 - var(--r,0))))}
+.u236-sc{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;pointer-events:none}
+.u236-sc::-webkit-scrollbar{display:none}
+.u236-sc:focus-visible{outline:2px solid #818CF8;outline-offset:-4px;border-radius:32px}
+.u236-mn{position:relative;z-index:1;pointer-events:auto;background:var(--ux-surface);border-radius:0 0 28px 28px;box-shadow:0 20px 40px -10px rgba(0,0,0,.5);padding:38px 22px 30px}
+.u236-mn small{font-size:10px;font-weight:850;letter-spacing:.08em;color:var(--ux-accent)}
+.u236-mn h3{margin:8px 0 0;font-size:25px;line-height:1.15;font-weight:900;letter-spacing:-.04em}
+.u236-mn p{margin:10px 0 0;font-size:12px;line-height:1.6;font-weight:600;color:var(--ux-ink-2)}
+.u236-cs{margin-top:22px;padding:16px;border-radius:18px;background:var(--ux-surface-2)}
+.u236-cs small{color:var(--ux-ink-3)}
+.u236-cs b{display:block;margin-top:4px;font-size:16px;font-weight:900;letter-spacing:-.02em}
+.u236-cs i{display:block;height:120px;margin-top:12px;border-radius:12px;background:linear-gradient(135deg,var(--ux-accent-soft),color-mix(in srgb,var(--ux-accent) 30%,var(--ux-surface)))}
+.u236-sp{height:300px;pointer-events:none}
+@media (prefers-reduced-motion: reduce){.u236-ft{transform:none;opacity:1}.u236-wm{transform:none}}
+</style>
+<div class="ux u236">
+  <footer class="u236-ft">
+    <div class="u236-nl"><small>Newsletter</small><b>Once a month, only useful news</b><form class="u236-fm"><input type="email" placeholder="Email address" aria-label="Email address" autocomplete="off"><button type="submit" class="u236-go"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></button></form></div>
+    <div class="u236-cols"><div><b>Product</b><span>Features</span><span>Pricing</span></div><div><b>Company</b><span>About</span><span>Careers</span></div><div><b>Help</b><span>Docs</span><span>Contact</span></div></div>
+    <div class="u236-wm" aria-hidden="true">Quiet.</div>
+  </footer>
+  <div class="u236-sc" tabindex="0" aria-label="Page">
+    <div class="u236-mn"><small>Final section</small><h3>Good tools<br>work quietly</h3><p>We handle the rest so your team can focus on the work.</p><div class="u236-cs"><small>Case study</small><b>Cut launch time in half</b><i></i></div></div>
+    <div class="u236-sp"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u236-sc'), sp = root.querySelector('.u236-sp'), fm = root.querySelector('.u236-fm'), inp = fm.querySelector('input'), go = root.querySelector('.u236-go'), lb = go.querySelector('span');
+  function onScroll() { var max = sc.scrollHeight - sc.clientHeight, r = Math.max(0, Math.min(1, 1 - (max - sc.scrollTop) / sp.offsetHeight)); root.style.setProperty('--r', r.toFixed(3)); }
+  sc.addEventListener('scroll', onScroll, { passive: true });
+  fm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!inp.value) inp.value = 'hello@quiet.so';
+    go.classList.add('is-ok'); lb.textContent = 'Subscribed';
+  });
+  lb.textContent = 'Subscribe';
+  onScroll();
+})();
+</script>

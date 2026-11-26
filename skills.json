@@ -10,5 +10,9 @@
   {
     "name": "icons-pro-max",
     "path": "skills/icons-pro-max"
+  },
+  {
+    "name": "uxui-prompt",
+    "path": "skills/uxui-prompt"
   }
 ]

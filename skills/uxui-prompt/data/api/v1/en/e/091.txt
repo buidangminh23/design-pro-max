@@ -1,0 +1,169 @@
+<!-- Lucian UX/UI Prompt #091 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#091 -->
+<!--
+Element: Offline message queue
+ID: 091 · Category: Empty & Error States · Tags: offline, reconnect, queue, banner, chat
+What it does: When the connection drops, a banner comes down with Wi‑Fi arcs blinking in turn as it searches for a signal, and messages sent in the meantime wait in dashed bubbles with a clock mark. Reconnect and the slash wipes away, the banner turns green, and the queued messages fill in and send one by one.
+How to use it: Send a few messages while offline, then turn on the Wi‑Fi switch in the top right. Turn it off again to go back offline
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#091
+-->
+<style>
+.u091{position:relative;width:340px;height:470px;display:flex;flex-direction:column;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u091-top{display:flex;align-items:center;gap:10px;height:64px;flex:none;padding:0 14px 0 16px;border-bottom:1px solid var(--ux-line)}
+.u091-av{display:flex}
+.u091-av i{width:30px;height:30px;margin-right:-9px;border-radius:50%;background:var(--g);box-shadow:0 0 0 2.5px var(--ux-surface)}
+.u091-ti{margin-left:10px}
+.u091-ti b{display:block;font-size:15.5px;font-weight:850;letter-spacing:-.03em}
+.u091-ti small{display:block;font-size:11.5px;font-weight:700;color:var(--ux-ink-3);transition:color .3s}
+.u091.on .u091-ti small,.u091.back .u091-ti small{color:var(--ux-mint)}
+.u091-sw{position:relative;margin-left:auto;width:62px;height:34px;flex:none;border:0;padding:0;border-radius:17px;background:var(--ux-surface-3);transition:background-color .3s}
+.u091-sw[aria-checked="true"]{background:var(--ux-mint)}
+.u091-sw span{position:absolute;left:4px;top:4px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface);color:var(--ux-ink-3);box-shadow:0 2px 6px -2px rgba(0,0,0,.35);transition:transform .45s var(--ux-spring),color .3s}
+.u091-sw[aria-checked="true"] span{transform:translateX(28px);color:var(--ux-mint)}
+.u091-sw svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u091-sw:active span{width:30px}
+.u091-sw[aria-checked="true"]:active span{transform:translateX(24px)}
+.u091-bn{display:grid;grid-template-rows:0fr;flex:none;transition:grid-template-rows .45s var(--ux-ease)}
+.u091.off .u091-bn,.u091.rec .u091-bn,.u091.back .u091-bn{grid-template-rows:1fr}
+.u091-bi{min-height:0;overflow:hidden}
+.u091-bc{display:flex;align-items:center;gap:11px;margin:10px 12px 2px;padding:10px 14px 10px 10px;border-radius:17px;background:var(--ux-ink);color:var(--ux-page);transition:background-color .4s,color .4s}
+.u091.back .u091-bc{background:var(--ux-mint);color:var(--ux-accent-ink)}
+.u091-wf{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,currentColor 12%,transparent)}
+.u091-wf svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.u091-wf .a{opacity:.25}
+.u091.off .u091-wf .a{animation:u091-scan 1.8s ease-in-out infinite}
+.u091.rec .u091-wf .a{animation:u091-scan .9s ease-in-out infinite}
+.u091-wf .a2{animation-delay:.2s!important}.u091-wf .a3{animation-delay:.4s!important}
+.u091.back .u091-wf .a{opacity:1}
+@keyframes u091-scan{30%{opacity:1}70%,100%{opacity:.25}}
+.u091-wf .x{stroke-dasharray:24;stroke-dashoffset:0;transition:stroke-dashoffset .45s var(--ux-ease)}
+.u091.rec .u091-wf .x,.u091.back .u091-wf .x{stroke-dashoffset:24}
+.u091-bt b{display:block;font-size:13.5px;font-weight:800;letter-spacing:-.02em}
+.u091-bt small{display:block;margin-top:1px;font-size:12px;font-weight:650;opacity:.72}
+.u091-list{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;padding:12px 14px 10px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 22px);mask-image:linear-gradient(180deg,transparent,#000 22px)}
+.u091-r{display:flex;flex-direction:column;align-self:flex-start;align-items:flex-start;max-width:80%;animation:u091-in .45s var(--ux-spring) backwards}
+@keyframes u091-in{from{opacity:0;transform:translateY(12px) scale(.96)}}
+.u091-r.me{align-self:flex-end;align-items:flex-end}
+.u091-m{padding:9px 13px;border-radius:18px 18px 18px 6px;background:var(--ux-surface-2);font-size:14px;font-weight:600;line-height:1.45;transition:background-color .35s,color .35s,outline-color .35s}
+.u091-r.me .u091-m{border-radius:18px 18px 6px 18px;background:var(--ux-accent);color:var(--ux-accent-ink);outline:1.5px dashed transparent;outline-offset:-1.5px}
+.u091-r.q .u091-m{background:var(--ux-accent-soft);color:var(--ux-ink);outline-color:var(--ux-accent)}
+.u091-r.pop .u091-m{animation:u091-pop .45s var(--ux-spring)}
+@keyframes u091-pop{40%{transform:scale(1.05)}}
+.u091-meta{display:flex;align-items:center;gap:4px;margin-top:3px;padding:0 4px;font-size:11px;font-weight:700;color:var(--ux-ink-3)}
+.u091-meta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u091-r.q .u091-meta{color:var(--ux-accent)}
+.u091-r.q .u091-meta svg{animation:u091-tick 2s linear infinite}
+@keyframes u091-tick{to{transform:rotate(360deg)}}
+.u091-typ{display:inline-flex;gap:4px;padding:12px 14px}
+.u091-typ i{width:6px;height:6px;border-radius:50%;background:var(--ux-ink-3);animation:u091-b 1s ease-in-out infinite}
+.u091-typ i:nth-child(2){animation-delay:.15s}.u091-typ i:nth-child(3){animation-delay:.3s}
+@keyframes u091-b{30%{transform:translateY(-4px)}}
+.u091-cmp{display:flex;gap:8px;flex:none;padding:10px 12px 14px;border-top:1px solid var(--ux-line)}
+.u091-in{flex:1;min-width:0;height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--ux-surface-2);font:inherit;font-size:14px;color:var(--ux-ink);transition:box-shadow .2s}
+.u091-in::placeholder{color:var(--ux-ink-3)}
+.u091-in:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u091-send{width:44px;height:44px;flex:none;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-accent);color:var(--ux-accent-ink);transition:transform .3s var(--ux-spring),opacity .2s}
+.u091-send svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u091-send[aria-disabled="true"]{opacity:.35}
+.u091-send:not([aria-disabled="true"]):active{transform:scale(.88)}
+.u091-sw:focus-visible,.u091-send:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u091 off">
+  <div class="u091-top">
+    <span class="u091-av" aria-hidden="true"><i style="--g:linear-gradient(140deg,#22C3A6,#0EA5E9)"></i><i style="--g:linear-gradient(140deg,#8B6CFF,#5B8CFF)"></i><i style="--g:linear-gradient(140deg,#FF7A93,#B04FD0)"></i></span>
+    <span class="u091-ti"><b>Design team</b><small>Disconnected</small></span>
+    <button class="u091-sw" type="button" role="switch" aria-checked="false" aria-label="Wi‑Fi connection"><span aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M5.6 10.2a3.4 3.4 0 0 1 4.8 0M3.4 7.8a6.6 6.6 0 0 1 9.2 0"/><circle cx="8" cy="12.6" r=".6"/></svg></span></button>
+  </div>
+  <div class="u091-bn"><div class="u091-bi"><div class="u091-bc" role="status">
+    <span class="u091-wf" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="a a3" d="M2.8 9.2a13.2 13.2 0 0 1 18.4 0"/><path class="a a2" d="M5.7 12.4a9 9 0 0 1 12.6 0"/><path class="a" d="M8.6 15.6a4.8 4.8 0 0 1 6.8 0"/><circle cx="12" cy="19" r="1.3" fill="currentColor" stroke="none"/><path class="x" d="M4.5 3.5l15 17"/></svg></span>
+    <span class="u091-bt"><b></b><small></small></span>
+  </div></div></div>
+  <div class="u091-list" aria-live="polite"></div>
+  <form class="u091-cmp"><input class="u091-in" type="text" maxlength="60" autocomplete="off" aria-label="Message"><button class="u091-send" type="submit" aria-label="Send" aria-disabled="true"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 14.5v-11M4 8l5-4.5L14 8"/></svg></button></form>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sw = root.querySelector('.u091-sw'), bt = root.querySelector('.u091-bt b'), bs = root.querySelector('.u091-bt small'), sub = root.querySelector('.u091-ti small');
+  var list = root.querySelector('.u091-list'), form = root.querySelector('.u091-cmp'), inp = root.querySelector('.u091-in'), send = root.querySelector('.u091-send');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CLOCK = '<circle cx="7" cy="7" r="5.2"/><path d="M7 4.4V7l1.8 1.2"/>', DBL = '<path d="M1.6 7.4l2.4 2.4L9 4.8M6.4 9.4l.4.4 5-5"/>';
+  var state = 'off', ts = [], min = 14, replied = false;
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, ms)); }
+  function clear() { ts.forEach(clearTimeout); ts = []; }
+  function setState(s) { state = s; root.classList.remove('off', 'rec', 'on', 'back'); root.classList.add(s); sw.setAttribute('aria-checked', String(s !== 'off')); sub.textContent = s === 'off' ? 'Disconnected' : s === 'rec' ? 'Connecting' : 'Online'; }
+  function queued() { return list.querySelectorAll('.u091-r.q'); }
+  function banner(b, s) { bt.textContent = b; bs.textContent = s; }
+  function offText() { var n = queued().length; banner('You’re offline', n ? n + ' waiting · sends when online' : 'Messages send once you’re connected'); }
+  function row(text, me, q) {
+    var r = document.createElement('div');
+    r.className = 'u091-r' + (me ? ' me' : '') + (q ? ' q' : '');
+    r.innerHTML = '<div class="u091-m"></div>' + (me ? '<span class="u091-meta"><span></span><svg viewBox="0 0 14 14" aria-hidden="true"></svg></span>' : '');
+    r.firstChild.textContent = text;
+    if (me) mark(r, q);
+    list.appendChild(r);
+    while (list.children.length > 9) list.firstChild.remove();
+    return r;
+  }
+  function mark(r, q) {
+    r.classList.toggle('q', q);
+    r.querySelector('.u091-meta span').textContent = q ? 'Queued' : '2:' + min + ' PM';
+    r.querySelector('.u091-meta svg').innerHTML = q ? CLOCK : DBL;
+  }
+  row('Could you check the draft before the afternoon review?', false);
+  row('Sure, looking now', true, false);
+  row('Maybe raise the color contrast a bit', true, true);
+  function flush() {
+    var q = Array.prototype.slice.call(queued()), n = q.length;
+    q.forEach(function (r, i) {
+      later(function () { min++; mark(r, false); r.classList.remove('pop'); void r.offsetWidth; r.classList.add('pop'); }, rm ? 0 : 300 + i * 380);
+    });
+    banner('Back online', n ? 'Sent ' + n + (n === 1 ? ' queued message' : ' queued messages') : 'Messages go through in real time again');
+    later(function () {
+      setState('on');
+      if (n && !replied) {
+        replied = true;
+        var t = row('', false); t.firstChild.innerHTML = '<span class="u091-typ" aria-label="Typing"><i></i><i></i><i></i></span>'; t.firstChild.style.padding = '0';
+        later(function () { t.firstChild.style.padding = ''; t.firstChild.textContent = 'Sounds good, I’ll raise it and repost'; }, rm ? 0 : 1300);
+      }
+    }, rm ? 600 : 1500 + n * 380);
+  }
+  function reconnect() {
+    clear(); setState('rec');
+    banner('Reconnecting…', 'Found a signal');
+    later(function () { setState('back'); flush(); }, rm ? 300 : 1300);
+  }
+  function goOffline() { clear(); setState('off'); offText(); }
+  sw.addEventListener('click', function () { if (state === 'off') reconnect(); else goOffline(); });
+  function sync() { send.setAttribute('aria-disabled', String(!inp.value.trim())); }
+  inp.addEventListener('input', sync);
+  inp.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (!e.isComposing && e.keyCode !== 229) form.requestSubmit();
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = inp.value.trim();
+    if (!v) return;
+    inp.value = ''; sync();
+    if (state === 'off' || state === 'rec') {
+      row(v, true, true);
+      if (state === 'off') offText();
+    } else {
+      min++;
+      var r = row(v, true, false);
+      r.querySelector('.u091-meta span').textContent = 'Sending';
+      later(function () { mark(r, false); }, rm ? 0 : 450);
+    }
+  });
+  function onNet() {
+    if (!root.isConnected) { window.removeEventListener('online', onNet); window.removeEventListener('offline', onNet); return; }
+    if (navigator.onLine) { if (state === 'off') reconnect(); } else if (state !== 'off') goOffline();
+  }
+  window.addEventListener('online', onNet);
+  window.addEventListener('offline', onNet);
+  offText();
+})();
+</script>

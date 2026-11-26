@@ -1,0 +1,147 @@
+<!-- Lucian UX/UI Prompt #381 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#381 -->
+<!--
+Element: Splitting map clusters
+ID: 381 · Category: Data Motion · Tags: map, clustering, zoom, markers, data
+What it does: On a neighborhood map with a river and parks, 140 cafés gather into numbered clusters; zoom in and the clusters split into smaller groups and single pins that spread out to their places, then get pulled back together when you zoom out. Drag to pan the map, press a cluster to zoom one level in around it, and press a single pin to see the café's name and rating.
+How to use it: Zoom with + and −, drag the map or press a cluster
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#381
+-->
+<style>
+
+.u381{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#F1EFE8;background:light-dark(#F1EFE8,#15171D);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#1F2937;color:light-dark(#1F2937,#EEF0F5);transition:background-color 1ms;--m-land:light-dark(#F1EFE8,#15171D);--m-alley:light-dark(#fff,#1E2129);--m-park:light-dark(#CDEBC4,#1B3125);--m-case:light-dark(#E2DDD0,#0D0E12);--m-road:light-dark(#fff,#2A2E39);--m-river:light-dark(#BFDBFE,#1A3150);--m-pin:light-dark(#92400E,#FDBA74);--m-hole:light-dark(#fff,#15171D)}
+.u381-cv{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+.u381.is-drag .u381-cv{cursor:grabbing}
+.u381-cv:focus-visible{outline:2px solid #F97316;outline-offset:-4px;border-radius:30px}
+.u381-hd{position:absolute;left:16px;top:16px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.92);background:light-dark(rgba(255,255,255,.92),rgba(35,38,49,.92));box-shadow:0 4px 14px -6px rgba(0,0,0,.25);box-shadow:0 4px 14px -6px light-dark(rgba(0,0,0,.25),rgba(0,0,0,.6));font-size:11px;font-weight:850;font-variant-numeric:tabular-nums;pointer-events:none}
+.u381-zm{position:absolute;right:16px;top:16px;display:flex;flex-direction:column;border-radius:14px;background:#fff;background:light-dark(#fff,#232631);box-shadow:0 6px 18px -8px rgba(0,0,0,.35);box-shadow:0 6px 18px -8px light-dark(rgba(0,0,0,.35),rgba(0,0,0,.7));overflow:hidden}
+.u381-zm button{width:36px;height:36px;border:0;background:none;color:#1F2937;color:light-dark(#1F2937,#EEF0F5);font:inherit;font-size:20px;font-weight:700;line-height:1;cursor:pointer;display:grid;place-items:center}
+.u381-zm button+button{box-shadow:inset 0 1px 0 #E5E7EB;box-shadow:inset 0 1px 0 light-dark(#E5E7EB,rgba(255,255,255,.08))}
+.u381-zm button:disabled{color:#CBD5E1;color:light-dark(#CBD5E1,#4A505E);cursor:default}
+.u381-zm button:focus-visible{outline:2px solid #F97316;outline-offset:-3px}
+.u381-tip{position:absolute;left:0;top:0;padding:6px 9px;border-radius:10px;background:#1F2937;background:light-dark(#1F2937,#EEF0F5);color:#fff;color:light-dark(#fff,#15171D);font-size:10.5px;font-weight:750;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,-100%);transition:opacity .15s}
+.u381-tip.is-on{opacity:1}
+</style>
+<div class="ux u381">
+  <canvas class="u381-cv" tabindex="0" role="img" aria-label="Café map, drag to pan"></canvas>
+  <div class="u381-hd" aria-live="polite"></div>
+  <div class="u381-zm"><button type="button" class="u381-zi" aria-label="Zoom in">+</button><button type="button" class="u381-zo" aria-label="Zoom out">−</button></div>
+  <div class="u381-tip"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u381-cv'), cx = cv.getContext('2d'), hd = root.querySelector('.u381-hd'), zi = root.querySelector('.u381-zi'), zo = root.querySelector('.u381-zo'), tip = root.querySelector('.u381-tip');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 340, H = 340, dpr = Math.min(2, window.devicePixelRatio || 1), SC = [170, 176], ZMAX = 3;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var seed = 11; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function gauss() { return (rnd() + rnd() + rnd() - 1.5) / 1.5; }
+  var HOODS = [[300, 320, 70, 30], [630, 270, 60, 25], [480, 580, 55, 28], [770, 640, 60, 20], [240, 720, 50, 18], [580, 840, 65, 19]], PT = [];
+  HOODS.forEach(function (h) { for (var k = 0; k < h[3]; k++) PT.push({ x: h[0] + gauss() * h[2], y: h[1] + gauss() * h[2], s: (3.6 + rnd() * 1.4).toFixed(1) }); });
+  var RIVER = [[-50, 470], [180, 500], [330, 455], [520, 420], [700, 500], [860, 470], [1050, 450]];
+  var PARKS = [[380, 190, 70, 42], [700, 790, 85, 50], [140, 560, 48, 62]];
+  var ROADS = [[[-50, 300], [1050, 255]], [[-50, 700], [1050, 725]], [[430, -50], [455, 1050]], [[760, -50], [725, 1050]], [[-50, 120], [1050, 160]], [[150, -50], [120, 1050]]];
+  function sOf(z) { return 0.32 * Math.pow(2, z); }
+  var z = 0, cam = { s: sOf(0), x: 500, y: 500 }, anim = null, cur = null;
+  function scr(x, y) { return [(x - cam.x) * cam.s + SC[0], (y - cam.y) * cam.s + SC[1]]; }
+  function cluster(zz) {
+    var cell = 54 / sOf(zz), map = {}, list = [], id = [];
+    PT.forEach(function (p, i) { var k = Math.floor(p.x / cell) + ',' + Math.floor(p.y / cell); if (!(k in map)) { map[k] = list.length; list.push({ x: 0, y: 0, n: 0, m: [] }); } var c = list[map[k]]; c.x += p.x; c.y += p.y; c.n++; c.m.push(i); id[i] = map[k]; });
+    list.forEach(function (c) { c.x /= c.n; c.y /= c.n; });
+    var near = 40 / sOf(zz), out = [];
+    list.sort(function (a, b) { return b.n - a.n; }).forEach(function (c) {
+      var t = null; out.forEach(function (o) { var dx = o.x - c.x, dy = o.y - c.y; if (!t && dx * dx + dy * dy < near * near) t = o; });
+      if (t) { t.x = (t.x * t.n + c.x * c.n) / (t.n + c.n); t.y = (t.y * t.n + c.y * c.n) / (t.n + c.n); t.n += c.n; t.m = t.m.concat(c.m); } else out.push(c);
+    });
+    out.forEach(function (c, k) { c.m.forEach(function (i) { id[i] = k; }); });
+    return { list: out, id: id };
+  }
+  var CL = [0, 1, 2, 3].map(cluster);
+  var probe = document.createElement('i'), PAL = null, palKey = ''; probe.hidden = true; root.appendChild(probe);
+  function pal() {
+    var k = getComputedStyle(root).backgroundColor;
+    if (PAL && k === palKey) return PAL;
+    palKey = k; PAL = {};
+    ['land', 'alley', 'park', 'case', 'road', 'river', 'pin', 'hole'].forEach(function (n) { probe.style.color = 'var(--m-' + n + ')'; PAL[n] = getComputedStyle(probe).color; });
+    return PAL;
+  }
+  function bubble(x, y, n, a) {
+    cx.globalAlpha = a;
+    if (n > 1) {
+      var r = 11 + Math.sqrt(n) * 2.2;
+      cx.fillStyle = 'rgba(249,115,22,.22)'; cx.beginPath(); cx.arc(x, y, r + 5, 0, 6.2832); cx.fill();
+      cx.fillStyle = '#F97316'; cx.beginPath(); cx.arc(x, y, r, 0, 6.2832); cx.fill();
+      cx.strokeStyle = '#fff'; cx.lineWidth = 2; cx.stroke();
+      cx.fillStyle = '#fff'; cx.font = '800 ' + (n > 9 ? 11 : 12) + 'px system-ui, sans-serif'; cx.textAlign = 'center'; cx.fillText(n, x, y + 4);
+    } else {
+      cx.fillStyle = PAL.pin; cx.beginPath(); cx.arc(x, y - 9, 6.5, 0, 6.2832); cx.fill(); cx.beginPath(); cx.moveTo(x - 5, y - 6); cx.lineTo(x, y); cx.lineTo(x + 5, y - 6); cx.fill();
+      cx.fillStyle = PAL.hole; cx.beginPath(); cx.arc(x, y - 9, 2.6, 0, 6.2832); cx.fill();
+    }
+    cx.globalAlpha = 1;
+  }
+  function path(pts, w, col) { cx.strokeStyle = col; cx.lineWidth = w; cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.beginPath(); pts.forEach(function (p, i) { var q = scr(p[0], p[1]); if (i) cx.lineTo(q[0], q[1]); else cx.moveTo(q[0], q[1]); }); cx.stroke(); }
+  function drawMap() {
+    var P = pal(); cx.fillStyle = P.land; cx.fillRect(0, 0, W, H);
+    if (cam.s > 0.55) { cx.globalAlpha = Math.min(1, (cam.s - 0.55) * 2); for (var g = 0; g <= 1000; g += 62) { path([[g, 0], [g + 20, 1000]], 2.2 * cam.s, P.alley); path([[0, g], [1000, g - 18]], 2.2 * cam.s, P.alley); } cx.globalAlpha = 1; }
+    PARKS.forEach(function (p) { var q = scr(p[0], p[1]); cx.fillStyle = P.park; cx.beginPath(); cx.ellipse(q[0], q[1], p[2] * cam.s, p[3] * cam.s, 0.3, 0, 6.2832); cx.fill(); });
+    ROADS.forEach(function (r) { path(r, 12 * cam.s + 2, P.case); path(r, 12 * cam.s, P.road); });
+    path(RIVER, 34 * cam.s, P.river);
+  }
+  function draw() {
+    drawMap();
+    if (anim) {
+      var e = anim.e, inn = anim.to > anim.from, A = CL[anim.from], B = CL[anim.to];
+      if (inn) B.list.forEach(function (c) { var o = A.list[A.id[c.m[0]]], x = o.x + (c.x - o.x) * e, y = o.y + (c.y - o.y) * e, q = scr(x, y); bubble(q[0], q[1], c.n, 0.5 + 0.5 * e); });
+      else A.list.forEach(function (c) { var t = B.list[B.id[c.m[0]]], x = c.x + (t.x - c.x) * e, y = c.y + (t.y - c.y) * e, q = scr(x, y); bubble(q[0], q[1], c.n, 1); });
+    } else CL[z].list.forEach(function (c) { var q = scr(c.x, c.y); bubble(q[0], q[1], c.n, 1); });
+  }
+  function info() { hd.textContent = 'Café ' + PT.length + ' places · zoom ' + (z + 1) + '/4'; zi.disabled = z >= ZMAX; zo.disabled = z <= 0; }
+  function zoomTo(nz, fx, fy) {
+    if (nz < 0 || nz > ZMAX || nz === z) return;
+    tip.classList.remove('is-on');
+    var to = { s: sOf(nz), x: nz === 0 ? 500 : fx, y: nz === 0 ? 500 : fy }, fr = { s: cam.s, x: cam.x, y: cam.y };
+    anim = { from: z, to: nz, e: 0 }; z = nz; info();
+    var t0 = performance.now(), dur = rm ? 0 : 620;
+    (function f(now) {
+      var k = dur ? Math.min(1, (now - t0) / dur) : 1, e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      cam.s = Math.exp(Math.log(fr.s) + (Math.log(to.s) - Math.log(fr.s)) * e); cam.x = fr.x + (to.x - fr.x) * e; cam.y = fr.y + (to.y - fr.y) * e;
+      anim.e = e; if (k >= 1) anim = null;
+      draw(); if (k < 1) requestAnimationFrame(f);
+    })(t0);
+  }
+  zi.addEventListener('click', function () { zoomTo(z + 1, cam.x, cam.y); });
+  zo.addEventListener('click', function () { zoomTo(z - 1, cam.x, cam.y); });
+  function loc(e) { var r = cv.getBoundingClientRect(), k = W / r.width; return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; }
+  function hit(p) { var best = null; CL[z].list.forEach(function (c) { var q = scr(c.x, c.y), r = c.n > 1 ? 11 + Math.sqrt(c.n) * 2.2 : 9, yy = c.n > 1 ? q[1] : q[1] - 8, dx = p[0] - q[0], dy = p[1] - yy; if (dx * dx + dy * dy <= r * r) best = c; }); return best; }
+  var down = null;
+  cv.addEventListener('pointerdown', function (e) { if (anim) return; down = { p: loc(e), x: cam.x, y: cam.y, moved: false }; root.classList.add('is-drag'); try { cv.setPointerCapture(e.pointerId); } catch (er) {} });
+  cv.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    var p = loc(e), dx = p[0] - down.p[0], dy = p[1] - down.p[1];
+    if (Math.abs(dx) + Math.abs(dy) > 4) { down.moved = true; tip.classList.remove('is-on'); }
+    if (down.moved) { var m = 170 / cam.s, lo = Math.min(500, m - 80), hi = Math.max(500, 1080 - m); cam.x = Math.max(lo, Math.min(hi, down.x - dx / cam.s)); cam.y = Math.max(lo, Math.min(hi, down.y - dy / cam.s)); if (z === 0) { cam.x = 500 + (cam.x - 500) * 0.3; cam.y = 500 + (cam.y - 500) * 0.3; } draw(); }
+  });
+  function up() {
+    if (!down) return; root.classList.remove('is-drag');
+    if (!down.moved) {
+      var c = hit(down.p);
+      if (c && c.n > 1 && z < ZMAX) zoomTo(z + 1, c.x, c.y);
+      else if (c && c.n === 1) { var q = scr(c.x, c.y), p = PT[c.m[0]]; tip.textContent = 'Café ' + (c.m[0] + 1) + ' · ★' + p.s; tip.style.left = q[0] + 'px'; tip.style.top = (q[1] - 20) + 'px'; tip.classList.add('is-on'); }
+      else tip.classList.remove('is-on');
+    } else if (z === 0) { var bx = cam.x, by = cam.y; zoomTo0(bx, by); }
+    down = null;
+  }
+  function zoomTo0(bx, by) { var t0 = performance.now(); (function f(now) { var k = rm ? 1 : Math.min(1, (now - t0) / 400), e = 1 - Math.pow(1 - k, 3); cam.x = bx + (500 - bx) * e; cam.y = by + (500 - by) * e; draw(); if (k < 1) requestAnimationFrame(f); })(t0); }
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('keydown', function (e) {
+    var d = { ArrowLeft: [-40, 0], ArrowRight: [40, 0], ArrowUp: [0, -40], ArrowDown: [0, 40] }[e.key];
+    if (e.key === '+' || e.key === '=') { zoomTo(z + 1, cam.x, cam.y); e.preventDefault(); return; }
+    if (e.key === '-') { zoomTo(z - 1, cam.x, cam.y); e.preventDefault(); return; }
+    if (!d || z === 0) return; e.preventDefault(); cam.x += d[0] / cam.s; cam.y += d[1] / cam.s; draw();
+  });
+  root.addEventListener('transitionend', function (e) { if (e.target === root) draw(); });
+  info(); draw();
+})();
+</script>

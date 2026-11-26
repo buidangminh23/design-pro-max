@@ -1,0 +1,117 @@
+<!-- Lucian UX/UI Prompt #374 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#374 -->
+<!--
+Element: Quarter-by-quarter app growth bubbles
+ID: 374 · Category: Data Motion · Tags: gapminder, scatter, bubble, timeline, data
+What it does: Eight apps float as bubbles sized by revenue on axes of users and retention, sliding along their own paths each time a quarter passes. Drag the chart background left or right to wind time back and forth as the big quarter label behind follows, and press a bubble to leave a dotted trail of where it has been, making booms and busts easy to spot.
+How to use it: Drag the chart background to wind time, and press a bubble to show its trail
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#374
+-->
+<style>
+.u374{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u374-cv{position:absolute;inset:0;width:100%;height:100%;cursor:ew-resize;touch-action:none}
+.u374-cv.is-on{cursor:pointer}
+.u374-cv:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-4px;border-radius:30px}
+.u374-pp{position:absolute;right:16px;top:14px;width:30px;height:30px;border:0;border-radius:50%;background:var(--ux-ink);color:var(--ux-surface);display:grid;place-items:center;cursor:pointer;z-index:2}
+.u374-pp svg{width:12px;height:12px}
+.u374-pp .u374-pl{display:none}
+.u374-pp.is-paused .u374-pl{display:block}
+.u374-pp.is-paused .u374-pa{display:none}
+.u374-pp:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u374-lg{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:11px;font-size:10px;font-weight:750;color:var(--ux-ink-2);pointer-events:none}
+.u374-lg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+</style>
+<div class="ux u374">
+  <canvas class="u374-cv" tabindex="0" role="img" aria-label="App growth bubble chart, drag sideways to move through time"></canvas>
+  <button type="button" class="u374-pp"><svg class="u374-pa" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="8.4" y="1" width="3.6" height="12" rx="1" fill="currentColor"/></svg><svg class="u374-pl" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9.5-5.5z" fill="currentColor"/></svg></button>
+  <div class="u374-lg" aria-hidden="true"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u374-cv'), cx = cv.getContext('2d'), pp = root.querySelector('.u374-pp'), lg = root.querySelector('.u374-lg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 340, H = 340, dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var NAME = ['Notes', 'To-do', 'Walking', 'Meditation', 'Photo edit', 'Reading', 'Budget', 'Investing'];
+  var CAT = ['Productivity', 'Health', 'Hobby', 'Finance'], COL = ['#6366F1', '#10B981', '#F59E0B', '#EC4899'], C = [0, 0, 1, 1, 2, 2, 3, 3];
+  var XT = [['10k', 0], ['100k', 1], ['1M', 2], ['10M', 3]];
+  var KQ = [0, 8, 16, 23];
+  var K = [[[30, 42, 5], [60, 46, 8], [90, 48, 10], [110, 50, 12]], [[8, 30, 2], [40, 38, 6], [150, 44, 15], [300, 47, 26]], [[200, 25, 4], [500, 22, 6], [420, 28, 7], [380, 34, 9]], [[15, 50, 6], [80, 55, 14], [60, 52, 12], [45, 58, 13]],
+    [[120, 35, 10], [180, 30, 12], [260, 33, 18], [600, 38, 32]], [[5, 60, 3], [9, 62, 4], [20, 64, 6], [35, 66, 8]], [[50, 28, 3], [70, 31, 4], [140, 40, 9], [180, 45, 12]], [[2, 20, 1], [260, 18, 10], [90, 24, 6], [70, 35, 7]]];
+  var NQ = 23, PL = 46, PR = 318, PT = 50, PB = 272, SPD = 2.4;
+  function at(i, q) {
+    for (var s = 1; s < KQ.length; s++) if (q <= KQ[s]) break;
+    s = Math.min(s, KQ.length - 1);
+    var a = K[i][s - 1], b = K[i][s], f = (q - KQ[s - 1]) / (KQ[s] - KQ[s - 1]); f = f * f * (3 - 2 * f);
+    var lu = Math.log(a[0]) + (Math.log(b[0]) - Math.log(a[0])) * f;
+    return [Math.exp(lu), a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+  }
+  function px(u) { return PL + Math.log(u) / Math.LN10 / 3 * (PR - PL); }
+  function py(r) { return PB - (r - 10) / 60 * (PB - PT); }
+  function rad(v) { return 4 + Math.sqrt(v) * 2.6; }
+  var q = rm ? NQ : 0, playing = !rm, hold = 0, trail = [false, false, false, false, true, false, false, false], hov = -1, ink = '#111', ink3 = '#999', line = '#ddd';
+  lg.innerHTML = CAT.map(function (c, i) { return '<span><i style="background:' + COL[i] + '"></i>' + c + '</span>'; }).join('');
+  function qName(v) { var k = Math.floor(v + 1e-4); return (2021 + Math.floor(k / 4)) + ' Q' + (k % 4 + 1); }
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = ink; cx.globalAlpha = 0.07; cx.textAlign = 'center'; cx.font = '900 40px system-ui, sans-serif'; cx.fillText(qName(q), (PL + PR) / 2, 178); cx.globalAlpha = 1;
+    cx.strokeStyle = line; cx.lineWidth = 1; cx.font = '700 9px system-ui, sans-serif'; cx.fillStyle = ink3;
+    XT.forEach(function (t) { var x = PL + t[1] / 3 * (PR - PL); cx.beginPath(); cx.moveTo(x, PT); cx.lineTo(x, PB); cx.stroke(); cx.textAlign = t[1] === 0 ? 'left' : t[1] === 3 ? 'right' : 'center'; cx.fillText(t[0], x, PB + 12); });
+    [20, 40, 60].forEach(function (r) { var y = py(r); cx.beginPath(); cx.moveTo(PL, y); cx.lineTo(PR, y); cx.stroke(); cx.textAlign = 'right'; cx.fillText(r + '%', PL - 5, y + 3); });
+    cx.textAlign = 'right'; cx.fillText('Monthly users →', PR, PB + 25); cx.textAlign = 'left'; cx.fillText('30-day retention', 18, PT - 22);
+    NAME.forEach(function (n, i) {
+      if (!trail[i]) return;
+      cx.strokeStyle = COL[C[i]]; cx.fillStyle = COL[C[i]]; cx.setLineDash([3, 3]); cx.lineWidth = 1.4; cx.globalAlpha = 0.6; cx.beginPath();
+      for (var s = 0; s <= q; s += 0.25) { var p = at(i, s); if (s === 0) cx.moveTo(px(p[0]), py(p[1])); else cx.lineTo(px(p[0]), py(p[1])); }
+      var e = at(i, q); cx.lineTo(px(e[0]), py(e[1])); cx.stroke(); cx.setLineDash([]);
+      for (var k = 0; k <= Math.floor(q); k++) { var p2 = at(i, k); cx.beginPath(); cx.arc(px(p2[0]), py(p2[1]), 1.8, 0, 6.2832); cx.fill(); }
+      cx.globalAlpha = 1;
+    });
+    var cur = NAME.map(function (n, i) { var p = at(i, q); return { i: i, x: px(p[0]), y: py(p[1]), r: rad(p[2]) }; }).sort(function (a, b) { return b.r - a.r; });
+    cur.forEach(function (b) {
+      cx.globalAlpha = 0.85; cx.fillStyle = COL[C[b.i]]; cx.beginPath(); cx.arc(b.x, b.y, b.r, 0, 6.2832); cx.fill();
+      cx.globalAlpha = 1; cx.strokeStyle = 'rgba(255,255,255,.75)'; cx.lineWidth = 1.2; cx.stroke();
+      if (trail[b.i] || hov === b.i) { cx.fillStyle = ink; cx.font = '800 10px system-ui, sans-serif'; cx.textAlign = 'center'; cx.fillText(NAME[b.i], b.x, b.y - b.r - 5); }
+    });
+    BUB = cur;
+  }
+  var BUB = [];
+  function setPlay(p) { playing = p; pp.classList.toggle('is-paused', !p); pp.setAttribute('aria-label', p ? 'Pause' : 'Play'); }
+  var raf = 0, last = 0, vis = true;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now;
+    if (playing && !down) {
+      if (q >= NQ) { hold += dt; if (hold > 1.6) { q = 0; hold = 0; } }
+      else q = Math.min(NQ, q + dt * SPD);
+    }
+    draw();
+    if (playing || down) raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  function loc(e) { var r = cv.getBoundingClientRect(), k = W / r.width; return [(e.clientX - r.left) * k, (e.clientY - r.top) * k]; }
+  function hit(p) { for (var k = BUB.length - 1; k >= 0; k--) { var b = BUB[k], dx = p[0] - b.x, dy = p[1] - b.y; if (dx * dx + dy * dy <= (b.r + 3) * (b.r + 3)) return b.i; } return -1; }
+  var down = null;
+  cv.addEventListener('pointerdown', function (e) { var p = loc(e); down = { p: p, q: q, b: hit(p), moved: false }; setPlay(false); try { cv.setPointerCapture(e.pointerId); } catch (er) {} run(); });
+  cv.addEventListener('pointermove', function (e) {
+    var p = loc(e);
+    if (!down) { var h = hit(p); cv.classList.toggle('is-on', h >= 0); if (h !== hov) { hov = h; draw(); } return; }
+    var dx = p[0] - down.p[0]; if (Math.abs(dx) > 4) down.moved = true;
+    if (down.moved) { q = Math.max(0, Math.min(NQ, down.q + dx / 8)); hold = 0; }
+  });
+  function up() { if (!down) return; if (!down.moved && down.b >= 0) trail[down.b] = !trail[down.b]; down = null; draw(); }
+  cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('pointerleave', function () { if (hov >= 0) { hov = -1; draw(); } });
+  cv.addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
+    e.preventDefault(); setPlay(false); q = Math.max(0, Math.min(NQ, Math.round(q) + d)); draw();
+  });
+  pp.addEventListener('click', function () { if (!playing && q >= NQ) q = 0; setPlay(!playing); run(); });
+  var cs = getComputedStyle(root); ink = cs.color; ink3 = cs.getPropertyValue('--ux-ink-3').trim() || '#999'; line = cs.getPropertyValue('--ux-line').trim() || '#e5e5e5';
+  setPlay(playing); draw(); run();
+})();
+</script>

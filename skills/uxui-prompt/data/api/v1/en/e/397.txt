@@ -1,0 +1,69 @@
+<!-- Lucian UX/UI Prompt #397 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#397 -->
+<!--
+Element: Wave-flipping tile picture
+ID: 397 · Category: Sections & Content · Tags: tiles, flip, 3d, wave, css-3d
+What it does: Sixty-four tiles form one picture, then flip in turn as a ripple spreads from where you press, turning into a different picture on their backs. Each tile tips over in the direction the wave travels, and tiles under the cursor lift slightly forward, rippling after your fingertip.
+How to use it: Press anywhere on the picture, and pass the cursor over the tiles
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#397
+-->
+<style>
+.u397{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#11131C;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#fff}
+.u397-gd{position:absolute;left:22px;top:22px;width:296px;height:296px;display:grid;grid-template-columns:repeat(8,1fr);gap:1px;perspective:700px;cursor:pointer;touch-action:manipulation}
+.u397-t{position:relative;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,1.5,.5,1)}
+.u397-f{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:2px;background-size:296px 296px}
+.u397-k{transform:rotateY(180deg)}
+.u397-bar{position:absolute;left:30px;right:30px;bottom:30px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.u397-nm{padding:5px 10px;border-radius:999px;background:rgba(17,19,28,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-size:11.5px;font-weight:750}
+.u397-go{pointer-events:auto;border:0;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.92);color:#11131C;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer}
+.u397-go:focus-visible{outline:2px solid #FFD43B;outline-offset:2px}
+</style>
+<div class="ux u397">
+  <div class="u397-gd" role="img" aria-label="Tile picture, press to flip"></div>
+  <div class="u397-bar"><span class="u397-nm" aria-live="polite"></span><button type="button" class="u397-go">Flip</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u397-gd'), nm = root.querySelector('.u397-nm'), go = root.querySelector('.u397-go');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NAMES = ['Dawn sea', 'Starry ridge'], N = 8, S = 296 / N, side = 0;
+  var A = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 296"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A8B"/><stop offset=".55" stop-color="#FFD3A5"/><stop offset=".56" stop-color="#3A6EA5"/><stop offset="1" stop-color="#1B3A5C"/></linearGradient></defs><rect width="296" height="296" fill="url(#s)"/><circle cx="148" cy="164" r="44" fill="#FFF1C9"/><rect y="164" width="296" height="132" fill="#2B5584"/>' +
+    [0, 1, 2, 3, 4, 5, 6].map(function (i) { return '<rect x="' + (110 - i * 9) + '" y="' + (172 + i * 16) + '" width="' + (76 + i * 18) + '" height="4" rx="2" fill="#FFE3A3" opacity="' + (0.85 - i * 0.1) + '"/>'; }).join('') +
+    '<path d="M0 120 Q40 108 80 118 T150 112 T230 122 T296 110" stroke="#fff" stroke-width="3" fill="none" opacity=".5"/><path d="M60 70 l10 6 l10 -6 M200 52 l8 5 l8 -5" stroke="#5A3D5C" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
+  var Bk = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 296 296"><defs><linearGradient id="n" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1036"/><stop offset="1" stop-color="#3B2A6B"/></linearGradient></defs><rect width="296" height="296" fill="url(#n)"/>' +
+    Array.apply(null, Array(46)).map(function (_, i) { var x = (i * 73) % 296, y = (i * 41) % 170, r = i % 5 ? 1 : 1.8; return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="#fff" opacity="' + (0.4 + (i % 3) * 0.2) + '"/>'; }).join('') +
+    '<circle cx="222" cy="66" r="26" fill="#FFF6D8"/><circle cx="212" cy="58" r="24" fill="#0B1036" opacity=".9"/><path d="M0 230 L60 150 L100 196 L150 120 L210 200 L250 160 L296 214 V296 H0Z" fill="#241A4A"/><path d="M0 262 L70 200 L120 240 L180 190 L240 246 L296 226 V296 H0Z" fill="#160F33"/><path d="M150 120 L136 140 L146 136 L152 146 L160 134 Z" fill="#E6E2FF"/></svg>';
+  function url(s) { return 'url("data:image/svg+xml,' + encodeURIComponent(s) + '")'; }
+  var T = [];
+  for (var r = 0; r < N; r++) for (var c = 0; c < N; c++) {
+    var t = document.createElement('div'); t.className = 'u397-t';
+    var f = document.createElement('div'); f.className = 'u397-f'; f.style.backgroundImage = url(A); f.style.backgroundPosition = (-c * S) + 'px ' + (-r * S) + 'px';
+    var k = document.createElement('div'); k.className = 'u397-f u397-k'; k.style.backgroundImage = url(Bk); k.style.backgroundPosition = (-c * S) + 'px ' + (-r * S) + 'px';
+    t.appendChild(f); t.appendChild(k); gd.appendChild(t);
+    T.push({ el: t, r: r, c: c, ry: 0, lift: 0 });
+  }
+  function apply(o) { o.el.style.transform = 'translateZ(' + o.lift + 'px) rotateY(' + o.ry + 'deg)'; }
+  function flip(fc, fr) {
+    side = 1 - side; nm.textContent = NAMES[side];
+    T.forEach(function (o) {
+      var d = Math.hypot(o.c - fc, o.r - fr), dir = o.c >= fc ? 1 : -1;
+      o.el.style.transitionDelay = rm ? '0s' : (d * 55).toFixed(0) + 'ms';
+      o.ry += 180 * dir; apply(o);
+    });
+  }
+  gd.addEventListener('click', function (e) {
+    var rc = gd.getBoundingClientRect(), k = gd.offsetWidth / (rc.width || 1);
+    flip((e.clientX - rc.left) * k / S - 0.5, (e.clientY - rc.top) * k / S - 0.5);
+  });
+  go.addEventListener('click', function () { flip(3.5, 3.5); });
+  gd.addEventListener('pointermove', function (e) {
+    if (rm) return;
+    var rc = gd.getBoundingClientRect(), k = gd.offsetWidth / (rc.width || 1), x = (e.clientX - rc.left) * k / S - 0.5, y = (e.clientY - rc.top) * k / S - 0.5;
+    T.forEach(function (o) { var d = Math.hypot(o.c - x, o.r - y), l = d < 2.2 ? Math.round((1 - d / 2.2) * 26) : 0; if (l !== o.lift) { o.lift = l; o.el.style.transitionDelay = '0s'; apply(o); } });
+  });
+  gd.addEventListener('pointerleave', function () { T.forEach(function (o) { if (o.lift) { o.lift = 0; apply(o); } }); });
+  nm.textContent = NAMES[side];
+})();
+</script>

@@ -1,0 +1,71 @@
+<!-- Lucian UX/UI Prompt #294 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#294 -->
+<!--
+Element: Device that assembles on scroll
+ID: 294 · Category: Scroll Motion · Tags: scroll, exploded, product, isometric, 3d
+What it does: At first the phone’s glass, display, logic board, battery and back float apart in layers at an angle, each linked to a label by a line. Scroll down and the layers come down one at a time and lock together while the labels fold away, and once it is assembled the screen switches on.
+How to use it: Scroll down inside the card to assemble it, and back up to take it apart
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#294
+-->
+<style>
+.u294{position:relative;width:300px;height:500px;border-radius:30px;background:radial-gradient(90% 60% at 50% 40%,var(--ux-surface),var(--ux-surface-2));box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u294-sc{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;outline:none}
+.u294-sc::-webkit-scrollbar{display:none}
+.u294-run{height:1200px}
+.u294-st{position:sticky;top:0;height:500px}
+.u294-k{position:absolute;left:20px;top:20px;margin:0;font-size:20px;font-weight:880;letter-spacing:-.03em}
+.u294-ok{position:absolute;left:0;right:0;bottom:24px;text-align:center;font-size:13px;font-weight:800;color:var(--ux-mint);opacity:var(--done,0)}
+.u294-iso{position:absolute;left:50%;top:56%;width:0;height:0;transform:rotateX(58deg) rotateZ(-38deg);transform-style:preserve-3d}
+.u294-L{position:absolute;left:-60px;top:-110px;width:120px;height:220px;border-radius:22px;transform:translateZ(var(--z));transition:none}
+.u294-L.g{background:linear-gradient(135deg,rgba(255,255,255,.75),rgba(200,220,255,.35));box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9),0 0 0 1px var(--ux-line-2)}
+.u294-L.d{background:linear-gradient(135deg,#1B1E3A,#0B0C12);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.u294-L.d::after{content:"";position:absolute;inset:8px;border-radius:16px;background:radial-gradient(70% 50% at 30% 30%,#7048E8,transparent 70%),radial-gradient(60% 50% at 80% 80%,#15AABF,transparent 70%),#151626;opacity:var(--on,0);transition:opacity .5s}
+.u294-L.b{background:#1E7A4F;box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.u294-L.b::before{content:"";position:absolute;left:20px;top:24px;width:46px;height:46px;border-radius:6px;background:#2B2D33;box-shadow:54px 10px 0 -10px #C0A060,0 80px 0 -14px #2B2D33,40px 120px 0 -16px #C0A060}
+.u294-L.y{background:linear-gradient(135deg,#ADB5BD,#868E96);border-radius:16px;left:-48px;top:-80px;width:96px;height:160px}
+.u294-L.y::after{content:"";position:absolute;inset:16px;border:2px dashed rgba(255,255,255,.4);border-radius:10px}
+.u294-L.k{background:linear-gradient(135deg,#E9ECEF,#CED4DA);box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.08),0 20px 30px rgba(0,0,0,.15)}
+.u294-lb{position:absolute;left:186px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:var(--ux-ink-2);white-space:nowrap;transform:translateY(-50%);transform-origin:0 50%}
+.u294-lb::before{content:"";width:28px;height:1.5px;background:var(--ux-line-2)}
+</style>
+<div class="ux u294">
+  <div class="u294-sc" tabindex="0" aria-label="Exploded view, scroll to assemble">
+    <div class="u294-run"><div class="u294-st">
+      <p class="u294-k">Look inside</p>
+      <div class="u294-iso" aria-hidden="true"><span class="u294-L k"></span><span class="u294-L y"></span><span class="u294-L b"></span><span class="u294-L d"></span><span class="u294-L g"></span></div>
+      <div class="u294-lbs" aria-hidden="true"></div>
+      <p class="u294-ok">Assembled</p>
+    </div></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u294-sc'), st = root.querySelector('.u294-st'), lbs = root.querySelector('.u294-lbs');
+  var layers = Array.prototype.slice.call(root.querySelectorAll('.u294-L')).reverse();
+  var PARTS = ['Cover glass', 'Display', 'Logic board', 'Battery', 'Back panel'];
+  var SPREAD = [200, 140, 80, 30, 0], TIGHT = [14, 11, 7, 4, 0];
+  var labels = PARTS.map(function (p) { var l = document.createElement('span'); l.className = 'u294-lb'; l.textContent = p; lbs.appendChild(l); return l; });
+  st.querySelector('.u294-iso').setAttribute('aria-label', PARTS.join(', '));
+  var raf = 0;
+  function draw() {
+    raf = 0;
+    var max = sc.scrollHeight - sc.clientHeight, p = max ? Math.min(1, sc.scrollTop / max) : 0;
+    layers.forEach(function (L, i) {
+      var start = (layers.length - 1 - i) * 0.14, k = Math.max(0, Math.min(1, (p - start) / 0.4)), e = k * k * (3 - 2 * k);
+      var z = SPREAD[i] + (TIGHT[i] - SPREAD[i]) * e;
+      L.style.setProperty('--z', z.toFixed(1) + 'px');
+      var lb = labels[i];
+      lb.style.top = (280 - z * 0.72 - (4 - i) * 6).toFixed(1) + 'px';
+      lb.style.opacity = (1 - e * 1.3).toFixed(2);
+      lb.style.transform = 'translateY(-50%) scaleX(' + (1 - e * 0.6).toFixed(2) + ')';
+    });
+    var done = p > 0.92 ? 1 : 0;
+    st.style.setProperty('--done', done);
+    layers[1].style.setProperty('--on', done);
+  }
+  sc.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(draw); }, { passive: true });
+  draw();
+})();
+</script>

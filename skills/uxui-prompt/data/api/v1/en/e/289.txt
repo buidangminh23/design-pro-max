@@ -1,0 +1,77 @@
+<!-- Lucian UX/UI Prompt #289 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#289 -->
+<!--
+Element: Live display settings panel
+ID: 289 · Category: Navigation · Tags: accessibility, settings, font-size, contrast, a11y
+What it does: Press the person-shaped button in the corner of a website and a display settings panel unfolds. Raise the text size and the page text behind grows smoothly; turn on high contrast and the background and text get bolder; turn on link highlighting and every link gains an underline and outline. You can widen line spacing too, and Reset brings every setting back together.
+How to use it: Press the button in the bottom right and change text size, contrast and link highlighting
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#289
+-->
+<style>
+.u289{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);--fs:1;--lh:1.6}
+.u289-pg{position:absolute;inset:0;padding:22px 20px;background:var(--bg,transparent);color:var(--fg,var(--ux-ink));transition:background .3s,color .3s}
+.u289.is-hc .u289-pg{--bg:#000;--fg:#fff}
+.u289-pg h3{margin:0;font-size:calc(20px * var(--fs));font-weight:900;letter-spacing:-.03em;transition:font-size .3s}
+.u289-pg p{margin:10px 0 0;font-size:calc(12px * var(--fs));line-height:var(--lh);font-weight:600;color:var(--pc,var(--ux-ink-2));transition:font-size .3s,line-height .3s}
+.u289.is-hc .u289-pg p{--pc:#fff}
+.u289-pg nav{display:flex;gap:14px;margin-top:12px}
+.u289-pg a{font-size:calc(12px * var(--fs));font-weight:800;color:var(--ux-accent);text-decoration:none;border-radius:4px;transition:font-size .3s,box-shadow .2s}
+.u289.is-hc .u289-pg a{color:#FDE047}
+.u289.is-ln .u289-pg a{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;box-shadow:0 0 0 2px currentColor;padding:1px 4px}
+.u289-fb{position:absolute;right:14px;bottom:14px;z-index:3;width:46px;height:46px;border:0;border-radius:50%;background:#2563EB;color:#fff;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 22px -10px #2563EB}
+.u289-fb svg{width:24px;height:24px}
+.u289-pn{position:absolute;right:14px;bottom:70px;z-index:3;width:212px;padding:12px;border-radius:18px;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 22px 44px -16px rgba(0,0,0,.4);transform-origin:calc(100% - 23px) calc(100% + 34px);transform:scale(.5);opacity:0;pointer-events:none;transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+.u289.is-open .u289-pn{transform:none;opacity:1;pointer-events:auto}
+.u289-pn b{display:block;font-size:12.5px;font-weight:900}
+.u289-fs{display:flex;align-items:center;gap:6px;margin-top:10px;padding:6px;border-radius:11px;background:var(--ux-surface-2)}
+.u289-fs span{flex:1;font-size:11px;font-weight:800}
+.u289-fs em{font-style:normal;font-size:10.5px;font-weight:850;color:var(--ux-ink-3);font-variant-numeric:tabular-nums;min-width:34px;text-align:center}
+.u289-fs button{width:28px;height:28px;border:0;border-radius:8px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink);font:inherit;font-weight:900;cursor:pointer}
+.u289-fs button:disabled{opacity:.35;cursor:default}
+.u289-dn{font-size:10px}.u289-up{font-size:14px}
+.u289-rw{display:flex;align-items:center;justify-content:space-between;margin-top:6px;padding:6px 6px 6px 8px;font-size:11px;font-weight:800}
+.u289-sw{position:relative;width:34px;height:20px;border:0;border-radius:10px;background:var(--ux-surface-3);cursor:pointer;transition:background .2s}
+.u289-sw::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .25s cubic-bezier(.3,1.5,.5,1)}
+.u289-sw[aria-checked="true"]{background:#2563EB}
+.u289-sw[aria-checked="true"]::after{transform:translateX(14px)}
+.u289-rs{width:100%;height:30px;margin-top:6px;border:0;border-radius:9px;background:none;color:var(--ux-ink-3);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.u289 button:focus-visible{outline:2px solid #2563EB;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u289-pn,.u289-pg,.u289-pg h3,.u289-pg p,.u289-pg a{transition:none}}
+</style>
+<div class="ux u289">
+  <div class="u289-pg"><h3>Spring garden care</h3><p>Once it warms up, check the soil first. Loosening soil packed down over winter lets the roots breathe.</p><nav><a href="#">Watering guide</a><a href="#">Seeds we love</a></nav></div>
+  <div class="u289-pn" role="dialog" aria-hidden="true"><b>Display settings</b>
+    <div class="u289-fs"><span>Text size</span><button type="button" class="u289-dn" aria-label="Smaller text">A</button><em class="u289-fv"></em><button type="button" class="u289-up" aria-label="Larger text">A</button></div>
+    <div class="u289-sws"></div>
+    <button type="button" class="u289-rs">Reset</button>
+  </div>
+  <button type="button" class="u289-fb" aria-label="Open display settings" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="4.5" r="2.2" fill="currentColor"/><path d="M4.5 8.5l7.5 1.5 7.5-1.5M12 10v5m0 0l-3.5 6.5M12 15l3.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var fb = root.querySelector('.u289-fb'), pn = root.querySelector('.u289-pn'), dn = root.querySelector('.u289-dn'), up = root.querySelector('.u289-up'), fv = root.querySelector('.u289-fv'), sws = root.querySelector('.u289-sws'), rs = root.querySelector('.u289-rs');
+  var SW = ['High contrast', 'Highlight links', 'Wider line spacing'], CLS = ['is-hc', 'is-ln', 'is-lh'];
+  var STEPS = [0.9, 1, 1.15, 1.3], k = 1, on = [false, false, false];
+  Array.prototype.forEach.call(root.querySelectorAll('.u289-pg a'), function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); });
+  var B = SW.map(function (t, i) {
+    var r = document.createElement('div'); r.className = 'u289-rw'; r.innerHTML = '<span></span><button type="button" class="u289-sw" role="switch" aria-checked="false"></button>';
+    r.firstChild.textContent = t; var b = r.lastChild; b.setAttribute('aria-label', t);
+    b.addEventListener('click', function () { on[i] = !on[i]; sync(); });
+    sws.appendChild(r); return b;
+  });
+  function sync() {
+    root.style.setProperty('--fs', STEPS[k]); root.style.setProperty('--lh', on[2] ? 2 : 1.6);
+    fv.textContent = Math.round(STEPS[k] * 100) + '%'; dn.disabled = k === 0; up.disabled = k === STEPS.length - 1;
+    B.forEach(function (b, i) { b.setAttribute('aria-checked', on[i]); root.classList.toggle(CLS[i], on[i]); });
+  }
+  dn.addEventListener('click', function () { if (k > 0) { k--; sync(); } });
+  up.addEventListener('click', function () { if (k < STEPS.length - 1) { k++; sync(); } });
+  rs.addEventListener('click', function () { k = 1; on = [false, false, false]; sync(); });
+  function open(v) { root.classList.toggle('is-open', v); pn.setAttribute('aria-hidden', !v); fb.setAttribute('aria-expanded', v); if (v) setTimeout(function () { up.focus({ preventScroll: true }); }, 200); }
+  fb.addEventListener('click', function () { open(!root.classList.contains('is-open')); });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && root.classList.contains('is-open')) { open(false); fb.focus(); } });
+  sync();
+})();
+</script>

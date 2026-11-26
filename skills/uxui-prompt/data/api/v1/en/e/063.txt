@@ -1,0 +1,142 @@
+<!-- Lucian UX/UI Prompt #063 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#063 -->
+<!--
+Element: One-question-at-a-time sign-up
+ID: 063 · Category: Sign-in & Sign-up · Tags: signup, conversational, multistep, validation, chips
+What it does: Questions rise one at a time, and each answer folds up into a summary chip at the top. A wrong format shakes the field and explains why, and the bar at the top fills one segment per step. Press a summary chip to go back to that question.
+How to use it: Enter a name, email and password in turn and press Enter or Next. Try an invalid email too, then press a summary chip to fix it
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#063
+-->
+<style>
+.u063{position:relative;width:340px;height:480px;display:flex;flex-direction:column;padding:22px 22px 22px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u063-bar{display:flex;gap:6px}
+.u063-bar i{flex:1;height:5px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u063-bar i::after{content:"";display:block;height:100%;border-radius:inherit;background:var(--ux-grad);transform:scaleX(0);transform-origin:0 50%;transition:transform .6s var(--ux-ease)}
+.u063-bar i.on::after{transform:none}
+.u063-chips{display:flex;flex-wrap:wrap;gap:6px;min-height:34px;margin-top:16px}
+.u063-chip{height:32px;padding:0 12px 0 8px;border:0;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:var(--ux-surface-2);font-size:12.5px;font-weight:700;color:var(--ux-ink-2);max-width:100%;animation:u063-chip .55s var(--ux-spring) backwards;transition:background-color .2s}
+.u063-chip:hover{background:var(--ux-surface-3)}
+.u063-chip:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u063-chip i{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);flex:none}
+.u063-chip i svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u063-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes u063-chip{from{opacity:0;transform:translateY(60px) scale(.8)}}
+.u063-stage{position:relative;flex:1;margin-top:10px}
+.u063-q{position:absolute;left:0;right:0;top:0;transition:transform .55s var(--ux-ease),opacity .35s}
+.u063-q.out{transform:translateY(-40px);opacity:0;pointer-events:none}
+.u063-q.wait{transform:translateY(50px);opacity:0;pointer-events:none}
+.u063-q small{font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--ux-accent)}
+.u063-q label{display:block;margin:6px 0 16px;font-size:23px;font-weight:850;line-height:1.3;letter-spacing:-.045em}
+.u063-in{position:relative;display:flex;align-items:center;border-bottom:2px solid var(--ux-line-2);transition:border-color .3s}
+.u063-in:focus-within{border-color:var(--ux-accent)}
+.u063-q.bad .u063-in{border-color:var(--ux-danger)}
+.u063-q.bad .u063-in{animation:u063-no .4s}
+@keyframes u063-no{20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-3px)}}
+.u063-in input{flex:1;min-width:0;height:50px;border:0;padding:0;background:none;font-size:19px;font-weight:650;color:var(--ux-ink);outline:none}
+.u063-in input:focus-visible{outline:none}
+.u063-in input::placeholder{color:var(--ux-ink-3);font-weight:500}
+.u063-msg{min-height:20px;margin-top:8px;font-size:12.5px;font-weight:650;color:var(--ux-ink-3)}
+.u063-q.bad .u063-msg{color:var(--ux-danger)}
+.u063-meter{display:flex;gap:4px;margin-top:10px}
+.u063-meter i{flex:1;height:4px;border-radius:2px;background:var(--ux-surface-3);transition:background-color .3s}
+.u063-done{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transform:scale(.9);pointer-events:none;transition:opacity .4s,transform .6s var(--ux-spring)}
+.u063.is-done .u063-done{opacity:1;transform:none;pointer-events:auto}
+.u063-done span{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 10px color-mix(in srgb,var(--ux-mint) 16%,transparent)}
+.u063-done span svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u063-done span path{stroke-dasharray:30;stroke-dashoffset:30;transition:stroke-dashoffset .5s var(--ux-ease) .35s}
+.u063.is-done .u063-done span path{stroke-dashoffset:0}
+.u063-done b{margin-top:18px;font-size:21px;font-weight:850;letter-spacing:-.04em}
+.u063-done p{margin:6px 0 0;font-size:13.5px;color:var(--ux-ink-3)}
+.u063-next{height:54px;border:0;border-radius:17px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--ux-ink);color:var(--ux-page);font-size:15.5px;font-weight:760;transition:transform .3s var(--ux-spring),background-color .3s}
+.u063-next:active{transform:scale(.97)}
+.u063-next:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u063-next svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s var(--ux-spring)}
+.u063-next:hover svg{transform:translateX(3px)}
+</style>
+<div class="ux u063">
+  <div class="u063-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="u063-chips" aria-label="Your answers"></div>
+  <form class="u063-stage" novalidate>
+    <div class="u063-q"><small>1 / 3</small><label>What should we call you?</label><div class="u063-in"><input type="text" autocomplete="name" placeholder="Name" data-k="name"></div><div class="u063-msg" aria-live="polite">This is the name your team will see</div></div>
+    <div class="u063-q wait"><small>2 / 3</small><label>What email will you sign in with?</label><div class="u063-in"><input type="email" autocomplete="email" placeholder="name@example.com" data-k="mail"></div><div class="u063-msg" aria-live="polite">We’ll send you a verification email</div></div>
+    <div class="u063-q wait"><small>3 / 3</small><label>Choose a password</label><div class="u063-in"><input type="password" autocomplete="new-password" placeholder="8+ characters" data-k="pw"></div><div class="u063-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="u063-msg" aria-live="polite">Mix in numbers and symbols to make it safer</div></div>
+    <div class="u063-done" aria-hidden="true"><span><svg viewBox="0 0 36 36"><path d="M9 18.5l6 6L27 12"/></svg></span><b>You’re signed up</b><p class="u063-who"></p></div>
+    <button class="u063-sub" type="submit" hidden></button>
+  </form>
+  <button class="u063-next" type="button"><span>Next</span><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10M10 5l4 4-4 4"/></svg></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var qs = Array.prototype.slice.call(root.querySelectorAll('.u063-q'));
+  var bars = root.querySelectorAll('.u063-bar i'), chips = root.querySelector('.u063-chips');
+  var form = root.querySelector('.u063-stage'), next = root.querySelector('.u063-next'), done = root.querySelector('.u063-done');
+  var meter = root.querySelectorAll('.u063-meter i'), uid = 'u063' + Math.random().toString(36).slice(2, 7);
+  var cur = 0, vals = {};
+  qs.forEach(function (q, i) {
+    var inp = q.querySelector('input'), lab = q.querySelector('label'), msg = q.querySelector('.u063-msg');
+    inp.id = uid + i; lab.htmlFor = inp.id; msg.id = uid + 'm' + i; inp.setAttribute('aria-describedby', msg.id);
+    q.setAttribute('data-hint', msg.textContent);
+    q.inert = i !== 0;
+  });
+  function score(v) { var s = 0; if (v.length >= 8) s++; if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++; if (v.length >= 12) s++; return s; }
+  root.querySelector('[data-k="pw"]').addEventListener('input', function (e) {
+    var s = score(e.target.value), C = ['var(--ux-danger)', 'var(--ux-warn)', '#3D8BFF', 'var(--ux-mint)'];
+    meter.forEach(function (m, i) { m.style.background = i < s ? C[s - 1] : ''; });
+  });
+  function check(i) {
+    var v = qs[i].querySelector('input').value.trim();
+    if (i === 0 && v.length < 2) return 'Please enter at least two characters';
+    if (i === 1 && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v)) return 'That isn’t an email address · e.g. name@example.com';
+    if (i === 2 && v.length < 8) return 'Use at least 8 characters · now ' + v.length;
+    return '';
+  }
+  function show(i) {
+    qs.forEach(function (q, k) {
+      q.classList.toggle('out', k < i);
+      q.classList.toggle('wait', k > i);
+      q.inert = k !== i;
+    });
+    cur = i;
+    bars.forEach(function (b, k) { b.classList.toggle('on', k < i); });
+    if (i < 3) setTimeout(function () { if (root.isConnected && cur === i) qs[i].querySelector('input').focus({ preventScroll: true }); }, 350);
+  }
+  function chipsRender() {
+    chips.innerHTML = '';
+    ['name', 'mail', 'pw'].forEach(function (k, i) {
+      if (!(k in vals) || i >= cur) return;
+      var c = document.createElement('button');
+      c.type = 'button'; c.className = 'u063-chip';
+      c.style.animationDelay = (i === cur - 1 ? 0 : -1) + 's';
+      c.innerHTML = '<i aria-hidden="true"><svg viewBox="0 0 10 10"><path d="M2 5.2l2 2 4-4.4"/></svg></i><span></span>';
+      c.querySelector('span').textContent = k === 'pw' ? '•'.repeat(Math.min(10, vals[k].length)) : vals[k];
+      c.setAttribute('aria-label', 'Edit ' + ['name', 'email', 'password'][i]);
+      c.addEventListener('click', function () { root.classList.remove('is-done'); done.setAttribute('aria-hidden', 'true'); next.hidden = false; show(i); chipsRender(); next.querySelector('span').textContent = i === 2 ? 'Sign up' : 'Next'; });
+      chips.appendChild(c);
+    });
+  }
+  function advance() {
+    if (cur > 2) return;
+    var q = qs[cur], msg = q.querySelector('.u063-msg'), bad = check(cur), inp = q.querySelector('input');
+    if (bad) {
+      q.classList.remove('bad'); void q.offsetWidth; q.classList.add('bad');
+      msg.textContent = bad; inp.setAttribute('aria-invalid', 'true'); inp.focus({ preventScroll: true });
+      return;
+    }
+    q.classList.remove('bad'); inp.removeAttribute('aria-invalid'); msg.textContent = q.getAttribute('data-hint');
+    vals[inp.getAttribute('data-k')] = inp.value.trim();
+    show(cur + 1);
+    chipsRender();
+    if (cur === 3) {
+      root.classList.add('is-done');
+      done.setAttribute('aria-hidden', 'false');
+      root.querySelector('.u063-who').textContent = 'Thanks, ' + vals.name + '. We sent a verification email to ' + vals.mail;
+      next.hidden = true;
+    } else next.querySelector('span').textContent = cur === 2 ? 'Sign up' : 'Next';
+  }
+  form.addEventListener('submit', function (e) { e.preventDefault(); advance(); });
+  next.addEventListener('click', advance);
+  qs.forEach(function (q) { q.querySelector('input').addEventListener('input', function () { if (q.classList.contains('bad')) { q.classList.remove('bad'); q.querySelector('.u063-msg').textContent = q.getAttribute('data-hint'); } }); });
+})();
+</script>

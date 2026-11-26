@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #307 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#307 -->
+<!--
+Element: Typewriter rotating keyword
+ID: 307 · Category: Text Motion · Tags: text, typewriter, rotate, hero, caret
+What it does: Only the key word at the end of the sentence is deleted and retyped like a typewriter. Korean is typed jamo by jamo the way an IME composes it, and the underline color changes with each word. The caret blinks while idle and holds still while typing.
+How to use it: Press a chip below to rewrite the word right away. Hover the sentence to pause the rotation
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#307
+-->
+<style>
+.u307{position:relative;width:340px;height:272px;display:flex;flex-direction:column;padding:24px 22px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;--c:var(--ux-accent)}
+.u307::after{content:"";position:absolute;right:-60px;top:-70px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--c) 26%,transparent),transparent 70%);transition:background .6s var(--ux-ease);pointer-events:none}
+.u307-k{position:relative;margin:0;font:600 11px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;color:var(--ux-ink-3)}
+.u307-line{position:relative;margin:16px 0 0;min-height:100px;font-size:31px;line-height:1.24;font-weight:820;letter-spacing:-.045em}
+.u307-a{display:block;color:var(--ux-ink-2)}
+.u307-b{display:inline;white-space:nowrap}
+.u307-w{position:relative;color:var(--ux-ink);background:linear-gradient(var(--c),var(--c)) 0 100%/100% .14em no-repeat;padding-bottom:.04em;transition:background-size .3s var(--ux-ease)}
+.u307-w:empty{padding:0}
+.u307-caret{display:inline-block;width:3px;height:.95em;margin:0 2px 0 3px;vertical-align:-.1em;border-radius:2px;background:var(--c);animation:u307-blink 1s steps(1) infinite;transition:background-color .4s}
+.u307.is-typing .u307-caret{animation:none}
+@keyframes u307-blink{50%{opacity:0}}
+.u307-tail{color:var(--ux-ink)}
+.u307-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.u307-chips{position:relative;margin-top:auto;display:flex;flex-wrap:wrap;gap:6px}
+.u307-chip{height:34px;padding:0 13px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:700;color:var(--ux-ink-2);box-shadow:inset 0 0 0 1px var(--ux-line);transition:background-color .3s,color .3s,box-shadow .3s,transform .35s var(--ux-spring)}
+.u307-chip:hover{color:var(--ux-ink)}
+.u307-chip:active{transform:scale(.93)}
+.u307-chip[aria-pressed="true"]{background:var(--k);color:#fff;box-shadow:none}
+</style>
+<div class="ux u307">
+  <p class="u307-k">LUCIANLABS · STUDIO</p>
+  <p class="u307-line"><span class="u307-a">What we build together is</span> <span class="u307-sr"></span><span class="u307-b"><span class="u307-w" aria-hidden="true"></span><span class="u307-caret" aria-hidden="true"></span><span class="u307-tail">.</span></span></p>
+  <div class="u307-chips" role="group" aria-label="Change the word">
+    <button class="u307-chip" type="button" aria-pressed="true" style="--k:var(--ux-accent)">products</button>
+    <button class="u307-chip" type="button" aria-pressed="false" style="--k:var(--ux-mint)">experiences</button>
+    <button class="u307-chip" type="button" aria-pressed="false" style="--k:var(--ux-warn)">brands</button>
+    <button class="u307-chip" type="button" aria-pressed="false" style="--k:var(--ux-accent-2)">tomorrow</button>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var line = root.querySelector('.u307-line'), wEl = root.querySelector('.u307-w'), sr = root.querySelector('.u307-sr');
+  var chips = Array.prototype.slice.call(root.querySelectorAll('.u307-chip'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var WORDS = ['products', 'experiences', 'brands', 'tomorrow'];
+  var COLORS = ['var(--ux-accent)', 'var(--ux-mint)', 'var(--ux-warn)', 'var(--ux-accent-2)'];
+  var CHO = [0x3131, 0x3132, 0x3134, 0x3137, 0x3138, 0x3139, 0x3141, 0x3142, 0x3143, 0x3145, 0x3146, 0x3147, 0x3148, 0x3149, 0x314A, 0x314B, 0x314C, 0x314D, 0x314E];
+  var cur = 0, timer = 0, hold = false, busy = false;
+  function frames(word) {
+    var out = [], pre = '';
+    Array.from(word).forEach(function (ch) {
+      var c = ch.charCodeAt(0) - 0xAC00;
+      if (c >= 0 && c < 11172) {
+        var jong = c % 28, base = ch.charCodeAt(0) - jong;
+        out.push(pre + String.fromCharCode(CHO[Math.floor(c / 588)]));
+        out.push(pre + String.fromCharCode(base));
+        if (jong) out.push(pre + ch);
+      } else out.push(pre + ch);
+      pre += ch;
+    });
+    return out;
+  }
+  function wait(ms, fn) { clearTimeout(timer); timer = setTimeout(function () { if (root.isConnected) fn(); }, ms); }
+  function go(i, manual) {
+    if (busy && !manual) return;
+    busy = true;
+    cur = i;
+    chips.forEach(function (c, k) { c.setAttribute('aria-pressed', String(k === i)); });
+    var target = WORDS[i], seq = frames(target);
+    root.classList.add('is-typing');
+    if (rm) { wEl.textContent = target; done(); return; }
+    (function del() {
+      var s = wEl.textContent;
+      if (s.length) { wEl.textContent = s.slice(0, -1); wait(55, del); return; }
+      root.style.setProperty('--c', COLORS[i]);
+      var k = 0;
+      wait(220, function type() {
+        wEl.textContent = seq[k++];
+        if (k < seq.length) wait(70 + Math.random() * 70, type); else done();
+      });
+    })();
+  }
+  function done() {
+    root.classList.remove('is-typing');
+    root.style.setProperty('--c', COLORS[cur]);
+    sr.textContent = WORDS[cur];
+    busy = false;
+    next();
+  }
+  function next() { wait(2300, function () { if (hold) { next(); return; } go((cur + 1) % WORDS.length); }); }
+  chips.forEach(function (c, i) { c.addEventListener('click', function () { if (i !== cur || busy) go(i, true); }); });
+  line.addEventListener('pointerenter', function () { hold = true; });
+  line.addEventListener('pointerleave', function () { hold = false; });
+  wEl.textContent = '';
+  go(0, true);
+})();
+</script>

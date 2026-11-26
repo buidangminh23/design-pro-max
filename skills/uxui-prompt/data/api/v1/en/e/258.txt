@@ -1,0 +1,87 @@
+<!-- Lucian UX/UI Prompt #258 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#258 -->
+<!--
+Element: Blur-up photo loading
+ID: 258 · Category: Sections & Content · Tags: image-loading, blur-up, lqip, gallery, performance
+What it does: When the photo gallery opens, each tile first shows a tiny blurry preview while a thin bar below fills as data arrives. Once a photo has fully loaded, the blur lifts and it shrinks slightly into place, sharp, and its name floats up. Turn on slow connection and reload to watch the same process slowly, so you can feel how waiting works without empty boxes.
+How to use it: Press reload, then turn on slow connection and reload again
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#258
+-->
+<style>
+.u258{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u258-hd{position:absolute;left:20px;right:16px;top:18px;height:32px;display:flex;align-items:center;gap:8px}
+.u258-hd b{margin-right:auto;font-size:16px;font-weight:900;letter-spacing:-.03em}
+.u258-sl{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 8px;border:0;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.u258-sl i{position:relative;width:24px;height:14px;border-radius:7px;background:var(--ux-surface-3);transition:background .2s}
+.u258-sl i::after{content:"";position:absolute;left:2px;top:2px;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .25s cubic-bezier(.3,1.5,.5,1)}
+.u258-sl[aria-pressed="true"] i{background:#F59E0B}
+.u258-sl[aria-pressed="true"] i::after{transform:translateX(10px)}
+.u258-rl{width:30px;height:30px;border:0;border-radius:50%;background:var(--ux-ink);color:var(--ux-surface);display:grid;place-items:center;cursor:pointer}
+.u258-rl svg{width:14px;height:14px;transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+.u258-rl.is-spin svg{transform:rotate(360deg)}
+.u258-sl:focus-visible,.u258-rl:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u258-gd{position:absolute;left:16px;right:16px;top:62px;bottom:16px;display:grid;grid-template-columns:1.2fr 1fr;grid-template-rows:1fr 1fr .78fr;gap:8px}
+.u258-tl{position:relative;border-radius:16px;overflow:hidden;background:var(--ux-surface-2)}
+.u258-tl:first-child{grid-row:span 2}
+.u258-tl:last-child{grid-column:span 2}
+.u258-tl svg{position:absolute;inset:0;width:100%;height:100%;transform:scale(1);filter:none;transition:filter .8s ease,transform 1s cubic-bezier(.2,.8,.2,1)}
+.u258-tl.is-lq svg{filter:blur(12px) saturate(.75);transform:scale(1.15);transition:none}
+.u258-tl::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.28) 50%,transparent 65%);background-size:250% 100%;opacity:0;pointer-events:none}
+.u258-tl.is-lq::after{opacity:1;animation:u258-sh 1.4s linear infinite}
+@keyframes u258-sh{from{background-position:130% 0}to{background-position:-30% 0}}
+.u258-pg{position:absolute;left:10px;right:10px;bottom:9px;height:3px;border-radius:2px;background:rgba(255,255,255,.35);overflow:hidden;transition:opacity .3s .3s}
+.u258-pg b{display:block;height:100%;width:100%;background:#fff;transform:scaleX(0);transform-origin:0 50%}
+.u258-tl:not(.is-lq) .u258-pg{opacity:0}
+.u258-kb{position:absolute;right:9px;top:8px;padding:2px 6px;border-radius:6px;background:rgba(0,0,0,.35);color:#fff;font-size:9px;font-weight:800;font-variant-numeric:tabular-nums;transition:opacity .3s}
+.u258-tl:not(.is-lq) .u258-kb{opacity:0}
+.u258-cp{position:absolute;left:11px;bottom:9px;color:#fff;font-size:11px;font-weight:850;text-shadow:0 1px 6px rgba(0,0,0,.4);opacity:0;transform:translateY(6px);transition:opacity .4s .25s,transform .5s cubic-bezier(.2,.8,.2,1) .25s}
+.u258-tl:not(.is-lq) .u258-cp{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.u258-tl svg,.u258-cp,.u258-rl svg{transition:none!important}.u258-tl.is-lq::after{animation:none}}
+</style>
+<div class="ux u258">
+  <div class="u258-hd"><b>Trip photos</b><button type="button" class="u258-sl" aria-pressed="false"><i aria-hidden="true"></i>Slow network</button><button type="button" class="u258-rl" aria-label="Reload"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M11.6 5.2A4.9 4.9 0 1 0 12 8.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12.2 1.8v3.6H8.6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  <div class="u258-gd"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var gd = root.querySelector('.u258-gd'), sl = root.querySelector('.u258-sl'), rl = root.querySelector('.u258-rl');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var uid = 'u258' + Math.random().toString(36).slice(2, 7);
+  var NM = ['Jeju hills', 'Gangneung sea', 'Seoul at night', 'Seorak valley'], KB = [212, 168, 194, 151];
+  var SC = [
+    '<defs><linearGradient id="#a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FB923C"/><stop offset=".55" stop-color="#F472B6"/><stop offset="1" stop-color="#7C3AED"/></linearGradient></defs><rect width="100" height="160" fill="url(##a)"/><circle cx="62" cy="62" r="15" fill="#FEF3C7" opacity=".95"/><path d="M0 104 L22 82 L40 96 L62 70 L84 92 L100 80 V160 H0Z" fill="#4C1D95" opacity=".75"/><path d="M0 122 L28 100 L52 116 L76 98 L100 112 V160 H0Z" fill="#2E1065"/><path d="M0 142 Q50 128 100 140 V160 H0Z" fill="#1E1B4B"/>',
+    '<defs><linearGradient id="#a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DD3FC"/><stop offset="1" stop-color="#E0F2FE"/></linearGradient></defs><rect width="100" height="100" fill="url(##a)"/><circle cx="76" cy="24" r="9" fill="#fff"/><rect y="52" width="100" height="48" fill="#0284C7"/><path d="M0 60 Q12 56 25 60 T50 60 T75 60 T100 60 V100 H0Z" fill="#0369A1"/><path d="M0 74 Q12 70 25 74 T50 74 T75 74 T100 74 V100 H0Z" fill="#075985"/><path d="M40 52 L48 30 L48 52Z" fill="#fff"/><path d="M38 53 H54 L51 57 H41Z" fill="#7C2D12"/>',
+    '<rect width="100" height="100" fill="#0F172A"/><circle cx="80" cy="18" r="6" fill="#FDE68A"/><g fill="#1E293B"><rect x="4" y="44" width="18" height="56"/><rect x="24" y="30" width="16" height="70"/><rect x="42" y="50" width="20" height="50"/><rect x="64" y="36" width="14" height="64"/><rect x="80" y="56" width="18" height="44"/></g><g fill="#FBBF24"><rect x="8" y="50" width="3" height="3"/><rect x="14" y="58" width="3" height="3"/><rect x="28" y="36" width="3" height="3"/><rect x="34" y="46" width="3" height="3"/><rect x="28" y="60" width="3" height="3"/><rect x="47" y="56" width="3" height="3"/><rect x="54" y="66" width="3" height="3"/><rect x="68" y="42" width="3" height="3"/><rect x="72" y="54" width="3" height="3"/><rect x="85" y="62" width="3" height="3"/><rect x="90" y="72" width="3" height="3"/></g><rect y="88" width="100" height="12" fill="#1D4ED8" opacity=".5"/>',
+    '<defs><linearGradient id="#a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BBF7D0"/><stop offset="1" stop-color="#F0FDF4"/></linearGradient></defs><rect width="100" height="100" fill="url(##a)"/><path d="M0 50 L18 26 L34 44 L54 18 L76 42 L100 28 V100 H0Z" fill="#15803D"/><path d="M0 62 Q30 44 58 58 T100 52 V100 H0Z" fill="#166534"/><path d="M0 76 Q40 68 100 76 V100 H0Z" fill="#38BDF8"/><path d="M8 84 H38 M50 90 H86" stroke="#E0F2FE" stroke-width="1.5" stroke-linecap="round"/>'
+  ];
+  var VB = ['0 0 100 160', '0 0 100 100', '0 0 100 100', '0 0 100 100'];
+  var T = SC.map(function (s, i) {
+    var t = document.createElement('figure'); t.className = 'u258-tl'; t.style.margin = '0';
+    t.innerHTML = '<svg viewBox="' + VB[i] + '" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + s.replace(/##a/g, '#' + uid + i).replace(/"#a"/g, '"' + uid + i + '"') + '</svg><span class="u258-kb"></span><span class="u258-pg" aria-hidden="true"><b></b></span><figcaption class="u258-cp"></figcaption>';
+    t.querySelector('.u258-cp').textContent = NM[i];
+    gd.appendChild(t); return { el: t, bar: t.querySelector('.u258-pg b'), kb: t.querySelector('.u258-kb') };
+  });
+  var gen = 0, slow = false;
+  function load() {
+    var g = ++gen;
+    T.forEach(function (t, i) {
+      t.el.classList.add('is-lq'); t.el.setAttribute('aria-busy', 'true'); t.el.setAttribute('aria-label', NM[i] + ' loading'); t.bar.style.transform = 'scaleX(0)'; t.kb.textContent = '0 / ' + KB[i] + 'KB';
+      var dur = slow ? 1800 + i * 900 : 420 + i * 240, t0 = performance.now() + (slow ? 150 : 60) * i;
+      if (rm) dur = slow ? dur : 1;
+      (function f(now) {
+        if (g !== gen || !root.isConnected) return;
+        var k = Math.max(0, Math.min(1, (now - t0) / dur)), e = slow ? 1 - Math.pow(1 - k, 1.6) : k;
+        t.bar.style.transform = 'scaleX(' + e.toFixed(3) + ')'; t.kb.textContent = Math.round(KB[i] * e) + ' / ' + KB[i] + 'KB';
+        if (k < 1) { requestAnimationFrame(f); return; }
+        t.el.classList.remove('is-lq'); t.el.removeAttribute('aria-busy'); t.el.removeAttribute('aria-label');
+      })(performance.now());
+    });
+  }
+  rl.addEventListener('click', function () { rl.classList.remove('is-spin'); void rl.offsetWidth; rl.classList.add('is-spin'); setTimeout(function () { rl.classList.remove('is-spin'); }, 520); load(); });
+  sl.addEventListener('click', function () { slow = !slow; sl.setAttribute('aria-pressed', slow); });
+  T.forEach(function (t) { t.el.classList.add('is-lq'); });
+  if ('IntersectionObserver' in window) { var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); load(); } }); io.observe(root); } else load();
+})();
+</script>

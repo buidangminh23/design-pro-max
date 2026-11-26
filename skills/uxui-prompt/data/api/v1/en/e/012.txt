@@ -1,0 +1,98 @@
+<!-- Lucian UX/UI Prompt #012 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#012 -->
+<!--
+Element: Bookmark ribbon
+ID: 012 · Category: Buttons · Tags: button, bookmark, toggle, burst, counter
+What it does: Press it and color pours down into the ribbon from the top, the icon drops and bounces back up, and small confetti scatters. The save count and the label roll over together.
+How to use it: Press the ribbon to save, and press again to remove it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#012
+-->
+<style>
+.u012{--fill:linear-gradient(180deg,#FFC14D,#FF6B6B);position:relative;width:300px;height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.u012-btn{position:relative;width:104px;height:104px;border:0;padding:0;border-radius:32px;background:var(--ux-surface);color:var(--ux-ink);
+  box-shadow:0 0 0 1px var(--ux-line),0 24px 40px -24px var(--ux-shadow-strong);transition:transform .5s var(--ux-spring),box-shadow .5s var(--ux-ease)}
+.u012-btn:hover{transform:translateY(-3px);box-shadow:0 0 0 1px var(--ux-line-2),0 30px 48px -24px var(--ux-shadow-strong)}
+.u012-btn:active{transform:scale(.9)}
+.u012-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u012-icon{position:absolute;left:30px;top:24px;width:44px;height:56px}
+.u012-icon svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.u012-out{fill:none;stroke:currentColor;stroke-width:2.6;stroke-linejoin:round}
+.u012-in{fill:url(#u012-g);clip-path:inset(0 0 100% 0);transition:clip-path .55s cubic-bezier(.6,0,.3,1)}
+.u012.is-on .u012-in{clip-path:inset(0 0 0 0)}
+.u012.is-on .u012-out{stroke:transparent;transition:stroke .2s .4s}
+.u012.is-on .u012-icon{animation:u012-drop .7s var(--ux-ease)}
+@keyframes u012-drop{0%{transform:translateY(0)}30%{transform:translateY(7px) scaleY(.9)}60%{transform:translateY(-5px)}100%{transform:none}}
+.u012-p{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:3px;background:var(--c);opacity:0;pointer-events:none}
+.u012.is-burst .u012-p{animation:u012-burst .8s var(--ux-ease) forwards}
+@keyframes u012-burst{0%{opacity:1;transform:rotate(var(--a)) translateY(-30px) scale(.6)}100%{opacity:0;transform:rotate(var(--a)) translateY(-92px) scale(1.1) rotate(160deg)}}
+.u012-ring{position:absolute;inset:-2px;border-radius:34px;box-shadow:0 0 0 2px #FF9F5A;opacity:0;pointer-events:none}
+.u012.is-burst .u012-ring{animation:u012-ring .6s var(--ux-ease)}
+@keyframes u012-ring{from{opacity:1;transform:scale(.9)}to{opacity:0;transform:scale(1.35)}}
+.u012-meta{margin:0;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:680;color:var(--ux-ink-2)}
+.u012-roll{position:relative;height:22px;overflow:hidden;transition:width .45s var(--ux-spring)}
+.u012-roll span{white-space:nowrap}
+.u012-roll span{display:block;width:max-content;line-height:22px;transition:transform .5s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u012-roll span+span{position:absolute;left:0;top:0;transform:translateY(100%);opacity:0}
+.u012.is-on .u012-roll span:first-child{transform:translateY(-100%);opacity:0}
+.u012.is-on .u012-roll span+span{transform:none;opacity:1}
+.u012.is-on .u012-lab{color:var(--ux-ink)}
+.u012-dot{width:4px;height:4px;border-radius:50%;background:var(--ux-ink-3)}
+.u012-num{font-variant-numeric:tabular-nums;color:var(--ux-ink-3);font-weight:600}
+</style>
+<div class="ux u012">
+  <button class="u012-btn" type="button" aria-pressed="false" aria-label="Save this post">
+    <span class="u012-ring" aria-hidden="true"></span>
+    <span class="u012-icon" aria-hidden="true">
+      <svg viewBox="0 0 44 56">
+        <defs><linearGradient id="u012-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC14D"/><stop offset="1" stop-color="#FF6B6B"/></linearGradient></defs>
+        <path class="u012-in" d="M6 4h32a2 2 0 0 1 2 2v46l-18-12L4 52V6a2 2 0 0 1 2-2z"/>
+        <path class="u012-out" d="M6 4h32a2 2 0 0 1 2 2v46l-18-12L4 52V6a2 2 0 0 1 2-2z"/>
+      </svg>
+    </span>
+    <span class="u012-p" style="--a:0deg;--c:#FFC14D" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:45deg;--c:#FF6B6B" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:90deg;--c:#8B6CFF" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:135deg;--c:#22C3A6" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:180deg;--c:#FFC14D" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:225deg;--c:#FF6B6B" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:270deg;--c:#3D8BFF" aria-hidden="true"></span>
+    <span class="u012-p" style="--a:315deg;--c:#FF9F5A" aria-hidden="true"></span>
+  </button>
+  <p class="u012-meta" aria-live="polite">
+    <span class="u012-roll u012-lab"><span>Read later</span><span>Saved</span></span>
+    <span class="u012-dot" aria-hidden="true"></span>
+    <span class="u012-num">128</span>
+  </p>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u012-btn');
+  var num = root.querySelector('.u012-num');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var gid = 'u012-g-' + Math.random().toString(36).slice(2, 7);
+  root.querySelector('linearGradient').id = gid;
+  root.querySelector('.u012-in').style.fill = 'url(#' + gid + ')';
+  var n = 128, t = 0;
+  var roll = root.querySelector('.u012-roll');
+  function fitRoll(on) { roll.style.width = roll.children[on ? 1 : 0].offsetWidth + 'px'; }
+  fitRoll(false);
+  btn.addEventListener('click', function () {
+    var on = !root.classList.contains('is-on');
+    root.classList.toggle('is-on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.setAttribute('aria-label', on ? 'Remove from saved' : 'Save this post');
+    n += on ? 1 : -1;
+    num.textContent = n;
+    fitRoll(on);
+    root.classList.remove('is-burst');
+    clearTimeout(t);
+    if (on && !rm) {
+      void root.offsetWidth;
+      root.classList.add('is-burst');
+      t = setTimeout(function () { root.classList.remove('is-burst'); }, 900);
+    }
+  });
+})();
+</script>

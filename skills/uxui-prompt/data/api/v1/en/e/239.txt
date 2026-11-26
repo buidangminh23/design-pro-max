@@ -1,0 +1,89 @@
+<!-- Lucian UX/UI Prompt #239 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#239 -->
+<!--
+Element: Try-it API example
+ID: 239 · Category: Site Builder Tools · Tags: api, code-sample, docs, request, developer
+What it does: In a developer docs API example, choose the cURL, JavaScript or Python tab and the same request switches to code in that language. Press Send request and a glowing dot flies from the code to the response pane, where 200 OK and the elapsed time appear before the JSON response writes itself out line by line with keys and values in different colors. The copy button copies the code for the current language.
+How to use it: Switch language tabs, then press Send request
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#239
+-->
+<style>
+.u239{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u239-cd{position:absolute;left:12px;right:12px;top:12px;height:152px;border-radius:16px;background:#0F1117;box-shadow:0 0 0 1px #262A36;color:#E5E7EB;overflow:hidden}
+.u239-tl{display:flex;align-items:center;gap:2px;height:34px;padding:0 6px 0 8px;border-bottom:1px solid #262A36}
+.u239-tb{height:24px;padding:0 9px;border:0;border-radius:7px;background:none;color:#8B90A3;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.u239-tb[aria-selected="true"]{background:#1E2230;color:#F3F4F6}
+.u239-tl em{margin-left:auto;padding:2px 6px;border-radius:5px;background:#1F3B2D;color:#6EE7B7;font-style:normal;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.5px;font-weight:800}
+.u239-cp{width:26px;height:26px;margin-left:6px;border:0;border-radius:7px;background:#1E2230;color:#C7CAD6;display:grid;place-items:center;cursor:pointer}
+.u239-cp svg{width:12px;height:12px}
+.u239-cp.is-ok{background:#064E3B;color:#6EE7B7}
+.u239-pre{margin:0;padding:9px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;line-height:1.65;white-space:pre;transition:opacity .2s,filter .2s}
+.u239-pre.is-sw{opacity:0;filter:blur(3px)}
+.u239-pre .k{color:#C4B5FD}.u239-pre .s{color:#86EFAC}.u239-pre .c{color:#6B7280}.u239-pre .f{color:#93C5FD}
+.u239-ln{position:absolute;left:24px;top:164px;width:2px;height:22px;background:linear-gradient(#262A36,var(--ux-line))}
+.u239-dot{position:absolute;left:20px;top:150px;width:10px;height:10px;border-radius:50%;background:#A78BFA;box-shadow:0 0 12px #A78BFA;opacity:0}
+.u239-go{position:absolute;right:12px;top:172px;display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:0;border-radius:10px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:11px;font-weight:850;cursor:pointer;transition:opacity .2s}
+.u239-go:disabled{opacity:.5;cursor:default}
+.u239-go svg{width:11px;height:11px}
+.u239-rs{position:absolute;left:12px;right:12px;top:210px;bottom:12px;border-radius:16px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);overflow:hidden}
+.u239-rh{display:flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-bottom:1px solid var(--ux-line);font-size:10px;font-weight:850;color:var(--ux-ink-3)}
+.u239-st{margin-left:auto;display:inline-flex;gap:5px;opacity:0;transform:translateY(-4px);transition:opacity .25s,transform .3s cubic-bezier(.3,1.5,.5,1)}
+.u239.is-res .u239-st{opacity:1;transform:none}
+.u239-st b{padding:1px 6px;border-radius:5px;background:color-mix(in srgb,#10B981 16%,transparent);color:#047857;font-weight:900}
+.u239-st span{font-variant-numeric:tabular-nums}
+.u239-js{margin:0;padding:7px 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;line-height:1.6;white-space:pre;color:var(--ux-ink-2)}
+.u239-js .k{color:#7C3AED}.u239-js .s{color:#059669}.u239-js .n{color:#D97706}
+.u239-ph{display:grid;place-items:center;height:calc(100% - 28px);font-size:10.5px;font-weight:700;color:var(--ux-ink-3)}
+.u239 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u239-pre,.u239-st{transition:none}}
+</style>
+<div class="ux u239">
+  <div class="u239-cd"><div class="u239-tl" role="tablist" aria-label="Language"><em>POST</em><button type="button" class="u239-cp" aria-label="Copy code"></button></div><pre class="u239-pre" role="tabpanel"></pre></div>
+  <span class="u239-ln" aria-hidden="true"></span><span class="u239-dot" aria-hidden="true"></span>
+  <button type="button" class="u239-go"><svg viewBox="0 0 11 11" aria-hidden="true"><path d="M2 1.5l7.5 4L2 9.5l1.4-4z" fill="currentColor"/></svg>Send request</button>
+  <div class="u239-rs" aria-live="polite"><div class="u239-rh">Response<span class="u239-st"><b>200 OK</b><span class="u239-ms"></span></span></div><div class="u239-ph">The response shows up here</div><pre class="u239-js" hidden></pre></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tl = root.querySelector('.u239-tl'), pre = root.querySelector('.u239-pre'), cp = root.querySelector('.u239-cp'), go = root.querySelector('.u239-go'), dot = root.querySelector('.u239-dot'), ph = root.querySelector('.u239-ph'), js = root.querySelector('.u239-js'), ms = root.querySelector('.u239-ms');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NAME = 'Spring sale';
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  var LG = [
+    ['cURL', '<span class="f">curl</span> -X POST https://api.lucian.dev/v1/links \\\n  -H <span class="s">"Authorization: Bearer sk_live_…"</span> \\\n  -d <span class="s">\'{"url":"https://shop.dev/sale",\n       "name":"' + esc(NAME) + '"}\'</span>'],
+    ['JavaScript', '<span class="k">const</span> res = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">\'/v1/links\'</span>, {\n  method: <span class="s">\'POST\'</span>,\n  headers: { Authorization: <span class="s">`Bearer ${key}`</span> },\n  body: JSON.<span class="f">stringify</span>({ url, name: <span class="s">\'' + esc(NAME) + '\'</span> })\n});'],
+    ['Python', '<span class="k">import</span> lucian\n\nclient = lucian.<span class="f">Client</span>(api_key=key)\nlink = client.links.<span class="f">create</span>(\n    url=<span class="s">"https://shop.dev/sale"</span>,\n    name=<span class="s">"' + esc(NAME) + '"</span>)']
+  ];
+  var RES = [['"id"', '"lnk_8Kx2"', 's'], ['"short"', '"lnk.to/sale"', 's'], ['"name"', '"' + NAME + '"', 's'], ['"clicks"', '0', 'n'], ['"created"', '"2026-10-15"', 's']];
+  var COPY = '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M2 8V2.8C2 2.4 2.4 2 2.8 2H8" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>', OK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.3l2.3 2.3L9.5 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  cp.innerHTML = COPY;
+  var em = tl.querySelector('em');
+  var T = LG.map(function (l, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u239-tb'; b.setAttribute('role', 'tab'); b.textContent = l[0]; b.addEventListener('click', function () { pick(i); }); tl.insertBefore(b, em); return b; });
+  var cur = -1;
+  function pick(i) {
+    if (i === cur) return; var first = cur < 0; cur = i;
+    T.forEach(function (b, k) { b.setAttribute('aria-selected', k === i); b.tabIndex = k === i ? 0 : -1; });
+    if (first || rm) { pre.innerHTML = LG[i][1]; return; }
+    pre.classList.add('is-sw'); setTimeout(function () { pre.innerHTML = LG[i][1]; pre.classList.remove('is-sw'); }, 180);
+  }
+  var gen = 0;
+  go.addEventListener('click', function () {
+    var g = ++gen; go.disabled = true; root.classList.remove('is-res'); js.hidden = true; ph.hidden = false;
+    if (!rm && dot.animate) dot.animate([{ transform: 'translateY(0)', opacity: 0 }, { opacity: 1, offset: .2 }, { transform: 'translateY(58px)', opacity: 1, offset: .85 }, { transform: 'translateY(62px) scale(1.6)', opacity: 0 }], { duration: 650, easing: 'cubic-bezier(.5,0,.3,1)' });
+    setTimeout(function () {
+      if (g !== gen) return;
+      ms.textContent = (120 + Math.round(Math.random() * 60)) + 'ms'; root.classList.add('is-res'); ph.hidden = true; js.hidden = false; js.innerHTML = '';
+      var lines = ['{'].concat(RES.map(function (r, k) { return '  <span class="k">' + r[0] + '</span>: <span class="' + r[2] + '">' + esc(r[1]) + '</span>' + (k < RES.length - 1 ? ',' : ''); }), ['}']);
+      lines.forEach(function (l, k) { setTimeout(function () { if (g !== gen) return; js.insertAdjacentHTML('beforeend', (k ? '\n' : '') + l); if (k === lines.length - 1) go.disabled = false; }, rm ? 0 : k * 140); });
+    }, rm ? 0 : 700);
+  });
+  var Tm = 0;
+  cp.addEventListener('click', function () {
+    try { navigator.clipboard && navigator.clipboard.writeText(pre.textContent).catch(function () {}); } catch (e) {}
+    cp.innerHTML = OK; cp.classList.add('is-ok'); clearTimeout(Tm); Tm = setTimeout(function () { cp.innerHTML = COPY; cp.classList.remove('is-ok'); }, 1500);
+  });
+  pick(0);
+})();
+</script>

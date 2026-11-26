@@ -1,0 +1,110 @@
+<!-- Lucian UX/UI Prompt #076 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#076 -->
+<!--
+Element: Gliding tooltip
+ID: 076 · Category: Alerts & Feedback · Tags: tooltip, hover, focus, placement, shortcut
+What it does: Rest on a tool button and a tooltip rises after a short delay; move to the next button and it glides along with no wait. It opens downward from the top bar and upward from the bottom bar, and at the edges only the box shifts inward while the arrow keeps pointing at the button.
+How to use it: Move the cursor over the buttons on both toolbars, slowly and then quickly. Tab moves the tooltip too, and Esc hides it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#076
+-->
+<style>
+.u076{position:relative;width:350px;height:340px;display:flex;flex-direction:column;border-radius:26px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u076-bar{display:flex;align-items:center;gap:2px;padding:8px}
+.u076-bar.top{border-bottom:1px solid var(--ux-line)}
+.u076-bar.bot{margin-top:auto;border-top:1px solid var(--ux-line)}
+.u076-sep{width:1px;height:20px;margin:0 4px;background:var(--ux-line-2)}
+.u076-b{width:38px;height:38px;flex:none;border:0;padding:0;border-radius:11px;display:grid;place-items:center;background:none;color:var(--ux-ink-2);transition:background-color .2s,color .2s,transform .25s var(--ux-spring)}
+.u076-b:hover,.u076-b:focus-visible{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u076-b:active{transform:scale(.9)}
+.u076-b[aria-pressed="true"]{background:var(--ux-accent-soft);color:var(--ux-accent)}
+.u076-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u076-b svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u076-send{margin-left:auto;height:38px;padding:0 14px;border:0;border-radius:11px;background:var(--ux-ink);color:var(--ux-page);font-size:13px;font-weight:750}
+.u076-send:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u076-doc{flex:1;padding:16px 18px;font-size:14px;line-height:1.7;color:var(--ux-ink-2)}
+.u076-doc b{color:var(--ux-ink)}
+.u076-doc mark{background:color-mix(in srgb,#FFB547 35%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.u076-tip{position:absolute;left:0;top:0;z-index:5;pointer-events:none;opacity:0;transform:translate(var(--x,0px),var(--y,0px)) scale(.92);transition:opacity .16s,transform .16s}
+.u076-tip.on{opacity:1;transform:translate(var(--x,0px),var(--y,0px))}
+.u076-tip.glide{transition:opacity .16s,transform .32s var(--ux-spring)}
+.u076-box{position:relative;display:flex;align-items:center;gap:8px;height:34px;padding:0 6px 0 11px;border-radius:10px;background:var(--ux-ink);color:var(--ux-page);font-size:12.5px;font-weight:700;white-space:nowrap;box-shadow:0 10px 20px -10px rgba(0,0,0,.5)}
+.u076-box kbd{height:22px;padding:0 6px;border-radius:6px;display:inline-flex;align-items:center;background:color-mix(in srgb,var(--ux-page) 16%,transparent);font:inherit;font-size:11px;font-weight:750}
+.u076-box kbd:empty{display:none}
+.u076-box:has(kbd:empty){padding-right:11px}
+.u076-arr{position:absolute;width:10px;height:10px;left:var(--ax,20px);margin-left:-5px;background:var(--ux-ink);transform:rotate(45deg);border-radius:2px;transition:left .32s var(--ux-spring)}
+.u076-tip.below .u076-arr{top:-4px}
+.u076-tip.above .u076-arr{bottom:-4px}
+</style>
+<div class="ux u076">
+  <div class="u076-bar top" role="toolbar" aria-label="Formatting">
+    <button class="u076-b" type="button" data-t="Bold" data-k="⌘B" aria-pressed="true"><svg viewBox="0 0 18 18"><path d="M5 3.5h5a3 3 0 0 1 0 6H5zM5 9.5h6a3 3 0 0 1 0 6H5z"/></svg></button>
+    <button class="u076-b" type="button" data-t="Italic" data-k="⌘I" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M11 3.5H7.5M10.5 14.5H7M10 3.5l-2 11"/></svg></button>
+    <button class="u076-b" type="button" data-t="Underline" data-k="⌘U" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M5 3v5.5a4 4 0 0 0 8 0V3M4 15.5h10"/></svg></button>
+    <span class="u076-sep" aria-hidden="true"></span>
+    <button class="u076-b" type="button" data-t="Highlight" data-k="⌘⇧H" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M10.5 3.5l4 4-6 6H4.5v-4zM3 15.5h12"/></svg></button>
+    <button class="u076-b" type="button" data-t="Insert link" data-k="⌘K" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M7.5 10.5l3-3M8 5.5l1-1a3 3 0 0 1 4.5 4.5l-1 1M10 12.5l-1 1A3 3 0 0 1 4.5 9l1-1"/></svg></button>
+    <button class="u076-b" type="button" data-t="List" data-k="" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M7 5h8M7 9h8M7 13h8M3.5 5h.01M3.5 9h.01M3.5 13h.01"/></svg></button>
+    <button class="u076-b" type="button" data-t="Clear formatting" data-k="⌘\" aria-pressed="false"><svg viewBox="0 0 18 18"><path d="M4 4h10M9 4l-2.5 10M11 11l4 4M15 11l-4 4"/></svg></button>
+  </div>
+  <div class="u076-doc"><b>This week’s meeting notes</b><br>The new onboarding will <mark>start right on the first screen</mark>, and every tooltip will show its shortcut too.</div>
+  <div class="u076-bar bot" role="toolbar" aria-label="Attach">
+    <button class="u076-b" type="button" data-t="Attach file" data-k="⌘⇧A"><svg viewBox="0 0 18 18"><path d="M14.5 8.5l-5.6 5.6a3.5 3.5 0 0 1-5-5L9.5 3.5a2.3 2.3 0 0 1 3.3 3.3l-5.6 5.6a1.2 1.2 0 0 1-1.7-1.7L10.5 5.7"/></svg></button>
+    <button class="u076-b" type="button" data-t="Emoji" data-k="⌘E"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="6.5"/><path d="M6.5 10.5a3 3 0 0 0 5 0M7 7h.01M11 7h.01"/></svg></button>
+    <button class="u076-b" type="button" data-t="Mention" data-k="@"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="2.6"/><path d="M11.6 9v1a2 2 0 0 0 4 0V9A6.6 6.6 0 1 0 13 14.2"/></svg></button>
+    <button class="u076-send" type="button" data-t="Send" data-k="⌘↵">Send</button>
+  </div>
+  <div class="u076-tip" role="tooltip"><div class="u076-box"><span></span><kbd></kbd></div><i class="u076-arr"></i></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tip = root.querySelector('.u076-tip'), lab = tip.querySelector('span'), kbd = tip.querySelector('kbd'), arr = tip.querySelector('.u076-arr');
+  var btns = Array.prototype.slice.call(root.querySelectorAll('[data-t]'));
+  var uid = 'u076' + Math.random().toString(36).slice(2, 7);
+  var showT = 0, hideT = 0, warm = false, coolT = 0, cur = null;
+  tip.id = uid;
+  function place(b, glide) {
+    lab.textContent = b.getAttribute('data-t'); kbd.textContent = b.getAttribute('data-k') || '';
+    var below = !!b.closest('.top');
+    tip.classList.toggle('below', below); tip.classList.toggle('above', !below);
+    var bx = b.offsetLeft, by = b.offsetTop;
+    var w = tip.offsetWidth, h = tip.offsetHeight, cx = bx + b.offsetWidth / 2;
+    var x = Math.max(8, Math.min(root.clientWidth - w - 8, cx - w / 2));
+    var y = below ? by + b.offsetHeight + 8 : by - h - 8;
+    tip.classList.toggle('glide', glide);
+    tip.style.setProperty('--x', x + 'px'); tip.style.setProperty('--y', y + 'px');
+    arr.style.setProperty('--ax', (cx - x) + 'px');
+  }
+  function show(b) {
+    clearTimeout(hideT); clearTimeout(coolT); clearTimeout(showT);
+    var go = function () {
+      var was = tip.classList.contains('on');
+      place(b, was);
+      tip.classList.add('on'); warm = true; cur = b;
+      btns.forEach(function (x) { x.removeAttribute('aria-describedby'); });
+      b.setAttribute('aria-describedby', uid);
+    };
+    if (warm) go(); else showT = setTimeout(function () { if (root.isConnected) go(); }, 450);
+  }
+  function hide(now) {
+    clearTimeout(showT);
+    var go = function () {
+      tip.classList.remove('on'); cur = null;
+      coolT = setTimeout(function () { warm = false; }, 300);
+    };
+    if (now) go(); else hideT = setTimeout(go, 80);
+  }
+  btns.forEach(function (b) {
+    b.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') show(b); });
+    b.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') hide(); });
+    b.addEventListener('focus', function () { if (b.matches(':focus-visible')) { warm = true; show(b); } });
+    b.addEventListener('blur', function () { hide(); });
+    b.addEventListener('click', function () {
+      if (b.hasAttribute('aria-pressed')) b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+      hide(true);
+    });
+  });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && cur) { e.preventDefault(); hide(true); } });
+})();
+</script>

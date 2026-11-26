@@ -1,0 +1,76 @@
+<!-- Lucian UX/UI Prompt #041 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#041 -->
+<!--
+Element: Notched bottom tab bar
+ID: 041 · Category: Menus & Tabs · Tags: tab-bar, mobile, navigation, notch, indicator
+What it does: A round button rises above the selected tab while the top edge of the bar dips into a matching notch and slides along with it. The icon lifts up into the circle and the label appears below.
+How to use it: Press the tabs one by one. With a keyboard, use the left and right arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#041
+-->
+<style>
+.u041{--x:34px;position:relative;width:350px;height:170px;display:flex;align-items:flex-end}
+.u041-bar{position:relative;width:100%;height:84px;border-radius:28px;background:var(--ux-surface);
+  -webkit-mask:radial-gradient(circle 42px at var(--x) -4px,transparent 96%,#000 100%);mask:radial-gradient(circle 42px at var(--x) -4px,transparent 96%,#000 100%);
+  box-shadow:0 0 0 1px var(--ux-line)}
+.u041-shadow{position:absolute;left:0;right:0;bottom:0;height:84px;border-radius:28px;box-shadow:0 24px 40px -24px var(--ux-shadow-strong);pointer-events:none}
+.u041-bub{position:absolute;left:var(--x);top:calc(100% - 84px - 35px);width:62px;height:62px;margin-left:-31px;border-radius:50%;background:var(--ux-grad);box-shadow:0 14px 26px -12px rgba(91,72,255,.7)}
+.u041-tabs{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;margin:0;padding:0 14px;list-style:none}
+.u041-tabs>li{flex:1;display:flex}
+.u041-tab{position:relative;flex:1;height:100%;border:0;padding:0;background:none;color:var(--ux-ink-3)}
+.u041-tab:hover .u041-ic{color:var(--ux-ink)}
+.u041-tab:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-6px;border-radius:18px}
+.u041-ic{position:absolute;left:50%;top:22px;width:26px;height:26px;margin-left:-13px;transition:transform .55s var(--ux-spring),color .3s}
+.u041-ic svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.u041-lab{position:absolute;left:0;right:0;bottom:12px;font-size:11.5px;font-weight:700;color:var(--ux-ink);opacity:0;transform:translateY(6px);transition:opacity .3s,transform .45s var(--ux-spring)}
+.u041-tab[aria-selected="true"] .u041-ic{transform:translateY(-39px);color:var(--ux-accent-ink)}
+.u041-tab[aria-selected="true"] .u041-ic svg{stroke-width:2.2}
+.u041-tab[aria-selected="true"] .u041-lab{opacity:1;transform:none}
+.u041-bd{position:absolute;left:calc(50% + 6px);top:16px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#FF5A6E;color:#fff;font-size:10.5px;font-weight:800;line-height:18px;font-style:normal;box-shadow:0 0 0 2.5px var(--ux-surface);transition:transform .45s var(--ux-spring),opacity .3s}
+.u041-tab[aria-selected="true"] .u041-bd{transform:scale(0);opacity:0}
+</style>
+<div class="ux u041">
+  <span class="u041-shadow" aria-hidden="true"></span>
+  <div class="u041-bar" aria-hidden="true"></div>
+  <span class="u041-bub" aria-hidden="true"></span>
+  <ul class="u041-tabs" role="tablist" aria-label="Bottom navigation">
+    <li role="none"><button class="u041-tab" type="button" role="tab" aria-selected="true"><span class="u041-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z"/></svg></span><span class="u041-lab">Home</span></button></li>
+    <li role="none"><button class="u041-tab" type="button" role="tab" aria-selected="false"><span class="u041-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg></span><span class="u041-lab">Explore</span></button></li>
+    <li role="none"><button class="u041-tab" type="button" role="tab" aria-selected="false"><span class="u041-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6.5 3.5h11a1 1 0 0 1 1 1v16l-6.5-4.5-6.5 4.5v-16a1 1 0 0 1 1-1z"/></svg></span><span class="u041-lab">Saved</span></button></li>
+    <li role="none"><button class="u041-tab" type="button" role="tab" aria-selected="false"><span class="u041-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span><em class="u041-bd" aria-label="3 new alerts">3</em><span class="u041-lab">Alerts</span></button></li>
+    <li role="none"><button class="u041-tab" type="button" role="tab" aria-selected="false"><span class="u041-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c.9-3.8 3.8-5.8 7.5-5.8s6.6 2 7.5 5.8"/></svg></span><span class="u041-lab">Me</span></button></li>
+  </ul>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tabs = Array.prototype.slice.call(root.querySelectorAll('.u041-tab'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var x = 0, v = 0, target = 0, raf = 0;
+  function center(t) { return t.parentNode.offsetLeft + t.offsetWidth / 2; }
+  function step() {
+    var a = (target - x) * 0.16 - v * 0.42;
+    v += a; x += v;
+    root.style.setProperty('--x', x.toFixed(2) + 'px');
+    if (Math.abs(target - x) > 0.3 || Math.abs(v) > 0.3) raf = requestAnimationFrame(step);
+    else { x = target; v = 0; root.style.setProperty('--x', x + 'px'); raf = 0; }
+  }
+  function select(i, focus) {
+    tabs.forEach(function (t, k) { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    if (focus) tabs[i].focus();
+    target = center(tabs[i]);
+    if (rm) { x = target; root.style.setProperty('--x', x + 'px'); return; }
+    if (!raf) raf = requestAnimationFrame(step);
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { select(i); });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); select((i + d + tabs.length) % tabs.length, true); }
+    });
+  });
+  x = target = center(tabs[0]);
+  root.style.setProperty('--x', x + 'px');
+  select(0);
+})();
+</script>

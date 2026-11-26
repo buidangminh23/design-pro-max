@@ -1,0 +1,99 @@
+<!-- Lucian UX/UI Prompt #399 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#399 -->
+<!--
+Element: Month-reshuffling review word cloud
+ID: 399 · Category: Data Motion · Tags: word-cloud, text, frequency, flip-animation, data
+What it does: Words that come up most in café reviews gather in a cloud sized by how often they're mentioned; switch between January, April and July above and words that stay grow or shrink to their new size as they slide into new spots, words that drop out shrink away and new words pop in. Hover a word to keep only its group with its mention count and change from the previous month shown, or pick a whole group from the legend below.
+How to use it: Switch months above, then hover a word or the legend
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#399
+-->
+<style>
+.u399{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u399-hd{position:absolute;left:20px;right:16px;top:16px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.u399-hd b{font-size:13.5px;font-weight:900}
+.u399-sg{display:flex;padding:3px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u399-mo{border:0;padding:4px 11px;border-radius:999px;background:none;color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.u399-mo.is-on{background:var(--ux-ink);color:var(--ux-surface)}
+.u399-mo:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u399-w{position:absolute;left:0;top:0;border:0;padding:0;background:none;font:inherit;font-size:34px;font-weight:850;line-height:1.15;letter-spacing:-.02em;white-space:nowrap;color:var(--c);cursor:default;transform-origin:0 0;transition:transform .75s cubic-bezier(.3,1.15,.4,1),opacity .4s;will-change:transform}
+.u399-w.is-out{opacity:0;pointer-events:none}
+.u399-w:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px;border-radius:4px}
+.u399.is-f .u399-w{opacity:.14}
+.u399.is-f .u399-w.is-hl{opacity:1}
+.u399.is-f .u399-w.is-out{opacity:0}
+.u399-ft{position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:2}
+.u399-in{font-size:10.5px;font-weight:800;color:var(--ux-ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.u399-lg{display:flex;gap:2px}
+.u399-lg button{border:0;padding:3px 7px;border-radius:8px;background:none;color:var(--ux-ink-2);font:inherit;font-size:10px;font-weight:750;cursor:default}
+.u399-lg button:hover,.u399-lg button.g-hov,.u399-lg button:focus-visible{background:var(--ux-surface-2);outline:none}
+.u399-lg i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+</style>
+<div class="ux u399">
+  <div class="u399-hd"><b>Café review keywords</b><div class="u399-sg" role="group" aria-label="Month"><button type="button" class="u399-mo is-on" aria-pressed="true">Jan</button><button type="button" class="u399-mo" aria-pressed="false">Apr</button><button type="button" class="u399-mo" aria-pressed="false">Jul</button></div></div>
+  <div class="u399-ws"></div>
+  <div class="u399-ft"><span class="u399-in" aria-live="polite"></span><div class="u399-lg"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ws = root.querySelector('.u399-ws'), info = root.querySelector('.u399-in'), lg = root.querySelector('.u399-lg'), mos = root.querySelectorAll('.u399-mo');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = [['americano', 0, [90, 80, 95]], ['latte', 0, [70, 65, 40]], ['hot cocoa', 0, [60, 12, 0]], ['strawberry', 0, [20, 75, 15]], ['cold brew', 0, [12, 35, 85]], ['lemonade', 0, [0, 22, 60]], ['mulled wine', 0, [45, 0, 0]], ['shaved ice', 1, [0, 15, 80]], ['cake', 1, [55, 50, 35]], ['croffle', 1, [40, 45, 30]], ['macaron', 1, [25, 35, 20]], ['cherry menu', 1, [0, 70, 0]], ['terrace', 2, [6, 55, 50]], ['window seat', 2, [35, 30, 25]], ['outlets', 2, [40, 40, 40]], ['air con', 2, [0, 6, 65]], ['cozy', 2, [55, 10, 0]], ['vibe', 2, [65, 70, 60]], ['friendly', 3, [50, 55, 50]], ['wait time', 3, [30, 45, 55]], ['price', 3, [35, 30, 35]], ['parking', 3, [25, 25, 30]]];
+  var CAT = ['Drinks', 'Desserts', 'Space', 'Service'], COL = ['#6366F1', '#EC4899', '#0D9488', '#D97706'];
+  var BASE = 34, CXY = [170, 166], BOX = [14, 52, 326, 284], month = 0, hov = null, EL = [], POS = [];
+  var mc = document.createElement('canvas').getContext('2d');
+  W.forEach(function (w, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u399-w is-out'; b.textContent = w[0]; b.style.setProperty('--c', COL[w[1]]);
+    b.addEventListener('pointerenter', function () { setHov({ w: i }); }); b.addEventListener('pointerleave', function () { setHov(null); });
+    b.addEventListener('focus', function () { setHov({ w: i }); }); b.addEventListener('blur', function () { setHov(null); });
+    ws.appendChild(b); EL.push(b);
+  });
+  lg.innerHTML = CAT.map(function (c, i) { return '<button type="button"><i style="background:' + COL[i] + '"></i>' + c + '</button>'; }).join('');
+  lg.querySelectorAll('button').forEach(function (b, i) { b.addEventListener('pointerenter', function () { setHov({ c: i }); }); b.addEventListener('pointerleave', function () { setHov(null); }); b.addEventListener('focus', function () { setHov({ c: i }); }); b.addEventListener('blur', function () { setHov(null); }); });
+  function sizeOf(v) { return 11 + Math.pow(v / 95, 0.85) * 22; }
+  function layout(m) {
+    var fam = getComputedStyle(root).fontFamily, out = [], placed = [];
+    var order = W.map(function (w, i) { return i; }).filter(function (i) { return W[i][2][m] > 0; }).sort(function (a, b) { return W[b][2][m] - W[a][2][m]; });
+    order.forEach(function (i) {
+      var fs = sizeOf(W[i][2][m]); mc.font = '850 ' + fs + 'px ' + fam;
+      var w = mc.measureText(W[i][0]).width + 4, h = fs * 1.15, ok = null;
+      for (var t = 0; t < 140 && !ok; t += 0.12) {
+        var r = 3.2 * t, x = CXY[0] + r * Math.cos(t) * 1.45 - w / 2, y = CXY[1] + r * Math.sin(t) - h / 2;
+        if (x < BOX[0] || y < BOX[1] || x + w > BOX[2] || y + h > BOX[3]) continue;
+        if (placed.every(function (p) { return x + w + 3 < p[0] || p[0] + p[2] + 3 < x || y + h + 1 < p[1] || p[1] + p[3] + 1 < y; })) ok = [x, y, w, h];
+      }
+      if (ok) { placed.push(ok); out[i] = { x: ok[0], y: ok[1], k: fs / BASE }; }
+    });
+    return out;
+  }
+  function apply(m, first) {
+    var L = layout(m);
+    W.forEach(function (w, i) {
+      var b = EL[i], p = L[i], was = !b.classList.contains('is-out');
+      b.style.transitionDelay = rm ? '0s' : (i % 7) * 0.025 + 's';
+      if (p) {
+        if (!was && !rm) { b.style.transition = 'none'; b.style.transform = 'translate(' + (p.x + 20 * p.k) + 'px,' + (p.y + 12 * p.k) + 'px) scale(' + (p.k * 0.2) + ')'; void b.offsetWidth; b.style.transition = ''; }
+        b.classList.remove('is-out'); b.style.transform = 'translate(' + p.x.toFixed(1) + 'px,' + p.y.toFixed(1) + 'px) scale(' + p.k.toFixed(3) + ')';
+        b.tabIndex = 0; b.setAttribute('aria-label', w[0] + ' ' + w[2][m]);
+      } else {
+        b.classList.add('is-out'); b.tabIndex = -1;
+        if (was && POS[i]) b.style.transform = 'translate(' + (POS[i].x + 20 * POS[i].k) + 'px,' + (POS[i].y + 10 * POS[i].k) + 'px) scale(' + (POS[i].k * 0.3).toFixed(3) + ')';
+      }
+    });
+    POS = L;
+  }
+  function setHov(h) {
+    hov = h; root.classList.toggle('is-f', !!h);
+    var cat = h ? (h.c != null ? h.c : W[h.w][1]) : -1;
+    EL.forEach(function (b, i) { b.classList.toggle('is-hl', W[i][1] === cat); });
+    if (!h) { info.textContent = 'Hover a word'; return; }
+    if (h.c != null) { var s = 0; W.forEach(function (w) { if (w[1] === h.c) s += w[2][month]; }); info.textContent = CAT[h.c] + ' · ' + s + ' mentions'; return; }
+    var w = W[h.w], v = w[2][month], d = month ? v - w[2][month - 1] : null;
+    info.textContent = w[0] + ' · ' + v + ' mentions' + (d == null ? '' : '  (' + (d >= 0 ? '+' : '') + d + ')');
+  }
+  mos.forEach(function (b, i) { b.addEventListener('click', function () { month = i; mos.forEach(function (x, j) { x.classList.toggle('is-on', j === i); x.setAttribute('aria-pressed', j === i); }); apply(i); if (hov) setHov(hov); }); });
+  apply(0, true); setHov(null);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (root.isConnected) apply(month); });
+})();
+</script>

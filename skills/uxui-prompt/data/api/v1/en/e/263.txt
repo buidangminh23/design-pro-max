@@ -1,0 +1,57 @@
+<!-- Lucian UX/UI Prompt #263 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#263 -->
+<!--
+Element: Flowing gradient headline and thinking text
+ID: 263 · Category: Text Motion · Tags: gradient-text, shimmer, headline, ai, loading-text
+What it does: A color gradient slowly flows through the highlighted word of a section headline, and in the AI reply bubble below, a bright sheen repeatedly sweeps across the gray ‘Thinking…’ text. Pick one of three color sets with the chips above — flowing light, rainbow or gold — and the headline and button text change together; when the answer is ready the shimmer stops and the real sentence appears.
+How to use it: Switch color sets above, then press Ask to see the thinking text
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#263
+-->
+<style>
+.u263{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);--g:linear-gradient(90deg,#6366F1,#22D3EE,#A855F7,#6366F1)}
+.u263[data-s="1"]{--g:linear-gradient(90deg,#F43F5E,#F59E0B,#22C55E,#3B82F6,#A855F7,#F43F5E)}
+.u263[data-s="2"]{--g:linear-gradient(90deg,#92400E,#F59E0B,#FDE68A,#D97706,#92400E)}
+.u263-sws{position:absolute;left:18px;top:16px;display:flex;gap:5px}
+.u263-sw{border:0;padding:5px 10px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.u263-sw.is-on{background:var(--ux-ink);color:var(--ux-surface);box-shadow:none}
+.u263-sw:focus-visible,.u263-ask:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u263-h{position:absolute;left:22px;right:22px;top:56px;margin:0;font-size:27px;line-height:1.2;font-weight:900;letter-spacing:-.045em}
+.u263-h em,.u263-ask span{font-style:normal;background:var(--g);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:u263-flow 5s linear infinite}
+@keyframes u263-flow{to{background-position:-300% 0}}
+.u263-ask{position:absolute;left:22px;top:140px;height:34px;padding:0 15px;border:0;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1.5px var(--ux-line),0 6px 16px -10px var(--ux-shadow-strong);font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.u263-chat{position:absolute;left:18px;right:18px;bottom:18px;display:flex;flex-direction:column;gap:7px}
+.u263-q{align-self:flex-end;max-width:80%;padding:8px 12px;border-radius:14px 14px 4px 14px;background:var(--ux-accent);color:#fff;font-size:11.5px;font-weight:700;opacity:0;transform:translateY(6px);transition:opacity .3s,transform .3s}
+.u263-a{align-self:flex-start;max-width:88%;padding:9px 12px;border-radius:14px 14px 14px 4px;background:var(--ux-surface-2);font-size:11.5px;line-height:1.5;font-weight:650;opacity:0;transform:translateY(6px);transition:opacity .3s .15s,transform .3s .15s}
+.u263.is-chat .u263-q,.u263.is-chat .u263-a{opacity:1;transform:none}
+.u263-sh{background:linear-gradient(90deg,var(--ux-ink-3) 0 40%,var(--ux-ink) 50%,var(--ux-ink-3) 60% 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:u263-sh 1.5s linear infinite;font-weight:800}
+@keyframes u263-sh{from{background-position:100% 0}to{background-position:-150% 0}}
+@media (prefers-reduced-motion: reduce){.u263-h em,.u263-ask span,.u263-sh{animation:none}}
+</style>
+<div class="ux u263" data-s="0">
+  <div class="u263-sws" role="group" aria-label="Color set"></div>
+  <h3 class="u263-h">Long meeting notes,<br>summed up in <em>three lines</em></h3>
+  <button type="button" class="u263-ask"><span>Ask</span></button>
+  <div class="u263-chat" aria-live="polite"><div class="u263-q">Give me the key points from this week's meetings</div><div class="u263-a"><span class="u263-ans"></span></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sws = root.querySelector('.u263-sws'), ask = root.querySelector('.u263-ask'), ans = root.querySelector('.u263-ans');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SET = ['Light', 'Rainbow', 'Gold'], B = [], t = 0;
+  SET.forEach(function (n, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u263-sw'; b.textContent = n;
+    b.addEventListener('click', function () { root.dataset.s = i; B.forEach(function (x, k) { x.classList.toggle('is-on', k === i); x.setAttribute('aria-pressed', k === i); }); });
+    sws.appendChild(b); B.push(b);
+  });
+  B[0].classList.add('is-on'); B[0].setAttribute('aria-pressed', 'true');
+  function answer() { ans.className = 'u263-ans'; ans.textContent = 'Launch is set for Nov 3, pricing stays the same, and design review wraps up by Wednesday.'; }
+  ask.addEventListener('click', function () {
+    clearTimeout(t); root.classList.add('is-chat');
+    ans.className = 'u263-ans u263-sh'; ans.textContent = 'Thinking…';
+    t = setTimeout(answer, rm ? 300 : 2400);
+  });
+  root.classList.add('is-chat'); answer();
+})();
+</script>

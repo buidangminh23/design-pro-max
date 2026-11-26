@@ -1,0 +1,82 @@
+<!-- Lucian UX/UI Prompt #266 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#266 -->
+<!--
+Element: Shuffle-to-generate color palette
+ID: 266 · Category: Site Builder Tools · Tags: palette, color, generator, design-tokens, builder
+What it does: In a five-stripe palette generator, press Shuffle and the unlocked stripes wash into new colors one after another, their color codes changing with them. Stripes you lock stay put, and pressing a stripe copies its code with a small notice. The preview below paints its buttons, card and background with the current palette right away to show how it would actually look.
+How to use it: Press Shuffle, lock a stripe you like, then shuffle again
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#266
+-->
+<style>
+.u266{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u266-cs{position:absolute;left:12px;right:12px;top:12px;height:186px;display:flex;border-radius:18px;overflow:hidden}
+.u266-cl{position:relative;flex:1;background:var(--c);color:var(--t);transition:background .55s ease,color .4s,flex .3s cubic-bezier(.3,1.3,.5,1)}
+.u266-cp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 12px;border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+.u266-cl:hover,.u266-cl.g-hov{flex:1.25}
+.u266-cp:focus-visible,.u266-lk:focus-visible{outline:2px solid var(--t);outline-offset:-4px}
+.u266-cl code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;font-weight:800;letter-spacing:.02em}
+.u266-lk{position:absolute;top:10px;left:50%;width:26px;height:26px;margin-left:-13px;border:0;border-radius:50%;background:color-mix(in srgb,var(--t) 16%,transparent);color:var(--t);display:grid;place-items:center;cursor:pointer;opacity:.55;transition:opacity .2s,transform .3s cubic-bezier(.3,1.7,.5,1)}
+.u266-lk[aria-pressed="true"]{opacity:1;transform:scale(1.1)}
+.u266-lk svg{width:12px;height:12px}
+.u266-cl:hover .u266-lk,.u266-cl.g-hov .u266-lk{opacity:1}
+.u266-tb{position:absolute;left:12px;right:12px;top:206px;display:flex;align-items:center;gap:8px}
+.u266-sh{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border:0;border-radius:11px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:12px;font-weight:850;cursor:pointer}
+.u266-sh svg{width:13px;height:13px;transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+.u266-sh.is-spin svg{transform:rotate(360deg)}
+.u266-sh:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u266-tb kbd{margin-left:auto;padding:2px 6px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--ux-line),0 1px 0 var(--ux-line);font-family:inherit;font-size:9.5px;font-weight:800;color:var(--ux-ink-3)}
+.u266-pv{position:absolute;left:12px;right:12px;bottom:12px;height:72px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:16px;background:var(--p0);background:light-dark(var(--p0),var(--p4));transition:background .55s}
+.u266-pv div{flex:1;min-width:0}
+.u266-pv small{display:block;font-size:9px;font-weight:850;color:var(--p2);transition:color .55s}
+.u266-pv b{display:block;margin-top:2px;font-size:13px;font-weight:900;color:var(--p4);color:light-dark(var(--p4),var(--p0));transition:color .55s}
+.u266-pv span{padding:8px 12px;border-radius:10px;background:var(--p3);color:var(--p0);font-size:10.5px;font-weight:850;white-space:nowrap;transition:background .55s,color .55s}
+.u266-pv i{flex:none;width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--p1),var(--p2));transition:background .55s}
+.u266-tt{position:absolute;left:50%;top:96px;padding:6px 11px;border-radius:10px;background:var(--ux-ink);color:var(--ux-surface);font-size:10.5px;font-weight:800;white-space:nowrap;transform:translate(-50%,8px);opacity:0;pointer-events:none;transition:opacity .2s,transform .3s cubic-bezier(.3,1.5,.5,1)}
+.u266-tt.is-on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){.u266-cl,.u266-pv,.u266-pv *,.u266-sh svg,.u266-tt{transition:none}}
+</style>
+<div class="ux u266">
+  <div class="u266-cs"></div>
+  <div class="u266-tb"><button type="button" class="u266-sh"><svg viewBox="0 0 13 13" aria-hidden="true"><path d="M1.5 4h2.2c1.6 0 2.5.9 3.3 2.5S8.7 9 10.3 9h1.2M1.5 9h2.2c.9 0 1.5-.3 2-.8M8.6 4.8c.5-.5 1-.8 1.7-.8h1.2M10 2.3L11.7 4 10 5.7M10 7.3L11.7 9 10 10.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Shuffle</button><kbd>Space</kbd></div>
+  <div class="u266-pv" aria-hidden="true"><i></i><div><small>New collection</small><b>30% off fall arrivals</b></div><span>Shop now</span></div>
+  <div class="u266-tt" role="status"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cs = root.querySelector('.u266-cs'), sh = root.querySelector('.u266-sh'), tt = root.querySelector('.u266-tt');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function hsl(h, s, l) { s /= 100; l /= 100; var a = s * Math.min(l, 1 - l), f = function (n) { var k = (n + h / 30) % 12, c = l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(c * 255).toString(16).padStart(2, '0'); }; return ('#' + f(0) + f(8) + f(4)).toUpperCase(); }
+  function lum(hex) { var n = parseInt(hex.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+  function scheme() {
+    var h = Math.random() * 360, mode = Math.floor(Math.random() * 3), off = mode === 0 ? 25 : mode === 1 ? 180 : 140;
+    return [hsl(h, 45, 94), hsl(h + off * .3, 55, 78), hsl(h + off * .6, 62, 58), hsl(h + off, 58, 42), hsl(h + off * .5, 40, 18)];
+  }
+  var P = ['#F5EFE6', '#E8C6A0', '#D98A5F', '#7A4E8C', '#2B2238'], lock = [false, false, false, false, false];
+  var LOCK = '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2.5" y="5.5" width="7" height="5" rx="1.3" fill="currentColor"/><path d="M4 5.5V4a2 2 0 0 1 4 0v1.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>', OPEN = '<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="2.5" y="5.5" width="7" height="5" rx="1.3" fill="currentColor"/><path d="M4 5.5V4a2 2 0 0 1 3.8-.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  var C = P.map(function (c, i) {
+    var col = document.createElement('div'); col.className = 'u266-cl';
+    col.innerHTML = '<button type="button" class="u266-cp"><code></code></button><button type="button" class="u266-lk"></button>';
+    var b = col.querySelector('.u266-cp'), lk = col.querySelector('.u266-lk');
+    lk.addEventListener('click', function () { lock[i] = !lock[i]; paint(i); });
+    b.addEventListener('click', function () { try { navigator.clipboard && navigator.clipboard.writeText(P[i]).catch(function () {}); } catch (e) {} tt.textContent = 'Copied ' + P[i]; tt.classList.remove('is-on'); void tt.offsetWidth; tt.classList.add('is-on'); clearTimeout(tt._t); tt._t = setTimeout(function () { tt.classList.remove('is-on'); }, 1400); });
+    cs.appendChild(col); return { col: col, b: b, lk: lk, code: b.querySelector('code') };
+  });
+  function paint(i) {
+    var c = C[i], hex = P[i], t = lum(hex) > .35 ? '#1A1A1A' : '#FFFFFF';
+    c.col.style.setProperty('--c', hex); c.col.style.setProperty('--t', t); c.code.textContent = hex;
+    c.lk.innerHTML = lock[i] ? LOCK : OPEN; c.lk.setAttribute('aria-pressed', lock[i]); c.lk.setAttribute('aria-label', hex + (lock[i] ? ' — unlock' : ' — lock')); c.b.setAttribute('aria-label', hex + ' — copy');
+    root.style.setProperty('--p' + i, hex);
+  }
+  function shuffle() {
+    var n = scheme();
+    sh.classList.remove('is-spin'); void sh.offsetWidth; sh.classList.add('is-spin');
+    n.forEach(function (hex, i) { if (lock[i]) return; setTimeout(function () { P[i] = hex; paint(i); }, rm ? 0 : i * 70); });
+  }
+  sh.addEventListener('click', shuffle);
+  root.addEventListener('keydown', function (e) { if (e.key === ' ' && e.target === root) { e.preventDefault(); shuffle(); } });
+  root.tabIndex = -1;
+  P.forEach(function (c, i) { paint(i); });
+})();
+</script>

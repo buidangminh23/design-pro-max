@@ -1,0 +1,125 @@
+<!-- Lucian UX/UI Prompt #005 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#005 -->
+<!--
+Element: Paper plane send button
+ID: 005 · Category: Buttons · Tags: button, send, paper-plane, offset-path, chat
+What it does: Press send and the paper plane inside the button lifts off, loops once and flies off the screen, leaving a dotted trail that fades away. Meanwhile a progress ring circles the button and turns into a check, and the message rises into the chat as a bubble. A moment later a new plane glides back into the button.
+How to use it: Press the send button, or press Enter in the input
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#005
+-->
+<style>
+.u005{position:relative;width:340px;height:320px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;color:var(--ux-ink)}
+.u005-hd{display:flex;align-items:center;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--ux-line)}
+.u005-av{position:relative;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#FFC078,#F06595)}
+.u005-av::after{content:"";position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:50%;background:#40C057;box-shadow:0 0 0 2px var(--ux-surface)}
+.u005-hd b{display:block;font-size:14px;font-weight:800}
+.u005-hd small{display:block;font-size:11.5px;color:var(--ux-ink-3)}
+.u005-th{position:absolute;left:14px;right:14px;top:70px;bottom:78px;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;overflow:hidden}
+.u005-bb{max-width:76%;padding:9px 13px;border-radius:18px;font-size:13.5px;line-height:1.4}
+.u005-bb.in{align-self:flex-start;background:var(--ux-surface-2);border-bottom-left-radius:6px}
+.u005-bb.out{align-self:flex-end;background:linear-gradient(135deg,#6A57F2,#3D8BFF);color:#fff;border-bottom-right-radius:6px;transform-origin:100% 100%}
+.u005-bb.pop{animation:u005-pop .5s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes u005-pop{from{opacity:0;transform:translate(10px,18px) scale(.6)}}
+.u005-st{align-self:flex-end;margin:-4px 4px 0 0;font-size:11px;font-weight:700;color:var(--ux-ink-3);display:flex;align-items:center;gap:4px}
+.u005-st svg{width:16px;height:10px;fill:none;stroke:#3D8BFF;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;transition:stroke-dashoffset .5s .1s}
+.u005-st.ok svg{stroke-dashoffset:0}
+.u005-cp{position:absolute;left:14px;right:14px;bottom:16px;height:50px;display:flex;align-items:center;gap:8px;padding:0 5px 0 16px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u005-cp.shake{animation:u005-sh .4s}
+@keyframes u005-sh{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.u005-in{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:14px;color:var(--ux-ink);outline:none}
+.u005-btn{position:relative;flex:none;width:42px;height:42px;border:0;padding:0;border-radius:50%;background:linear-gradient(140deg,#7B61FF,#3D8BFF);box-shadow:0 8px 16px -8px #4F5BFF;display:grid;place-items:center;transition:transform .35s var(--ux-spring),background .35s}
+.u005-btn:active{transform:scale(.9)}
+.u005-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u005-pl{width:24px;height:22px;transform:translate(-1px,1px) rotate(-18deg);transition:transform .45s var(--ux-spring),opacity .2s}
+.u005-btn.fly .u005-pl{opacity:0;transform:translate(10px,-10px) rotate(-30deg) scale(.6);transition:none}
+.u005-btn.back .u005-pl{animation:u005-back .6s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes u005-back{from{opacity:0;transform:translate(-26px,14px) rotate(10deg) scale(.7)}}
+.u005-rg{position:absolute;inset:-4px;width:50px;height:50px;transform:rotate(-90deg);opacity:0;transition:opacity .2s}
+.u005-rg circle{fill:none;stroke:#7B61FF;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:145;stroke-dashoffset:145}
+.u005-btn.fly .u005-rg{opacity:1}
+.u005-btn.fly .u005-rg circle{transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.3,1);stroke-dashoffset:0}
+.u005-ck{position:absolute;width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:24;stroke-dashoffset:24;opacity:0}
+.u005-btn.done{background:linear-gradient(140deg,#37B24D,#20C997);box-shadow:0 8px 16px -8px #2B8A3E}
+.u005-btn.done .u005-ck{opacity:1;stroke-dashoffset:0;transition:stroke-dashoffset .35s .05s}
+.u005-btn.done .u005-pl{opacity:0}
+.u005-sky{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.u005-tr{fill:none;stroke:#7B61FF;stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1.5 6;opacity:.7;transition:opacity .6s}
+.u005-fp{position:absolute;left:0;top:0;width:34px;height:30px;margin:0;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(60,40,160,.25))}
+.u005-fp svg{width:100%;height:100%}
+</style>
+<div class="ux u005">
+  <div class="u005-hd"><span class="u005-av" aria-hidden="true"></span><span><b>Minji</b><small>Active now</small></span></div>
+  <div class="u005-th" role="log" aria-label="Conversation"><div class="u005-bb in">Can you send me the photo?</div></div>
+  <svg class="u005-sky" viewBox="0 0 340 320" aria-hidden="true"><defs><mask id="u005-m" maskUnits="userSpaceOnUse" x="-40" y="-80" width="440" height="420"><path class="u005-mk" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></mask></defs><path class="u005-tr" mask="url(#u005-m)"/></svg>
+  <div class="u005-cp"><input class="u005-in" aria-label="Message" value=""><button class="u005-btn" type="button" aria-label="Send"><svg class="u005-rg" viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="23"/></svg><svg class="u005-pl" viewBox="0 0 28 24" aria-hidden="true"><path d="M1 3 27 12 10 13Z" fill="#fff"/><path d="M10 13 27 12 6 22Z" fill="#D8E0FF"/><path d="M10 13 27 12 12.5 17Z" fill="#A3B4FF"/></svg><svg class="u005-ck" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5 8.3 14.5 16 6"/></svg></button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u005-btn'), inp = root.querySelector('.u005-in'), th = root.querySelector('.u005-th'), cp = root.querySelector('.u005-cp');
+  var tr = root.querySelector('.u005-tr'), mk = root.querySelector('.u005-mk');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NEXT = ['Sending the photo I just took 📷', 'See you tomorrow at 10!', 'Thanks, you saved me 🙏'];
+  var PLANE = '<svg viewBox="0 0 28 24"><path d="M1 3 27 12 10 13Z" fill="#fff"/><path d="M10 13 27 12 6 22Z" fill="#D8E0FF"/><path d="M10 13 27 12 12.5 17Z" fill="#A3B4FF"/><path d="M1 3 27 12 10 13Z" fill="none" stroke="#7B61FF" stroke-width=".8" stroke-linejoin="round"/><path d="M10 13 27 12 6 22Z" fill="none" stroke="#7B61FF" stroke-width=".8" stroke-linejoin="round"/></svg>';
+  var mid = 'u005-m' + Math.random().toString(36).slice(2, 8);
+  root.querySelector('mask').id = mid; tr.setAttribute('mask', 'url(#' + mid + ')');
+  var n = 0, busy = false;
+  inp.value = NEXT[0];
+  var canPath = window.CSS && CSS.supports && CSS.supports('offset-path', 'path("M0 0L1 1")');
+  function route() {
+    var b = btn.getBoundingClientRect(), r = root.getBoundingClientRect(), k = root.offsetWidth / (r.width || 1);
+    var x = (b.left - r.left + b.width / 2) * k, y = (b.top - r.top + b.height / 2) * k;
+    return 'M' + x + ' ' + y + ' C' + (x - 30) + ' ' + (y - 60) + ' ' + (x - 150) + ' ' + (y - 70) + ' ' + (x - 150) + ' ' + (y - 140) +
+      ' C' + (x - 150) + ' ' + (y - 205) + ' ' + (x - 70) + ' ' + (y - 215) + ' ' + (x - 60) + ' ' + (y - 165) +
+      ' C' + (x - 50) + ' ' + (y - 120) + ' ' + (x - 125) + ' ' + (y - 110) + ' ' + (x - 120) + ' ' + (y - 170) +
+      ' C' + (x - 115) + ' ' + (y - 235) + ' ' + (x - 10) + ' ' + (y - 280) + ' ' + (x + 90) + ' ' + (y - 330);
+  }
+  function bubble(text) {
+    var b = document.createElement('div'); b.className = 'u005-bb out' + (rm ? '' : ' pop'); b.textContent = text;
+    var st = document.createElement('div'); st.className = 'u005-st'; st.innerHTML = '<span></span><svg viewBox="0 0 16 10" aria-hidden="true"><path d="M1 5.5 4 8.5 9.5 2M7 8.5 15 1"/></svg>';
+    st.firstChild.textContent = 'Sending';
+    th.appendChild(b); th.appendChild(st);
+    while (th.children.length > 5) th.removeChild(th.firstChild);
+    return st;
+  }
+  function send() {
+    var text = inp.value.trim();
+    if (busy) return;
+    if (!text) { cp.classList.remove('shake'); void cp.offsetWidth; cp.classList.add('shake'); inp.focus(); return; }
+    busy = true;
+    var st = bubble(text);
+    inp.value = '';
+    var d = route(), dur = rm ? 0 : 1500;
+    btn.classList.remove('back', 'done');
+    btn.classList.add('fly');
+    if (!rm) {
+      tr.setAttribute('d', d); mk.setAttribute('d', d); tr.style.opacity = '';
+      var fp = document.createElement('div'); fp.className = 'u005-fp'; fp.innerHTML = PLANE;
+      root.appendChild(fp);
+      var ease = 'cubic-bezier(.45,0,.3,1)';
+      if (canPath && fp.animate) {
+        fp.style.offsetPath = 'path("' + d + '")'; fp.style.offsetRotate = 'auto';
+        fp.animate([{ offsetDistance: '0%', transform: 'scale(.75)' }, { offsetDistance: '35%', transform: 'scale(1.25)', offset: 0.35 }, { offsetDistance: '100%', transform: 'scale(.7)' }], { duration: dur, easing: ease, fill: 'forwards' });
+      } else if (fp.animate) {
+        var p = d.split(/[ MC]+/).filter(Boolean).map(Number);
+        fp.animate([{ transform: 'translate(' + (p[0] - 17) + 'px,' + (p[1] - 15) + 'px)' }, { transform: 'translate(' + (p[p.length - 2] - 17) + 'px,' + (p[p.length - 1] - 15) + 'px) rotate(-40deg)' }], { duration: dur, easing: ease, fill: 'forwards' });
+      }
+      if (mk.animate) mk.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: dur, easing: ease, fill: 'forwards' });
+      setTimeout(function () { fp.remove(); tr.style.opacity = '0'; }, dur + 80);
+    }
+    setTimeout(function () {
+      btn.classList.remove('fly'); btn.classList.add('done');
+      st.firstChild.textContent = 'Sent'; st.classList.add('ok');
+    }, dur ? dur - 100 : 0);
+    setTimeout(function () {
+      if (!root.isConnected) return;
+      btn.classList.remove('done'); btn.classList.add('back');
+      n = (n + 1) % NEXT.length; inp.value = NEXT[n];
+      busy = false;
+    }, rm ? 0 : dur + 900);
+  }
+  btn.addEventListener('click', send);
+  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); send(); } });
+})();
+</script>

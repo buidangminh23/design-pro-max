@@ -1,0 +1,112 @@
+<!-- Lucian UX/UI Prompt #387 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#387 -->
+<!--
+Element: Brushable parallel coordinates
+ID: 387 · Category: Data Motion · Tags: parallel-coordinates, brushing, filter, multivariate, data
+What it does: Forty-two laptops are drawn as curves across five axes — price, weight, battery, performance and screen — unfolding from left to right when they first appear. Drag up or down on an axis to make a filter band that keeps only that range, sinking non-matching lines to gray, and add bands on more axes to stack conditions. A short press on an axis clears its band, and hovering the legend below highlights just that type.
+How to use it: Drag up or down on an axis to filter, and press an axis to clear it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#387
+-->
+<style>
+.u387{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u387-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.u387-ax{position:absolute;top:66px;height:200px;width:30px;margin-left:-15px;cursor:ns-resize;touch-action:none;border-radius:8px}
+.u387-ax::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;border-radius:1px;background:var(--ux-ink-3);opacity:.45}
+.u387-ax:hover::before{opacity:.9}
+.u387-ax:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u387-br{position:absolute;left:7px;right:7px;border-radius:5px;background:rgba(99,102,241,.18);box-shadow:inset 0 0 0 1.5px #6366F1;display:none}
+.u387-ax.is-br .u387-br{display:block}
+.u387-al{position:absolute;top:30px;width:70px;margin-left:-35px;text-align:center;pointer-events:none}
+.u387-al b{display:block;font-size:11px;font-weight:850}
+.u387-al span{font-size:8.5px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u387-mn{position:absolute;top:270px;width:50px;margin-left:-25px;text-align:center;font-size:8.5px;font-weight:700;color:var(--ux-ink-3);pointer-events:none;font-variant-numeric:tabular-nums}
+.u387-ft{position:absolute;left:16px;right:16px;bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.u387-ct{padding:5px 10px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:10.5px;font-weight:850;font-variant-numeric:tabular-nums;white-space:nowrap}
+.u387-lg{display:flex;gap:2px}
+.u387-lg button{border:0;padding:4px 5px;border-radius:8px;background:none;color:var(--ux-ink-2);font:inherit;font-size:10px;font-weight:750;cursor:default;white-space:nowrap}
+.u387-lg button:hover,.u387-lg button.g-hov{background:var(--ux-surface-2)}
+.u387-lg i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:3px}
+</style>
+<div class="ux u387">
+  <canvas class="u387-cv" aria-hidden="true"></canvas>
+  <div class="u387-ft"><span class="u387-ct" aria-live="polite"></span><div class="u387-lg"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var cv = root.querySelector('.u387-cv'), cx = cv.getContext('2d'), ct = root.querySelector('.u387-ct'), lg = root.querySelector('.u387-lg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 340, H = 340, dpr = Math.min(2, window.devicePixelRatio || 1), TOP = 66, HT = 200;
+  cv.width = W * dpr; cv.height = H * dpr; cx.scale(dpr, dpr);
+  var AX = [['Price', '×₩10k'], ['Weight', 'kg'], ['Battery', 'h'], ['Speed', 'pts'], ['Screen', 'in']];
+  var CAT = ['Light', 'Gaming', 'Work', 'Budget'], COL = ['#06B6D4', '#EF4444', '#6366F1', '#F59E0B'];
+  var RANGE = [[60, 440], [0.8, 3], [4, 24], [10, 100], [13, 17.5]], XS = [36, 103, 170, 237, 304];
+  var seed = 5; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function rr(a, b) { return a + (b - a) * rnd(); }
+  var PROF = [[[140, 260], [0.9, 1.3], [15, 22], [45, 75], [13, 14]], [[230, 420], [2.2, 2.9], [4, 8], [80, 99], [15.6, 17.3]], [[120, 240], [1.3, 1.8], [10, 16], [50, 80], [14, 16]], [[60, 120], [1.6, 2.2], [6, 11], [15, 45], [14, 15.6]]];
+  var N = [12, 9, 12, 9], D = [];
+  N.forEach(function (n, c) { for (var k = 0; k < n; k++) D.push({ c: c, v: PROF[c].map(function (r) { return rr(r[0], r[1]); }), a: 1 }); });
+  var BR = AX.map(function () { return null; }), hl = -1, prog = rm ? 1 : 0, AXEL = [];
+  function yOf(i, v) { var r = RANGE[i]; return TOP + HT - (v - r[0]) / (r[1] - r[0]) * HT; }
+  function fmt(i, v) { return i === 1 || i === 4 ? v.toFixed(1) : Math.round(v); }
+  AX.forEach(function (a, i) {
+    var l = document.createElement('div'); l.className = 'u387-al'; l.style.left = XS[i] + 'px'; l.innerHTML = '<b>' + a[0] + '</b><span>' + fmt(i, RANGE[i][1]) + ' ' + a[1] + '</span>'; root.appendChild(l);
+    var m = document.createElement('div'); m.className = 'u387-mn'; m.style.left = XS[i] + 'px'; m.textContent = fmt(i, RANGE[i][0]); root.appendChild(m);
+    var ax = document.createElement('div'); ax.className = 'u387-ax'; ax.style.left = XS[i] + 'px'; ax.tabIndex = 0; ax.setAttribute('role', 'slider'); ax.setAttribute('aria-label', a[0] + ' axis, drag up or down to filter');
+    ax.innerHTML = '<span class="u387-br"></span>'; root.appendChild(ax); AXEL.push(ax);
+    var st = null;
+    function fy(e) { var r = ax.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)); }
+    ax.addEventListener('pointerdown', function (e) { e.preventDefault(); st = { y: fy(e), moved: false }; try { ax.setPointerCapture(e.pointerId); } catch (er) {} });
+    ax.addEventListener('pointermove', function (e) { if (!st) return; var y = fy(e); if (Math.abs(y - st.y) > 0.02) st.moved = true; if (st.moved) setBrush(i, Math.min(st.y, y), Math.max(st.y, y)); });
+    function up() { if (!st) return; if (!st.moved) setBrush(i, null); st = null; }
+    ax.addEventListener('pointerup', up); ax.addEventListener('pointercancel', up);
+    ax.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { setBrush(i, null); return; }
+      var d = e.key === 'ArrowUp' ? -0.05 : e.key === 'ArrowDown' ? 0.05 : 0; if (!d) return; e.preventDefault();
+      var b = BR[i] || [0.35, 0.65], a0 = Math.max(0, Math.min(1 - (b[1] - b[0]), b[0] + d)); setBrush(i, a0, a0 + (b[1] - b[0]));
+    });
+  });
+  function setBrush(i, a, b) {
+    BR[i] = a == null ? null : [a, b];
+    var ax = AXEL[i], el = ax.firstChild; ax.classList.toggle('is-br', a != null);
+    if (a != null) { el.style.top = (a * 100) + '%'; el.style.height = ((b - a) * 100) + '%'; }
+    info(); run();
+  }
+  function pass(d) { return BR.every(function (b, i) { if (!b) return true; var f = (yOf(i, d.v[i]) - TOP) / HT; return f >= b[0] && f <= b[1]; }); }
+  function info() { var n = D.filter(pass).length; ct.textContent = D.length + ' → ' + n + ' left'; }
+  lg.innerHTML = CAT.map(function (c, i) { return '<button type="button"><i style="background:' + COL[i] + '"></i>' + c + '</button>'; }).join('');
+  lg.querySelectorAll('button').forEach(function (b, i) {
+    b.addEventListener('pointerenter', function () { hl = i; run(); }); b.addEventListener('pointerleave', function () { hl = -1; run(); });
+    b.addEventListener('focus', function () { hl = i; run(); }); b.addEventListener('blur', function () { hl = -1; run(); });
+  });
+  var ink3 = '#999';
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    cx.save(); cx.beginPath(); cx.rect(0, 0, XS[0] + (XS[4] - XS[0]) * prog + 2, H); cx.clip();
+    var order = D.slice().sort(function (a, b) { return a.a - b.a; });
+    order.forEach(function (d) {
+      var on = d.a > 0.5, hot = hl < 0 || d.c === hl;
+      cx.strokeStyle = on ? COL[d.c] : ink3; cx.globalAlpha = (on ? (hot ? 0.8 : 0.12) : 0.13) * (0.4 + 0.6 * d.a); cx.lineWidth = on && hl === d.c ? 2 : 1.3;
+      cx.beginPath();
+      d.v.forEach(function (v, i) { var x = XS[i], y = yOf(i, v); if (!i) cx.moveTo(x, y); else { var px = XS[i - 1], py = yOf(i - 1, d.v[i - 1]), m = (x - px) / 2; cx.bezierCurveTo(px + m, py, x - m, y, x, y); } });
+      cx.stroke();
+    });
+    cx.restore(); cx.globalAlpha = 1;
+  }
+  var raf = 0, last = 0, vis = true, busy = false;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected || !vis) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now; busy = false;
+    if (prog < 1) { prog = Math.min(1, prog + dt / 1.1); busy = true; }
+    D.forEach(function (d) { var t = pass(d) ? 1 : 0; if (Math.abs(d.a - t) > 0.01) { d.a += (t - d.a) * Math.min(1, dt * (rm ? 99 : 9)); busy = true; } else d.a = t; });
+    draw();
+    if (busy) raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf && vis) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { vis = es[0].isIntersecting; run(); }).observe(root);
+  ink3 = getComputedStyle(root).getPropertyValue('--ux-ink-3').trim() || '#999';
+  info(); run();
+})();
+</script>

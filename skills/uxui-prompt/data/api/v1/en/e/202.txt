@@ -1,0 +1,118 @@
+<!-- Lucian UX/UI Prompt #202 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#202 -->
+<!--
+Element: Rising isometric data blocks
+ID: 202 · Category: Data Motion · Tags: isometric, 3d, bar-chart, svg, data
+What it does: Six months of results for four regions, shown as a block city seen from an angle. Blocks rise row by row from the front when it first appears, and switching between orders and visits with the chips above re-levels the heights in a wave. Hover a block and only its row and column keep their color while the rest turns gray, and its value floats up.
+How to use it: Hover over the blocks, and switch the metric with the chips above
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#202
+-->
+<style>
+.u202{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:linear-gradient(160deg,#F5F7FF,#E9EEFB);background:linear-gradient(160deg,light-dark(#F5F7FF,#151829),light-dark(#E9EEFB,#0B0D17));box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:#1E2440;color:light-dark(#1E2440,#E9ECF8)}
+.u202-hd{position:absolute;left:16px;right:16px;top:14px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.u202-hd b{font-size:13.5px;font-weight:800}
+.u202-chips{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(30,36,64,.07);background:light-dark(rgba(30,36,64,.07),rgba(255,255,255,.07))}
+.u202-chip{border:0;padding:5px 11px;border-radius:999px;background:transparent;color:#525A7A;color:light-dark(#525A7A,#9CA3C0);font:inherit;font-size:11px;font-weight:750;cursor:pointer;transition:background .2s,color .2s}
+.u202-chip[aria-pressed="true"]{background:#1E2440;background:light-dark(#1E2440,#E9ECF8);color:#fff;color:light-dark(#fff,#151829)}
+.u202-chip:focus-visible{outline:2px solid #3D8BFF;outline-offset:2px}
+.u202-sv{position:absolute;inset:0;width:100%;height:100%}
+.u202-sv>path{fill:rgba(30,36,64,.05);fill:light-dark(rgba(30,36,64,.05),rgba(255,255,255,.035));stroke:rgba(30,36,64,.1);stroke:light-dark(rgba(30,36,64,.1),rgba(255,255,255,.1))}
+.u202-b path{transition:fill .2s}
+.u202-dim .u202-b:not(.is-line):not(.is-on) path:nth-child(1){fill:#E4E7F1;fill:light-dark(#E4E7F1,#2B2F42)}
+.u202-dim .u202-b:not(.is-line):not(.is-on) path:nth-child(2){fill:#D2D7E5;fill:light-dark(#D2D7E5,#222638)}
+.u202-dim .u202-b:not(.is-line):not(.is-on) path:nth-child(3){fill:#C0C6D9;fill:light-dark(#C0C6D9,#1A1D2D)}
+.u202-b.is-on path{stroke:#fff;stroke-width:1.2;stroke-linejoin:round}
+.u202-tip{position:absolute;left:0;top:0;padding:6px 9px;border-radius:10px;background:#1E2440;background:light-dark(#1E2440,#E9ECF8);color:#fff;color:light-dark(#fff,#151829);font-size:11px;font-weight:700;white-space:nowrap;pointer-events:none;opacity:0;transform:translate(-50%,-120%) scale(.92);transition:opacity .15s,transform .22s var(--ux-spring)}
+.u202-tip.is-on{opacity:1;transform:translate(-50%,-120%)}
+.u202-tip span{display:block;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.u202-lg{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;gap:12px;font-size:10.5px;font-weight:700;color:#525A7A;color:light-dark(#525A7A,#9CA3C0)}
+.u202-lg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+</style>
+<div class="ux u202">
+  <div class="u202-hd"><b>By region</b><div class="u202-chips" role="group" aria-label="Choose a metric"><button type="button" class="u202-chip" aria-pressed="true">Orders</button><button type="button" class="u202-chip" aria-pressed="false">Visits</button></div></div>
+  <svg class="u202-sv" viewBox="0 0 340 340" role="img" aria-label="Block chart of six months for four regions"></svg>
+  <div class="u202-tip" aria-hidden="true"><b class="u202-tl"></b><span class="u202-tv"></span></div>
+  <div class="u202-lg" aria-hidden="true"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sv = root.querySelector('.u202-sv'), tip = root.querySelector('.u202-tip'), tl = root.querySelector('.u202-tl'), tv = root.querySelector('.u202-tv');
+  var chips = root.querySelectorAll('.u202-chip'), lg = root.querySelector('.u202-lg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var REG = ['Seoul', 'Busan', 'Daegu', 'Gwangju'];
+  var MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  var UNIT = [' orders', ' visits'];
+  var COL = [['#7C8CFF', '#5A69E6', '#4352C4'], ['#4FD1C5', '#2FB3A8', '#22948A'], ['#FFB86B', '#F2994A', '#D97F2E'], ['#F78FB3', '#E26D98', '#C4537D']];
+  var DATA = [
+    [[42, 55, 61, 58, 74, 88], [30, 34, 41, 47, 45, 52], [22, 25, 24, 31, 36, 40], [15, 19, 23, 21, 27, 33]],
+    [[66, 70, 64, 80, 85, 92], [48, 44, 57, 60, 66, 63], [35, 41, 38, 46, 44, 55], [28, 26, 34, 38, 41, 47]]
+  ];
+  var NS = 'http://www.w3.org/2000/svg', OX = 149, OY = 160, DX = 21, DY = 12.2, FW = 0.72, metric = 0;
+  function iso(c, r) { return [OX + (c - r) * DX, OY + (c + r) * DY]; }
+  var B = [];
+  for (var r = 0; r < 4; r++) for (var c = 0; c < 6; c++) B.push({ r: r, c: c, h: 0, from: 0, to: 0, t0: 0 });
+  B.sort(function (a, b) { return (a.r + a.c) - (b.r + b.c) || a.c - b.c; });
+  var floor = document.createElementNS(NS, 'path');
+  var f0 = iso(-0.6, -0.6), f1 = iso(5.6, -0.6), f2 = iso(5.6, 3.6), f3 = iso(-0.6, 3.6);
+  floor.setAttribute('d', 'M' + f0 + 'L' + f1 + 'L' + f2 + 'L' + f3 + 'Z'); floor.setAttribute('fill', 'rgba(30,36,64,.05)'); floor.setAttribute('stroke', 'rgba(30,36,64,.1)');
+  sv.appendChild(floor);
+  B.forEach(function (b, i) {
+    var g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'u202-b');
+    ['top', 'left', 'right'].forEach(function (k, j) { var p = document.createElementNS(NS, 'path'); p.setAttribute('fill', COL[b.r][j]); g.appendChild(p); b[k] = p; });
+    g.addEventListener('pointerenter', function () { focus(b); });
+    g.addEventListener('pointerleave', function () { focus(null); });
+    b.g = g; sv.appendChild(g);
+  });
+  REG.forEach(function (n, i) { var s = document.createElement('span'); var dot = document.createElement('i'); dot.style.background = COL[i][0]; s.appendChild(dot); s.appendChild(document.createTextNode(n)); lg.appendChild(s); });
+  function shape(b) {
+    var hw = FW / 2, h = b.h * 1.25, p = function (dc, dr, up) { var q = iso(b.c + dc, b.r + dr); return (q[0]).toFixed(1) + ',' + (q[1] - up).toFixed(1); };
+    b.top.setAttribute('d', 'M' + p(-hw, -hw, h) + 'L' + p(hw, -hw, h) + 'L' + p(hw, hw, h) + 'L' + p(-hw, hw, h) + 'Z');
+    b.left.setAttribute('d', 'M' + p(-hw, hw, h) + 'L' + p(hw, hw, h) + 'L' + p(hw, hw, 0) + 'L' + p(-hw, hw, 0) + 'Z');
+    b.right.setAttribute('d', 'M' + p(hw, -hw, h) + 'L' + p(hw, hw, h) + 'L' + p(hw, hw, 0) + 'L' + p(hw, -hw, 0) + 'Z');
+  }
+  var cur = null;
+  function focus(b) {
+    cur = b; root.classList.toggle('u202-dim', !!b);
+    B.forEach(function (o) { o.g.classList.toggle('is-on', o === b); o.g.classList.toggle('is-line', !!b && o !== b && (o.r === b.r || o.c === b.c)); });
+    place();
+  }
+  function place() {
+    if (!cur) { tip.classList.remove('is-on'); return; }
+    var q = iso(cur.c, cur.r), k = sv.getBoundingClientRect().width / 340 || 1;
+    tip.style.left = q[0] + 'px'; tip.style.top = (q[1] - cur.h * 1.25 - 6) + 'px';
+    tl.textContent = REG[cur.r] + ' · ' + MON[cur.c];
+    tv.textContent = Math.round(DATA[metric][cur.r][cur.c] * 37).toLocaleString() + UNIT[metric];
+    tip.classList.add('is-on');
+  }
+  function retarget(first) {
+    var now = performance.now();
+    B.forEach(function (b) { b.from = b.h; b.to = DATA[metric][b.r][b.c]; b.t0 = now + (first ? (8 - b.r - b.c) * 70 : (b.c + b.r) * 45); });
+    if (rm) { B.forEach(function (b) { b.h = b.to; shape(b); }); place(); return; }
+    run();
+  }
+  function ease(t) { return 1 - Math.pow(1 - t, 3) * Math.cos(t * 4.2) * (1 - t * 0.2); }
+  var raf = 0;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var busy = false;
+    B.forEach(function (b) {
+      var t = Math.max(0, Math.min(1, (now - b.t0) / 650));
+      b.h = b.from + (b.to - b.from) * (t <= 0 ? 0 : ease(t)); if (t < 1) busy = true; else b.h = b.to;
+      shape(b);
+    });
+    place();
+    if (busy) raf = requestAnimationFrame(frame);
+  }
+  function run() { if (!raf) raf = requestAnimationFrame(frame); }
+  [].forEach.call(chips, function (ch, i) {
+    ch.addEventListener('click', function () { if (metric === i) return; metric = i; [].forEach.call(chips, function (o, j) { o.setAttribute('aria-pressed', j === i ? 'true' : 'false'); }); retarget(false); });
+  });
+  B.forEach(shape);
+  var shown = false;
+  if ('IntersectionObserver' in window && !rm) new IntersectionObserver(function (es) { if (es[0].isIntersecting && !shown) { shown = true; retarget(true); } }).observe(root);
+  else retarget(true);
+})();
+</script>

@@ -1,0 +1,134 @@
+<!-- Lucian UX/UI Prompt #031 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#031 -->
+<!--
+Element: Custom select listbox
+ID: 031 · Category: Inputs & Search · Tags: select, listbox, dropdown, keyboard, typeahead
+What it does: Press the field and the list grows open right below it, with a check on the current value. Move with the arrow keys and the highlight bar glides along; type a letter to jump straight to items that start with it.
+How to use it: Press the language field and pick another language. With a keyboard, open it with Enter and move with the arrow keys
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#031
+-->
+<style>
+.u031{position:relative;width:340px;height:436px;padding:22px 20px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u031-h{margin:0 2px 18px;font-size:19px;font-weight:760;letter-spacing:-.03em}
+.u031-f{position:relative;margin-bottom:14px}
+.u031-lab{display:block;margin:0 2px 7px;font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u031-btn{display:flex;align-items:center;gap:12px;width:100%;height:56px;padding:0 14px;border:0;border-radius:16px;background:var(--ux-surface-2);color:var(--ux-ink);text-align:left;
+  box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .25s var(--ux-ease),background-color .25s}
+.u031-btn:hover{box-shadow:inset 0 0 0 1.5px var(--ux-line-2)}
+.u031-btn:focus-visible,.u031.is-open .u031-btn[aria-expanded="true"]{outline:0;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-accent),0 0 0 5px var(--ux-accent-soft)}
+.u031-flag{width:30px;height:30px;flex:none;border-radius:9px;display:grid;place-items:center;font-size:10.5px;font-weight:800;letter-spacing:.02em;color:#fff;background:var(--c)}
+.u031-v{flex:1;min-width:0}
+.u031-v b{display:block;font-size:15.5px;font-weight:680}
+.u031-v small{display:block;font-size:12px;color:var(--ux-ink-3)}
+.u031-car{width:18px;height:18px;fill:none;stroke:var(--ux-ink-3);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .45s var(--ux-spring)}
+.u031-btn[aria-expanded="true"] .u031-car{transform:rotate(180deg)}
+.u031-list{position:absolute;z-index:5;left:0;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;border-radius:18px;background:var(--ux-surface);
+  box-shadow:0 0 0 1px var(--ux-line-2),0 28px 56px -24px var(--ux-shadow-strong);transform-origin:50% 0;outline:none;
+  opacity:0;transform:translateY(-6px) scaleY(.92);visibility:hidden;transition:opacity .2s var(--ux-ease),transform .4s var(--ux-spring),visibility 0s .4s}
+.u031-list.is-open{opacity:1;transform:none;visibility:visible;transition:opacity .2s var(--ux-ease),transform .45s var(--ux-spring)}
+.u031-hl{position:absolute;left:6px;right:6px;top:6px;height:46px;border-radius:12px;background:var(--ux-surface-2);transform:translateY(calc(var(--i,0) * 46px));transition:transform .35s var(--ux-spring);pointer-events:none}
+.u031-o{position:relative;display:flex;align-items:center;gap:12px;height:46px;padding:0 10px;border-radius:12px;cursor:pointer;font-size:14.5px;font-weight:620}
+.u031-o .u031-flag{width:26px;height:26px;border-radius:8px;font-size:9.5px}
+.u031-o small{margin-left:4px;font-size:12px;font-weight:500;color:var(--ux-ink-3)}
+.u031-ck{margin-left:auto;width:18px;height:18px;fill:none;stroke:var(--ux-accent);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:scale(.4);transition:opacity .2s,transform .4s var(--ux-spring)}
+.u031-o[aria-selected="true"] .u031-ck{opacity:1;transform:none}
+.u031-save{position:absolute;left:20px;right:20px;bottom:20px;height:50px;border:0;border-radius:15px;background:var(--ux-ink);color:var(--ux-page);font-size:15px;font-weight:700;transition:transform .35s var(--ux-spring)}
+.u031-save:active{transform:scale(.97)}
+.u031-save:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u031">
+  <p class="u031-h">Region & language</p>
+  <div class="u031-f">
+    <span class="u031-lab">Display language</span>
+    <button class="u031-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+      <span class="u031-flag" style="--c:linear-gradient(140deg,#3D6BFF,#FF6B6B)" aria-hidden="true">EN</span>
+      <span class="u031-v"><b>English</b><small>United States</small></span>
+      <svg class="u031-car" viewBox="0 0 18 18" aria-hidden="true"><path d="M4.5 7l4.5 4.5L13.5 7"/></svg>
+    </button>
+    <ul class="u031-list" role="listbox" tabindex="-1" aria-label="Display language"><li class="u031-hl" role="presentation" aria-hidden="true"></li></ul>
+  </div>
+  <div class="u031-f">
+    <span class="u031-lab">Time zone</span>
+    <button class="u031-btn" type="button" tabindex="-1" aria-disabled="true">
+      <span class="u031-flag" style="--c:linear-gradient(140deg,#22C3A6,#0EA5E9)" aria-hidden="true">+9</span>
+      <span class="u031-v"><b>Seoul</b><small>GMT+9 · Set automatically</small></span>
+    </button>
+  </div>
+  <button class="u031-save" type="button">Save</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var btn = root.querySelector('.u031-btn');
+  var list = root.querySelector('.u031-list');
+  var hl = root.querySelector('.u031-hl');
+  var save = root.querySelector('.u031-save');
+  var OPTS = [['KO', '한국어', 'South Korea', 'linear-gradient(140deg,#5B8CFF,#E5484D)'], ['EN', 'English', 'United States', 'linear-gradient(140deg,#3D6BFF,#FF6B6B)'], ['JA', '日本語', 'Japan', 'linear-gradient(140deg,#FF7A93,#F0264D)'], ['ES', 'Español', 'Spain', 'linear-gradient(140deg,#FFB547,#E5484D)'], ['FR', 'Français', 'France', 'linear-gradient(140deg,#5B8CFF,#8B6CFF)']];
+  var uid = 'u031-' + Math.random().toString(36).slice(2, 7);
+  var sel = 1, act = 1, typed = '', tt = 0;
+  list.id = uid;
+  btn.setAttribute('aria-controls', uid);
+  var items = OPTS.map(function (o, i) {
+    var li = document.createElement('li');
+    li.className = 'u031-o';
+    li.id = uid + '-' + i;
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', String(i === sel));
+    li.innerHTML = '<span class="u031-flag" style="--c:' + o[3] + '" aria-hidden="true">' + o[0] + '</span>' + o[1] + '<small>' + o[2] + '</small><svg class="u031-ck" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9.5l3.5 3.5L14 6"/></svg>';
+    li.addEventListener('pointermove', function () { if (act !== i) { act = i; mark(); } });
+    li.addEventListener('click', function () { choose(i); });
+    list.appendChild(li);
+    return li;
+  });
+  function mark() {
+    hl.style.setProperty('--i', act);
+    list.setAttribute('aria-activedescendant', items[act].id);
+  }
+  function open() {
+    root.classList.add('is-open');
+    btn.setAttribute('aria-expanded', 'true');
+    list.classList.add('is-open');
+    act = sel; mark();
+    list.focus({ preventScroll: true });
+  }
+  function close(refocus) {
+    root.classList.remove('is-open');
+    btn.setAttribute('aria-expanded', 'false');
+    list.classList.remove('is-open');
+    if (refocus) btn.focus({ preventScroll: true });
+  }
+  function choose(i) {
+    sel = i;
+    items.forEach(function (li, k) { li.setAttribute('aria-selected', String(k === i)); });
+    var o = OPTS[i];
+    btn.querySelector('.u031-flag').textContent = o[0];
+    btn.querySelector('.u031-flag').style.setProperty('--c', o[3]);
+    btn.querySelector('.u031-v b').textContent = o[1];
+    btn.querySelector('.u031-v small').textContent = o[2];
+    var v = btn.querySelector('.u031-v');
+    if (v.animate) v.animate([{ transform: 'translateY(8px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.34,1.45,.64,1)' });
+    close(true);
+  }
+  btn.addEventListener('click', function () { list.classList.contains('is-open') ? close(true) : open(); });
+  btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
+  list.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); act = Math.min(items.length - 1, act + 1); mark(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); act = Math.max(0, act - 1); mark(); }
+    else if (e.key === 'Home') { e.preventDefault(); act = 0; mark(); }
+    else if (e.key === 'End') { e.preventDefault(); act = items.length - 1; mark(); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(act); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+    else if (e.key === 'Tab') close(false);
+    else if (e.key.length === 1) {
+      typed += e.key.toLowerCase();
+      clearTimeout(tt); tt = setTimeout(function () { typed = ''; }, 600);
+      var hit = OPTS.findIndex(function (o) { return o[1].toLowerCase().indexOf(typed) === 0 || o[0].toLowerCase().indexOf(typed) === 0; });
+      if (hit >= 0) { act = hit; mark(); }
+    }
+  });
+  list.addEventListener('blur', function () { setTimeout(function () { if (!root.contains(document.activeElement)) close(false); }, 0); });
+  document.addEventListener('pointerdown', function (e) { if (root.isConnected && list.classList.contains('is-open') && !root.querySelector('.u031-f').contains(e.target)) close(false); });
+  save.addEventListener('click', function () { save.textContent = 'Saved'; setTimeout(function () { if (root.isConnected) save.textContent = 'Save'; }, 1400); });
+})();
+</script>

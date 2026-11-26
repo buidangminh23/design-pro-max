@@ -1,0 +1,53 @@
+<!-- Lucian UX/UI Prompt #212 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#212 -->
+<!--
+Element: Hide-on-scroll header
+ID: 212 · Category: Navigation · Tags: header, navbar, scroll, sticky, navigation
+What it does: At the top, a roomy transparent header sits over the page; scroll down and it slides up out of the way to give you room to read. Scroll up even a little and it comes back down as a slim header with a blurred background and shadow, while a thin bar beneath it fills as you read. Back at the very top it turns transparent again.
+How to use it: Scroll down inside the card, then scroll up a little
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#212
+-->
+<style>
+.u212{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u212-hd{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;align-items:center;gap:12px;height:58px;padding:0 18px;font-size:11px;font-weight:750;color:var(--ux-ink-2);transition:transform .38s cubic-bezier(.2,.8,.2,1),height .3s,background-color .3s,box-shadow .3s,backdrop-filter .3s}
+.u212-hd b{margin-right:auto;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:900;color:var(--ux-ink)}
+.u212-hd b i{width:14px;height:14px;border-radius:50%;background:var(--ux-grad)}
+.u212-hd strong{padding:6px 11px;border-radius:999px;background:var(--ux-ink);color:var(--ux-surface);font-size:10.5px;font-weight:800}
+.u212.is-solid .u212-hd{height:46px;background:color-mix(in srgb,var(--ux-surface) 78%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--ux-line),0 8px 20px -14px var(--ux-shadow-strong)}
+.u212.is-hide .u212-hd{transform:translateY(-110%)}
+.u212-pg{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--ux-accent);opacity:0;transition:opacity .3s}
+.u212.is-solid .u212-pg{opacity:1}
+.u212-sc{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.u212-sc::-webkit-scrollbar{display:none}
+.u212-sc:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-4px;border-radius:30px}
+.u212-cv{height:150px;margin:0;padding:72px 22px 0;background:linear-gradient(160deg,var(--ux-accent-soft),transparent 80%)}
+.u212-cv small{font-size:10px;font-weight:800;color:var(--ux-accent)}
+.u212-cv h3{margin:6px 0 0;font-size:24px;line-height:1.15;font-weight:900;letter-spacing:-.04em}
+.u212-bd{padding:22px 22px 40px}
+.u212-bd p{margin:0 0 14px;font-size:12.5px;line-height:1.75;font-weight:600;color:var(--ux-ink-2)}
+.u212-bd i{display:block;height:84px;margin:0 0 14px;border-radius:14px;background:linear-gradient(135deg,var(--ux-surface-2),color-mix(in srgb,var(--ux-accent) 18%,var(--ux-surface)))}
+@media (prefers-reduced-motion: reduce){.u212-hd{transition:none}}
+</style>
+<div class="ux u212">
+  <header class="u212-hd"><b><i aria-hidden="true"></i>Relay</b><span>Product</span><span>Pricing</span><span>Blog</span><strong>Get started</strong><span class="u212-pg" aria-hidden="true"></span></header>
+  <div class="u212-sc" tabindex="0" aria-label="Blog post"><div class="u212-cv"><small>Blog · 5 min read</small><h3>How small teams<br>ship fast</h3></div><div class="u212-bd"></div></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u212-sc'), bd = root.querySelector('.u212-bd'), pg = root.querySelector('.u212-pg');
+  var P = ['If you try to make it perfect from the start, launch keeps slipping. Ship the smallest useful thing and refine it as people respond.', 'Keep meetings short and notes long. When the reason behind a decision is written down, the next person won’t repeat the same debate.', 'Automate the third time you repeat something. Automate too early and you cement what is still changing.', 'Finally, set the launch date first. A date is what lets you choose what to cut.'];
+  P.forEach(function (t, i) { var p = document.createElement('p'); p.textContent = t; bd.appendChild(p); if (i === 1) bd.appendChild(document.createElement('i')); });
+  var last = 0, acc = 0;
+  sc.addEventListener('scroll', function () {
+    var y = sc.scrollTop, d = y - last; last = y;
+    acc = (d > 0) === (acc > 0) ? acc + d : d;
+    root.classList.toggle('is-solid', y > 20);
+    if (y < 60) root.classList.remove('is-hide');
+    else if (acc > 8) root.classList.add('is-hide');
+    else if (acc < -6) root.classList.remove('is-hide');
+    pg.style.width = (y / Math.max(1, sc.scrollHeight - sc.clientHeight) * 100).toFixed(1) + '%';
+  }, { passive: true });
+})();
+</script>

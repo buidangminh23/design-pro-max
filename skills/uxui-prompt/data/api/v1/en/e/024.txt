@@ -1,0 +1,129 @@
+<!-- Lucian UX/UI Prompt #024 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#024 -->
+<!--
+Element: Price histogram range filter
+ID: 024 · Category: Toggles & Pickers · Tags: range, dual-thumb, price, filter, histogram
+What it does: Choose a price range with two handles: bars outside the range sink while only the bars inside rise in color. The result count rolls over and the price at the top updates with it.
+How to use it: Drag both handles to narrow the range. Arrow keys work too
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#024
+-->
+<style>
+.u024{position:relative;width:340px;padding:4px 8px}
+.u024-head{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.u024-head small{display:block;font-size:13px;font-weight:600;color:var(--ux-ink-3)}
+.u024-val{display:block;margin-top:4px;font-size:22px;font-weight:780;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.u024-count{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);font-size:13px;font-weight:650;color:var(--ux-ink-2)}
+.u024-roll{position:relative;width:3ch;height:18px;overflow:hidden;text-align:right;color:var(--ux-ink);font-weight:760;font-variant-numeric:tabular-nums}
+.u024-roll span{display:block;line-height:18px;transition:transform .45s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u024-roll span+span{position:absolute;left:0;right:0;top:0}
+.u024-hist{position:relative;height:110px;margin:22px 4px 0;display:flex;align-items:flex-end;gap:4px}
+.u024-bar{flex:1;height:calc(var(--h) * 1%);border-radius:6px 6px 3px 3px;background:var(--ux-surface-3);transform-origin:50% 100%;transform:scaleY(.82);transition:background-color .35s var(--ux-ease),transform .55s var(--ux-spring),opacity .35s var(--ux-ease)}
+.u024-bar.in{background:linear-gradient(180deg,#2FD8A8,#14B8A6 60%,#0E9F8E);transform:none}
+.u024-track{position:relative;height:36px;margin:0 4px}
+.u024-rail{position:absolute;left:0;right:0;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:var(--ux-surface-3)}
+.u024-sel{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:999px;background:#14B8A6;left:calc(var(--a) * 1%);right:calc(100% - var(--b) * 1%)}
+.u024-h{position:absolute;top:50%;left:calc(var(--pos) * 1%);width:30px;height:30px;margin:-15px 0 0 -15px;border:0;padding:0;border-radius:50%;background:#fff;cursor:grab;touch-action:none;z-index:2;
+  box-shadow:0 0 0 2.5px #14B8A6,0 6px 14px -4px rgba(0,60,50,.4);transition:transform .35s var(--ux-spring),box-shadow .3s var(--ux-ease)}
+.u024-h::after{content:"";position:absolute;inset:10px;border-radius:50%;background:#14B8A6;transform:scale(.6);transition:transform .35s var(--ux-spring)}
+.u024-h:hover{transform:scale(1.08)}
+.u024-h.drag{cursor:grabbing;transform:scale(1.18);box-shadow:0 0 0 2.5px #14B8A6,0 0 0 10px rgba(20,184,166,.18),0 6px 14px -4px rgba(0,60,50,.4)}
+.u024-h.drag::after{transform:scale(1)}
+.u024-h:focus-visible{outline:2px solid var(--ux-accent);outline-offset:4px}
+.u024-scale{display:flex;justify-content:space-between;margin:2px 4px 0;font-size:12px;font-weight:600;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u024">
+  <div class="u024-head">
+    <div><small>Price range</small><span class="u024-val">$53 – $120</span></div>
+    <span class="u024-count" aria-live="polite"><span class="u024-roll"><span>48</span><span></span></span> products</span>
+  </div>
+  <div class="u024-hist" aria-hidden="true"></div>
+  <div class="u024-track">
+    <span class="u024-rail" aria-hidden="true"></span>
+    <span class="u024-sel" aria-hidden="true"></span>
+    <button class="u024-h" type="button" role="slider" aria-label="Minimum price" data-k="lo" aria-valuemin="0" aria-valuemax="100"></button>
+    <button class="u024-h" type="button" role="slider" aria-label="Maximum price" data-k="hi" aria-valuemin="0" aria-valuemax="100"></button>
+  </div>
+  <div class="u024-scale" aria-hidden="true"><span>$30</span><span>$105</span><span>$180</span></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var track = root.querySelector('.u024-track');
+  var hist = root.querySelector('.u024-hist');
+  var val = root.querySelector('.u024-val');
+  var roll = root.querySelector('.u024-roll');
+  var handles = Array.prototype.slice.call(root.querySelectorAll('.u024-h'));
+  var STEP = 2;
+  var v = { lo: 16, hi: 60 };
+  var COUNTS = [2, 3, 4, 6, 7, 9, 11, 14, 16, 15, 13, 12, 10, 11, 9, 8, 6, 5, 6, 4, 3, 3, 2, 1];
+  var MAXC = 16;
+  var bars = COUNTS.map(function (c) {
+    var b = document.createElement('span');
+    b.className = 'u024-bar';
+    b.style.setProperty('--h', Math.max(8, c / MAXC * 100).toFixed(1));
+    hist.appendChild(b);
+    return b;
+  });
+  var won = function (p) { return Math.round((30000 + p / 100 * 150000) / 1000) * 1000; };
+  var fmt = function (n) { return '$' + Math.round(n / 1000); };
+  var ci = 0, shown = '';
+  function setCount(n) {
+    if (String(n) === shown) return;
+    var up = !shown || n > +shown;
+    shown = String(n);
+    var cur = roll.children[ci], nxt = roll.children[1 - ci];
+    nxt.style.transition = 'none';
+    nxt.textContent = n;
+    nxt.style.transform = 'translateY(' + (up ? 100 : -100) + '%)'; nxt.style.opacity = '0';
+    void nxt.offsetWidth;
+    nxt.style.transition = '';
+    nxt.style.transform = 'none'; nxt.style.opacity = '1';
+    cur.style.transform = 'translateY(' + (up ? -100 : 100) + '%)'; cur.style.opacity = '0';
+    ci = 1 - ci;
+  }
+  function paint() {
+    handles[0].style.setProperty('--pos', v.lo);
+    handles[1].style.setProperty('--pos', v.hi);
+    root.style.setProperty('--a', v.lo);
+    root.style.setProperty('--b', v.hi);
+    [['lo', 0], ['hi', 1]].forEach(function (x) {
+      handles[x[1]].setAttribute('aria-valuenow', String(v[x[0]]));
+      handles[x[1]].setAttribute('aria-valuetext', '$' + Math.round(won(v[x[0]]) / 1000));
+    });
+    val.textContent = fmt(won(v.lo)) + ' – ' + fmt(won(v.hi));
+    var n = 0;
+    bars.forEach(function (b, i) {
+      var c = (i + 0.5) / bars.length * 100;
+      var inside = c >= v.lo && c <= v.hi;
+      b.classList.toggle('in', inside);
+      if (inside) n += COUNTS[i];
+    });
+    setCount(n);
+  }
+  function posFromX(x) {
+    var r = track.getBoundingClientRect();
+    return Math.max(0, Math.min(100, Math.round((x - r.left) / r.width * 100 / STEP) * STEP));
+  }
+  function drag(h, e) {
+    var p = posFromX(e.clientX);
+    if (h.dataset.k === 'lo') v.lo = Math.min(p, v.hi - STEP * 3); else v.hi = Math.max(p, v.lo + STEP * 3);
+    paint();
+  }
+  handles.forEach(function (h) {
+    h.addEventListener('pointerdown', function (e) { h.setPointerCapture(e.pointerId); h.classList.add('drag'); drag(h, e); });
+    h.addEventListener('pointermove', function (e) { if (h.hasPointerCapture(e.pointerId)) drag(h, e); });
+    h.addEventListener('pointerup', function () { h.classList.remove('drag'); });
+    h.addEventListener('pointercancel', function () { h.classList.remove('drag'); });
+    h.addEventListener('keydown', function (e) {
+      var d = (e.key === 'ArrowRight' || e.key === 'ArrowUp') ? STEP : (e.key === 'ArrowLeft' || e.key === 'ArrowDown') ? -STEP : 0;
+      if (!d) return;
+      e.preventDefault();
+      if (h.dataset.k === 'lo') v.lo = Math.max(0, Math.min(v.lo + d, v.hi - STEP * 3));
+      else v.hi = Math.min(100, Math.max(v.hi + d, v.lo + STEP * 3));
+      paint();
+    });
+  });
+  paint();
+})();
+</script>

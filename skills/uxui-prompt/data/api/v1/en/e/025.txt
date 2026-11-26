@@ -1,0 +1,117 @@
+<!-- Lucian UX/UI Prompt #025 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#025 -->
+<!--
+Element: Notched floating label field
+ID: 025 · Category: Inputs & Search · Tags: input, floating-label, outlined, validation, form
+What it does: Focus a field and its label shrinks and rises into a notch in the border, which parts around it. A valid email draws a check; an invalid one shakes the field and drops down a hint.
+How to use it: Type into the email field. Leave it with an invalid address to see the error
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#025
+-->
+<style>
+.u025{position:relative;width:340px;height:268px;display:flex;flex-direction:column;gap:14px}
+.u025-btn{margin-top:auto}
+.u025-f{position:relative}
+.u025-box{position:relative;height:62px}
+.u025-in{position:absolute;inset:0;width:100%;height:100%;padding:18px 48px 0 18px;border:0;outline:0;border-radius:16px;background:var(--ux-surface);font-size:16.5px;font-weight:560;color:var(--ux-ink);letter-spacing:-.01em}
+
+.u025-line{position:absolute;inset:0;display:flex;pointer-events:none;border-radius:16px}
+.u025-line i{display:block;border:1.5px solid var(--ux-line-2);transition:border-color .3s var(--ux-ease)}
+.u025-line .l{width:14px;border-right:0;border-radius:16px 0 0 16px}
+.u025-line .g{width:var(--gap,0px);border-left:0;border-right:0;transition:width .35s var(--ux-ease),border-color .3s var(--ux-ease)}
+.u025-line .r{flex:1;border-left:0;border-radius:0 16px 16px 0}
+.u025-f.is-up .u025-line .g{border-top-color:transparent!important}
+.u025-f.is-focus .u025-line i{border-color:var(--ux-accent);border-width:2px}
+.u025-f.is-bad .u025-line i{border-color:var(--ux-danger)}
+.u025-f.is-ok .u025-line i{border-color:var(--ux-mint)}
+.u025-lab{position:absolute;left:18px;top:21px;padding:0 4px;margin-left:-4px;font-size:16px;font-weight:560;color:var(--ux-ink-3);transform-origin:0 0;pointer-events:none;white-space:nowrap;
+  transition:transform .35s var(--ux-ease),color .3s var(--ux-ease)}
+.u025-f.is-up .u025-lab{transform:translate(0,-30px) scale(.8);color:var(--ux-ink-2);font-weight:650}
+.u025-f.is-focus .u025-lab{color:var(--ux-accent)}
+.u025-f.is-bad .u025-lab{color:var(--ux-danger)}
+.u025-f.is-up .u025-in{padding-top:0}
+.u025-ok{position:absolute;right:16px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);transform:scale(0);transition:transform .45s var(--ux-spring)}
+.u025-ok svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u025-ok path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .35s var(--ux-ease) .15s}
+.u025-f.is-ok .u025-ok{transform:none}
+.u025-f.is-ok .u025-ok path{stroke-dashoffset:0}
+.u025-f.is-shake .u025-box{animation:u025-shake .42s var(--ux-ease)}
+@keyframes u025-shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.u025-help{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ux-ease)}
+.u025-help>span{overflow:hidden;min-height:0;display:flex;align-items:center;gap:6px;padding-left:4px;font-size:13px;font-weight:600;color:var(--ux-danger)}
+.u025-help>span::before{content:"!";display:grid;place-items:center;width:16px;height:16px;flex:none;border-radius:50%;background:var(--ux-danger);color:var(--ux-accent-ink);font-size:11px;font-weight:800}
+.u025-f.is-bad .u025-help{grid-template-rows:1fr}
+.u025-f.is-bad .u025-help>span{padding-top:8px}
+.u025-btn{height:56px;border:0;border-radius:16px;background:var(--ux-ink);color:var(--ux-page);font-size:16px;font-weight:700;transition:transform .4s var(--ux-spring),opacity .3s var(--ux-ease)}
+.u025-btn:active{transform:scale(.97)}
+.u025-btn:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u025-btn[aria-disabled="true"]{opacity:.35}
+.u025-in:focus-visible{outline:none}
+</style>
+<div class="ux u025">
+  <div class="u025-f">
+    <div class="u025-box">
+      <input class="u025-in" type="text" value="Seoyeon Kim" autocomplete="name">
+      <span class="u025-line" aria-hidden="true"><i class="l"></i><i class="g"></i><i class="r"></i></span>
+      <label class="u025-lab">Name</label>
+    </div>
+  </div>
+  <div class="u025-f" data-mail>
+    <div class="u025-box">
+      <input class="u025-in" type="email" autocomplete="email" inputmode="email">
+      <span class="u025-line" aria-hidden="true"><i class="l"></i><i class="g"></i><i class="r"></i></span>
+      <label class="u025-lab">Work email</label>
+      <span class="u025-ok" aria-hidden="true"><svg viewBox="0 0 14 14"><path d="M3 7.3l2.7 2.7L11 4.5"/></svg></span>
+    </div>
+    <div class="u025-help"><span class="u025-msg" aria-live="polite"></span></div>
+  </div>
+  <button class="u025-btn" type="button" aria-disabled="true">Send invite</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var fields = Array.prototype.slice.call(root.querySelectorAll('.u025-f'));
+  var btn = root.querySelector('.u025-btn');
+  var re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  var uid = Math.random().toString(36).slice(2, 7);
+  fields.forEach(function (f, i) {
+    var input = f.querySelector('.u025-in');
+    var lab = f.querySelector('.u025-lab');
+    var gap = f.querySelector('.g');
+    input.id = 'u025-' + uid + '-' + i;
+    lab.htmlFor = input.id;
+    var isMail = f.hasAttribute('data-mail');
+    var msg = f.querySelector('.u025-msg');
+    if (msg) { msg.id = input.id + '-m'; input.setAttribute('aria-describedby', msg.id); }
+    function lift() {
+      var up = document.activeElement === input || input.value.length > 0;
+      f.classList.toggle('is-up', up);
+      f.querySelector('.u025-line').style.setProperty('--gap', up ? (lab.offsetWidth * 0.8 + 2) + 'px' : '0px');
+    }
+    function check(strict) {
+      if (!isMail) return;
+      var v = input.value.trim();
+      var ok = re.test(v);
+      f.classList.toggle('is-ok', ok);
+      if (ok || !v) { f.classList.remove('is-bad'); input.removeAttribute('aria-invalid'); msg.textContent = ''; }
+      else if (strict) {
+        f.classList.add('is-bad');
+        input.setAttribute('aria-invalid', 'true');
+        msg.textContent = 'Check the email format, e.g. name@company.com';
+        f.classList.remove('is-shake'); void f.offsetWidth; f.classList.add('is-shake');
+      }
+      btn.setAttribute('aria-disabled', String(!ok));
+    }
+    input.addEventListener('focus', function () { f.classList.add('is-focus'); lift(); });
+    input.addEventListener('blur', function () { f.classList.remove('is-focus'); lift(); check(true); });
+    input.addEventListener('input', function () { lift(); check(f.classList.contains('is-bad')); });
+    lift();
+  });
+  btn.addEventListener('click', function () {
+    var mail = root.querySelector('[data-mail] .u025-in');
+    if (btn.getAttribute('aria-disabled') === 'true') { mail.focus(); return; }
+    btn.textContent = 'Invite sent';
+    setTimeout(function () { if (root.isConnected) btn.textContent = 'Send invite'; }, 1600);
+  });
+})();
+</script>

@@ -1,0 +1,90 @@
+<!-- Lucian UX/UI Prompt #304 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#304 -->
+<!--
+Element: Search-to-fill shipping address
+ID: 304 · Category: Forms & Input · Tags: address, search, autocomplete, checkout, form
+What it does: Type a street or building name into a shipping form's address field and a result list unfolds below, with the part matching your typing in bold. Choose a result and the postal code and address slide into place, while a detail field opens underneath and the cursor moves to it. Fill in the details and the save button turns on.
+How to use it: Type a street name into the address field and pick a result
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#304
+-->
+<style>
+.u304{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u304-wr{position:absolute;left:20px;right:20px;top:24px}
+.u304 h3{margin:0;font-size:18px;font-weight:900;letter-spacing:-.03em}
+.u304-lb{display:block;margin-top:16px;font-size:11px;font-weight:800;color:var(--ux-ink-2)}
+.u304-sb{position:relative;margin-top:6px}
+.u304-sb svg{position:absolute;left:12px;top:13px;width:16px;height:16px;color:var(--ux-ink-3)}
+.u304-q,.u304-dt{width:100%;height:42px;padding:0 12px 0 36px;border:0;border-radius:12px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1.5px var(--ux-line);color:var(--ux-ink);font:inherit;font-size:12.5px;font-weight:700;outline:none;box-sizing:border-box}
+.u304-dt{padding-left:12px}
+.u304-q:focus,.u304-dt:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u304-rs{position:absolute;left:20px;right:20px;top:120px;z-index:2;max-height:0;overflow:hidden;border-radius:14px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 34px -16px var(--ux-shadow-strong);opacity:0;transition:max-height .4s cubic-bezier(.3,1,.4,1),opacity .2s}
+.u304.is-list .u304-rs{max-height:200px;opacity:1}
+.u304-rs small{display:block;padding:9px 12px 3px;font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u304-r{display:block;width:100%;padding:8px 12px;border:0;border-top:1px solid var(--ux-line);background:none;color:var(--ux-ink-2);font:inherit;font-size:11.5px;font-weight:650;text-align:left;cursor:pointer}
+.u304-r:hover,.u304-r.g-hov{background:var(--ux-surface-2)}
+.u304-r b{font-weight:900;color:var(--ux-ink)}
+.u304-r span{display:block;margin-top:2px;font-size:10px;color:var(--ux-ink-3)}
+.u304-r em{font-style:normal;margin-right:6px;padding:1px 5px;border-radius:4px;background:var(--ux-accent-soft);color:var(--ux-accent);font-size:9.5px;font-weight:850}
+.u304-pk{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s cubic-bezier(.3,1,.4,1)}
+.u304-pk>div{min-height:0;overflow:hidden}
+.u304.is-pick .u304-pk{grid-template-rows:1fr}
+.u304-ad{display:flex;align-items:center;gap:8px;margin-top:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--ux-accent) 8%,transparent);font-size:12px;font-weight:800;animation:u304-in .45s cubic-bezier(.3,1.3,.5,1) backwards}
+.u304-ad i{flex:none;font-style:normal;padding:2px 6px;border-radius:6px;background:var(--ux-accent);color:#fff;font-size:10px;font-weight:850;font-variant-numeric:tabular-nums}
+@keyframes u304-in{from{opacity:0;transform:translateX(-16px)}}
+.u304-pk .u304-lb{margin-top:10px}
+.u304-go{position:absolute;left:20px;right:20px;bottom:20px;height:44px;border:0;border-radius:13px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:13px;font-weight:850;transition:opacity .25s}
+.u304-go:disabled{opacity:.3}
+.u304 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u304-rs,.u304-pk{transition:none}.u304-ad{animation:none}}
+</style>
+<div class="ux u304">
+  <div class="u304-wr">
+    <h3>Add shipping address</h3>
+    <span class="u304-lb">Address</span>
+    <div class="u304-sb"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.6 10.6l3.4 3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><input class="u304-q" type="search" placeholder="Search by street or building" aria-label="Search address" autocomplete="off"></div>
+    <div class="u304-pk"><div><div class="u304-ad"><i class="u304-zp"></i><span class="u304-at"></span></div><label class="u304-lb" for="">Apt, suite, floor</label><input class="u304-dt" placeholder="Apt, suite, floor" autocomplete="off" tabindex="-1"></div></div>
+  </div>
+  <div class="u304-rs" role="listbox" aria-label="Search results"></div>
+  <button type="button" class="u304-go" disabled>Save</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var q = root.querySelector('.u304-q'), rs = root.querySelector('.u304-rs'), zp = root.querySelector('.u304-zp'), at = root.querySelector('.u304-at'), ad = root.querySelector('.u304-ad'), dt = root.querySelector('.u304-dt'), go = root.querySelector('.u304-go');
+  var uid = 'u304' + Math.random().toString(36).slice(2, 7);
+  dt.id = uid; root.querySelector('.u304-pk label').htmlFor = uid;
+  var A = [['94103', '1355 Market St, San Francisco, CA', 'Market Square'], ['94102', '1 Market St, San Francisco, CA', 'Spear Tower'], ['94105', '101 Market St, San Francisco, CA', 'One Market Plaza'], ['10001', '20 W 34th St, New York, NY', 'Empire State Building']];
+  function mark(el, text, k) {
+    var i = k ? text.toLowerCase().indexOf(k.toLowerCase()) : -1;
+    if (i < 0) { el.appendChild(document.createTextNode(text)); return; }
+    el.appendChild(document.createTextNode(text.slice(0, i))); var b = document.createElement('b'); b.textContent = text.slice(i, i + k.length); el.appendChild(b); el.appendChild(document.createTextNode(text.slice(i + k.length)));
+  }
+  function search() {
+    var k = q.value.trim(); rs.innerHTML = '';
+    if (k.length < 2) { root.classList.remove('is-list'); return; }
+    var hit = A.filter(function (a) { return (a[1] + a[2]).toLowerCase().indexOf(k.toLowerCase()) >= 0; });
+    var s = document.createElement('small'); s.textContent = hit.length ? hit.length + ' results' : ''; rs.appendChild(s);
+    if (!hit.length) { var n = document.createElement('div'); n.className = 'u304-r'; n.innerHTML = '<span>No results</span>'; rs.appendChild(n); }
+    hit.forEach(function (a) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'u304-r'; b.setAttribute('role', 'option');
+      var em = document.createElement('em'); em.textContent = a[0]; b.appendChild(em); mark(b, a[1], k);
+      var sp = document.createElement('span'); mark(sp, a[2], k); b.appendChild(sp);
+      b.addEventListener('click', function () { pick(a); });
+      rs.appendChild(b);
+    });
+    root.classList.add('is-list');
+  }
+  function pick(a) {
+    root.classList.remove('is-list'); zp.textContent = a[0]; at.textContent = a[1];
+    ad.style.animation = 'none'; void ad.offsetWidth; ad.style.animation = '';
+    root.classList.add('is-pick'); dt.tabIndex = 0; q.value = a[2];
+    setTimeout(function () { dt.focus({ preventScroll: true }); }, 250);
+    sync();
+  }
+  function sync() { go.disabled = !(root.classList.contains('is-pick') && dt.value.trim()); }
+  q.addEventListener('input', search);
+  dt.addEventListener('input', sync);
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape') root.classList.remove('is-list'); });
+})();
+</script>

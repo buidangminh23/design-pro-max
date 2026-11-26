@@ -1,0 +1,62 @@
+<!-- Lucian UX/UI Prompt #346 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#346 -->
+<!--
+Element: Hidden line inside the cursor
+ID: 346 · Category: Cursor & Hover · Tags: mask, reveal, typography, cursor, hidden
+What it does: Hover over a large sentence and a round window follows the cursor; inside it alone, a different sentence in inverted colors shows through in the same place. Move fast and the window stretches slightly as it follows; press and it floods the whole frame to reveal the hidden sentence, then press again to shrink it back.
+How to use it: Move the cursor over the sentence to find the hidden words, and press to reveal it all
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#346
+-->
+<style>
+.u346{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:#F5F1E8;background:light-dark(#F5F1E8,#1F1C17);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);cursor:none}
+.u346-l{position:absolute;inset:0;padding:30px 26px;display:flex;flex-direction:column;justify-content:center;gap:2px;font-size:56px;line-height:1.06;font-weight:900;letter-spacing:-.04em;word-break:keep-all;pointer-events:none}
+.u346-a{color:#1D1A16;color:light-dark(#1D1A16,#EDE5D5)}
+.u346-b{background:#1D1A16;background:light-dark(#1D1A16,#0A0907);color:#FFD43B;clip-path:ellipse(var(--rx,0px) var(--ry,0px) at var(--x,170px) var(--y,170px))}
+.u346-b span:nth-child(2n){color:#FF8787}
+.u346-hit{position:absolute;inset:0;border:0;padding:0;background:transparent;cursor:none;border-radius:inherit}
+.u346-hit:focus-visible{outline:2px solid #1D1A16;outline-color:light-dark(#1D1A16,#EDE5D5);outline-offset:-6px}
+.u346-ring{position:absolute;left:0;top:0;border-radius:50%;box-shadow:0 0 0 1.5px rgba(255,212,59,.9);pointer-events:none;opacity:0;transition:opacity .2s}
+</style>
+<div class="ux u346">
+  <div class="u346-l u346-a" aria-hidden="true"></div>
+  <div class="u346-l u346-b" aria-hidden="true"></div>
+  <div class="u346-ring" aria-hidden="true"></div>
+  <button type="button" class="u346-hit" aria-label="Find the hidden sentence, press to reveal it all"></button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var la = root.querySelector('.u346-a'), lb = root.querySelector('.u346-b'), ring = root.querySelector('.u346-ring'), hit = root.querySelector('.u346-hit');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var A = ['Even', 'an ordinary', 'button', 'hides a story'];
+  var B = ['Tiny', 'motions', 'can move', 'a heart'];
+  A.forEach(function (w) { var s = document.createElement('span'); s.textContent = w; la.appendChild(s); });
+  B.forEach(function (w) { var s = document.createElement('span'); s.textContent = w; lb.appendChild(s); });
+  hit.setAttribute('aria-description', B.join(' '));
+  var pos = { x: 170, y: 170 }, sp = { x: 170, y: 170 }, v = { x: 0, y: 0 }, r = 0, rT = 0, full = false, raf = 0, last = 0;
+  function frame(now) {
+    raf = 0;
+    if (!root.isConnected) return;
+    var dt = Math.min(0.033, Math.max(0, (now - last) / 1000)); last = now;
+    if (rm) { sp.x = pos.x; sp.y = pos.y; r = rT; }
+    else {
+      v.x += ((pos.x - sp.x) * 260 - v.x * 24) * dt; v.y += ((pos.y - sp.y) * 260 - v.y * 24) * dt; sp.x += v.x * dt; sp.y += v.y * dt;
+      r += (rT - r) * Math.min(1, dt * (full ? 5 : 12));
+    }
+    var spd = Math.min(1, Math.hypot(v.x, v.y) / 1600), ang = Math.atan2(v.y, v.x);
+    var rx = r * (1 + spd * 0.35 * Math.abs(Math.cos(ang))), ry = r * (1 + spd * 0.35 * Math.abs(Math.sin(ang)));
+    lb.style.setProperty('--x', sp.x.toFixed(1) + 'px'); lb.style.setProperty('--y', sp.y.toFixed(1) + 'px'); lb.style.setProperty('--rx', rx.toFixed(1) + 'px'); lb.style.setProperty('--ry', ry.toFixed(1) + 'px');
+    ring.style.width = (rx * 2) + 'px'; ring.style.height = (ry * 2) + 'px'; ring.style.transform = 'translate(' + (sp.x - rx).toFixed(1) + 'px,' + (sp.y - ry).toFixed(1) + 'px)';
+    ring.style.opacity = !full && r > 4 ? '1' : '0';
+    if (Math.abs(pos.x - sp.x) + Math.abs(pos.y - sp.y) > 0.3 || Math.abs(rT - r) > 0.3 || Math.hypot(v.x, v.y) > 2) raf = requestAnimationFrame(frame);
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function loc(e) { var b = root.getBoundingClientRect(), k = root.offsetWidth / (b.width || 1); return { x: (e.clientX - b.left) * k, y: (e.clientY - b.top) * k }; }
+  root.addEventListener('pointermove', function (e) { var q = loc(e); if (!rT && !full) { sp.x = q.x; sp.y = q.y; } pos = q; if (!full) rT = 66; kick(); });
+  root.addEventListener('pointerleave', function () { if (!full) { rT = 0; kick(); } });
+  hit.addEventListener('click', function (e) { full = !full; if (e.detail) pos = loc(e); rT = full ? 520 : 66; kick(); });
+  hit.addEventListener('focus', function () { if (!full && !rT) { pos = { x: 170, y: 170 }; sp.x = 170; sp.y = 170; rT = 66; kick(); } });
+  hit.addEventListener('blur', function () { if (!full) { rT = 0; kick(); } });
+})();
+</script>

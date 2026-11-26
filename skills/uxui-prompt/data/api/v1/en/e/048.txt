@@ -1,0 +1,140 @@
+<!-- Lucian UX/UI Prompt #048 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#048 -->
+<!--
+Element: Swipe-linked underline tabs
+ID: 048 · Category: Menus & Tabs · Tags: tabs, swipe, underline, scroll-linked, overflow
+What it does: Swipe the articles sideways and the underline stretches along with your finger to the next tab. The chosen tab scrolls to the center, and both ends of the tab row fade to hint there is more.
+How to use it: Drag or swipe the article card sideways, or press the tabs above. With a keyboard, use the left and right arrows on the tabs
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#048
+-->
+<style>
+.u048{position:relative;width:350px;height:420px;display:flex;flex-direction:column;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -38px var(--ux-shadow-strong);overflow:hidden}
+.u048-top{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 6px}
+.u048-top b{font-size:21px;font-weight:800;letter-spacing:-.04em}
+.u048-top small{font-size:12px;font-weight:700;color:var(--ux-ink-3)}
+.u048-tw{position:relative;border-bottom:1px solid var(--ux-line)}
+.u048-tw::before,.u048-tw::after{content:"";position:absolute;top:0;bottom:0;width:36px;z-index:1;pointer-events:none;transition:opacity .3s}
+.u048-tw::before{left:0;background:linear-gradient(90deg,var(--ux-surface),transparent);opacity:var(--fl,0)}
+.u048-tw::after{right:0;background:linear-gradient(-90deg,var(--ux-surface),transparent);opacity:var(--fr,1)}
+.u048-tabs{position:relative;display:flex;gap:4px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.u048-tabs::-webkit-scrollbar{display:none}
+.u048-tab{position:relative;flex:none;height:46px;padding:0 10px;border:0;background:none;font-size:15px;font-weight:700;letter-spacing:-.02em;color:var(--ux-ink-3);white-space:nowrap;transition:color .3s}
+.u048-tab:hover{color:var(--ux-ink-2)}
+.u048-tab[aria-selected="true"]{color:var(--ux-ink)}
+.u048-tab:focus-visible{outline:2px solid var(--ux-accent);outline-offset:-6px;border-radius:12px}
+.u048-line{position:absolute;left:0;bottom:0;width:40px;height:3px;border-radius:3px 3px 0 0;background:var(--ux-grad);pointer-events:none}
+.u048-pages{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;cursor:grab;touch-action:pan-x pan-y}
+.u048-pages::-webkit-scrollbar{display:none}
+.u048-pages.drag{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.u048-pg{flex:none;width:100%;padding:14px 16px 16px;scroll-snap-align:start;display:flex;flex-direction:column;gap:10px}
+.u048-hero{position:relative;flex:none;height:170px;border-radius:20px;overflow:hidden;background:var(--g);padding:16px;display:flex;flex-direction:column;justify-content:flex-end;color:#fff}
+.u048-hero::before{content:"";position:absolute;width:180px;height:180px;right:-50px;top:-70px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.5),transparent 65%)}
+.u048-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,8,25,.45))}
+.u048-hero small{position:relative;z-index:1;font-size:11px;font-weight:800;letter-spacing:.08em;opacity:.85}
+.u048-hero b{position:relative;z-index:1;margin-top:4px;font-size:18px;line-height:1.3;font-weight:800;letter-spacing:-.035em}
+.u048-it{display:flex;align-items:center;gap:12px}
+.u048-it i{width:48px;height:48px;flex:none;border-radius:13px;background:var(--g);opacity:.85}
+.u048-it span{font-size:14px;font-weight:650;line-height:1.35;letter-spacing:-.02em}
+.u048-it small{display:block;margin-top:2px;font-size:11.5px;font-weight:600;color:var(--ux-ink-3)}
+</style>
+<div class="ux u048">
+  <div class="u048-top"><b>Today’s reads</b><small>October 10</small></div>
+  <div class="u048-tw"><div class="u048-tabs" role="tablist" aria-label="Topics"><span class="u048-line" aria-hidden="true"></span></div></div>
+  <div class="u048-pages" tabindex="-1"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bar = root.querySelector('.u048-tabs'), line = root.querySelector('.u048-line'), pages = root.querySelector('.u048-pages');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var D = [
+    ['For you', 'linear-gradient(140deg,#7B61FF,#3D8BFF)', 'Why slower teams go further', ['Teams that dropped morning meetings', 'How to protect focus time']],
+    ['Economy', 'linear-gradient(140deg,#22C3A6,#0E7490)', 'Rates are on hold. What’s the next signal?', ['Grocery shopping on a weak won', 'Three things to do on payday']],
+    ['Tech', 'linear-gradient(140deg,#3D8BFF,#B04FD0)', 'Why screenless devices are rising', ['Why voice assistants are back', 'Settings that save battery']],
+    ['Design', 'linear-gradient(140deg,#FF6B8B,#FFB547)', 'Roomier screens read faster', ['A brand in three colors', 'What makes a good button']],
+    ['Travel', 'linear-gradient(140deg,#0EA5E9,#22C3A6)', 'Five islands for autumn walks', ['Solo train journeys', 'How to pack half as much']],
+    ['Food', 'linear-gradient(140deg,#FF7A45,#E5484D)', 'Why the corner bakery opens at 4 a.m.', ['Soup with in-season radish', 'Foolproof pot rice']],
+    ['Culture', 'linear-gradient(140deg,#8B6CFF,#FF6B8B)', 'Six small shows this weekend', ['Classic novels, reread', 'Films worth a theater trip']]
+  ];
+  var uid = 'u048-' + Math.random().toString(36).slice(2, 7);
+  D.forEach(function (d, i) {
+    var t = document.createElement('button');
+    t.className = 'u048-tab'; t.type = 'button'; t.setAttribute('role', 'tab');
+    t.id = uid + '-t' + i; t.setAttribute('aria-controls', uid + '-p' + i);
+    t.textContent = d[0];
+    bar.insertBefore(t, line);
+    var p = document.createElement('section');
+    p.className = 'u048-pg'; p.id = uid + '-p' + i; p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', t.id);
+    p.style.setProperty('--g', d[1]);
+    p.innerHTML = '<div class="u048-hero"><small>' + d[0] + ' · 5 min</small><b>' + d[2] + '</b></div>' + d[3].map(function (x, k) { return '<div class="u048-it"><i aria-hidden="true" style="filter:hue-rotate(' + (k * 25 + 15) + 'deg)"></i><span>' + x + '<small>' + (k + 3) + ' min read</small></span></div>'; }).join('');
+    pages.appendChild(p);
+  });
+  var tabs = Array.prototype.slice.call(bar.querySelectorAll('.u048-tab'));
+  var panels = Array.prototype.slice.call(pages.children);
+  var act = -1;
+  function sync() {
+    var w = pages.clientWidth || 1, f = Math.max(0, Math.min(tabs.length - 1, pages.scrollLeft / w));
+    var i = Math.floor(f), t = f - i, a = tabs[i], b = tabs[Math.min(i + 1, tabs.length - 1)];
+    var l = a.offsetLeft + (b.offsetLeft - a.offsetLeft) * t + 10;
+    var wd = (a.offsetWidth + (b.offsetWidth - a.offsetWidth) * t) - 20 + Math.sin(t * Math.PI) * 26;
+    line.style.transform = 'translateX(' + (l - Math.sin(t * Math.PI) * 6).toFixed(1) + 'px)';
+    line.style.width = wd.toFixed(1) + 'px';
+    var n = Math.round(f);
+    if (n !== act) select(n);
+  }
+  function select(n) {
+    act = n;
+    tabs.forEach(function (t, k) { t.setAttribute('aria-selected', String(k === n)); t.tabIndex = k === n ? 0 : -1; });
+    panels.forEach(function (p, k) { p.inert = k !== n; });
+    var t = tabs[n];
+    bar.scrollTo({ left: t.offsetLeft - (bar.clientWidth - t.offsetWidth) / 2, behavior: rm ? 'auto' : 'smooth' });
+  }
+  function edges() {
+    var max = bar.scrollWidth - bar.clientWidth;
+    bar.parentNode.style.setProperty('--fl', bar.scrollLeft > 4 ? '1' : '0');
+    bar.parentNode.style.setProperty('--fr', bar.scrollLeft < max - 4 ? '1' : '0');
+  }
+  function goTo(i, focus) {
+    i = Math.max(0, Math.min(tabs.length - 1, i));
+    if (focus) tabs[i].focus({ preventScroll: true });
+    pages.scrollTo({ left: i * pages.clientWidth, behavior: rm ? 'auto' : 'smooth' });
+  }
+  pages.addEventListener('scroll', sync, { passive: true });
+  bar.addEventListener('scroll', edges, { passive: true });
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { goTo(i); });
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (e.key === 'Home') d = -i; else if (e.key === 'End') d = tabs.length - 1 - i;
+      if (d) { e.preventDefault(); goTo(i + d, true); }
+    });
+  });
+  var sx = 0, sl = 0, v = 0, lx = 0, dragging = false;
+  pages.addEventListener('pointerdown', function (e) {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    dragging = true; sx = lx = e.clientX; sl = pages.scrollLeft; v = 0;
+    pages.classList.add('drag');
+    pages.setPointerCapture(e.pointerId);
+  });
+  pages.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    v = e.clientX - lx; lx = e.clientX;
+    pages.scrollLeft = sl - (e.clientX - sx);
+  });
+  function end() {
+    if (!dragging) return;
+    dragging = false;
+    var w = pages.clientWidth, f = pages.scrollLeft / w;
+    var n = Math.abs(v) > 4 ? (v < 0 ? Math.ceil(f) : Math.floor(f)) : Math.round(f);
+    goTo(n);
+    var done = function () { pages.removeEventListener('scrollend', done); clearTimeout(tm); if (!dragging) pages.classList.remove('drag'); };
+    var tm = setTimeout(done, 700);
+    pages.addEventListener('scrollend', done);
+  }
+  pages.addEventListener('pointerup', end);
+  pages.addEventListener('pointercancel', end);
+  sync(); edges();
+  if (window.ResizeObserver) new ResizeObserver(function () { pages.scrollLeft = act * pages.clientWidth; sync(); edges(); }).observe(pages);
+})();
+</script>

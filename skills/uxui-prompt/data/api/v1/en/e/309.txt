@@ -1,0 +1,64 @@
+<!-- Lucian UX/UI Prompt #309 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#309 -->
+<!--
+Element: Layered mountain parallax
+ID: 309 · Category: Scroll Motion · Tags: scroll, parallax, landscape, hero, depth
+What it does: Scroll inside and the sky, far mountains, near mountains and forest move at different speeds to create depth, while the sun sets with the scroll and the sky warms into dusk. The title sinks behind the mountains, then body cards rise over the forest and cover the scene.
+How to use it: Scroll up and down inside the card
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#309
+-->
+<style>
+.u309{position:relative;width:300px;height:500px;border-radius:30px;box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u309-sc{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none;outline:none}
+.u309-sc::-webkit-scrollbar{display:none}
+.u309-scene{position:sticky;top:0;height:500px;overflow:hidden;background:linear-gradient(var(--s1,#7EC4F2),var(--s2,#D7EEFF))}
+.u309-sun{position:absolute;left:50%;top:0;width:70px;height:70px;margin-left:-35px;border-radius:50%;background:radial-gradient(circle,#FFF4C2,#FFC94D 60%);box-shadow:0 0 60px 20px rgba(255,200,80,.45)}
+.u309-ly{position:absolute;left:-10%;width:120%;bottom:0;will-change:transform}
+.u309-ly svg{display:block;width:100%;height:auto}
+.u309-t{position:absolute;left:0;right:0;top:120px;text-align:center;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.25);will-change:transform}
+.u309-t b{display:block;font-size:30px;font-weight:880;letter-spacing:-.04em}
+.u309-t span{font-size:12.5px;font-weight:700;opacity:.9}
+.u309-body{position:relative;margin-top:-90px;padding:0 14px 20px;display:grid;gap:12px}
+.u309-c{padding:16px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 18px 30px -18px var(--ux-shadow-strong);color:var(--ux-ink)}
+.u309-c b{font-size:15px;font-weight:850}
+.u309-c p{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:var(--ux-ink-2)}
+</style>
+<div class="ux u309">
+  <div class="u309-sc" tabindex="0" aria-label="Travelogue, scroll to read">
+    <div class="u309-scene" aria-hidden="true">
+      <span class="u309-sun"></span>
+      <div class="u309-t"><b>Three days up high</b><span>Seorak ridge walk · Autumn 2026</span></div>
+      <div class="u309-ly" data-s="0.12"><svg viewBox="0 0 360 200"><path d="M0 120 L50 70 L95 110 L150 40 L210 100 L260 60 L320 105 L360 80 V200 H0z" fill="#9DB4D6"/></svg></div>
+      <div class="u309-ly" data-s="0.28"><svg viewBox="0 0 360 200"><path d="M0 150 L60 95 L120 140 L175 80 L235 135 L290 100 L360 140 V200 H0z" fill="#6E86B5"/></svg></div>
+      <div class="u309-ly" data-s="0.5"><svg viewBox="0 0 360 200"><path d="M0 170 L45 130 L90 160 L140 120 L200 165 L250 128 L310 160 L360 135 V200 H0z" fill="#3F5A8A"/></svg></div>
+      <div class="u309-ly" data-s="0.8"><svg viewBox="0 0 360 120"><path d="M0 70 q10-30 20 0 q10-36 22 0 q10-28 20 0 q12-40 24 0 q10-30 20 0 q12-34 22 0 q10-30 20 0 q12-40 24 0 q10-30 20 0 q12-34 22 0 q10-30 20 0 q12-38 24 0 q10-30 20 0 q12-34 22 0 q10-30 20 0 q8-26 20 0 V120 H0z" fill="#1F3B37"/></svg></div>
+    </div>
+    <div class="u309-body">
+      <div class="u309-c"><b>Day one</b><p>At 4 a.m. we climbed the first slope by headlamp alone. As the sun came up, the ridges revealed themselves one layer at a time.</p></div>
+      <div class="u309-c"><b>Day two</b><p>We ate warm noodles at the shelter while clouds drifted beneath our feet. The wind was so strong I had to grab my hat twice.</p></div>
+      <div class="u309-c"><b>Day three</b><p>The way down was longer than expected, but looking back, the ridges seemed much closer than at the start.</p></div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sc = root.querySelector('.u309-sc'), scene = root.querySelector('.u309-scene'), sun = root.querySelector('.u309-sun'), title = root.querySelector('.u309-t');
+  var layers = Array.prototype.slice.call(root.querySelectorAll('.u309-ly'));
+  var raf = 0;
+  function mix(a, b, t) { return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')'; }
+  function draw() {
+    raf = 0;
+    var y = sc.scrollTop, p = Math.min(1, y / 420);
+    layers.forEach(function (l) { l.style.transform = 'translateY(' + (y * (1 - +l.dataset.s) * -0.35 + p * 40 * (+l.dataset.s)).toFixed(1) + 'px)'; });
+    sun.style.transform = 'translateY(' + (60 + p * 230).toFixed(1) + 'px) scale(' + (1 + p * 0.25).toFixed(2) + ')';
+    title.style.transform = 'translateY(' + (p * 150).toFixed(1) + 'px)';
+    title.style.opacity = (1 - p * 1.1).toFixed(2);
+    scene.style.setProperty('--s1', mix([126, 196, 242], [70, 60, 130], p));
+    scene.style.setProperty('--s2', mix([215, 238, 255], [255, 160, 110], p));
+  }
+  sc.addEventListener('scroll', function () { if (!raf) raf = requestAnimationFrame(draw); }, { passive: true });
+  draw();
+})();
+</script>

@@ -1,0 +1,107 @@
+<!-- Lucian UX/UI Prompt #391 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#391 -->
+<!--
+Element: Month-switching chord diagram
+ID: 391 · Category: Data Motion · Tags: chord-diagram, flow, network, transition, data
+What it does: A chord diagram shows the messages six teams sent each other as arcs around a circle joined by ribbons, with the arcs growing around the rim and the ribbons weaving in when it first appears. Switch between last month and this month above and the arc lengths and ribbon widths stretch and shrink continuously; hover a team's arc to keep only its ribbons with sent and received counts below, or hover a ribbon to see the traffic both ways.
+How to use it: Hover a team arc or a ribbon, then switch months above
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#391
+-->
+<style>
+.u391{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u391-hd{position:absolute;left:20px;right:16px;top:16px;display:flex;justify-content:space-between;align-items:center;z-index:1}
+.u391-hd b{font-size:13.5px;font-weight:900;white-space:nowrap}
+.u391-sg{display:flex;padding:3px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line)}
+.u391-mo{border:0;padding:4px 10px;white-space:nowrap;border-radius:999px;background:none;color:var(--ux-ink-2);font:inherit;font-size:11px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.u391-mo.is-on{background:var(--ux-ink);color:var(--ux-surface)}
+.u391-mo:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u391-sv{position:absolute;left:0;top:0;width:340px;height:340px}
+.u391-rb{fill-opacity:.55;stroke:var(--ux-surface);stroke-width:.6;cursor:pointer;transition:fill-opacity .25s}
+.u391-ar{cursor:pointer;transition:opacity .25s}
+.u391-tx{font-size:10.5px;font-weight:850;fill:var(--ux-ink);pointer-events:none}
+.u391.is-f .u391-rb{fill-opacity:.07}
+.u391.is-f .u391-rb.is-hl{fill-opacity:.8}
+.u391.is-f .u391-ar{opacity:.35}
+.u391.is-f .u391-ar.is-hl{opacity:1}
+.u391-in{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);font-size:10.5px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+</style>
+<div class="ux u391">
+  <div class="u391-hd"><b>Team messages</b><div class="u391-sg" role="group" aria-label="Period"><button type="button" class="u391-mo" aria-pressed="false">Last mo.</button><button type="button" class="u391-mo is-on" aria-pressed="true">This mo.</button></div></div>
+  <svg class="u391-sv" viewBox="0 0 340 340"><g class="u391-rbs"></g><g class="u391-ars"></g><g class="u391-txs" aria-hidden="true"></g></svg>
+  <div class="u391-in" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var rbs = root.querySelector('.u391-rbs'), ars = root.querySelector('.u391-ars'), txs = root.querySelector('.u391-txs'), info = root.querySelector('.u391-in'), mos = root.querySelectorAll('.u391-mo');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NAME = ['Eng', 'Design', 'Product', 'Mktg', 'Sales', 'Ops'], COL = ['#6366F1', '#EC4899', '#F59E0B', '#10B981', '#0EA5E9', '#8B5CF6'];
+  var M = [
+    [[0, 60, 70, 15, 10, 80], [55, 0, 60, 40, 8, 10], [80, 50, 0, 45, 50, 25], [20, 45, 50, 0, 140, 25], [12, 10, 40, 130, 0, 85], [70, 12, 30, 20, 75, 0]],
+    [[0, 120, 90, 20, 15, 60], [110, 0, 80, 70, 10, 15], [95, 85, 0, 60, 40, 30], [25, 75, 55, 0, 90, 20], [10, 12, 45, 95, 0, 70], [55, 18, 25, 22, 65, 0]]
+  ];
+  var n = 6, CX = 170, CY = 173, R0 = 91, R1 = 102, PAD = 0.06, cur = M[1].map(function (r) { return r.slice(); }), grow = rm ? 1 : 0, hov = null;
+  var AR = [], RB = [], TX = [], PAIRS = [];
+  function el(tag, cls, parent) { var e = document.createElementNS('http://www.w3.org/2000/svg', tag); e.setAttribute('class', cls); parent.appendChild(e); return e; }
+  for (var i = 0; i < n; i++) for (var j = i + 1; j < n; j++) PAIRS.push([i, j]);
+  PAIRS.forEach(function (p, k) { var r = el('path', 'u391-rb', rbs); r.setAttribute('fill', COL[p[0]]); r.addEventListener('pointerenter', function () { setHov({ r: k }); }); r.addEventListener('pointerleave', function () { setHov(null); }); RB.push(r); });
+  NAME.forEach(function (nm, i) { var a = el('path', 'u391-ar', ars); a.setAttribute('fill', COL[i]); a.addEventListener('pointerenter', function () { setHov({ g: i }); }); a.addEventListener('pointerleave', function () { setHov(null); }); AR.push(a); var t = el('text', 'u391-tx', txs); t.textContent = nm; TX.push(t); });
+  function pt(a, r) { return (CX + r * Math.sin(a)).toFixed(2) + ' ' + (CY - r * Math.cos(a)).toFixed(2); }
+  function layout() {
+    var tot = 0; cur.forEach(function (r) { r.forEach(function (v) { tot += v; }); });
+    var k = (2 * Math.PI - n * PAD) / tot * grow, a = 0, G = [], S = [];
+    for (var i = 0; i < n; i++) {
+      var g0 = a; S[i] = [];
+      for (var t = 1; t <= n - 1; t++) { var j = (i + t) % n, w = cur[i][j] * k; S[i][j] = [a, a + w]; a += w; }
+      G.push([g0, a]); a += PAD * grow;
+    }
+    return { G: G, S: S };
+  }
+  function paint() {
+    var L = layout();
+    L.G.forEach(function (g, i) {
+      var big = g[1] - g[0] > Math.PI ? 1 : 0;
+      AR[i].setAttribute('d', 'M' + pt(g[0], R1) + ' A' + R1 + ' ' + R1 + ' 0 ' + big + ' 1 ' + pt(g[1], R1) + ' L' + pt(g[1], R0) + ' A' + R0 + ' ' + R0 + ' 0 ' + big + ' 0 ' + pt(g[0], R0) + ' Z');
+      var m = (g[0] + g[1]) / 2, x = CX + (R1 + 10) * Math.sin(m), y = CY - (R1 + 10) * Math.cos(m);
+      TX[i].setAttribute('x', x.toFixed(1)); TX[i].setAttribute('y', (y + 3.5 + (Math.cos(m) < -0.6 ? 6 : Math.cos(m) > 0.6 ? -2 : 0)).toFixed(1));
+      TX[i].setAttribute('text-anchor', Math.sin(m) > 0.25 ? 'start' : Math.sin(m) < -0.25 ? 'end' : 'middle');
+      TX[i].style.opacity = grow;
+    });
+    PAIRS.forEach(function (p, k) {
+      var s = L.S[p[0]][p[1]], t = L.S[p[1]][p[0]];
+      RB[k].setAttribute('d', 'M' + pt(s[0], R0) + ' A' + R0 + ' ' + R0 + ' 0 0 1 ' + pt(s[1], R0) + ' Q' + CX + ' ' + CY + ' ' + pt(t[0], R0) + ' A' + R0 + ' ' + R0 + ' 0 0 1 ' + pt(t[1], R0) + ' Q' + CX + ' ' + CY + ' ' + pt(s[0], R0) + ' Z');
+      RB[k].setAttribute('fill', COL[cur[p[0]][p[1]] >= cur[p[1]][p[0]] ? p[0] : p[1]]);
+    });
+    if (hov) setHov(hov, true);
+  }
+  function setHov(h, quiet) {
+    hov = h; root.classList.toggle('is-f', !!h);
+    AR.forEach(function (a, i) { a.classList.toggle('is-hl', !!h && (h.g === i || (h.r != null && PAIRS[h.r].indexOf(i) >= 0))); });
+    RB.forEach(function (r, k) { r.classList.toggle('is-hl', !!h && (h.r === k || (h.g != null && PAIRS[k].indexOf(h.g) >= 0))); });
+    if (!h) { info.textContent = 'Hover an arc or a ribbon'; return; }
+    if (h.g != null) { var sent = 0, got = 0; for (var j = 0; j < n; j++) { sent += cur[h.g][j]; got += cur[j][h.g]; } info.textContent = NAME[h.g] + ' · sent ' + Math.round(sent) + ' · received ' + Math.round(got); }
+    else { var p = PAIRS[h.r]; info.textContent = NAME[p[0]] + ' → ' + NAME[p[1]] + ' ' + Math.round(cur[p[0]][p[1]]) + '  ·  ' + NAME[p[1]] + ' → ' + NAME[p[0]] + ' ' + Math.round(cur[p[1]][p[0]]); }
+  }
+  var tw = 0;
+  function morph(to) {
+    var from = cur.map(function (r) { return r.slice(); }), t0 = performance.now();
+    cancelAnimationFrame(tw);
+    (function f(now) {
+      var k = rm ? 1 : Math.min(1, (now - t0) / 800), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      cur = from.map(function (r, i) { return r.map(function (v, j) { return v + (M[to][i][j] - v) * e; }); });
+      paint(); if (k < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  mos.forEach(function (b, i) { b.addEventListener('click', function () { mos.forEach(function (x, j) { x.classList.toggle('is-on', j === i); x.setAttribute('aria-pressed', j === i); }); morph(i); }); });
+  if (!rm && 'IntersectionObserver' in window) {
+    var done = false, io = new IntersectionObserver(function (es) {
+      if (!es[0].isIntersecting || done) return; done = true; io.disconnect();
+      var t0 = performance.now();
+      (function f(now) { var k = Math.min(1, (now - t0) / 1100); grow = 1 - Math.pow(1 - k, 3); paint(); if (k < 1) requestAnimationFrame(f); })(t0);
+    });
+    io.observe(root);
+  } else grow = 1;
+  paint(); setHov(null);
+})();
+</script>

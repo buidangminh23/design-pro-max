@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #122 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#122 -->
+<!--
+Element: Layer stacking order
+ID: 122 · Category: Layout, Schedule & Design · Tags: z-order, native, spatial
+What it does: A panel for reordering three overlapping layers. Press a layer to bring it to the front; the new order is announced to screen readers too.
+How to use it: Press a layer underneath to bring it forward. ↓ sends the focused layer to the back
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#122
+-->
+<style>
+.u122{width:100%;max-width:400px;min-width:0;font-size:13px}.u122 button{font:inherit;color:inherit;cursor:pointer}.u122 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u122 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u122 .canvas{height:250px;position:relative;background:var(--ux-surface-2);border:1px solid var(--ux-line-2);border-radius:4px}.u122 .shape{position:absolute;width:120px;height:120px;border:2px solid #fff7;border-radius:12px;display:grid;place-items:center;font-size:25px;font-weight:700;color:#fff;box-shadow:0 4px 12px #0002}.u122 .shape[data-id=A]{left:calc(50% - 107px);top:27px;background:#a8886b}.u122 .shape[data-id=B]{left:calc(50% - 25px);top:67px;background:#6f8c81}.u122 .shape[data-id=C]{left:calc(50% - 75px);top:112px;background:#455f55}.u122 .shape[aria-pressed=true]{outline:2px solid var(--ux-accent);outline-offset:3px}
+</style>
+<div class="ux u122"><div class="canvas" aria-label="Layer stack"><button class="shape" data-id="A" aria-pressed="false">A</button><button class="shape" data-id="B" aria-pressed="true">B</button><button class="shape" data-id="C" aria-pressed="false">C</button></div><output class="sr" aria-live="polite"></output></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let order=['A','B','C'],selected='B';function paint(){qa('.shape').forEach(b=>{const i=order.indexOf(b.dataset.id);b.style.zIndex=i+1;b.setAttribute('aria-pressed',b.dataset.id===selected);b.setAttribute('aria-label','Layer '+b.dataset.id+', '+(i===2?'front':i===0?'back':'middle')+', press to bring to front')});q('output').textContent='Front '+[...order].reverse().join(' · ')+' back'}function front(id){selected=id;order=order.filter(x=>x!==id).concat(id);paint()}qa('.shape').forEach(b=>{b.onclick=()=>front(b.dataset.id);b.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();selected=b.dataset.id;order=[selected,...order.filter(x=>x!==selected)];paint()}if(e.key==='ArrowUp'){e.preventDefault();front(b.dataset.id)}if(e.key==='Escape'){order=['A','B','C'];selected='B';paint()}}});paint();})();
+</script>

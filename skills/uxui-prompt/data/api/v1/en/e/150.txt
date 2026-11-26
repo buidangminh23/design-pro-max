@@ -1,0 +1,21 @@
+<!-- Lucian UX/UI Prompt #150 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#150 -->
+<!--
+Element: Line tidier
+ID: 150 · Category: Document & Data Editing · Tags: line-cleaner, editing, interactive
+What it does: A tidy-up tool that strips stray spaces and duplicates from a list and sorts it. Each button applies one cleanup instantly, and Ctrl/⌘+Z undoes it.
+How to use it: Press Trim, Dedupe and Sort in turn
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#150
+-->
+<style>
+.u150{width:min(100%,370px);font-size:14px;line-height:1.6;color:var(--ux-ink)}.u150 button,.u150 input,.u150 textarea,.u150 select{font:inherit;color:inherit;max-width:100%;min-width:0}.u150 button{cursor:pointer;min-height:44px;border:1px solid var(--ux-line-2);border-radius:8px;background:var(--ux-surface);padding:8px 12px}.u150 input,.u150 textarea,.u150 select{border:1px solid var(--ux-line-2);border-radius:6px;background:var(--ux-surface);padding:8px 10px}.u150 .quiet{color:var(--ux-ink-2)}.u150 .primary{background:var(--ux-accent);color:var(--ux-accent-ink);border-color:transparent}.u150 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u150 [hidden]{display:none!important}.u150 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.u150 *{animation:none!important;transition:none!important}}
+.u150{padding:22px 24px;background:var(--ux-surface);border-left:2px solid var(--ux-accent);border-radius:3px;box-shadow:0 8px 18px var(--ux-shadow)}.u150 textarea{width:100%;height:171px;border:0;border-radius:0;padding:0;background:transparent;resize:none;font:19px/2 Georgia,'Apple SD Gothic Neo',serif}.u150 .tools{display:flex;gap:7px;border-top:1px solid var(--ux-line);padding-top:15px;margin-top:15px}.u150 .tools button{border:0;background:var(--ux-surface-2);font-size:12px;flex:1}.u150 .tools button:active{background:var(--ux-accent-soft);color:var(--ux-accent)}
+</style>
+<div class="ux u150"><textarea aria-label="Lines to tidy"> Basil 
+Rosemary
+Basil
+Mint </textarea><div class="tools"><button data-trim>Trim</button><button data-dedup>Dedupe</button><button data-sort>Sort</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,$=s=>root.querySelector(s),$$=s=>[...root.querySelectorAll(s)],esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const motion=(node,frames,opts={})=>{if(node?.animate&&!matchMedia('(prefers-reduced-motion:reduce)').matches)node.animate(frames,{duration:220,easing:'cubic-bezier(.2,.8,.2,1)',...opts})};const editor=$('textarea'),history=[];editor.addEventListener('input',()=>history.length=0);function clean(type){history.push(editor.value);let lines=editor.value.split('\n');if(type==='trim')lines=lines.map(x=>x.trim()).filter(Boolean);if(type==='dedup')lines=[...new Set(lines.map(x=>x.trim()).filter(Boolean))];if(type==='sort')lines.sort((a,b)=>a.trim().localeCompare(b.trim(),'ko'));editor.value=lines.join('\n');motion(editor,[{transform:'translateX(3px)'},{transform:'none'}])}$$('button').forEach(b=>b.onclick=()=>clean(b.hasAttribute('data-trim')?'trim':b.hasAttribute('data-dedup')?'dedup':'sort'));root.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'&&history.length){e.preventDefault();editor.value=history.pop()}});})();
+</script>

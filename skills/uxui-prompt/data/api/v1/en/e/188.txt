@@ -1,0 +1,27 @@
+<!-- Lucian UX/UI Prompt #188 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#188 -->
+<!--
+Element: Canary rollout
+ID: 188 · Category: Workflow & Systems · Tags: canary-rollout, new-century
+What it does: A canary release screen that opens a new feature to a slice of users first. Each step raises the share and fills that much of the dot grid, and roll back undoes it at once.
+How to use it: Press the release button step by step to raise the share
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#188
+-->
+<style>
+.u188 {width:100%;max-width:370px;font-size:14px;line-height:1.45;position:relative;--a:#cd5339;--soft:color-mix(in srgb,var(--a) 12%,var(--ux-surface));font-variant-numeric:tabular-nums}
+.u188 button{border:1px solid var(--ux-line-2);background:var(--ux-surface);border-radius:9px;padding:9px 12px;min-height:38px;transition:background .2s,transform .3s,color .2s;color:var(--ux-ink)}
+.u188 button:active{transform:translateY(1px)}.u188 button:disabled{opacity:.4;cursor:default}.u188 button.primary{background:var(--ux-ink);color:var(--ux-page);border-color:transparent}
+.u188 .muted{color:var(--ux-ink-2);font-size:12px}.u188 .eyebrow{font:600 10px/1.2 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--ux-ink-2)}
+.u188 .row{display:flex;align-items:center;justify-content:space-between;gap:8px}.u188 .actions{display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap}
+.u188 input,.u188 select{max-width:100%;min-width:0;background:var(--ux-surface);color:var(--ux-ink);border:1px solid var(--ux-line-2);border-radius:7px;padding:8px;font:inherit}
+.u188 output{font-variant-numeric:tabular-nums}.u188 :focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){.u188 *,.u188 *::before,.u188 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.u188 .cover{display:flex;align-items:baseline;gap:10px;margin:12px 0 13px}.u188 .cover output{font:68px/.95 Georgia,serif;letter-spacing:-5px}.u188 .cover span{font-size:12px;color:var(--ux-ink-2)}.u188 .fleet{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;padding:14px;border:1px solid var(--ux-line);border-radius:16px;background:var(--ux-surface)}.u188 .fleet i{width:16px;height:16px;margin:auto;border-radius:50%;background:var(--ux-surface-3);box-shadow:inset 0 0 0 1px var(--ux-line);transition:background .4s,transform .35s;transition-delay:var(--delay)}.u188 .fleet i.on{background:light-dark(#547b49,#afcc86);transform:scale(.88)}.u188 .stages{display:flex;justify-content:space-between;font:11px ui-monospace;color:var(--ux-ink-2);margin:14px 0}.u188 .stages span.active{color:var(--ux-ink);font-weight:700}.u188 .actions button{flex:1;font-size:12px}.u188 .status{font-size:11px;min-height:17px;color:var(--ux-ink-2);margin-top:12px}
+
+/* Focused composition */
+.u188{max-width:320px}.u188 {max-width:245px}.u188 .cover{margin:0 0 26px;justify-content:center;align-items:baseline}.u188 .cover output{font-size:62px;letter-spacing:-3px}.u188 .cover span{font-size:12px}.u188 .fleet{grid-template-columns:repeat(5,1fr);gap:17px;padding:0;border:0;background:none;max-width:185px;margin:auto}.u188 .fleet i{width:20px;height:20px}.u188 .rollout-actions{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:25px}.u188 .rollout-actions button{border:0;background:none;min-height:34px;font-size:12px;padding:4px 7px}.u188 .rollout-actions .rollback{font-size:21px}.u188 [hidden]{display:none!important}</style>
+<div class="ux u188" data-state="initial"><div class="cover"><output>0%</output><span>new search</span></div><div class="fleet" aria-hidden="true"><i style="--delay:0ms"></i><i style="--delay:12ms"></i><i style="--delay:24ms"></i><i style="--delay:36ms"></i><i style="--delay:48ms"></i><i style="--delay:60ms"></i><i style="--delay:72ms"></i><i style="--delay:84ms"></i><i style="--delay:96ms"></i><i style="--delay:108ms"></i><i style="--delay:120ms"></i><i style="--delay:132ms"></i><i style="--delay:144ms"></i><i style="--delay:156ms"></i><i style="--delay:168ms"></i><i style="--delay:180ms"></i><i style="--delay:192ms"></i><i style="--delay:204ms"></i><i style="--delay:216ms"></i><i style="--delay:228ms"></i></div><div class="rollout-actions"><button class="deploy">5% live</button><button class="rollback" aria-label="Roll back all" hidden>↶</button></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling;const q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const state=s=>root.dataset.state=s;const pulse=(el,frames,duration=450)=>{if(!reduced)el.animate(frames,{duration,easing:'cubic-bezier(.2,.8,.2,1)'});};let stage=0;const p=[0,5,25,100];function render(){q('output').textContent=p[stage]+'%';qa('.fleet i').forEach((e,i)=>e.classList.toggle('on',i<20*p[stage]/100));q('.deploy').textContent=stage<3?p[stage+1]+'% live':'Fully live';q('.deploy').disabled=stage===3;q('.rollback').hidden=stage===0;state('rollout-'+p[stage])}q('.deploy').onclick=()=>{stage++;render()};q('.rollback').onclick=()=>{stage=0;render()};})();
+</script>

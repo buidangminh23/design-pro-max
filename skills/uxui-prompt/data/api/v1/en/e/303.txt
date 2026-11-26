@@ -1,0 +1,73 @@
+<!-- Lucian UX/UI Prompt #303 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#303 -->
+<!--
+Element: Font pairing and type scale
+ID: 303 · Category: Site Builder Tools · Tags: typography, font-pairing, type-scale, design-tokens, builder
+What it does: In a site's font settings, pick the Modern, Editorial, Tech or Classic pairing and the preview's heading and body fonts blur slightly and sharpen into the new pair. Change the size ratio and the heading, subheading and body sizes grow or shrink smoothly to that ratio, with each step's size marked on the scale at the right. Copy CSS copies the current setup as variables.
+How to use it: Switch font pairings, then change the size ratio
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#303
+-->
+<style>
+.u303{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);--hf:system-ui,sans-serif;--hw:800;--bf:system-ui,sans-serif;--r:1.25}
+.u303-ps{position:absolute;left:12px;right:12px;top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.u303-pr{display:flex;flex-direction:column;align-items:center;gap:1px;height:50px;justify-content:center;border:0;border-radius:12px;background:var(--ux-surface-2);box-shadow:inset 0 0 0 1px var(--ux-line);color:var(--ux-ink-2);font:inherit;font-size:9.5px;font-weight:800;cursor:pointer;transition:box-shadow .2s,background .2s}
+.u303-pr b{font-size:17px;line-height:1.1;color:var(--ux-ink)}
+.u303-pr[aria-checked="true"]{background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-ink)}
+.u303-sr{position:absolute;left:12px;right:12px;top:70px;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:var(--ux-ink-3)}
+.u303-sr>span{margin-right:auto}
+.u303-sc{height:24px;padding:0 8px;border:0;border-radius:7px;background:none;color:var(--ux-ink-3);font:inherit;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;font-weight:800;cursor:pointer}
+.u303-sc[aria-checked="true"]{background:var(--ux-ink);color:var(--ux-surface)}
+.u303-pv{position:absolute;left:12px;right:12px;top:102px;bottom:56px;display:flex;gap:10px;padding:14px;border-radius:16px;background:var(--ux-surface-2);overflow:hidden}
+.u303-tx{flex:1;min-width:0;transition:filter .2s,opacity .2s}
+.u303-tx.is-sw{filter:blur(4px);opacity:.3}
+.u303-tx h3{margin:0;font-family:var(--hf);font-weight:var(--hw);font-size:calc(11.5px * var(--r) * var(--r) * var(--r));line-height:1.15;letter-spacing:-.02em;transition:font-size .45s cubic-bezier(.3,1.1,.4,1)}
+.u303-tx h4{margin:10px 0 0;font-family:var(--hf);font-weight:var(--hw);font-size:calc(11.5px * var(--r));line-height:1.25;color:var(--ux-ink-2);transition:font-size .45s cubic-bezier(.3,1.1,.4,1)}
+.u303-tx p{margin:6px 0 0;font-family:var(--bf);font-size:11.5px;line-height:1.55;font-weight:500;color:var(--ux-ink-2)}
+.u303-rl{flex:none;width:44px;display:flex;flex-direction:column;justify-content:flex-start;gap:6px;padding-left:8px;border-left:1px dashed var(--ux-line);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9px;font-weight:800;color:var(--ux-ink-3)}
+.u303-rl span{display:flex;align-items:center;gap:4px}
+.u303-rl span i{display:block;height:3px;border-radius:2px;background:var(--ux-accent);transition:width .45s cubic-bezier(.3,1.1,.4,1)}
+.u303-ft{position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:8px}
+.u303-ft code{flex:1;min-width:0;padding:9px 10px;border-radius:10px;background:var(--ux-surface-2);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:9.5px;color:var(--ux-ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u303-cp{flex:none;height:34px;padding:0 12px;border:0;border-radius:10px;background:var(--ux-ink);color:var(--ux-surface);font:inherit;font-size:11px;font-weight:850;cursor:pointer;transition:background .3s}
+.u303-cp.is-ok{background:#059669}
+.u303 button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u303-tx,.u303-tx h3,.u303-tx h4,.u303-rl span i{transition:none}}
+</style>
+<div class="ux u303">
+  <div class="u303-ps" role="radiogroup" aria-label="Font pairing"></div>
+  <div class="u303-sr" role="radiogroup"><span>Scale ratio</span></div>
+  <div class="u303-pv"><div class="u303-tx"><h3>Big stories from small shops</h3><h4>A neighborhood bakery goes online</h4><p>The bread we bake every morning now comes to your door. Order by 9 PM the night before.</p></div><div class="u303-rl" aria-hidden="true"></div></div>
+  <div class="u303-ft"><code class="u303-cs"></code><button type="button" class="u303-cp">Copy CSS</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ps = root.querySelector('.u303-ps'), sr = root.querySelector('.u303-sr'), tx = root.querySelector('.u303-tx'), rl = root.querySelector('.u303-rl'), cs = root.querySelector('.u303-cs'), cp = root.querySelector('.u303-cp');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PR = [['Modern', 'system-ui,sans-serif', 800, 'system-ui,sans-serif'], ['Editorial', 'Georgia,serif', 700, 'system-ui,sans-serif'], ['Tech', 'ui-monospace,Menlo,monospace', 700, 'system-ui,sans-serif'], ['Classic', 'Georgia,serif', 700, 'Georgia,serif']];
+  var SC = [1.125, 1.25, 1.333, 1.5], pr = 0, sc = 1, BASE = 16;
+  var P = PR.map(function (p, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u303-pr'; b.setAttribute('role', 'radio'); b.innerHTML = '<b>Aa</b><span></span>'; b.firstChild.style.fontFamily = p[1]; b.firstChild.style.fontWeight = p[2]; b.lastChild.textContent = p[0]; b.addEventListener('click', function () { setPr(i); }); ps.appendChild(b); return b; });
+  var S = SC.map(function (s, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u303-sc'; b.setAttribute('role', 'radio'); b.textContent = s; b.addEventListener('click', function () { sc = i; sync(); }); sr.appendChild(b); return b; });
+  var R = ['h1', 'h2', 'p'].map(function (n) { var s = document.createElement('span'); s.innerHTML = '<i></i><em style="font-style:normal"></em>'; rl.appendChild(s); return s; });
+  function sync() {
+    var r = SC[sc], p = PR[pr];
+    root.style.setProperty('--r', r); root.style.setProperty('--hf', p[1]); root.style.setProperty('--hw', p[2]); root.style.setProperty('--bf', p[3]);
+    P.forEach(function (b, i) { b.setAttribute('aria-checked', i === pr); }); S.forEach(function (b, i) { b.setAttribute('aria-checked', i === sc); });
+    [Math.pow(r, 3), r, 1].forEach(function (k, i) { var px = Math.round(BASE * k); R[i].querySelector('i').style.width = Math.min(28, px * .6) + 'px'; R[i].querySelector('em').textContent = px; });
+    cs.textContent = '--font-head:' + p[1].split(',')[0] + '; --scale:' + r + ';';
+  }
+  function setPr(i) {
+    if (i === pr) return; pr = i;
+    if (rm) { sync(); return; }
+    tx.classList.add('is-sw'); setTimeout(function () { sync(); tx.classList.remove('is-sw'); }, 190);
+  }
+  var T = 0;
+  cp.addEventListener('click', function () {
+    var p = PR[pr], css = ':root {\n  --font-head: ' + p[1] + ';\n  --font-body: ' + p[3] + ';\n  --scale: ' + SC[sc] + ';\n}';
+    try { navigator.clipboard && navigator.clipboard.writeText(css).catch(function () {}); } catch (e) {}
+    cp.classList.add('is-ok'); cp.textContent = 'Copied'; clearTimeout(T); T = setTimeout(function () { cp.classList.remove('is-ok'); cp.textContent = 'Copy CSS'; }, 1500);
+  });
+  sync();
+})();
+</script>

@@ -1,0 +1,96 @@
+<!-- Lucian UX/UI Prompt #072 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#072 -->
+<!--
+Element: Collapsing inline alerts
+ID: 072 · Category: Alerts & Feedback · Tags: alert, inline, dismiss, collapse, status
+What it does: Alert rows stack up, each with its own color and icon. Dismiss one and it slides aside as its height folds, letting the rows below move up. The error alert expands a log with Details, and once all are dismissed a button to bring them back appears.
+How to use it: Dismiss alerts with ×, and open the log with Details on the error. After clearing them all, use “Show alerts again”
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#072
+-->
+<style>
+.u072{position:relative;width:340px;height:470px;display:flex;flex-direction:column;padding:20px 16px 16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u072-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 12px}
+.u072-head b{font-size:20px;font-weight:850;letter-spacing:-.045em}
+.u072-head small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u072-list{margin:0;padding:0;list-style:none}
+.u072-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease) .12s,margin .45s var(--ux-ease) .12s;margin-bottom:8px}
+.u072-it>div{min-height:0;overflow:hidden}
+.u072-it.gone{grid-template-rows:0fr;margin-bottom:0}
+.u072-a{position:relative;display:flex;gap:12px;padding:14px 12px 14px 14px;border-radius:18px;background:color-mix(in srgb,var(--c) 10%,var(--ux-surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent);transition:transform .4s var(--ux-ease),opacity .3s}
+.u072-a::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.u072-it.gone .u072-a{transform:translateX(40px);opacity:0}
+.u072-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--c);color:var(--ux-accent-ink)}
+.u072-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u072-tx{flex:1;min-width:0}
+.u072-tx b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}
+.u072-tx p{margin:3px 0 0;font-size:12.5px;line-height:1.5;color:var(--ux-ink-2)}
+.u072-more{margin-top:8px;border:0;padding:0;background:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:750;color:var(--c)}
+.u072-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:transform .35s var(--ux-spring)}
+.u072-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.u072-log{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ux-ease)}
+.u072-log.on{grid-template-rows:1fr}
+.u072-log>div{min-height:0;overflow:hidden}
+.u072-log code{display:block;margin-top:8px;padding:10px;border-radius:10px;background:var(--ux-surface);font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink-2);white-space:pre;overflow-x:auto}
+.u072-prog{height:5px;margin-top:8px;border-radius:3px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden}
+.u072-prog i{display:block;height:100%;width:72%;border-radius:inherit;background:var(--c)}
+.u072-x{width:28px;height:28px;flex:none;margin:-2px -2px 0 0;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}
+.u072-x:hover{background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ux-ink)}
+.u072-x:active{transform:scale(.85)}
+.u072-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u072-x:focus-visible,.u072-more:focus-visible,.u072-again:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u072-calm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;text-align:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .4s .3s,transform .5s var(--ux-spring) .3s}
+.u072.is-clear .u072-calm{opacity:1;transform:none;pointer-events:auto}
+.u072-calm i{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-mint) 15%,transparent);color:var(--ux-mint)}
+.u072-calm i svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u072-calm b{font-size:15px;font-weight:800}
+.u072-again{height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:720;color:var(--ux-ink)}
+</style>
+<div class="ux u072">
+  <div class="u072-head"><b>System status</b><small class="u072-n" aria-live="polite"></small></div>
+  <ul class="u072-list">
+    <li class="u072-it"><div><div class="u072-a" role="alert" style="--c:var(--ux-danger)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 4.5v4M8 11.2h.01"/></svg></span><div class="u072-tx"><b>Payment webhook failed</b><p>The last 3 requests got no response.</p><button class="u072-more" type="button" aria-expanded="false">Details <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button><div class="u072-log"><div><code>09:41:02  /hooks/pay  504
+09:41:32  /hooks/pay  504
+09:42:02  /hooks/pay  504</code></div></div></div><button class="u072-x" type="button" aria-label="Dismiss webhook alert"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-warn)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5l6 10.5H2zM8 7v2.5M8 11.3h.01"/></svg></span><div class="u072-tx"><b>Storage is 72% full</b><p>New uploads stop above 90%.</p><div class="u072-prog" aria-hidden="true"><i></i></div></div><button class="u072-x" type="button" aria-label="Dismiss storage alert"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-accent)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 7.5v4M8 4.8h.01"/></svg></span><div class="u072-tx"><b>Version 2.4 is out</b><p>Better contrast in dark mode.</p></div><button class="u072-x" type="button" aria-label="Dismiss update alert"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-mint)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 8.4l2.6 2.6L12 5.5"/></svg></span><div class="u072-tx"><b>Backup complete</b><p>Today 4:00 AM · 12.8 GB</p></div><button class="u072-x" type="button" aria-label="Dismiss backup alert"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+  </ul>
+  <div class="u072-calm" aria-hidden="true"><i><svg viewBox="0 0 26 26"><path d="M7 13.5l4 4L19 9"/></svg></i><b>You’re all caught up</b><button class="u072-again" type="button" tabindex="-1">Show alerts again</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var its = Array.prototype.slice.call(root.querySelectorAll('.u072-it')), n = root.querySelector('.u072-n');
+  var calm = root.querySelector('.u072-calm'), again = root.querySelector('.u072-again'), more = root.querySelector('.u072-more'), log = root.querySelector('.u072-log');
+  function count() {
+    var k = its.filter(function (it) { return !it.classList.contains('gone'); }).length;
+    n.textContent = k ? k + (k === 1 ? ' alert' : ' alerts') : '';
+    root.classList.toggle('is-clear', !k);
+    calm.setAttribute('aria-hidden', String(!!k));
+    again.tabIndex = k ? -1 : 0;
+    return k;
+  }
+  its.forEach(function (it, i) {
+    it.querySelector('.u072-x').addEventListener('click', function () {
+      it.classList.add('gone'); it.inert = true;
+      var rest = its.filter(function (x) { return !x.classList.contains('gone'); });
+      var next = rest.filter(function (x) { return its.indexOf(x) > i; })[0] || rest[rest.length - 1];
+      if (count() && next) next.querySelector('.u072-x').focus({ preventScroll: true });
+      else setTimeout(function () { if (root.isConnected) again.focus({ preventScroll: true }); }, 500);
+    });
+  });
+  more.addEventListener('click', function () {
+    var on = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded', String(on));
+    more.firstChild.textContent = on ? 'Hide ' : 'Details ';
+    log.classList.toggle('on', on);
+  });
+  again.addEventListener('click', function () {
+    its.forEach(function (it, i) { setTimeout(function () { if (!root.isConnected) return; it.classList.remove('gone'); it.inert = false; if (i === its.length - 1) count(); }, i * 90); });
+    root.classList.remove('is-clear');
+    setTimeout(function () { if (root.isConnected) its[0].querySelector('.u072-x').focus({ preventScroll: true }); }, 200);
+  });
+  count();
+})();
+</script>

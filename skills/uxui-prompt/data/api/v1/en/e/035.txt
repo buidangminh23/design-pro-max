@@ -1,0 +1,127 @@
+<!-- Lucian UX/UI Prompt #035 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#035 -->
+<!--
+Element: Money transfer amount
+ID: 035 · Category: Inputs & Search · Tags: currency, amount, input, transfer, validation
+What it does: Only the digits that change pop up from below as you type, and thousands separators slip in naturally. Quick-amount chips add to it, and going over your balance turns the amount red with a shake and blocks Send.
+How to use it: Type an amount or press the chips below. Try going over the balance
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#035
+-->
+<style>
+.u035{position:relative;width:340px;height:340px;display:flex;flex-direction:column;align-items:center}
+.u035-to{display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);font-size:14px;font-weight:650;color:var(--ux-ink-2)}
+.u035-to i{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFD3A8,#FF7A93 60%,#8B6CFF)}
+.u035-to b{color:var(--ux-ink)}
+.u035-amt{position:relative;display:flex;align-items:baseline;justify-content:center;gap:6px;width:100%;height:84px;margin-top:22px;cursor:text;border-radius:18px}
+.u035-num{display:flex;align-items:baseline;height:64px;overflow:hidden;font-size:52px;font-weight:820;letter-spacing:-.05em;line-height:64px;font-variant-numeric:tabular-nums;color:var(--ux-ink);transition:color .3s var(--ux-ease)}
+.u035-num span{display:inline-block}
+.u035-num span.new{animation:u035-up .4s var(--ux-spring)}
+@keyframes u035-up{from{transform:translateY(60%);opacity:0}}
+.u035-num span.c{color:var(--ux-ink-3);font-weight:700}
+.u035-num .ph{color:var(--ux-ink-3)}
+.u035-caret{width:3px;height:46px;margin-left:3px;align-self:center;border-radius:2px;background:var(--ux-accent);opacity:0}
+.u035.is-focus .u035-caret{opacity:1;animation:u035-blink 1s steps(1) infinite}
+@keyframes u035-blink{50%{opacity:0}}
+.u035-cur{position:relative;width:46px;height:36px;border:0;padding:0;border-radius:12px;background:var(--ux-surface-2);font-size:17px;font-weight:760;color:var(--ux-ink-2);perspective:200px;transition:background-color .2s}
+.u035-cur:hover{background:var(--ux-surface-3)}
+.u035-cur:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u035-cur span{position:absolute;inset:0;display:grid;place-items:center;backface-visibility:hidden;transition:transform .55s var(--ux-spring)}
+.u035-cur span+span{transform:rotateX(-180deg)}
+.u035.is-usd .u035-cur span:first-child{transform:rotateX(180deg)}
+.u035.is-usd .u035-cur span+span{transform:none}
+.u035-real{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;font-size:16px;cursor:text}
+.u035-sub{margin:6px 0 0;height:20px;font-size:13.5px;font-weight:600;color:var(--ux-ink-3);font-variant-numeric:tabular-nums;transition:color .3s}
+.u035.is-over .u035-num{color:var(--ux-danger)}
+.u035.is-over .u035-sub{color:var(--ux-danger)}
+.u035.is-shake .u035-amt{animation:u035-shake .42s var(--ux-ease)}
+@keyframes u035-shake{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.u035-chips{display:flex;gap:6px;margin-top:22px}
+.u035-chip{height:38px;padding:0 14px;border:0;border-radius:12px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line-2);font-size:13.5px;font-weight:700;color:var(--ux-ink-2);transition:transform .35s var(--ux-spring),box-shadow .2s,color .2s}
+.u035-chip:hover{color:var(--ux-ink);box-shadow:inset 0 0 0 1px var(--ux-ink-3)}
+.u035-chip:active{transform:scale(.92)}
+.u035-chip:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u035-send{width:100%;height:56px;margin-top:auto;border:0;border-radius:18px;background:var(--ux-mint);color:var(--ux-accent-ink);font-size:16px;font-weight:760;transition:opacity .3s,transform .35s var(--ux-spring),background-color .3s}
+.u035-send:active{transform:scale(.97)}
+.u035-send:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u035-send[aria-disabled="true"]{opacity:.35}
+.u035-real:focus-visible{outline:none}
+.u035.is-focus .u035-amt{box-shadow:0 0 0 2px var(--ux-accent-soft)}
+</style>
+<div class="ux u035">
+  <span class="u035-to"><i aria-hidden="true"></i>Send to <b>Seoyeon Kim</b></span>
+  <div class="u035-amt">
+    <span class="u035-num" aria-hidden="true"></span><span class="u035-caret" aria-hidden="true"></span>
+    <input class="u035-real" type="text" inputmode="numeric" aria-label="Amount to send" autocomplete="off">
+    <button class="u035-cur" type="button" aria-label="Switch currency: won"><span>₩</span><span>$</span></button>
+  </div>
+  <p class="u035-sub" aria-live="polite"></p>
+  <div class="u035-chips"><button class="u035-chip" type="button" data-add="10000">+10K</button><button class="u035-chip" type="button" data-add="50000">+50K</button><button class="u035-chip" type="button" data-add="100000">+100K</button><button class="u035-chip" type="button" data-all>All</button></div>
+  <button class="u035-send" type="button">Send</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var num = root.querySelector('.u035-num');
+  var real = root.querySelector('.u035-real');
+  var sub = root.querySelector('.u035-sub');
+  var cur = root.querySelector('.u035-cur');
+  var send = root.querySelector('.u035-send');
+  var BAL = 1284000, RATE = 1380;
+  var won = 250000, usd = false, prev = '';
+  function draw() {
+    var v = usd ? (won / RATE) : won;
+    var s = usd ? v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : v.toLocaleString('en-US');
+    if (!won) s = '0';
+    var p = prev;
+    num.innerHTML = '';
+    var off = s.length - p.length;
+    Array.from(s).forEach(function (ch, i) {
+      var sp = document.createElement('span');
+      sp.textContent = ch;
+      if (ch === ',' || ch === '.') sp.className = 'c';
+      if (!won) sp.classList.add('ph');
+      if (ch !== ',' && p[i - off] !== ch) sp.classList.add('new');
+      num.appendChild(sp);
+    });
+    prev = s;
+    var over = won > BAL;
+    root.classList.toggle('is-over', over);
+    sub.textContent = over ? '₩' + (won - BAL).toLocaleString('en-US') + ' over your balance' : 'Balance after: ₩' + (BAL - won).toLocaleString('en-US');
+    send.setAttribute('aria-disabled', String(over || !won));
+    real.value = String(usd ? Math.round(won / RATE) : won);
+  }
+  function shake() { root.classList.remove('is-shake'); void root.offsetWidth; root.classList.add('is-shake'); }
+  real.addEventListener('focus', function () { root.classList.add('is-focus'); });
+  real.addEventListener('blur', function () { root.classList.remove('is-focus'); });
+  real.addEventListener('input', function () {
+    var digits = real.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 10);
+    var was = won > BAL;
+    won = digits ? parseInt(digits, 10) : 0;
+    if (usd) won = Math.round(won * RATE);
+    draw();
+    if (!was && won > BAL) shake();
+  });
+  Array.prototype.forEach.call(root.querySelectorAll('.u035-chip'), function (b) {
+    b.addEventListener('click', function () {
+      var was = won > BAL;
+      won = b.hasAttribute('data-all') ? BAL : Math.min(9999999999, won + (+b.dataset.add));
+      draw();
+      if (!was && won > BAL) shake();
+    });
+  });
+  cur.addEventListener('click', function () {
+    usd = !usd;
+    root.classList.toggle('is-usd', usd);
+    cur.setAttribute('aria-label', 'Switch currency: ' + (usd ? 'dollars' : 'won'));
+    prev = '';
+    draw();
+  });
+  send.addEventListener('click', function () {
+    if (send.getAttribute('aria-disabled') === 'true') { shake(); return; }
+    send.textContent = 'Sent ' + (usd ? '$' + (won / RATE).toFixed(2) : '₩' + won.toLocaleString('en-US'));
+    setTimeout(function () { if (root.isConnected) send.textContent = 'Send'; }, 1600);
+  });
+  draw();
+})();
+</script>

@@ -1,0 +1,107 @@
+<!-- Lucian UX/UI Prompt #083 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#083 -->
+<!--
+Element: Queue bar turning into progress
+ID: 083 · Category: Loading & Progress · Tags: indeterminate, progress, deploy, log, morph
+What it does: While queued with no known end, two bar segments stretch and slide; once the build starts, the same bar smoothly turns into a progress bar that fills. Log lines rise one by one as spinners turn into checks, and the status pill changes its color and text along with it.
+How to use it: Watch the deploy move from the queue to building to done. “Redeploy” plays it again from the start
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#083
+-->
+<style>
+.u083{position:relative;width:350px;height:400px;display:flex;flex-direction:column;padding:20px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u083-h{display:flex;align-items:center;gap:10px}
+.u083-h i{width:36px;height:36px;border-radius:11px;background:var(--ux-ink);position:relative}
+.u083-h i::after{content:"";position:absolute;left:10px;top:11px;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid var(--ux-page)}
+.u083-h b{display:block;font-size:15.5px;font-weight:850;letter-spacing:-.03em}
+.u083-h small{display:block;font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u083-pill{margin-left:auto;height:26px;padding:0 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c);font-size:12px;font-weight:800;transition:background-color .4s,color .4s}
+.u083-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;animation:u083-blink 1.2s ease-in-out infinite}
+.u083.is-done .u083-pill::before{animation:none}
+@keyframes u083-blink{50%{opacity:.3}}
+.u083-trk{position:relative;height:6px;margin:18px 0 6px;border-radius:3px;background:var(--ux-surface-3);overflow:hidden}
+.u083-seg{position:absolute;top:0;bottom:0;border-radius:inherit;background:var(--ux-accent);transition:opacity .4s}
+.u083-seg.a{animation:u083-a 1.6s cubic-bezier(.65,.05,.35,1) infinite}
+.u083-seg.b{animation:u083-b 1.6s cubic-bezier(.25,.6,.4,1) .55s infinite}
+@keyframes u083-a{0%{left:-35%;right:100%}60%{left:100%;right:-90%}100%{left:100%;right:-90%}}
+@keyframes u083-b{0%{left:-200%;right:100%}60%{left:107%;right:-8%}100%{left:107%;right:-8%}}
+.u083-fill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:inherit;background:var(--ux-accent);transform-origin:0 50%;transform:scaleX(var(--p,0));opacity:0;transition:transform .5s var(--ux-ease),opacity .3s,background-color .4s}
+.u083.is-det .u083-seg{opacity:0}
+.u083.is-det .u083-fill{opacity:1}
+.u083.is-done .u083-fill{background:var(--ux-mint)}
+.u083-meta{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u083-log{flex:1;margin:12px 0 0;padding:12px;border-radius:16px;background:var(--ux-surface-2);list-style:none;overflow:hidden;display:flex;flex-direction:column;gap:7px;font-size:12.5px;font-weight:600;line-height:1.4}
+.u083-log li{display:flex;align-items:center;gap:8px;color:var(--ux-ink-2);animation:u083-in .4s var(--ux-ease)}
+@keyframes u083-in{from{opacity:0;transform:translateY(8px)}}
+.u083-log time{color:var(--ux-ink-3);font:600 11.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+.u083-st{width:14px;height:14px;flex:none;position:relative}
+.u083-st::before{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--ux-accent);border-right-color:transparent;animation:u083-spin .7s linear infinite}
+.u083-log li.ok .u083-st::before{border:0;animation:none;background:var(--ux-mint);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.4l2.6 2.6L11 4.6' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.4l2.6 2.6L11 4.6' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+.u083-log li.ok{color:var(--ux-ink-3)}
+@keyframes u083-spin{to{transform:rotate(360deg)}}
+.u083-re{margin-top:12px;height:44px;border:0;border-radius:14px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:750;transition:opacity .3s,transform .3s var(--ux-spring)}
+.u083-re:active{transform:scale(.97)}
+.u083-re[aria-disabled="true"]{opacity:.35}
+.u083-re:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u083">
+  <div class="u083-h"><i aria-hidden="true"></i><span><b>Deploy #128</b><small>main · a3f9c21</small></span><span class="u083-pill" role="status" aria-live="polite" style="--c:var(--ux-warn)">Queued</span></div>
+  <div class="u083-trk" role="progressbar" aria-label="Deploy progress" aria-valuemin="0" aria-valuemax="100"><span class="u083-seg a" aria-hidden="true"></span><span class="u083-seg b" aria-hidden="true"></span><span class="u083-fill" aria-hidden="true"></span></div>
+  <div class="u083-meta"><span class="u083-l">Waiting for a spot in the queue</span><span class="u083-r"></span></div>
+  <ol class="u083-log" aria-label="Deploy log"></ol>
+  <button class="u083-re" type="button" aria-disabled="true">Redeploy</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var pill = root.querySelector('.u083-pill'), trk = root.querySelector('.u083-trk'), fill = root.querySelector('.u083-fill');
+  var ml = root.querySelector('.u083-l'), mr = root.querySelector('.u083-r'), log = root.querySelector('.u083-log'), re = root.querySelector('.u083-re');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STEPS = [['Install dependencies', 0.22], ['Type check', 0.38], ['Build bundle', 0.7], ['Optimize images', 0.85], ['Deploy to edge', 1]];
+  var ts = [], raf = 0, sec = 0;
+  function later(fn, ms) { ts.push(setTimeout(function () { if (root.isConnected) fn(); }, rm ? Math.min(ms, 200) : ms)); }
+  function line(txt) {
+    var li = document.createElement('li');
+    sec += 1 + Math.round(Math.random() * 3);
+    li.innerHTML = '<span class="u083-st" aria-hidden="true"></span><time>00:' + ('0' + sec).slice(-2) + '</time><span></span>';
+    li.lastChild.textContent = txt;
+    log.appendChild(li);
+    while (log.children.length > 6) log.firstChild.remove();
+    return li;
+  }
+  function setPill(t, c) { pill.textContent = t; pill.style.setProperty('--c', c); }
+  function run() {
+    ts.forEach(clearTimeout); ts = []; cancelAnimationFrame(raf);
+    root.classList.remove('is-det', 'is-done'); log.innerHTML = ''; sec = 0;
+    fill.style.setProperty('--p', 0); trk.removeAttribute('aria-valuenow');
+    setPill('Queued', 'var(--ux-warn)'); ml.textContent = 'Waiting for a spot in the queue'; mr.textContent = '';
+    re.setAttribute('aria-disabled', 'true');
+    var q = line('Queued · 2 ahead');
+    later(function () {
+      q.classList.add('ok');
+      root.classList.add('is-det');
+      setPill('Building', 'var(--ux-accent)');
+      var i = 0;
+      (function next() {
+        var st = STEPS[i], li = line(st[0] + '…');
+        ml.textContent = st[0];
+        fill.style.setProperty('--p', st[1]);
+        trk.setAttribute('aria-valuenow', Math.round(st[1] * 100));
+        mr.textContent = Math.round(st[1] * 100) + '%';
+        later(function () {
+          li.classList.add('ok'); li.lastChild.textContent = st[0] + ' done';
+          i++;
+          if (i < STEPS.length) next();
+          else {
+            root.classList.add('is-done');
+            setPill('Ready', 'var(--ux-mint)'); ml.textContent = 'Deployed to lumen.app'; mr.textContent = '38s';
+            re.setAttribute('aria-disabled', 'false');
+          }
+        }, 650 + i * 120);
+      })();
+    }, 2300);
+  }
+  re.addEventListener('click', function () { if (re.getAttribute('aria-disabled') !== 'true') run(); });
+  run();
+})();
+</script>

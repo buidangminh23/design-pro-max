@@ -1,0 +1,105 @@
+<!-- Lucian UX/UI Prompt #018 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#018 -->
+<!--
+Element: Rolling quantity stepper
+ID: 018 · Category: Toggles & Pickers · Tags: stepper, quantity, odometer, counter, cart
+What it does: Press plus or minus and the number rolls one notch like an odometer. The total counts along smoothly, and at the minimum or maximum the stepper shakes its head.
+How to use it: Press + and −. It will not go below 1 or above 12
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#018
+-->
+<style>
+.u018{position:relative;width:320px;height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.u018-item{display:flex;align-items:center;gap:14px;width:280px}
+.u018-th{width:56px;height:56px;flex:none;border-radius:16px;display:grid;place-items:center;background:linear-gradient(150deg,#3A2A22,#7A4B2E 60%,#C98A55);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.u018-th svg{width:26px;height:26px;fill:none;stroke:#FFE7C7;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.u018-item b{display:block;font-size:16px;font-weight:720;letter-spacing:-.02em}
+.u018-item small{display:block;margin-top:3px;font-size:13px;color:var(--ux-ink-3);font-variant-numeric:tabular-nums}
+.u018-row{display:flex;align-items:center;justify-content:space-between;width:280px}
+.u018-step{display:flex;align-items:center;height:60px;padding:6px;border-radius:999px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 16px 30px -22px var(--ux-shadow-strong)}
+.u018-step.is-shake{animation:u018-no .42s var(--ux-ease)}
+@keyframes u018-no{20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.u018-b{width:48px;height:48px;border:0;padding:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink);display:grid;place-items:center;transition:transform .4s var(--ux-spring),background-color .25s var(--ux-ease),opacity .3s var(--ux-ease)}
+.u018-b:hover{background:var(--ux-surface-3)}
+.u018-b:active{transform:scale(.86)}
+.u018-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u018-b[aria-disabled="true"]{opacity:.35}
+.u018-b svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u018-b.pl{background:var(--ux-ink);color:var(--ux-page)}
+.u018-b.pl:hover{background:var(--ux-ink)}
+.u018-num{display:flex;justify-content:center;width:56px;height:34px;overflow:hidden;font-size:26px;font-weight:780;line-height:34px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.u018-col{display:flex;flex-direction:column;transition:transform .55s var(--ux-spring),width .4s var(--ux-ease),opacity .3s var(--ux-ease)}
+.u018-col span{height:34px;text-align:center}
+.u018-col.is-hide{width:0!important;opacity:0}
+.u018-sum{text-align:right}
+.u018-sum small{display:block;font-size:12.5px;color:var(--ux-ink-3)}
+.u018-sum b{display:block;margin-top:2px;font-size:21px;font-weight:780;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.u018-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+</style>
+<div class="ux u018">
+  <div class="u018-item">
+    <span class="u018-th" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 8h10l-1.2 11a2 2 0 0 1-2 1.8h-3.6a2 2 0 0 1-2-1.8z"/><path d="M6 8h12M9 8l.8-4h4.4l.8 4M10 12.5h4"/></svg></span>
+    <div><b>Cold brew 500 ml</b><small>$12.90 · Ships today</small></div>
+  </div>
+  <div class="u018-row">
+    <div class="u018-step" role="group" aria-label="Quantity">
+      <button class="u018-b mi" type="button" aria-label="Remove one"><svg viewBox="0 0 20 20"><path d="M5 10h10"/></svg></button>
+      <span class="u018-num" aria-live="polite" aria-atomic="true"><span class="u018-sr"></span><span class="u018-col" aria-hidden="true"></span><span class="u018-col" aria-hidden="true"></span></span>
+      <button class="u018-b pl" type="button" aria-label="Add one"><svg viewBox="0 0 20 20"><path d="M10 5v10M5 10h10"/></svg></button>
+    </div>
+    <div class="u018-sum"><small>Total</small><b class="u018-total">$25.80</b></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var step = root.querySelector('.u018-step');
+  var mi = root.querySelector('.mi'), pl = root.querySelector('.pl');
+  var cols = root.querySelectorAll('.u018-col');
+  var sr = root.querySelector('.u018-sr');
+  var total = root.querySelector('.u018-total');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PRICE = 12900, MIN = 1, MAX = 12;
+  var q = 2, shown = q * PRICE, raf = 0;
+  Array.prototype.forEach.call(cols, function (c) {
+    for (var d = 0; d < 10; d++) { var s = document.createElement('span'); s.textContent = d; c.appendChild(s); }
+    c.style.width = '17px';
+  });
+  function countTo(target) {
+    cancelAnimationFrame(raf);
+    var from = shown, t0 = performance.now(), D = rm ? 1 : 520;
+    (function f(now) {
+      var x = Math.min(1, (now - t0) / D);
+      shown = Math.round(from + (target - from) * (1 - Math.pow(1 - x, 3)));
+      total.textContent = '$' + (shown / 1000).toFixed(2);
+      if (x < 1 && root.isConnected) raf = requestAnimationFrame(f);
+    })(t0);
+  }
+  function render() {
+    var tens = Math.floor(q / 10), ones = q % 10;
+    cols[0].style.transform = 'translateY(' + (-tens * 34) + 'px)';
+    cols[0].classList.toggle('is-hide', tens === 0);
+    cols[1].style.transform = 'translateY(' + (-ones * 34) + 'px)';
+    mi.setAttribute('aria-disabled', String(q <= MIN));
+    pl.setAttribute('aria-disabled', String(q >= MAX));
+    sr.textContent = q + (q === 1 ? ' item' : ' items');
+    countTo(q * PRICE);
+  }
+  function bump(d) {
+    var n = q + d;
+    if (n < MIN || n > MAX) {
+      step.classList.remove('is-shake'); void step.offsetWidth; step.classList.add('is-shake');
+      return;
+    }
+    q = n;
+    render();
+  }
+  mi.addEventListener('click', function () { bump(-1); });
+  pl.addEventListener('click', function () { bump(1); });
+  step.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { e.preventDefault(); bump(1); }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { e.preventDefault(); bump(-1); }
+  });
+  render();
+})();
+</script>

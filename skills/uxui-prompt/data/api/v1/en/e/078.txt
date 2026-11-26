@@ -1,0 +1,139 @@
+<!-- Lucian UX/UI Prompt #078 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#078 -->
+<!--
+Element: Swipe-to-reply chat
+ID: 078 · Category: Alerts & Feedback · Tags: chat, reply, swipe, typing, composer
+What it does: Swipe a message right and the reply arrow fills; let go and a quote line rises above the composer. Typing turns the mic into a send button, and the sent bubble rises out of the composer before the other person’s typing dots and reply arrive.
+How to use it: Drag a message from the other person to the right, or hover it and press the reply arrow. Type in the composer below and press Enter to get a reply
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#078
+-->
+<style>
+.u078{position:relative;width:340px;height:500px;display:flex;flex-direction:column;border-radius:32px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u078-top{display:flex;align-items:center;gap:10px;height:62px;padding:0 16px;border-bottom:1px solid var(--ux-line)}
+.u078-top i{width:36px;height:36px;border-radius:50%;background:linear-gradient(140deg,#22C3A6,#0EA5E9)}
+.u078-top b{display:block;font-size:15px;font-weight:800}
+.u078-top small{display:block;font-size:11.5px;font-weight:650;color:var(--ux-mint)}
+.u078-log{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;padding:12px 14px;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,transparent,#000 22px);mask-image:linear-gradient(180deg,transparent,#000 22px)}
+.u078-m{position:relative;display:flex;align-items:center;max-width:82%;touch-action:pan-y}
+.u078-m.me{align-self:flex-end;flex-direction:row-reverse}
+.u078-bub{position:relative;z-index:1;padding:9px 13px;border-radius:18px 18px 18px 6px;background:var(--ux-surface-2);font-size:14px;line-height:1.45;transform:translateX(var(--dx,0px));transition:transform .4s var(--ux-spring);user-select:none;-webkit-user-select:none}
+.u078-m.drag .u078-bub{transition:none}
+.u078-m.me .u078-bub{border-radius:18px 18px 6px 18px;background:var(--ux-accent);color:var(--ux-accent-ink)}
+.u078-q{display:block;margin:-2px -4px 6px;padding:6px 8px;border-radius:10px;background:color-mix(in srgb,currentColor 12%,transparent);font-size:12px;line-height:1.35;opacity:.85;border-left:3px solid currentColor}
+.u078-rep{position:absolute;left:6px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink-2);opacity:var(--ro,0);transform:scale(calc(.5 + var(--ro,0) * .5))}
+.u078-rep svg,.u078-rb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u078-rep.full{background:var(--ux-accent);color:var(--ux-accent-ink)}
+.u078-rb{width:28px;height:28px;flex:none;margin:0 4px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3);opacity:0;transition:opacity .2s,background-color .2s}
+.u078-m:hover .u078-rb,.u078-rb:focus-visible{opacity:1}
+.u078-rb:hover{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u078-rb:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+@media (hover:none){.u078-rb{display:none}}
+.u078-m.in{animation:u078-in .5s var(--ux-spring)}
+@keyframes u078-in{from{opacity:0;transform:translateY(16px) scale(.9)}}
+.u078-m.me.in{transform-origin:100% 100%;animation:u078-up .55s var(--ux-spring)}
+@keyframes u078-up{from{opacity:0;transform:translateY(46px) scale(.6)}}
+.u078-ty{display:flex;gap:4px;align-self:flex-start;padding:12px 14px;border-radius:18px 18px 18px 6px;background:var(--ux-surface-2)}
+.u078-ty i{width:7px;height:7px;border-radius:50%;background:var(--ux-ink-3);animation:u078-dot 1.2s ease-in-out infinite}
+.u078-ty i:nth-child(2){animation-delay:.15s}.u078-ty i:nth-child(3){animation-delay:.3s}
+@keyframes u078-dot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.u078-reply{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ux-ease)}
+.u078-reply.on{grid-template-rows:1fr}
+.u078-reply>div{min-height:0;overflow:hidden}
+.u078-rbox{display:flex;align-items:center;gap:10px;margin:0 12px;padding:8px 6px 8px 12px;border-radius:14px 14px 0 0;background:var(--ux-surface-2);border-left:3px solid var(--ux-accent)}
+.u078-rbox span{flex:1;min-width:0;font-size:12.5px;line-height:1.35;color:var(--ux-ink-2)}
+.u078-rbox span b{display:block;font-size:11.5px;color:var(--ux-accent)}
+.u078-rbox span em{display:block;font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u078-rx{width:26px;height:26px;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3)}
+.u078-rx svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u078-rx:focus-visible{outline:2px solid var(--ux-accent)}
+.u078-bar{display:flex;align-items:center;gap:8px;padding:0 12px 14px}
+.u078-in{flex:1;min-width:0;height:46px;padding:0 16px;border:0;border-radius:23px;background:var(--ux-surface-2);font-size:14.5px;color:var(--ux-ink);outline:none;box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .2s}
+.u078-in:focus-visible{outline:none;box-shadow:inset 0 0 0 1.5px var(--ux-accent)}
+.u078-send{position:relative;width:46px;height:46px;flex:none;border:0;padding:0;border-radius:50%;background:var(--ux-surface-2);color:var(--ux-ink-2);transition:background-color .3s,color .3s,transform .3s var(--ux-spring)}
+.u078-send.go{background:var(--ux-accent);color:var(--ux-accent-ink)}
+.u078-send:active{transform:scale(.88)}
+.u078-send:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u078-send svg{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--ux-spring),opacity .2s}
+.u078-send .s{transform:scale(.3) rotate(-45deg);opacity:0}
+.u078-send.go .s{transform:none;opacity:1}
+.u078-send.go .mic{transform:scale(.3);opacity:0}
+</style>
+<div class="ux u078">
+  <div class="u078-top"><i aria-hidden="true"></i><span><b>Harin Yoon</b><small>Active now</small></span></div>
+  <div class="u078-log" aria-live="polite"></div>
+  <div class="u078-reply"><div><div class="u078-rbox"><span><b></b><em></em></span><button class="u078-rx" type="button" aria-label="Cancel reply" tabindex="-1"><svg viewBox="0 0 12 12"><path d="M3 3l6 6M9 3L3 9"/></svg></button></div></div></div>
+  <form class="u078-bar"><input class="u078-in" type="text" placeholder="Message" aria-label="Message" autocomplete="off"><button class="u078-send" type="submit" aria-label="Voice message"><svg class="mic" viewBox="0 0 20 20" aria-hidden="true"><rect x="7.5" y="3" width="5" height="9" rx="2.5"/><path d="M5 10a5 5 0 0 0 10 0M10 15v2.5"/></svg><svg class="s" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10L16.5 3.5 12 16.5 9.5 11z"/></svg></button></form>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var log = root.querySelector('.u078-log'), reply = root.querySelector('.u078-reply'), rb = reply.querySelector('b'), rt = reply.querySelector('em'), rx = root.querySelector('.u078-rx');
+  var form = root.querySelector('.u078-bar'), input = root.querySelector('.u078-in'), send = root.querySelector('.u078-send');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var target = null, ts = [];
+  var ARROW = '<svg viewBox="0 0 14 14"><path d="M5.5 3.5L2 7l3.5 3.5M2 7h6.5a3.5 3.5 0 0 1 3.5 3.5"/></svg>';
+  function esc(s) { return s.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
+  function bubble(text, me, quote, who) {
+    var m = document.createElement('div');
+    m.className = 'u078-m in' + (me ? ' me' : '');
+    m.innerHTML = '<span class="u078-rep" aria-hidden="true">' + ARROW + '</span><span class="u078-bub">' + (quote ? '<span class="u078-q">' + esc(quote) + '</span>' : '') + esc(text) + '</span>' + (me ? '' : '<button class="u078-rb" type="button" aria-label="Reply to this message">' + ARROW + '</button>');
+    m.setAttribute('data-t', text); m.setAttribute('data-w', who || (me ? 'Me' : 'Harin Yoon'));
+    log.appendChild(m);
+    m.addEventListener('animationend', function () { m.classList.remove('in'); });
+    if (!me) wire(m);
+    while (log.children.length > 7) log.firstChild.remove();
+    return m;
+  }
+  function setReply(m) {
+    target = m;
+    rb.textContent = 'Replying to ' + m.getAttribute('data-w');
+    rt.textContent = m.getAttribute('data-t');
+    reply.classList.add('on'); rx.tabIndex = 0;
+    input.focus({ preventScroll: true });
+  }
+  function clearReply() { target = null; reply.classList.remove('on'); rx.tabIndex = -1; }
+  function wire(m) {
+    var bub = m.querySelector('.u078-bub'), rep = m.querySelector('.u078-rep'), sx = 0, dx = 0, down = false;
+    bub.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; down = true; sx = e.clientX; dx = 0; bub.setPointerCapture(e.pointerId); m.classList.add('drag'); });
+    bub.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      dx = Math.max(0, e.clientX - sx); var d = dx > 60 ? 60 + (dx - 60) * 0.3 : dx;
+      bub.style.setProperty('--dx', d + 'px'); m.style.setProperty('--ro', Math.min(1, dx / 60).toFixed(2));
+      rep.classList.toggle('full', dx >= 60);
+    });
+    var end = function () { if (!down) return; down = false; m.classList.remove('drag'); bub.style.setProperty('--dx', '0px'); m.style.setProperty('--ro', 0); rep.classList.remove('full'); if (dx >= 60) setReply(m); };
+    bub.addEventListener('pointerup', end); bub.addEventListener('pointercancel', end);
+    m.querySelector('.u078-rb').addEventListener('click', function () { setReply(m); });
+  }
+  input.addEventListener('input', function () {
+    var on = !!input.value.trim();
+    send.classList.toggle('go', on);
+    send.setAttribute('aria-label', on ? 'Send' : 'Voice message');
+  });
+  rx.addEventListener('click', function () { clearReply(); input.focus(); });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && target) { e.preventDefault(); clearReply(); }
+    else if (e.key === 'Enter' && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true })); }
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = input.value.trim();
+    if (!v) { if (!rm) send.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 300 }); return; }
+    bubble(v, true, target && target.getAttribute('data-t'));
+    input.value = ''; send.classList.remove('go'); send.setAttribute('aria-label', 'Voice message');
+    clearReply();
+    ts.forEach(clearTimeout); ts = [];
+    var old = log.querySelector('.u078-ty'); if (old) old.remove();
+    ts.push(setTimeout(function () {
+      if (!root.isConnected) return;
+      var ty = document.createElement('div'); ty.className = 'u078-ty u078-m in'; ty.setAttribute('aria-label', 'Harin Yoon is typing'); ty.innerHTML = '<i></i><i></i><i></i>';
+      log.appendChild(ty);
+      ts.push(setTimeout(function () { if (!root.isConnected) return; ty.remove(); bubble(['Great, let’s do that!', 'Got it 👍', 'Oh, that’s nice'][Math.floor(Math.random() * 3)], false); }, rm ? 300 : 1500));
+    }, rm ? 100 : 500));
+  });
+  bubble('Draft v3 is up! I cut the button transition to 0.3s', false).classList.remove('in');
+  bubble('Feels much lighter', true).classList.remove('in');
+  bubble('Could you check dark mode too?', false).classList.remove('in');
+})();
+</script>

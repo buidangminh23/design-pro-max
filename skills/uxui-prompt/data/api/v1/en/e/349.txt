@@ -1,0 +1,76 @@
+<!-- Lucian UX/UI Prompt #349 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#349 -->
+<!--
+Element: Pixel-dissolve photo transition
+ID: 349 · Category: Sections & Content · Tags: transition, pixel, slider, dissolve, gallery
+What it does: Move to the next photo and the frame breaks into a small grid, each cell popping in a piece of the new photo at its own moment until it is covered. Choose how the cells spread: a wave from the left, a ring from the center, or at random.
+How to use it: Change photos with the arrows below, and pick a spread pattern on the right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#349
+-->
+<style>
+.u349{position:relative;width:340px;height:330px;display:flex;flex-direction:column;padding:14px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u349-fr{position:relative;flex:1;border-radius:18px;overflow:hidden;background:var(--bg)}
+.u349-cells{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(9,1fr)}
+.u349-cells i{background-image:var(--nx);background-size:1200% 900%;transform:scale(0);border-radius:2px}
+.u349-cells.go i{animation:u349-pop .38s cubic-bezier(.3,1.5,.5,1) both;animation-delay:var(--d)}
+@keyframes u349-pop{0%{transform:scale(0);border-radius:50%}70%{transform:scale(1.12)}100%{transform:scale(1.02);border-radius:0}}
+.u349-cap{position:absolute;left:14px;bottom:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,.35);color:#fff;font-size:12.5px;font-weight:750;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.u349-ft{display:flex;align-items:center;gap:8px;margin-top:12px}
+.u349-pv,.u349-nx{width:38px;height:38px;border:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-surface-2);color:var(--ux-ink)}
+.u349-ft svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.u349-ms{display:flex;gap:3px;margin-left:auto;padding:3px;border-radius:11px;background:var(--ux-surface-2)}
+.u349-m{height:30px;padding:0 10px;border:0;border-radius:8px;background:none;font-size:12px;font-weight:750;color:var(--ux-ink-3)}
+.u349-m[aria-pressed="true"]{background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line)}
+</style>
+<div class="ux u349">
+  <div class="u349-fr" role="img"><div class="u349-cells" aria-hidden="true"></div><span class="u349-cap" aria-hidden="true"></span></div>
+  <div class="u349-ft">
+    <button class="u349-pv" type="button" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+    <button class="u349-nx" type="button" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    <div class="u349-ms" role="group" aria-label="Spread pattern"><button class="u349-m" type="button" aria-pressed="true">Wave</button><button class="u349-m" type="button" aria-pressed="false">Ring</button><button class="u349-m" type="button" aria-pressed="false">Random</button></div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var fr = root.querySelector('.u349-fr'), cells = root.querySelector('.u349-cells'), cap = root.querySelector('.u349-cap');
+  var ms = Array.prototype.slice.call(root.querySelectorAll('.u349-m'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NAMES = ['Dawn lake', 'Desert afternoon', 'Violet night', 'Green forest'];
+  var IMG = [
+    'radial-gradient(30% 22% at 70% 35%,#FFF3BF,transparent 70%),linear-gradient(#A5D8FF 0,#FFD8A8 45%,#4DABF7 46%,#1864AB 100%)',
+    'radial-gradient(22% 18% at 25% 30%,#FFF9DB,transparent 70%),linear-gradient(#FFA94D,#F76707 50%,#E8590C 51%,#C2410C 75%,#9A3412)',
+    'radial-gradient(1.5px 1.5px at 30% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff,transparent),radial-gradient(40% 30% at 50% 100%,#E64980,transparent 70%),linear-gradient(#1B1035,#5F3DC4 70%,#9C36B5)',
+    'radial-gradient(50% 30% at 50% 10%,#D3F9D8,transparent 70%),linear-gradient(#69DB7C,#2F9E44 55%,#1B4332)'
+  ];
+  var cur = 0, mode = 0, busy = false, C = 12, R = 9, list = [];
+  for (var y = 0; y < R; y++) for (var x = 0; x < C; x++) {
+    var i = document.createElement('i');
+    i.style.backgroundPosition = (x / (C - 1) * 100) + '% ' + (y / (R - 1) * 100) + '%';
+    cells.appendChild(i); list.push({ el: i, x: x, y: y });
+  }
+  function show(n) { fr.style.setProperty('--bg', IMG[n]); cap.textContent = NAMES[n]; fr.setAttribute('aria-label', NAMES[n]); }
+  function go(n) {
+    if (busy) return;
+    n = (n + IMG.length) % IMG.length;
+    busy = true;
+    cells.style.setProperty('--nx', IMG[n]);
+    list.forEach(function (c) {
+      var d = mode === 0 ? c.x * 45 + c.y * 12 + Math.random() * 60 : mode === 1 ? Math.hypot(c.x - 5.5, (c.y - 4) * 1.2) * 70 + Math.random() * 40 : Math.random() * 650;
+      c.el.style.setProperty('--d', Math.round(d) + 'ms');
+    });
+    cells.classList.remove('go'); void cells.offsetWidth; cells.classList.add('go');
+    setTimeout(function () {
+      if (!root.isConnected) return;
+      show(n); cur = n;
+      cells.classList.remove('go');
+      busy = false;
+    }, rm ? 50 : 1080);
+  }
+  root.querySelector('.u349-nx').addEventListener('click', function () { go(cur + 1); });
+  root.querySelector('.u349-pv').addEventListener('click', function () { go(cur - 1); });
+  ms.forEach(function (b, i) { b.addEventListener('click', function () { mode = i; ms.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); }); });
+  show(0);
+})();
+</script>

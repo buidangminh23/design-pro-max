@@ -1,0 +1,96 @@
+<!-- Lucian UX/UI Prompt #326 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#326 -->
+<!--
+Element: Flipping-cell waffle chart
+ID: 326 · Category: Data Motion · Tags: waffle-chart, unit-chart, proportion, stagger, data
+What it does: A 100-cell waffle chart shows how 100 people commute; switch the age group above and only the cells that change hands flip one by one along a diagonal wave into their new color. The percentages in the legend on the right roll to their new values, and hovering or pressing a legend item leaves only that mode's cells in focus.
+How to use it: Switch age groups above, then hover the legend on the right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#326
+-->
+<style>
+.u326{position:relative;width:340px;height:340px;border-radius:30px;overflow:hidden;background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u326-hd{position:absolute;left:22px;right:22px;top:18px;display:flex;justify-content:space-between;align-items:baseline}
+.u326-hd b{font-size:14px;font-weight:900}
+.u326-hd span{font-size:10.5px;font-weight:700;color:var(--ux-ink-3)}
+.u326-tabs{position:absolute;left:22px;right:22px;top:46px;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.u326-tb{border:0;padding:6px 0;border-radius:9px;background:var(--ux-surface-2);color:var(--ux-ink-2);font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;transition:background .2s,color .2s}
+.u326-tb.is-on{background:var(--ux-ink);color:var(--ux-surface)}
+.u326-tb:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u326-gd{position:absolute;left:22px;top:94px;width:198px;height:198px;display:grid;grid-template-columns:repeat(10,1fr);gap:3px;perspective:400px}
+.u326-c{border-radius:4px;background:var(--c);transition:opacity .25s,transform .25s}
+.u326.is-f .u326-c{opacity:.16}
+.u326.is-f .u326-c.is-hl{opacity:1}
+.u326-lg{position:absolute;left:236px;right:16px;top:94px;display:flex;flex-direction:column;gap:6px}
+.u326-li{display:block;width:100%;border:0;padding:5px 6px;border-radius:10px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background .2s,opacity .2s}
+.u326-li:hover,.u326-li.is-on{background:var(--ux-surface-2)}
+.u326.is-f .u326-li:not(.is-hl){opacity:.4}
+.u326-li:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u326-li span{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:750;color:var(--ux-ink-2);white-space:nowrap}
+.u326-li span i{flex:none;width:8px;height:8px;border-radius:2px;background:var(--c)}
+.u326-li b{display:block;font-size:20px;font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.15}
+.u326-li b small{font-size:11px;font-weight:800;color:var(--ux-ink-3);margin-left:1px}
+</style>
+<div class="ux u326">
+  <div class="u326-hd"><b>How people commute</b><span>Per 100 people</span></div>
+  <div class="u326-tabs" role="group" aria-label="Age group"></div>
+  <div class="u326-gd" aria-hidden="true"></div>
+  <div class="u326-lg" aria-live="polite"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tabs = root.querySelector('.u326-tabs'), gd = root.querySelector('.u326-gd'), lg = root.querySelector('.u326-lg');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var CAT = ['Subway', 'Bus', 'Car', 'Bike/Walk'], AGE = ['20s', '30s', '40s', '50+'];
+  var COL = ['#6366F1', '#10B981', '#F59E0B', '#EC4899'];
+  var D = [[46, 28, 10, 16], [41, 22, 27, 10], [30, 18, 45, 7], [24, 27, 41, 8]];
+  var age = 0, cells = [], own = [], shown = D[0].slice(), T = [], LI = [], pin = -1;
+  for (var i = 0; i < 100; i++) { var c = document.createElement('span'); c.className = 'u326-c'; gd.appendChild(c); cells.push(c); }
+  AGE.forEach(function (a, i) { var b = document.createElement('button'); b.type = 'button'; b.className = 'u326-tb'; b.textContent = a; b.addEventListener('click', function () { setAge(i); }); tabs.appendChild(b); T.push(b); });
+  CAT.forEach(function (n, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'u326-li'; b.style.setProperty('--c', COL[i]);
+    b.innerHTML = '<span><i></i>' + n + '</span><b><em style="font-style:normal">0</em><small>%</small></b>';
+    b.addEventListener('pointerenter', function () { focus(i); });
+    b.addEventListener('pointerleave', function () { focus(pin); });
+    b.addEventListener('focus', function () { focus(i); });
+    b.addEventListener('blur', function () { focus(pin); });
+    b.addEventListener('click', function () { pin = pin === i ? -1 : i; LI.forEach(function (o, k) { o.classList.toggle('is-on', k === pin); o.setAttribute('aria-pressed', k === pin); }); focus(pin); });
+    lg.appendChild(b); LI.push(b);
+  });
+  function focus(k) {
+    root.classList.toggle('is-f', k >= 0);
+    cells.forEach(function (c, i) { c.classList.toggle('is-hl', own[i] === k); });
+    LI.forEach(function (o, i) { o.classList.toggle('is-hl', i === k); });
+  }
+  function owners(a) { var o = [], d = D[a]; d.forEach(function (n, k) { for (var j = 0; j < n; j++) o.push(k); }); return o; }
+  function label(i, v) { LI[i].querySelector('em').textContent = Math.round(v); LI[i].setAttribute('aria-label', CAT[i] + ' ' + D[age][i] + ' of 100'); }
+  var tw = 0;
+  function roll(from, to) {
+    cancelAnimationFrame(tw);
+    if (rm) { to.forEach(function (v, i) { label(i, v); }); shown = to.slice(); return; }
+    var t0 = performance.now();
+    (function f(now) {
+      var k = Math.min(1, (now - t0) / 700), e = 1 - Math.pow(1 - k, 3);
+      to.forEach(function (v, i) { shown[i] = from[i] + (v - from[i]) * e; label(i, shown[i]); });
+      if (k < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  function setAge(a) {
+    var prev = own, from = shown.slice();
+    age = a; own = owners(a);
+    T.forEach(function (b, i) { b.classList.toggle('is-on', i === a); b.setAttribute('aria-pressed', i === a); });
+    cells.forEach(function (c, i) {
+      var col = COL[own[i]];
+      if (prev[i] === own[i]) return;
+      if (rm || prev.length === 0) { c.style.setProperty('--c', col); return; }
+      var delay = ((i % 10) + Math.floor(i / 10)) * 22;
+      c.animate([{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg) scale(.85)', offset: 0.5 }, { transform: 'rotateY(0)' }], { duration: 380, delay: delay, easing: 'ease-in-out' });
+      setTimeout(function () { c.style.setProperty('--c', col); }, delay + 190);
+    });
+    roll(from, D[a]);
+    focus(pin);
+  }
+  setAge(0);
+})();
+</script>

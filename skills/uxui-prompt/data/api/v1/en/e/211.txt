@@ -1,0 +1,102 @@
+<!-- Lucian UX/UI Prompt #211 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#211 -->
+<!--
+Element: Glow-border sign-up CTA
+ID: 211 · Category: Hero & Backgrounds · Tags: cta, button, glow, conversion, landing
+What it does: A sign-up section at the end of a page: a faint grid and a beam of light turn behind the button, the “free for 14 days” line carries a flowing band of the button's colors, and colored light slowly circles the main button. Hover and the light speeds up as the button lifts slightly and the arrow pushes forward. Press it and three dots bounce inside before it turns into a check with ‘Check your inbox’, a faint green ring ripples out once from the button, the team count at the top rolls up by one, and the reassurance line changes.
+How to use it: Hover the main button, then press it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#211
+-->
+<style>
+.u211{position:relative;width:340px;height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:6px;box-sizing:border-box;border-radius:30px;overflow:hidden;isolation:isolate;background:radial-gradient(80% 60% at 50% 100%,color-mix(in srgb,var(--ux-accent) 20%,transparent),transparent 70%),var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);color:var(--ux-ink);text-align:center}
+
+.u211::before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(var(--ux-line) 1px,transparent 1px),linear-gradient(90deg,var(--ux-line) 1px,transparent 1px);background-size:26px 26px;background-position:center;-webkit-mask:radial-gradient(60% 50% at 50% 70%,#000,transparent 75%);mask:radial-gradient(60% 50% at 50% 70%,#000,transparent 75%);opacity:.7}
+.u211-bm{position:absolute;left:50%;top:68%;z-index:-1;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;background:conic-gradient(from var(--u211-b),transparent 0 70%,color-mix(in srgb,#6366F1 45%,transparent) 80%,color-mix(in srgb,#22D3EE 40%,transparent) 86%,transparent 92%);filter:blur(22px);opacity:.55;animation:u211-b 9s linear infinite;pointer-events:none}
+@property --u211-b{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes u211-b{to{--u211-b:360deg}}
+.u211-tg{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px 0 8px;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line),0 4px 12px -8px var(--ux-shadow-strong);font-size:10.5px;font-weight:750;color:var(--ux-ink-2)}
+.u211-tg em{font-style:normal;letter-spacing:-1px;color:#F59E0B;font-size:10px}
+.u211-cn{display:inline-block;height:14px;overflow:hidden;vertical-align:-3px;font-weight:900;color:var(--ux-ink);font-variant-numeric:tabular-nums}
+.u211-cn span{display:block;line-height:14px;transition:transform .45s cubic-bezier(.3,1.4,.5,1)}
+.u211-h{margin:14px 0 0;font-size:28px;line-height:1.14;font-weight:900;letter-spacing:-.045em}
+.u211-gr{background:linear-gradient(90deg,#6366F1,#22D3EE,#F472B6,#F59E0B,#6366F1);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:u211-g 6s linear infinite;transition:filter .4s}
+@keyframes u211-g{to{background-position:-200% 0}}
+.u211.is-done .u211-gr{background-image:linear-gradient(90deg,#10B981,#34D399,#10B981);animation:none}
+.u211-p{margin:10px 34px 0;font-size:11.5px;line-height:1.5;font-weight:600;color:var(--ux-ink-2)}
+.u211-row{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:20px;isolation:isolate}
+@property --u211-a{syntax:'<angle>';inherits:false;initial-value:0deg}
+.u211-bt{position:relative;height:44px;min-width:166px;padding:0;border:0;border-radius:999px;background:conic-gradient(from var(--u211-a),#6366F1,#22D3EE,#F472B6,#F59E0B,#6366F1);font:inherit;cursor:pointer;animation:u211-r 4s linear infinite;transition:transform .3s cubic-bezier(.3,1.6,.5,1),box-shadow .3s;box-shadow:0 10px 26px -14px #6366F1}
+.u211-bt::before{content:"";position:absolute;inset:-6px;border-radius:inherit;background:inherit;filter:blur(14px);opacity:.35;z-index:-1;transition:opacity .3s}
+.u211-bt:hover,.u211-bt.g-hov{transform:translateY(-2px);animation-duration:1.4s}
+.u211-bt:hover::before,.u211-bt.g-hov::before{opacity:.75}
+.u211-bt:focus-visible{outline:2px solid var(--ux-ink);outline-offset:4px}
+@keyframes u211-r{to{--u211-a:360deg}}
+.u211-in{position:absolute;inset:2px;border-radius:inherit;background:#0F1020;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:850;overflow:hidden}
+.u211-ar{width:14px;height:14px;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.u211-bt:hover .u211-ar,.u211-bt.g-hov .u211-ar{transform:translateX(4px)}
+.u211-dots{display:none;gap:4px}
+.u211-dots i{width:6px;height:6px;border-radius:50%;background:#fff;animation:u211-d .9s ease-in-out infinite}
+.u211-dots i:nth-child(2){animation-delay:.12s}
+.u211-dots i:nth-child(3){animation-delay:.24s}
+@keyframes u211-d{40%{transform:translateY(-5px);opacity:.6}}
+.u211.is-load .u211-dots{display:flex}
+.u211.is-load .u211-lb,.u211.is-load .u211-ar{display:none}
+.u211-ck{display:none;width:16px;height:16px}
+.u211-ck path{stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .45s .1s ease-out}
+.u211.is-done .u211-ck{display:block}
+.u211.is-done .u211-ck path{stroke-dashoffset:0}
+.u211.is-done .u211-ar{display:none}
+.u211.is-done .u211-bt{background:#10B981;animation:none;cursor:default}
+.u211.is-done .u211-bt::before{background:#10B981}
+.u211.is-done .u211-in{background:#0B3B2C}
+
+.u211-wv{position:absolute;left:50%;top:50%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;border:1.5px solid color-mix(in srgb,#10B981 70%,transparent);box-shadow:0 0 12px color-mix(in srgb,#10B981 22%,transparent);opacity:0;transform:scale(.15);pointer-events:none;z-index:-1}
+.u211.is-done .u211-wv{animation:u211-w 1.2s cubic-bezier(.2,.6,.3,1) .1s}
+@keyframes u211-w{0%{opacity:0;transform:scale(.15)}12%{opacity:.55}100%{opacity:0;transform:scale(1)}}
+.u211-gh{height:44px;padding:0 16px;border-radius:999px;background:var(--ux-surface);box-shadow:inset 0 0 0 1px var(--ux-line);display:inline-flex;align-items:center;font-size:12px;font-weight:800}
+.u211-ns{display:flex;justify-content:center;gap:12px;margin-top:16px;font-size:10.5px;font-weight:700;color:var(--ux-ink-3);transition:color .3s}
+.u211-ns span{display:inline-flex;align-items:center;gap:4px}
+.u211-ns svg{width:11px;height:11px;color:#10B981}
+.u211.is-done .u211-ns{color:#10B981}
+.u211-rs{position:absolute;right:14px;bottom:14px;border:0;padding:5px 10px;border-radius:999px;background:var(--ux-surface-2);color:var(--ux-ink-2);font:inherit;font-size:10px;font-weight:800;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s}
+.u211.is-done .u211-rs{opacity:1;pointer-events:auto}
+.u211-rs:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){.u211-bt,.u211-bm,.u211-gr{animation:none}.u211-dots i{animation:none}.u211.is-done .u211-wv{animation:none}.u211-cn span{transition:none}}
+</style>
+<div class="ux u211">
+  <span class="u211-bm" aria-hidden="true"></span>
+  <span class="u211-tg"><em aria-hidden="true">★★★★★</em><span><b class="u211-cn"><span></span></b> teams on board</span></span>
+  <h3 class="u211-h">Start today,<br><span class="u211-gr">free for 14 days</span></h3>
+  <p class="u211-p">Your whole team can start right away. Setup takes three minutes.</p>
+  <div class="u211-row">
+    <button type="button" class="u211-bt"><span class="u211-wv" aria-hidden="true"></span><span class="u211-in"><span class="u211-dots" aria-hidden="true"><i></i><i></i><i></i></span><svg class="u211-ck" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="u211-lb"></span><svg class="u211-ar" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7h8M7.5 3.5 11 7l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+    <span class="u211-gh">Talk to sales</span>
+  </div>
+  <div class="u211-ns" aria-live="polite"></div>
+  <button type="button" class="u211-rs">Reset</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var bt = root.querySelector('.u211-bt'), lb = root.querySelector('.u211-lb'), ns = root.querySelector('.u211-ns'), rs = root.querySelector('.u211-rs'), cn = root.querySelector('.u211-cn');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches, t = 0;
+  var NS0 = ['No card required', 'Cancel anytime'], CHK = '<svg viewBox="0 0 11 11" aria-hidden="true"><path d="M2.2 5.8l2 2L8.8 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var BASE = 1284, teams = BASE;
+  function count(n, roll) {
+    var old = cn.lastChild, nw = document.createElement('span'); nw.textContent = n.toLocaleString('en-US'); teams = n;
+    if (!roll || rm || !old.textContent) { cn.innerHTML = ''; cn.appendChild(nw); return; }
+    cn.appendChild(nw); void nw.offsetWidth; old.style.transform = nw.style.transform = 'translateY(-14px)';
+    setTimeout(function () { if (old.parentNode) old.remove(); nw.style.transition = 'none'; nw.style.transform = 'none'; void nw.offsetWidth; nw.style.transition = ''; }, 460);
+  }
+  function notes() { ns.innerHTML = ''; NS0.forEach(function (s) { var e = document.createElement('span'); e.innerHTML = CHK; e.appendChild(document.createTextNode(s)); ns.appendChild(e); }); }
+  function reset() { clearTimeout(t); root.classList.remove('is-load', 'is-done'); lb.textContent = 'Start for free'; notes(); bt.disabled = false; count(BASE, false); }
+  bt.addEventListener('click', function () {
+    if (root.classList.contains('is-load') || root.classList.contains('is-done')) return;
+    root.classList.add('is-load');
+    t = setTimeout(function () { root.classList.remove('is-load'); root.classList.add('is-done'); lb.textContent = 'Check your inbox'; ns.textContent = 'Sign-up link sent · Arrives within a minute'; count(teams + 1, true); }, rm ? 200 : 1300);
+  });
+  rs.addEventListener('click', function () { reset(); bt.focus({ preventScroll: true }); });
+  reset();
+})();
+</script>

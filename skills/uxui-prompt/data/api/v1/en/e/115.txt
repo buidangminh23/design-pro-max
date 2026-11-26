@@ -1,0 +1,17 @@
+<!-- Lucian UX/UI Prompt #115 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#115 -->
+<!--
+Element: Gradient stops
+ID: 115 · Category: Layout, Schedule & Design · Tags: gradient-stops, native, spatial
+What it does: An editor for placing the middle color of a three-color gradient. Move the middle stop and the point where the colors blend shifts, with its position shown below.
+How to use it: Drag the round middle stop left and right. ←/→ and Esc work too
+Footprint: fluid width (follows its container)
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#115
+-->
+<style>
+.u115{width:100%;max-width:400px;min-width:0;font-size:13px}.u115 button{font:inherit;color:inherit;cursor:pointer}.u115 input[type=range]{min-width:0;width:100%;accent-color:var(--ux-accent)}.u115 .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.u115{padding:14px 8px 10px}.u115 .gradient{height:185px;border-radius:90px 6px 6px 6px;background:linear-gradient(90deg,#536f9d 0%,#ad899e 50%,#d5ad82 100%)}.u115 .track{height:46px;position:relative;margin:15px 12px 0;border-top:2px solid var(--ux-line-2)}.u115 .end{position:absolute;top:-7px;width:11px;height:11px;border-radius:50%;background:#536f9d;border:2px solid var(--ux-surface)}.u115 .end:last-child{right:0;background:#d5ad82}.u115 .stop{position:absolute;left:calc(var(--pos,50%) - 22px);top:-19px;width:44px;height:44px;background:transparent;border:0;padding:0;touch-action:none;cursor:ew-resize}.u115 .stop:before{content:"";display:block;width:17px;height:17px;margin:4px auto 0;background:#ad899e;border:3px solid var(--ux-surface);border-radius:50%;box-shadow:0 0 0 1px var(--ux-ink-2)}.u115 .stop output{font-size:12px;display:block;margin-top:4px;color:var(--ux-ink-2)}
+</style>
+<div class="ux u115"><div class="gradient" aria-label="Three-color gradient"></div><div class="track"><span class="end"></span><button class="stop" role="slider" aria-label="Middle color stop position" aria-valuemin="5" aria-valuemax="95" aria-valuenow="50"><output>50%</output></button><span class="end"></span></div></div>
+<script>
+(()=>{const root=document.currentScript.previousElementSibling,q=s=>root.querySelector(s),qa=s=>[...root.querySelectorAll(s)];let v=50;function set(n){v=Math.max(5,Math.min(95,Math.round(n)));root.style.setProperty('--pos',v+'%');q('.gradient').style.background=`linear-gradient(90deg,#536f9d 0%,#ad899e ${v}%,#d5ad82 100%)`;q('.stop').setAttribute('aria-valuenow',v);q('output').textContent=v+'%'}q('.stop').onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End','Escape'].includes(e.key)){e.preventDefault();set(e.key==='Escape'?50:e.key==='Home'?5:e.key==='End'?95:v+(e.key==='ArrowRight'?5:-5))}};q('.stop').onpointerdown=e=>e.currentTarget.setPointerCapture(e.pointerId);q('.stop').onpointermove=e=>{if(e.currentTarget.hasPointerCapture(e.pointerId)){const r=q('.track').getBoundingClientRect();set((e.clientX-r.left)/r.width*100)}};})();
+</script>

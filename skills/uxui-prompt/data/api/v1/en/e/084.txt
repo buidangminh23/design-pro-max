@@ -1,0 +1,101 @@
+<!-- Lucian UX/UI Prompt #084 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#084 -->
+<!--
+Element: Voice-reactive dot loader
+ID: 084 · Category: Loading & Progress · Tags: voice, dots, wave, loader, press-and-hold
+What it does: While the mic button is held, five dots stretch up and down with the loudness of your voice. Let go and they turn into a rolling wave that shows it’s thinking, and then the transcribed sentence appears letter by letter.
+How to use it: Press and hold the mic button, then let go. On a keyboard, hold Space on the button and release it
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#084
+-->
+<style>
+.u084{position:relative;width:340px;height:380px;display:flex;flex-direction:column;align-items:center;padding:28px 24px 26px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden;text-align:center}
+.u084-lab{font-size:12.5px;font-weight:800;letter-spacing:.06em;color:var(--ux-ink-3);transition:color .3s}
+.u084[data-s="listen"] .u084-lab{color:var(--ux-danger)}
+.u084-dots{display:flex;align-items:center;justify-content:center;gap:12px;height:100px;margin-top:14px}
+.u084-dots i{width:22px;height:calc(22px + var(--h,0) * 70px);border-radius:999px;background:linear-gradient(180deg,var(--c1),var(--c2));transition:height .12s linear}
+.u084-dots i:nth-child(1){--c1:#22C3A6;--c2:#0EA5E9}
+.u084-dots i:nth-child(2){--c1:#3D8BFF;--c2:#7B61FF}
+.u084-dots i:nth-child(3){--c1:#7B61FF;--c2:#B04FD0}
+.u084-dots i:nth-child(4){--c1:#FF6B8B;--c2:#E5484D}
+.u084-dots i:nth-child(5){--c1:#FFB547;--c2:#FF7A45}
+.u084[data-s="idle"] .u084-dots i{animation:u084-breath 2.4s ease-in-out infinite;animation-delay:calc(var(--i) * .12s)}
+@keyframes u084-breath{50%{transform:scale(1.15);opacity:.75}}
+.u084[data-s="think"] .u084-dots i{height:22px;animation:u084-wave 1s cubic-bezier(.45,0,.55,1) infinite;animation-delay:calc(var(--i) * .1s)}
+@keyframes u084-wave{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-18px)}}
+.u084-say{min-height:48px;margin:16px 0 0;font-size:17px;line-height:1.45;font-weight:750;letter-spacing:-.03em}
+.u084-say .c{display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-2px;background:var(--ux-accent);animation:u084-caret 1s steps(1) infinite}
+@keyframes u084-caret{50%{opacity:0}}
+.u084-say.dim{color:var(--ux-ink-3);font-weight:650;font-size:14.5px}
+.u084-mic{position:relative;width:76px;height:76px;margin-top:auto;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--ux-ink);color:var(--ux-page);touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .35s var(--ux-spring),background-color .3s}
+.u084-mic svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.u084-mic::before{content:"";position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--ux-danger);opacity:0;transform:scale(calc(1 + var(--lv,0) * .35));transition:opacity .2s}
+.u084[data-s="listen"] .u084-mic{background:var(--ux-danger);color:#fff;transform:scale(1.08)}
+.u084[data-s="listen"] .u084-mic::before{opacity:.5}
+.u084-mic:focus-visible{outline:2px solid var(--ux-accent);outline-offset:6px}
+.u084-hint{margin-top:18px;font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+</style>
+<div class="ux u084" data-s="idle">
+  <span class="u084-lab" aria-live="polite">Idle</span>
+  <div class="u084-dots" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i></div>
+  <p class="u084-say dim" aria-live="polite">Listening while you hold</p>
+  <button class="u084-mic" type="button" aria-label="Hold to talk"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="10" y="4" width="8" height="13" rx="4"/><path d="M6.5 13.5a7.5 7.5 0 0 0 15 0M14 21v3"/></svg></button>
+  <span class="u084-hint" aria-hidden="true">Press and hold to talk</span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var dots = root.querySelectorAll('.u084-dots i'), mic = root.querySelector('.u084-mic'), say = root.querySelector('.u084-say'), lab = root.querySelector('.u084-lab');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ANS = ['Add a design review tomorrow at 10 AM', 'What’s the weather in Jeju this Saturday?', 'Tell Doyun Han I sent the draft'];
+  var raf = 0, t0 = 0, ts = [], n = 0, held = false;
+  function set(s, label) { root.setAttribute('data-s', s); lab.textContent = label; }
+  function listen(now) {
+    if (!root.isConnected || root.getAttribute('data-s') !== 'listen') return;
+    var t = (now - t0) / 1000, lv = 0;
+    dots.forEach(function (d, i) {
+      var v = Math.abs(Math.sin(t * 7 + i * 1.3) * 0.6 + Math.sin(t * 13 + i * 2.1) * 0.3 + Math.sin(t * 3.1) * 0.2);
+      v = rm ? 0.4 : Math.min(1, v * (0.7 + 0.3 * Math.sin(t * 2 + i)));
+      d.style.setProperty('--h', v.toFixed(3)); lv += v;
+    });
+    mic.style.setProperty('--lv', (lv / 5).toFixed(3));
+    raf = requestAnimationFrame(listen);
+  }
+  function down() {
+    if (held) return;
+    held = true;
+    ts.forEach(clearTimeout); ts = [];
+    set('listen', 'Listening');
+    say.className = 'u084-say dim'; say.textContent = 'Go ahead…';
+    t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(listen);
+  }
+  function up() {
+    if (!held) return;
+    held = false;
+    cancelAnimationFrame(raf);
+    dots.forEach(function (d) { d.style.setProperty('--h', 0); });
+    mic.style.setProperty('--lv', 0);
+    set('think', 'Thinking');
+    say.textContent = '';
+    var txt = ANS[n++ % ANS.length];
+    ts.push(setTimeout(function () {
+      if (!root.isConnected) return;
+      set('idle', 'Got it');
+      say.className = 'u084-say';
+      var k = 0;
+      (function type() {
+        if (!root.isConnected) return;
+        say.innerHTML = '';
+        say.appendChild(document.createTextNode(txt.slice(0, k)));
+        if (k < txt.length) { var c = document.createElement('span'); c.className = 'c'; say.appendChild(c); k++; ts.push(setTimeout(type, rm ? 0 : 38)); }
+      })();
+    }, rm ? 300 : 1600));
+  }
+  mic.addEventListener('pointerdown', function (e) { if (e.button !== 0) return; mic.setPointerCapture(e.pointerId); down(); });
+  mic.addEventListener('pointerup', up);
+  mic.addEventListener('pointercancel', up);
+  mic.addEventListener('keydown', function (e) { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); down(); } });
+  mic.addEventListener('keyup', function (e) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); up(); } });
+  mic.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+})();
+</script>

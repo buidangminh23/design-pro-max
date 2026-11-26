@@ -1,0 +1,73 @@
+<!-- Lucian UX/UI Prompt #308 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#308 -->
+<!--
+Element: Grid-to-list morph
+ID: 308 · Category: Sections & Content · Tags: flip, layout, grid, list, view-toggle
+What it does: Switch views and the photo tiles never vanish: each glides to its new spot and size as the layout moves between grid and list. The photos grow or shrink to fit their new slots, and the descriptions shown only in the list fade in beside them once the photos have settled.
+How to use it: Switch between grid and list with the buttons at the top right
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#308
+-->
+<style>
+.u308{position:relative;width:340px;height:350px;display:flex;flex-direction:column;padding:16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u308-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.u308-hd b{font-size:18px;font-weight:850}
+.u308-vs{display:flex;gap:2px;padding:3px;border-radius:11px;background:var(--ux-surface-2)}
+.u308-v{width:34px;height:28px;border:0;border-radius:8px;display:grid;place-items:center;background:none;color:var(--ux-ink-3)}
+.u308-v[aria-pressed="true"]{background:var(--ux-surface);color:var(--ux-ink);box-shadow:0 0 0 1px var(--ux-line)}
+.u308-v svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.u308-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.u308-it{display:flex;flex-direction:column;min-width:0}
+.u308-ph{aspect-ratio:1;border-radius:14px;background:var(--bg);transform-origin:0 0}
+.u308-tx{display:none;min-width:0}
+.u308-tx b{display:block;font-size:14px;font-weight:780;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u308-tx span{font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u308.is-list .u308-g{grid-template-columns:1fr;gap:6px}
+.u308.is-list .u308-it{flex-direction:row;align-items:center;gap:12px}
+.u308.is-list .u308-ph{width:38px;height:38px;aspect-ratio:auto;border-radius:10px;flex:none}
+.u308.is-list .u308-tx{display:block}
+</style>
+<div class="ux u308">
+  <div class="u308-hd"><b>Albums</b><div class="u308-vs" role="group" aria-label="View">
+    <button class="u308-v" type="button" aria-pressed="true" aria-label="Grid view"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg></button>
+    <button class="u308-v" type="button" aria-pressed="false" aria-label="List view"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+  </div></div>
+  <div class="u308-g"></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var g = root.querySelector('.u308-g'), vs = Array.prototype.slice.call(root.querySelectorAll('.u308-v'));
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var PH = [['Jeju sea', '12 photos'], ['Kyoto alleys', '24 photos'], ['Seorak autumn', '18 photos'], ['Busan at night', '9 photos'], ['Paris morning', '31 photos'], ['Namhae sunset', '15 photos']];
+  var BG = ['linear-gradient(#74C0FC,#1C7ED6)', 'linear-gradient(135deg,#FFD8A8,#E8590C)', 'linear-gradient(135deg,#FFA94D,#C92A2A)', 'linear-gradient(#364FC7,#0B0C12)', 'linear-gradient(135deg,#FFDEEB,#BAC8FF)', 'linear-gradient(#FFD43B,#F76707 60%,#5F3DC4)'];
+  var items = PH.map(function (p, i) {
+    var it = document.createElement('div');
+    it.className = 'u308-it';
+    it.innerHTML = '<span class="u308-ph" role="img"></span><span class="u308-tx"><b></b><span></span></span>';
+    var ph = it.querySelector('.u308-ph');
+    ph.style.setProperty('--bg', BG[i]); ph.setAttribute('aria-label', p[0]);
+    it.querySelector('b').textContent = p[0];
+    it.querySelector('.u308-tx span').textContent = p[1];
+    g.appendChild(it);
+    return { it: it, ph: ph, tx: it.querySelector('.u308-tx') };
+  });
+  function rel(el) {
+    var r = el.getBoundingClientRect(), rr = root.getBoundingClientRect(), k = root.offsetWidth / (rr.width || 1);
+    return { x: (r.left - rr.left) * k, y: (r.top - rr.top) * k, w: r.width * k, h: r.height * k };
+  }
+  function setView(list) {
+    var before = items.map(function (o) { return rel(o.ph); });
+    root.classList.toggle('is-list', list);
+    vs.forEach(function (b, i) { b.setAttribute('aria-pressed', String((i === 1) === list)); });
+    if (rm) return;
+    items.forEach(function (o, i) {
+      var a = before[i], b = rel(o.ph);
+      var sx = a.w / b.w, sy = a.h / b.h;
+      o.ph.animate([{ transform: 'translate(' + (a.x - b.x) + 'px,' + (a.y - b.y) + 'px) scale(' + sx + ',' + sy + ')', borderRadius: (list ? 14 / sx : 10 / sx) + 'px' }, { transform: 'none' }], { duration: 560, delay: i * 25, easing: 'cubic-bezier(.3,1.15,.4,1)', fill: 'backwards' });
+      if (list) o.tx.animate([{ opacity: 0, transform: 'translateX(-10px)' }, { opacity: 1, transform: 'none' }], { duration: 320, delay: 300 + i * 30, fill: 'backwards' });
+    });
+  }
+  vs.forEach(function (b, i) { b.addEventListener('click', function () { if ((i === 1) !== root.classList.contains('is-list')) setView(i === 1); }); });
+})();
+</script>

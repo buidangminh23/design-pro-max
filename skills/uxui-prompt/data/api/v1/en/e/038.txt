@@ -1,0 +1,161 @@
+<!-- Lucian UX/UI Prompt #038 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#038 -->
+<!--
+Element: Right-click context menu
+ID: 038 · Category: Menus & Tabs · Tags: context-menu, right-click, submenu, files, origin
+What it does: Right-click a file or press ⋯ and the menu blooms from the cursor. Near an edge it opens the other way, and the Share item slides its submenu in from the side. Deleting folds the card away with an undo.
+How to use it: Right-click a file card (or long-press, or use the ⋯ button). With a keyboard, press Shift+F10 on a card
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#038
+-->
+<style>
+.u038{position:relative;width:350px;height:350px;user-select:none;-webkit-user-select:none}
+.u038-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 12px}
+.u038-h b{font-size:18px;font-weight:760;letter-spacing:-.03em}
+.u038-h span{font-size:13px;color:var(--ux-ink-3)}
+.u038-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.u038-card{position:relative;padding:8px 8px 12px;border-radius:20px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);cursor:default;outline:none;transition:transform .45s var(--ux-spring),box-shadow .25s,opacity .35s,filter .35s}
+.u038-card:focus-visible{box-shadow:0 0 0 2px var(--ux-accent)}
+.u038-card.is-ctx{box-shadow:0 0 0 2px var(--ux-accent),0 16px 30px -18px var(--ux-shadow-strong);transform:translateY(-2px)}
+.u038-th{height:86px;border-radius:14px;background:var(--g);position:relative;overflow:hidden}
+.u038-th::after{content:"";position:absolute;left:12px;right:30%;bottom:12px;height:8px;border-radius:4px;background:rgba(255,255,255,.55);box-shadow:0 -14px 0 rgba(255,255,255,.35)}
+.u038-card b{display:block;margin:10px 4px 0;font-size:13.5px;font-weight:680;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.u038-card small{display:block;margin:2px 4px 0;font-size:11.5px;color:var(--ux-ink-3)}
+.u038-more{position:absolute;right:12px;top:12px;width:28px;height:28px;border:0;padding:0;border-radius:9px;background:rgba(255,255,255,.75);color:#2A2A30;display:grid;place-items:center;opacity:0;transition:opacity .2s}
+.u038-card:hover .u038-more,.u038-card:focus-within .u038-more{opacity:1}
+@media (hover:none){.u038-more{opacity:1}}
+.u038-more:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u038-more svg{width:16px;height:16px;fill:currentColor}
+.u038-card.is-gone{transform:scale(.94)}
+.u038-undo{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.u038-card.is-gone .u038-undo{opacity:1;pointer-events:auto}
+.u038-undo button{height:34px;padding:0 14px;border:0;border-radius:11px;background:var(--ux-ink);color:var(--ux-page);font-size:13px;font-weight:700}
+.u038-card.is-gone>:not(.u038-undo){opacity:.3;filter:grayscale(1)}
+.u038-menu{position:absolute;z-index:10;width:200px;padding:6px;border-radius:16px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line-2),0 24px 48px -20px var(--ux-shadow-strong);overflow:hidden;
+  height:var(--mh,auto);opacity:0;transform:scale(.85);visibility:hidden;transition:opacity .15s var(--ux-ease),transform .35s var(--ux-spring),height .4s var(--ux-spring),visibility 0s .35s}
+.u038-menu.is-open{opacity:1;transform:none;visibility:visible;transition:opacity .15s var(--ux-ease),transform .4s var(--ux-spring),height .4s var(--ux-spring)}
+.u038-track{display:flex;width:376px;gap:0;transition:transform .45s var(--ux-spring)}
+.u038-menu.is-sub .u038-track{transform:translateX(-188px)}
+.u038-p{width:188px;flex:none;margin:0;padding:0;list-style:none;transition:opacity .3s}
+.u038-menu.is-sub .u038-p:first-child,.u038-menu:not(.is-sub) .u038-p+.u038-p{opacity:0}
+.u038-back{color:var(--ux-ink-2)!important;font-weight:700!important}
+.u038-mi{display:flex;align-items:center;gap:10px;width:100%;height:38px;padding:0 10px;border:0;border-radius:10px;background:none;color:var(--ux-ink);font-size:13.5px;font-weight:620;text-align:left}
+.u038-mi:hover,.u038-mi:focus-visible,.u038-mi[aria-expanded="true"]{background:var(--ux-surface-2);outline:none}
+.u038-mi svg{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;color:var(--ux-ink-2)}
+.u038-mi kbd{margin-left:auto;font-family:inherit;font-size:11.5px;color:var(--ux-ink-3)}
+.u038-mi .u038-ar{margin-left:auto;width:14px;height:14px}
+.u038-mi.danger,.u038-mi.danger svg{color:var(--ux-danger)}
+.u038-sep{height:1px;margin:5px 8px;background:var(--ux-line)}
+</style>
+<div class="ux u038">
+  <div class="u038-h"><b>Recent files</b><span>4 items</span></div>
+  <div class="u038-grid">
+    <div class="u038-card" tabindex="0" aria-haspopup="menu" style="--g:linear-gradient(140deg,#8B6CFF,#5B8CFF)"><div class="u038-th"></div><b>Onboarding concept v4</b><small>Design · just now</small><button class="u038-more" type="button" aria-label="Menu for Onboarding concept v4" tabindex="-1"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.5" cy="8" r="1.5"/></svg></button><div class="u038-undo"><button type="button">Undo</button></div></div>
+    <div class="u038-card" tabindex="0" aria-haspopup="menu" style="--g:linear-gradient(140deg,#FFB547,#FF7A45)"><div class="u038-th"></div><b>Q3 report</b><small>Doc · 1 hour ago</small><button class="u038-more" type="button" aria-label="Menu for Q3 report" tabindex="-1"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.5" cy="8" r="1.5"/></svg></button><div class="u038-undo"><button type="button">Undo</button></div></div>
+    <div class="u038-card" tabindex="0" aria-haspopup="menu" style="--g:linear-gradient(140deg,#22C3A6,#0EA5E9)"><div class="u038-th"></div><b>Motion tokens</b><small>Sheet · yesterday</small><button class="u038-more" type="button" aria-label="Menu for Motion tokens" tabindex="-1"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.5" cy="8" r="1.5"/></svg></button><div class="u038-undo"><button type="button">Undo</button></div></div>
+    <div class="u038-card" tabindex="0" aria-haspopup="menu" style="--g:linear-gradient(140deg,#FF7A93,#B04FD0)"><div class="u038-th"></div><b>Brand moodboard</b><small>Board · 3 days ago</small><button class="u038-more" type="button" aria-label="Menu for Brand moodboard" tabindex="-1"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="12.5" cy="8" r="1.5"/></svg></button><div class="u038-undo"><button type="button">Undo</button></div></div>
+  </div>
+  <div class="u038-menu" role="menu" aria-label="File menu">
+    <div class="u038-track">
+      <ul class="u038-p" role="none">
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>Open<kbd>↵</kbd></button></li>
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Rename<kbd>F2</kbd></button></li>
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>Duplicate<kbd>⌘D</kbd></button></li>
+    <li role="none"><button class="u038-mi u038-has" type="button" role="menuitem" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg>Share<svg class="u038-ar" viewBox="0 0 14 14"><path d="M5 3l4 4-4 4"/></svg></button></li>
+    <li class="u038-sep" role="separator"></li>
+    <li role="none"><button class="u038-mi danger" type="button" role="menuitem" data-del><svg viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.8h5V7M7 7l.8 12.2h8.4L17 7"/></svg>Move to trash<kbd>⌫</kbd></button></li>
+    </ul>
+      <ul class="u038-p" role="none">
+        <li role="none"><button class="u038-mi u038-back" type="button" role="menuitem"><svg viewBox="0 0 24 24"><path d="M14.5 6L8.5 12l6 6"/></svg>Share</button></li>
+        <li class="u038-sep" role="separator"></li>
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Copy link</button></li>
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg>Send by email</button></li>
+    <li role="none"><button class="u038-mi" type="button" role="menuitem"><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M3.5 19c.6-3 2.8-4.5 5.5-4.5s4.9 1.5 5.5 4.5M16 8v6M13 11h6"/></svg>Invite members</button></li>
+    </ul>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var menu = root.querySelector('.u038-menu');
+  var panels = root.querySelectorAll('.u038-p');
+  var share = root.querySelector('.u038-has');
+  var back = root.querySelector('.u038-back');
+  var cards = Array.prototype.slice.call(root.querySelectorAll('.u038-card'));
+  var target = null;
+  function local(cx, cy) {
+    var r = root.getBoundingClientRect(), k = r.width / root.offsetWidth || 1;
+    return { x: (cx - r.left) / k, y: (cy - r.top) / k };
+  }
+  function items(p) { return Array.prototype.slice.call(panels[p].querySelectorAll('.u038-mi')); }
+  function fit(p) { menu.style.setProperty('--mh', (panels[p].offsetHeight + 12) + 'px'); }
+  function openAt(card, x, y, kb) {
+    closeAll();
+    target = card;
+    card.classList.add('is-ctx');
+    menu.classList.remove('is-sub');
+    fit(0);
+    var W = root.offsetWidth, H = root.offsetHeight, mw = 200, mh = panels[0].offsetHeight + 12;
+    var left = x + mw > W ? Math.max(0, x - mw) : x, top = y + mh > H ? Math.max(0, y - mh) : y;
+    menu.style.left = left + 'px'; menu.style.top = top + 'px';
+    menu.style.transformOrigin = (left < x ? 'right' : 'left') + ' ' + (top < y ? 'bottom' : 'top');
+    menu.classList.add('is-open');
+    if (kb) setTimeout(function () { items(0)[0].focus(); }, 30);
+  }
+  function sub(on, kb) {
+    menu.classList.toggle('is-sub', on);
+    share.setAttribute('aria-expanded', String(on));
+    fit(on ? 1 : 0);
+    if (kb) setTimeout(function () { (on ? back : share).focus(); }, 60);
+  }
+  function closeAll(refocus) {
+    menu.classList.remove('is-open', 'is-sub');
+    share.setAttribute('aria-expanded', 'false');
+    if (target) { target.classList.remove('is-ctx'); if (refocus) target.focus(); }
+    target = null;
+  }
+  cards.forEach(function (card) {
+    card.addEventListener('contextmenu', function (e) { e.preventDefault(); var p = local(e.clientX, e.clientY); openAt(card, p.x, p.y); });
+    card.querySelector('.u038-more').addEventListener('click', function (e) {
+      e.stopPropagation();
+      var b = e.currentTarget;
+      openAt(card, card.offsetLeft + b.offsetLeft + 28, card.offsetTop + b.offsetTop + 30, true);
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.target !== card) return;
+      if ((e.shiftKey && e.key === 'F10') || e.key === 'ContextMenu' || e.key === 'Enter') {
+        e.preventDefault();
+        openAt(card, card.offsetLeft + 40, card.offsetTop + 60, true);
+      }
+    });
+    var lp = 0;
+    card.addEventListener('pointerdown', function (e) {
+      if (e.pointerType !== 'touch') return;
+      var cx = e.clientX, cy = e.clientY;
+      lp = setTimeout(function () { var p = local(cx, cy); openAt(card, p.x, p.y); }, 480);
+    });
+    ['pointerup', 'pointercancel', 'pointermove'].forEach(function (t) { card.addEventListener(t, function () { clearTimeout(lp); }); });
+    card.querySelector('.u038-undo button').addEventListener('click', function () { card.classList.remove('is-gone'); card.focus(); });
+  });
+  [0, 1].forEach(function (p) {
+    items(p).forEach(function (m, i, arr) {
+      m.addEventListener('click', function () {
+        if (m === share) { sub(true, true); return; }
+        if (m === back) { sub(false, true); return; }
+        var t = target;
+        if (m.hasAttribute('data-del') && t) { closeAll(false); t.classList.add('is-gone'); t.querySelector('.u038-undo button').focus(); return; }
+        closeAll(true);
+      });
+      m.addEventListener('keydown', function (e) {
+        var d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+        if (d) { e.preventDefault(); arr[(i + d + arr.length) % arr.length].focus(); }
+        if (e.key === 'ArrowRight' && m === share) { e.preventDefault(); sub(true, true); }
+        if (e.key === 'ArrowLeft' && p === 1) { e.preventDefault(); sub(false, true); }
+      });
+    });
+  });
+  root.addEventListener('keydown', function (e) { if (e.key === 'Escape' && menu.classList.contains('is-open')) { e.preventDefault(); closeAll(true); } });
+  document.addEventListener('pointerdown', function (e) { if (root.isConnected && menu.classList.contains('is-open') && !menu.contains(e.target)) closeAll(false); });
+})();
+</script>

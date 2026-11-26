@@ -294,6 +294,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Seokwoooo/lucian-uxui-prompt and Seokwoooo/lucian-uxui
+
+- Authors: Seokwoooo
+- Repositories: https://github.com/Seokwoooo/lucian-uxui-prompt (commit `8749838ddc0987a0f7356ba9e2968fe419e7e06a`), https://github.com/Seokwoooo/lucian-uxui (commit `36f9a57dac3bee6b74c83a362d51479c3041bde4`)
+- Licence: MIT
+- Files: `skills/uxui-prompt/`, the bundled data byte for byte and the skill with the changes listed in its `NOTICE.md`
+
+```text
+MIT License
+
+Copyright (c) 2026 Seokwoooo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
 ## devicon
 
 - Files: `skills/apple/assets/apple.svg`

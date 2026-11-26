@@ -1,0 +1,84 @@
+<!-- Lucian UX/UI Prompt #355 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#355 -->
+<!--
+Element: Cloud autosave indicator
+ID: 355 · Category: Forms & Input · Tags: autosave, status, editor, offline, sync
+What it does: Start typing and three dots bob inside a cloud to show ‘Saving’; pause and they turn into a check that reads ‘Saved just now’. As time passes it switches to relative times like ‘Saved 10s ago’, and going offline draws a slash through the cloud with ‘Saved on this device’. Reconnect and a spinning arrow syncs it back.
+How to use it: Type in the body, and toggle offline with the switch below
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#355
+-->
+<style>
+.u355{position:relative;width:340px;height:330px;display:flex;flex-direction:column;padding:16px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u355-hd{display:flex;align-items:center;gap:8px}
+.u355-tt{flex:1;min-width:0;height:34px;border:0;background:none;font-size:18px;font-weight:850;letter-spacing:-.03em;color:var(--ux-ink);outline:none}
+.u355-st{display:flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 6px;border-radius:999px;background:var(--ux-surface-2);font-size:11.5px;font-weight:750;color:var(--ux-ink-2);white-space:nowrap;transition:background-color .3s,color .3s}
+.u355-st svg{width:24px;height:20px;overflow:visible}
+.u355-cl{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
+.u355-d{fill:currentColor;opacity:0}
+.u355[data-s="saving"] .u355-d{opacity:1;animation:u355-bob .9s ease-in-out infinite}
+.u355[data-s="saving"] .u355-d:nth-of-type(2){animation-delay:.15s}
+.u355[data-s="saving"] .u355-d:nth-of-type(3){animation-delay:.3s}
+@keyframes u355-bob{50%{transform:translateY(-2.5px)}}
+.u355-ok{fill:none;stroke:var(--ux-mint);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:12;stroke-dashoffset:12;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u355[data-s="saved"] .u355-ok{stroke-dashoffset:0}
+.u355-sl{stroke:var(--ux-warn);stroke-width:2;stroke-linecap:round;stroke-dasharray:30;stroke-dashoffset:30;transition:stroke-dashoffset .35s var(--ux-ease)}
+.u355[data-s="local"] .u355-sl{stroke-dashoffset:0}
+.u355[data-s="local"] .u355-st{background:color-mix(in srgb,var(--ux-warn) 14%,transparent);color:var(--ux-warn)}
+.u355-sy{fill:none;stroke:var(--ux-accent);stroke-width:1.8;stroke-linecap:round;opacity:0;transform-box:fill-box;transform-origin:50% 50%}
+.u355[data-s="sync"] .u355-sy{opacity:1;animation:u355-spin .8s linear infinite}
+@keyframes u355-spin{to{transform:rotate(360deg)}}
+.u355-ta{flex:1;width:100%;margin-top:8px;padding:12px;border:0;border-radius:14px;background:var(--ux-surface-2);font-size:14.5px;line-height:1.6;color:var(--ux-ink);resize:none;outline:none}
+.u355-ta:focus{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u355-ft{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.u355-ft span{font-size:12px;font-weight:650;color:var(--ux-ink-3)}
+.u355-off{display:flex;align-items:center;gap:8px;border:0;background:none;padding:0;font-size:12.5px;font-weight:700;color:var(--ux-ink-2)}
+.u355-off i{position:relative;width:36px;height:22px;border-radius:999px;background:var(--ux-surface-3);transition:background-color .3s}
+.u355-off i::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .4s var(--ux-spring)}
+.u355-off[aria-pressed="true"] i{background:var(--ux-warn)}
+.u355-off[aria-pressed="true"] i::after{transform:translateX(14px)}
+</style>
+<div class="ux u355" data-s="saved">
+  <div class="u355-hd">
+    <input class="u355-tt" type="text" value="Launch meeting" aria-label="Title">
+    <span class="u355-st" role="status"><svg viewBox="0 0 24 20" aria-hidden="true"><path class="u355-cl" d="M7 16.5h10.5a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.4 7.6 4.5 4.5 0 0 0 7 16.5z"/><circle class="u355-d" cx="9" cy="12" r="1.2"/><circle class="u355-d" cx="12.5" cy="12" r="1.2"/><circle class="u355-d" cx="16" cy="12" r="1.2"/><path class="u355-ok" d="M9.3 12l2.2 2.1 4-4.2"/><path class="u355-sl" d="M4 2l17 17"/><path class="u355-sy" d="M15.5 10.5a3.4 3.4 0 1 1-1-2.4M15.5 6.8v1.8h-1.8"/></svg><span class="u355-tx">Saved just now</span></span>
+  </div>
+  <textarea class="u355-ta" aria-label="Body">Notes for next week’s launch meeting.</textarea>
+  <div class="u355-ft"><span class="u355-all">All saved</span><button class="u355-off" type="button" aria-pressed="false"><i aria-hidden="true"></i>Work offline</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var tx = root.querySelector('.u355-tx'), ta = root.querySelector('.u355-ta'), tt = root.querySelector('.u355-tt'), off = root.querySelector('.u355-off');
+  var offline = false, savedAt = Date.now(), t1 = 0, t2 = 0, dirty = false;
+  function state(s, text) { root.setAttribute('data-s', s); tx.textContent = text; }
+  function ago() {
+    var s = Math.floor((Date.now() - savedAt) / 1000);
+    if (s < 10) return 'Saved just now';
+    if (s < 60) return 'Saved ' + s + 's ago';
+    return 'Saved ' + Math.floor(s / 60) + ' min ago';
+  }
+  function edited() {
+    clearTimeout(t1); clearTimeout(t2);
+    if (offline) { dirty = true; state('local', 'Saved on this device'); return; }
+    state('saving', 'Saving');
+    t1 = setTimeout(function () {
+      t2 = setTimeout(function () { if (!root.isConnected) return; savedAt = Date.now(); state('saved', ago()); }, 900);
+    }, 500);
+  }
+  ta.addEventListener('input', edited);
+  tt.addEventListener('input', edited);
+  off.addEventListener('click', function () {
+    offline = !offline;
+    off.setAttribute('aria-pressed', String(offline));
+    clearTimeout(t1); clearTimeout(t2);
+    if (offline) { state('local', 'Saved on this device'); return; }
+    state('sync', 'Syncing');
+    t2 = setTimeout(function () { if (!root.isConnected) return; dirty = false; savedAt = Date.now(); state('saved', ago()); }, 1300);
+  });
+  var iv = setInterval(function () {
+    if (!root.isConnected) { clearInterval(iv); return; }
+    if (root.getAttribute('data-s') === 'saved') tx.textContent = ago();
+  }, 1000);
+})();
+</script>

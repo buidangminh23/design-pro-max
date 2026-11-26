@@ -1,0 +1,163 @@
+<!-- Lucian UX/UI Prompt #096 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#096 -->
+<!--
+Element: Stock line that splits as you scrub
+ID: 096 · Category: Widgets & Charts · Tags: chart, line, scrub, stock, morph
+What it does: Scrub along the line and it splits into color to the left of the cursor and grey to the right, while the price, change and date at the top switch to that point. Dropping below the starting point turns the line and area red; let go and the cursor returns to now, and changing the period morphs the line into its new shape.
+How to use it: Sweep the mouse across the chart or drag with a finger. Change the period with 1D·1W·1M·1Y below. On a keyboard, use ←/→ on the chart
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#096
+-->
+<style>
+.u096{--c:var(--ux-mint);position:relative;width:340px;height:410px;display:flex;flex-direction:column;padding:20px 18px 14px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u096.dn{--c:var(--ux-danger)}
+.u096-h small{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:750;color:var(--ux-ink-3)}
+.u096-h small i{width:18px;height:18px;border-radius:6px;background:var(--ux-grad)}
+.u096-p{display:block;margin-top:4px;font-size:30px;font-weight:850;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.u096-d{display:flex;gap:6px;margin-top:2px;font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums}
+.u096-d b{color:var(--c);transition:color .3s}
+.u096-d span{color:var(--ux-ink-3)}
+.u096-ch{position:relative;flex:none;height:236px;margin:auto -18px 0;touch-action:pan-y;cursor:crosshair;outline:none}
+.u096-ch:focus-visible{box-shadow:inset 0 0 0 2px var(--ux-accent)}
+.u096-ch svg{display:block;width:100%;height:100%;overflow:visible}
+.u096-base{fill:none;stroke:var(--ux-ink-3);stroke-opacity:.35;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.u096-line{fill:none;stroke:var(--c);stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round;transition:stroke .3s}
+.u096-gd stop{stop-color:var(--c);transition:stop-color .3s}
+.u096-ref{stroke:var(--ux-ink-3);stroke-opacity:.5;stroke-width:1;stroke-dasharray:2 4}
+.u096-cur{stroke:var(--ux-ink-3);stroke-width:1;opacity:0;transition:opacity .2s}
+.u096.scrub .u096-cur{opacity:.6}
+.u096-dot{fill:var(--c);stroke:var(--ux-surface);stroke-width:2.5;transition:fill .3s}
+.u096-ring{fill:none;stroke:var(--c);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:u096-pulse 1.8s ease-out infinite}
+.u096.scrub .u096-ring{animation:none;opacity:0}
+@keyframes u096-pulse{from{transform:scale(1);opacity:.7}to{transform:scale(3.2);opacity:0}}
+.u096-tag{position:absolute;top:2px;left:0;height:22px;padding:0 8px;border-radius:7px;display:flex;align-items:center;background:var(--ux-ink);color:var(--ux-page);font-size:11px;font-weight:800;white-space:nowrap;pointer-events:none;transform:translateX(var(--tx,0));opacity:0;transition:opacity .2s}
+.u096.scrub .u096-tag{opacity:1}
+.u096-ev{fill:var(--ux-surface);stroke:var(--ux-ink-2);stroke-width:2}
+.u096-rg{position:relative;display:flex;margin-top:10px;padding:3px;border-radius:13px;background:var(--ux-surface-2)}
+.u096-rg::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc((100% - 6px) / 4);border-radius:10px;background:var(--ux-surface);box-shadow:0 1px 4px -1px var(--ux-shadow-strong);transform:translateX(calc(var(--k,0) * 100%));transition:transform .45s var(--ux-spring)}
+.u096-rg button{position:relative;flex:1;height:32px;border:0;padding:0;background:transparent;font-size:12.5px;font-weight:800;color:var(--ux-ink-3);transition:color .2s}
+.u096-rg button[aria-pressed="true"]{color:var(--ux-ink)}
+.u096-rg button:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px;border-radius:10px}
+</style>
+<div class="ux u096">
+  <div class="u096-h"><small><i aria-hidden="true"></i>LUMN · Lumen</small><b class="u096-p">₩0</b><div class="u096-d" aria-live="polite"><b></b><span></span></div></div>
+  <div class="u096-ch" tabindex="0" role="slider" aria-label="Price history" aria-valuemin="0">
+    <svg viewBox="0 0 340 236" aria-hidden="true">
+      <defs><linearGradient class="u096-gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-opacity=".3"/><stop offset="1" stop-opacity="0"/></linearGradient><clipPath class="u096-cp"><rect x="0" y="-20" height="276" width="340"/></clipPath></defs>
+      <line class="u096-ref" x1="0" x2="340"/>
+      <path class="u096-base"/>
+      <g class="u096-clip"><path class="u096-area"/><path class="u096-line"/></g>
+      <circle class="u096-ev" r="4"/>
+      <line class="u096-cur" y1="0" y2="236"/>
+      <circle class="u096-ring" r="5"/><circle class="u096-dot" r="5.5"/>
+    </svg>
+    <span class="u096-tag"></span>
+  </div>
+  <div class="u096-rg" role="group" aria-label="Period"><button type="button" aria-pressed="true">1D</button><button type="button" aria-pressed="false">1W</button><button type="button" aria-pressed="false">1M</button><button type="button" aria-pressed="false">1Y</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var uid = 'u096' + Math.random().toString(36).slice(2, 7);
+  var q = function (s) { return root.querySelector(s); };
+  var price = q('.u096-p'), dB = q('.u096-d b'), dS = q('.u096-d span'), ch = q('.u096-ch'), tag = q('.u096-tag');
+  var base = q('.u096-base'), line = q('.u096-line'), area = q('.u096-area'), ref = q('.u096-ref'), cur = q('.u096-cur'), dot = q('.u096-dot'), ring = q('.u096-ring'), ev = q('.u096-ev');
+  var rect = q('.u096-cp rect'), rg = q('.u096-rg'), btns = rg.querySelectorAll('button');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  q('.u096-gd').id = uid + 'g'; q('.u096-cp').id = uid + 'c';
+  area.setAttribute('fill', 'url(#' + uid + 'g)');
+  q('.u096-clip').setAttribute('clip-path', 'url(#' + uid + 'c)');
+  var N = 61, W = 340, H = 236, PT = 34, PB = 14;
+  function rnd(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function series(seed, a, b, vol) {
+    var r = rnd(seed), w = [0];
+    for (var i = 1; i < N; i++) w.push(w[i - 1] + (r() - 0.5) * vol);
+    return w.map(function (v, i) { var t = i / (N - 1); return Math.round(a + (b - a) * t + v - w[N - 1] * t); });
+  }
+  var R = [
+    { v: series(7, 52300, 53540, 420), lab: function (i) { var m = 9 * 60 + Math.round(i * 6.5); return (Math.floor(m / 60) % 12 || 12) + ':' + ('0' + m % 60).slice(-2) + (m < 720 ? ' AM' : ' PM'); }, now: 'Today', ev: [20, 'Volume spike'] },
+    { v: series(3, 50100, 53540, 700), lab: function (i) { var d = 6 + Math.floor(i / 12.2); return 'Oct ' + d; }, now: 'Past week', ev: [36, 'Product launch'] },
+    { v: series(11, 57900, 53540, 1100), lab: function (i) { var d = 10 + Math.floor(i / 2); return d > 30 ? 'Oct ' + (d - 30) : 'Sep ' + d; }, now: 'Past month', ev: [38, 'Earnings'] },
+    { v: series(5, 38200, 53540, 2600), lab: function (i) { var m = 10 + Math.floor(i / 5); return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][(m - 1) % 12] + (m > 12 ? ' 2026' : ' 2025'); }, now: 'Past year', ev: [44, 'Stock split'] }
+  ];
+  var k = 0, ys = null, at = N - 1, scrub = false, tw = 0, back = 0;
+  function proj(v) { var mn = Math.min.apply(null, v), mx = Math.max.apply(null, v), pad = (mx - mn) * 0.12; return v.map(function (x) { return PT + (1 - (x - mn + pad) / (mx - mn + pad * 2)) * (H - PT - PB); }); }
+  function X(i) { return i / (N - 1) * (W - 20); }
+  function d(y) { return y.map(function (v, i) { return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + v.toFixed(1); }).join(''); }
+  function value(i) { var v = R[k].v, a = Math.floor(i), b = Math.min(N - 1, a + 1); return v[a] + (v[b] - v[a]) * (i - a); }
+  function yAt(i) { var a = Math.floor(i), b = Math.min(N - 1, a + 1); return ys[a] + (ys[b] - ys[a]) * (i - a); }
+  function paint() {
+    var p = d(ys);
+    base.setAttribute('d', p); line.setAttribute('d', p);
+    area.setAttribute('d', p + 'L' + X(N - 1) + ' ' + H + 'L0 ' + H + 'Z');
+    ref.setAttribute('y1', ys[0]); ref.setAttribute('y2', ys[0]);
+    var e = R[k].ev[0]; ev.setAttribute('cx', X(e)); ev.setAttribute('cy', ys[e]);
+    place();
+  }
+  function place() {
+    var x = X(at), y = yAt(at), r = R[k], v = Math.round(value(at)), d0 = v - r.v[0];
+    rect.setAttribute('width', x.toFixed(1));
+    cur.setAttribute('x1', x); cur.setAttribute('x2', x);
+    dot.setAttribute('cx', x); dot.setAttribute('cy', y); ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+    root.classList.toggle('dn', d0 < 0);
+    price.textContent = '₩' + v.toLocaleString('ko-KR');
+    dB.textContent = (d0 >= 0 ? '+' : '−') + '₩' + Math.abs(d0).toLocaleString('ko-KR') + ' (' + (d0 >= 0 ? '+' : '−') + Math.abs(d0 / r.v[0] * 100).toFixed(2) + '%)';
+    var near = Math.abs(at - r.ev[0]) <= 1.5;
+    dS.textContent = scrub ? r.lab(Math.round(at)) : r.now;
+    tag.textContent = near ? r.ev[1] + ' · ' + r.lab(r.ev[0]) : r.lab(Math.round(at));
+    var cw = ch.clientWidth, tw2 = tag.offsetWidth, px = x / W * cw;
+    tag.style.setProperty('--tx', Math.max(8, Math.min(cw - tw2 - 8, px - tw2 / 2)).toFixed(1) + 'px');
+    ch.setAttribute('aria-valuemax', N - 1); ch.setAttribute('aria-valuenow', Math.round(at));
+    ch.setAttribute('aria-valuetext', (scrub ? r.lab(Math.round(at)) : r.now) + ' ₩' + v.toLocaleString('ko-KR'));
+  }
+  function morph(to) {
+    cancelAnimationFrame(tw);
+    var from = ys ? ys.slice() : to.map(function () { return H - PB; }), t0 = performance.now(), dur = rm ? 1 : 650;
+    (function f(n) {
+      if (!root.isConnected) return;
+      var t = Math.min(1, (n - t0) / dur), e = t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      ys = from.map(function (y, i) { return y + (to[i] - y) * e; });
+      paint();
+      if (t < 1) tw = requestAnimationFrame(f);
+    })(t0);
+  }
+  function goBack() {
+    cancelAnimationFrame(back);
+    var from = at, t0 = performance.now(), dur = rm ? 1 : 450;
+    (function f(n) {
+      if (!root.isConnected) return;
+      var t = Math.min(1, (n - t0) / dur), e = 1 - Math.pow(1 - t, 3);
+      at = from + (N - 1 - from) * e; place();
+      if (t < 1) back = requestAnimationFrame(f);
+    })(t0);
+  }
+  function idx(e) { var r = ch.getBoundingClientRect(); return Math.max(0, Math.min(N - 1, (e.clientX - r.left) / r.width * W / (W - 20) * (N - 1))); }
+  function start(e) { cancelAnimationFrame(back); scrub = true; root.classList.add('scrub'); at = idx(e); place(); }
+  function end() { if (!scrub) return; scrub = false; root.classList.remove('scrub'); goBack(); }
+  var touching = false;
+  ch.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse') return; touching = true; ch.setPointerCapture(e.pointerId); start(e); });
+  ch.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || touching) start(e); });
+  ch.addEventListener('pointerup', function (e) { if (touching) { touching = false; end(); } });
+  ch.addEventListener('pointercancel', function () { touching = false; end(); });
+  ch.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') end(); });
+  ch.addEventListener('keydown', function (e) {
+    var s = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+    if (e.key === 'Escape') return end();
+    if (e.key === 'Home') s = -N; else if (e.key === 'End') s = N;
+    if (s === undefined) return;
+    e.preventDefault(); cancelAnimationFrame(back);
+    scrub = true; root.classList.add('scrub');
+    at = Math.max(0, Math.min(N - 1, Math.round(at) + s)); place();
+  });
+  ch.addEventListener('blur', end);
+  btns.forEach(function (b, j) {
+    b.addEventListener('click', function () {
+      if (j === k) return;
+      k = j; rg.style.setProperty('--k', j);
+      btns.forEach(function (x, i) { x.setAttribute('aria-pressed', String(i === j)); });
+      at = N - 1; morph(proj(R[k].v));
+    });
+  });
+  morph(proj(R[0].v));
+})();
+</script>

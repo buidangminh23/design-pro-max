@@ -1,0 +1,103 @@
+<!-- Lucian UX/UI Prompt #028 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#028 -->
+<!--
+Element: Auto-growing reply box
+ID: 028 · Category: Inputs & Search · Tags: textarea, autogrow, counter, ring, composer
+What it does: The box grows smoothly as you write, and the ring in the bottom-right fills as you use up characters. Near the limit the ring turns orange, past it red, and it shows how many are left as a number.
+How to use it: Write a long reply. Past 140 characters the Post button is blocked
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#028
+-->
+<style>
+.u028{position:relative;width:350px;height:300px;display:flex;flex-direction:column;justify-content:center}
+.u028-thread{display:flex;gap:10px;margin-bottom:14px}
+.u028-av{width:34px;height:34px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFD3A8,#FF7A93 60%,#8B6CFF)}
+.u028-bub{margin:0;padding:10px 14px;border-radius:4px 16px 16px 16px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line);font-size:14px;line-height:1.5;color:var(--ux-ink-2)}
+.u028-bub b{display:block;font-size:12.5px;color:var(--ux-ink);margin-bottom:2px}
+.u028-box{position:relative;padding:14px 14px 12px 16px;border-radius:22px;background:var(--ux-surface);box-shadow:0 0 0 1.5px var(--ux-line-2),0 20px 40px -28px var(--ux-shadow-strong);transition:box-shadow .3s var(--ux-ease)}
+.u028-box:focus-within{box-shadow:0 0 0 2px var(--ux-accent),0 0 0 6px var(--ux-accent-soft),0 20px 40px -28px var(--ux-shadow-strong)}
+.u028-ta{display:block;width:100%;height:24px;min-height:24px;max-height:144px;padding:0;border:0;outline:0;resize:none;background:none;font:inherit;font-size:15.5px;line-height:24px;color:var(--ux-ink);overflow:hidden;transition:height .25s var(--ux-ease)}
+.u028-ta::placeholder{color:var(--ux-ink-3)}
+.u028-foot{display:flex;align-items:center;gap:10px;margin-top:12px}
+.u028-tool{width:34px;height:34px;border:0;padding:0;border-radius:10px;background:none;color:var(--ux-ink-3);display:grid;place-items:center;transition:background-color .2s,color .2s}
+.u028-tool:hover{background:var(--ux-surface-2);color:var(--ux-ink)}
+.u028-tool:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u028-tool svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.u028-ring{position:relative;width:30px;height:30px;margin-left:auto;transition:transform .45s var(--ux-spring)}
+.u028-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.u028-ring circle{fill:none;stroke-width:3}
+.u028-ring .bg{stroke:var(--ux-surface-3)}
+.u028-ring .fg{stroke:var(--ux-accent);stroke-linecap:round;stroke-dasharray:75.4;stroke-dashoffset:calc(75.4 * (1 - var(--p,0)));transition:stroke-dashoffset .3s var(--ux-ease),stroke .3s var(--ux-ease)}
+.u028-left{position:absolute;inset:0;display:grid;place-items:center;font-size:10.5px;font-weight:800;font-variant-numeric:tabular-nums;opacity:0;transition:opacity .2s}
+.u028.is-near .u028-ring{transform:scale(1.25)}
+.u028.is-near .u028-ring .fg{stroke:var(--ux-warn)}
+.u028.is-near .u028-left{opacity:1;color:var(--ux-warn)}
+.u028.is-over .u028-ring .fg{stroke:var(--ux-danger)}
+.u028.is-over .u028-left{color:var(--ux-danger)}
+.u028-send{height:38px;padding:0 16px;border:0;border-radius:12px;background:var(--ux-ink);color:var(--ux-page);font-size:14px;font-weight:700;transition:opacity .25s var(--ux-ease),transform .4s var(--ux-spring)}
+.u028-send:active{transform:scale(.94)}
+.u028-send:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u028-send[aria-disabled="true"]{opacity:.3;cursor:not-allowed}
+.u028-sep{width:1px;height:20px;background:var(--ux-line-2)}
+.u028-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.u028-ta:focus-visible{outline:none}
+</style>
+<div class="ux u028">
+  <div class="u028-thread">
+    <span class="u028-av" aria-hidden="true"></span>
+    <p class="u028-bub"><b>Seojun Yoon</b>The transition in concept 3 feels a little fast. Any thoughts?</p>
+  </div>
+  <div class="u028-box">
+    <textarea class="u028-ta" rows="1" placeholder="Write a reply" aria-label="Reply">Sounds good! I’ll set it to 200ms.</textarea>
+    <div class="u028-foot">
+      <button class="u028-tool" type="button" aria-label="Attach image"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><circle cx="9.5" cy="10" r="1.6"/><path d="M5 17l4.5-4.5 3 3 2.5-2.5L19.5 17"/></svg></button>
+      <button class="u028-tool" type="button" aria-label="Mention"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M15.5 12v1.3a2.2 2.2 0 0 0 4.4 0V12a8 8 0 1 0-3 6.2"/></svg></button>
+      <span class="u028-ring" aria-hidden="true"><svg viewBox="0 0 30 30"><circle class="bg" cx="15" cy="15" r="12"/><circle class="fg" cx="15" cy="15" r="12"/></svg><span class="u028-left"></span></span>
+      <span class="u028-sep" aria-hidden="true"></span>
+      <button class="u028-send" type="button">Post</button>
+    </div>
+  </div>
+  <span class="u028-sr" aria-live="polite"></span>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var ta = root.querySelector('.u028-ta');
+  var left = root.querySelector('.u028-left');
+  var send = root.querySelector('.u028-send');
+  var sr = root.querySelector('.u028-sr');
+  var MAX = 140;
+  function grow() {
+    var h = ta.style.height;
+    ta.style.transition = 'none';
+    ta.style.height = '24px';
+    var need = Math.min(144, ta.scrollHeight);
+    ta.style.height = h || '24px';
+    void ta.offsetHeight;
+    ta.style.transition = '';
+    ta.style.height = need + 'px';
+    ta.style.overflowY = ta.scrollHeight > 144 ? 'auto' : 'hidden';
+  }
+  function count() {
+    var n = Array.from(ta.value).length;
+    var rest = MAX - n;
+    root.style.setProperty('--p', Math.min(1, n / MAX).toFixed(3));
+    root.classList.toggle('is-near', rest <= 20);
+    root.classList.toggle('is-over', rest < 0);
+    left.textContent = rest;
+    var bad = n === 0 || rest < 0;
+    send.setAttribute('aria-disabled', String(bad));
+    if (rest === 20 || rest === 0 || rest === -1) sr.textContent = rest >= 0 ? rest + ' characters left' : 'Over the character limit';
+  }
+  ta.addEventListener('input', function () { grow(); count(); });
+  send.addEventListener('click', function () {
+    if (send.getAttribute('aria-disabled') === 'true') { ta.focus(); return; }
+    ta.value = '';
+    grow(); count();
+    sr.textContent = 'Reply posted';
+    send.textContent = 'Posted';
+    setTimeout(function () { if (root.isConnected) send.textContent = 'Post'; }, 1400);
+  });
+  grow(); count();
+})();
+</script>
