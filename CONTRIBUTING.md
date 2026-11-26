@@ -48,7 +48,7 @@ An own part is a `PART.md` guide, with references, assets and checkers, written 
 
 ## Vendor updates
 
-The weekly vendor sync proposes upstream changes as one pull request on the `vendor-sync` branch. Only an update that changes no shipped file, where upstream moved past the pins without touching the parts, merges itself, after the CI workflow passes on it; every update that adds, removes or edits a file waits for the maintainer, because agents read and run these files with the user's permissions. Comments on that pull request about what you checked in the upstream diff are welcome.
+The weekly vendor sync proposes upstream changes as one pull request on the `vendor-sync` branch. An update that changes no shipped file, where upstream moved past the pins without touching the parts, merges itself after the CI workflow passes on it. A small edit of existing Markdown files that no review pattern flags can merge itself too, but only after a pinned model reviewed exactly that diff as untrusted data and approved it with no concern, after it waited 6 days on the branch, and only while nobody set the `vendor-hold` label; patterns can only send an update to the maintainer, never approve one. Every other update, and every gated one whose review is missing, failed or not an approval, waits for the maintainer, because agents read and run these files with the user's permissions. Comments on that pull request about what you checked in the upstream diff are welcome.
 
 ## Releases
 

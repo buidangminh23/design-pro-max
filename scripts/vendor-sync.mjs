@@ -12,6 +12,11 @@
  *   confirm --from <dir>               network: re-fetch every moved source at its staged commit and require the
  *                                      staged parts to match a fresh copy, with the pin an ancestor of that commit
  *   apply --from <dir>                 check a staged update and copy it into the tree
+ *   review --from <dir> --out <file>   network: have the pinned model review a text edit that the review gate takes
+ *                                      (scripts/lib/vendor-review.mjs); needs ANTHROPIC_API_KEY, writes a record always
+ *   gate --classification <file> --review <file> --labels <file> --proposed-at <iso>
+ *                                      decide whether the workflow may merge after CI: pin-only, or a text edit that
+ *                                      passed the review and the hold; prints JSON and fails closed
  *
  * Every command also takes --root <dir>. Git always runs through execFile, never through a shell. Sync refuses to
  * start while a symlink or special file sits in the vendor folder or on the way down to it, and never writes outside
@@ -65,13 +70,14 @@ import {
 } from './lib/vendor.mjs';
 import { MEDIA_NOTICES } from './lib/media.mjs';
 import { RISKY_PATTERNS, visiblePath } from './vendor-guard.mjs';
+import { HOLD_DAYS, HOLD_LABEL, REVIEW_MODEL, gateDecision, gateEligibility, runReview } from './lib/vendor-review.mjs';
 
 const execFileAsync = promisify(execFile);
 const OBJECT_PATTERN = /^[0-9a-f]{40,64}$/;
 const RESERVED_SEGMENTS = new Set(['.claude-plugin', '.codex-plugin', '.claude', '.agents', '.codex', '.git']);
 const GENERATED_NAMES = new Map([['license', 'LICENSE'], [UPSTREAM_FILE.toLowerCase(), UPSTREAM_FILE]]);
 const CHECKS_MODES = process.platform !== 'win32';
-const USAGE = 'Usage: node scripts/vendor-sync.mjs <sync [--only <id>] [--force] | check | notices [--check] | stage --out <dir> | classify --from <dir> [--json | --markdown] | confirm --from <dir> | apply --from <dir>> [--root <dir>]';
+const USAGE = 'Usage: node scripts/vendor-sync.mjs <sync [--only <id>] [--force] | check | notices [--check] | stage --out <dir> | classify --from <dir> [--json | --markdown] | confirm --from <dir> | apply --from <dir> | review --from <dir> --out <file> | gate --classification <file> --review <file> --labels <file> --proposed-at <iso>> [--root <dir>]';
 
 /**
  * Run git with an argument list and return stdout as text, or as a Buffer when `buffer` is set.
@@ -912,16 +918,22 @@ export function compareParts(part, before, oldFiles, after, newFiles) {
   if (edited.includes('LICENSE') || !sameJson(before.license, after.license)) reasons.push(`${label}: changes its licence`);
   if (before.name !== after.name) reasons.push(`${label}: renames its skill from ${before.name} to ${after.name}`);
   const changes = new Map();
+  const summaries = new Set();
+  const texts = [];
   for (const file of edited) {
     if (file === 'LICENSE') continue;
     const oldText = decode(oldFiles.get(file) ?? Buffer.alloc(0));
     const newText = decode(newFiles.get(file) ?? Buffer.alloc(0));
     if (oldText === null || newText === null) {
       reasons.push(`${label}: edits ${file}, which is not UTF-8 text`);
+      texts.push({ path: file, before: null, after: null, addedLines: [], removed: 0 });
     } else {
       const change = lineChanges(oldText, newText);
       changes.set(file, change);
-      reasons.push(`${label}: edits ${file} (+${change.added.length} -${change.removed} lines)`);
+      const summary = `${label}: edits ${file} (+${change.added.length} -${change.removed} lines)`;
+      summaries.add(summary);
+      reasons.push(summary);
+      texts.push({ path: file, before: oldText, after: newText, addedLines: change.added, removed: change.removed });
     }
     if (isScript(file, oldList.get(file), oldText) || isScript(file, newList.get(file), newText)) reasons.push(`${label}: edits the script ${file}`);
     if (part.appleText.some((quote) => quote.file === file)) reasons.push(`${label}: edits ${file}, which holds Apple text listed in appleText`);
@@ -934,7 +946,8 @@ export function compareParts(part, before, oldFiles, after, newFiles) {
   }
   const known = knownLinks(oldFiles);
   for (const file of [...changes.keys()].sort(compareStrings)) reasons.push(...addedSignals(label, file, changes.get(file), known));
-  return { reasons, files: { added, removed, edited, modes } };
+  const blockers = reasons.filter((reason) => !summaries.has(reason));
+  return { reasons, blockers, edits: texts, files: { added, removed, edited, modes } };
 }
 
 function plain(text, limit = 300) {
@@ -962,26 +975,44 @@ function blockedSources(staged) {
  * message for the pull request.
  */
 export function classifyUpdate(root, staged) {
+  return gateMaterial(root, staged).result;
+}
+
+/**
+ * classifyUpdate's result together with the old and new text of every edited file, which the review reads. The
+ * result's gate says whether the update can take the review gate of scripts/lib/vendor-review.mjs and carries the
+ * digest of exactly these bytes.
+ */
+export function gateMaterial(root, staged) {
   const view = readStaged(root, staged);
   if (view.problems.length) throw new Error(`The staged update in ${staged} cannot be used:\n- ${view.problems.join('\n- ')}`);
   const reasons = [];
   const parts = [];
+  const gateParts = [];
+  const edits = [];
   for (const part of view.parts) {
     const before = loadUpstream(root, part.id).record;
     const after = loadUpstream(staged, part.id).record;
     if (!before || !Array.isArray(before.files)) {
-      reasons.push(`${part.id}: has no usable UPSTREAM.json in the tree to compare with`);
+      const reason = `${part.id}: has no usable UPSTREAM.json in the tree to compare with`;
+      reasons.push(reason);
+      gateParts.push({ id: part.id, blockers: [reason] });
       continue;
     }
     const result = compareParts(part, before, partFiles(root, part.id, before), after, partFiles(staged, part.id, after));
     reasons.push(...result.reasons);
     parts.push({ id: part.id, ...result.files });
+    gateParts.push({ id: part.id, blockers: result.blockers });
+    edits.push(...result.edits.map((edit) => ({ part: part.id, ...edit })));
   }
   const commitOf = (manifest, repo) => manifest.parts.find((part) => part.repo === repo).commit;
   const sources = [...view.moved].map((repo) => ({ repo, from: commitOf(view.current, repo), to: commitOf(view.next, repo), parts: view.parts.filter((part) => part.repo === repo).map((part) => part.id) }));
   const title = `chore(vendor): sync ${sources.length === 1 ? sources[0].repo : `${sources.length} upstream sources`}`;
   const message = `${title}\n\n${sources.map((source) => `${source.repo} ${short(source.from)}..${short(source.to)}`).join('\n')}\n`;
-  return { verdict: reasons.length ? 'needs-review' : 'safe', reasons, sources, parts, blocked: blockedSources(staged), title, message };
+  const verdict = reasons.length ? 'needs-review' : 'safe';
+  const eligibility = gateEligibility({ sources, parts: gateParts, edits });
+  const gate = { ...eligibility, eligible: verdict !== 'safe' && eligibility.eligible };
+  return { result: { verdict, reasons, sources, parts, gate, blocked: blockedSources(staged), title, message }, edits };
 }
 
 /**
@@ -1012,8 +1043,11 @@ export function renderProposal(result) {
   lines.push('');
   if (result.verdict === 'safe') {
     lines.push('### Verdict: safe', '', 'No file that ships in these parts changed: upstream moved past the pins without touching them, so only the pins, the records and the generated credits move. The workflow runs the CI workflow on this branch and merges this pull request only when every job passes on its head commit and main has not moved.');
+  } else if (result.gate?.eligible) {
+    lines.push('### Verdict: needs review (review gate)', '', ...result.reasons.map((reason) => `- \`${plain(reason)}\``), '', `Every change edits an existing Markdown file within the review gate's limits, and no review pattern flagged a line. The workflow merges this pull request without the owner only when all of these hold: the pinned model \`${REVIEW_MODEL}\` read the old and new text as untrusted data and approved this exact diff (digest \`${short(result.gate.digest)}\`) with no concern; the same tree has waited at least ${HOLD_DAYS} days on this branch; nobody added the \`${HOLD_LABEL}\` label; and CI passes on the head commit while main has not moved. Add \`${HOLD_LABEL}\` to keep the decision, or merge or close it yourself at any time.`);
   } else {
     lines.push('### Verdict: needs review', '', ...result.reasons.map((reason) => `- \`${plain(reason)}\``), '', 'The workflow never merges this pull request. Agents read and run these files with the user\'s permissions, so every change to them waits for the owner, who compares this pull request with the upstream diff linked above. The workflow also starts the CI workflow on this branch.');
+    if (result.gate?.blockers?.length && result.reasons.length) lines.push('', 'Outside the review gate because:', '', ...result.gate.blockers.slice(0, 20).map((reason) => `- \`${plain(reason)}\``));
   }
   if (result.blocked.length) {
     lines.push('', '### Blocked sources', '', 'These sources moved too, but stay at their pins until someone looks at them:', '');
@@ -1045,7 +1079,7 @@ export function applyUpdate(root, staged) {
 
 function parseArgs(argv) {
   const [command, ...rest] = argv;
-  const options = { command, only: null, force: false, check: false, out: null, from: null, format: 'text', root: ROOT };
+  const options = { command, only: null, force: false, check: false, out: null, from: null, format: 'text', classification: null, review: null, labels: null, proposedAt: null, root: ROOT };
   for (let index = 0; index < rest.length; index += 1) {
     const flag = rest[index];
     const value = () => {
@@ -1057,16 +1091,32 @@ function parseArgs(argv) {
     if (flag === '--only' && command === 'sync') options.only = value();
     else if (flag === '--force' && command === 'sync') options.force = true;
     else if (flag === '--check' && command === 'notices') options.check = true;
-    else if (flag === '--out' && command === 'stage') options.out = path.resolve(value());
-    else if (flag === '--from' && (command === 'classify' || command === 'confirm' || command === 'apply')) options.from = path.resolve(value());
+    else if (flag === '--out' && (command === 'stage' || command === 'review')) options.out = path.resolve(value());
+    else if (flag === '--from' && FROM_COMMANDS.includes(command)) options.from = path.resolve(value());
+    else if (flag === '--classification' && command === 'gate') options.classification = path.resolve(value());
+    else if (flag === '--review' && command === 'gate') options.review = path.resolve(value());
+    else if (flag === '--labels' && command === 'gate') options.labels = path.resolve(value());
+    else if (flag === '--proposed-at' && command === 'gate') options.proposedAt = value();
     else if ((flag === '--json' || flag === '--markdown') && command === 'classify' && options.format === 'text') options.format = flag.slice(2);
     else if (flag === '--root') options.root = path.resolve(value());
     else throw new Error(`Unknown argument: ${flag}\n${USAGE}`);
   }
-  if (!['sync', 'check', 'notices', 'stage', 'classify', 'confirm', 'apply'].includes(command)) throw new Error(USAGE);
+  if (!['sync', 'check', 'notices', 'stage', 'gate', ...FROM_COMMANDS].includes(command)) throw new Error(USAGE);
   if (command === 'stage' && !options.out) throw new Error(`stage needs --out <dir>\n${USAGE}`);
-  if ((command === 'classify' || command === 'confirm' || command === 'apply') && !options.from) throw new Error(`${command} needs --from <dir>\n${USAGE}`);
+  if (command === 'review' && !options.out) throw new Error(`review needs --out <file>\n${USAGE}`);
+  if (FROM_COMMANDS.includes(command) && !options.from) throw new Error(`${command} needs --from <dir>\n${USAGE}`);
+  if (command === 'gate' && (!options.classification || !options.review || !options.labels || !options.proposedAt)) throw new Error(`gate needs --classification, --review, --labels and --proposed-at\n${USAGE}`);
   return options;
+}
+
+const FROM_COMMANDS = ['classify', 'confirm', 'apply', 'review'];
+
+function readOptionalJson(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 async function main(argv) {
@@ -1103,6 +1153,27 @@ async function main(argv) {
     } else {
       out(`Confirmed ${result.parts.length} part(s) of ${result.sources.join(', ')} against upstream.`);
     }
+    return;
+  }
+  if (options.command === 'review') {
+    const material = gateMaterial(options.root, options.from);
+    const record = await runReview({ sources: material.result.sources, gate: material.result.gate, edits: material.edits }, { apiKey: process.env.ANTHROPIC_API_KEY });
+    fs.mkdirSync(path.dirname(options.out), { recursive: true });
+    writeRegular(options.out, formatJson(record));
+    if (record.status === 'reviewed') out(`Review by ${record.model}: ${record.verdict}${record.concerns.length ? ` with ${record.concerns.length} concern(s)` : ''}.`);
+    else out(`Review ${record.status}: ${(record.reasons ?? []).map((reason) => plain(reason)).join('; ')}`);
+    if (record.status === 'error') process.exitCode = 1;
+    return;
+  }
+  if (options.command === 'gate') {
+    const labels = readOptionalJson(options.labels);
+    const decision = gateDecision({
+      classification: readOptionalJson(options.classification),
+      review: readOptionalJson(options.review),
+      labels: Array.isArray(labels) && labels.every((label) => typeof label === 'string') ? labels : [HOLD_LABEL],
+      proposedAt: options.proposedAt,
+    });
+    out(JSON.stringify(decision));
     return;
   }
   if (options.command === 'apply') {
