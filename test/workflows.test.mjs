@@ -57,8 +57,8 @@ function runScripts(text) {
   return scripts;
 }
 
-test('the six workflows exist', () => {
-  assert.deepEqual(files, ['badges.yml', 'bundle-sync.yml', 'ci.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
+test('the seven workflows exist', () => {
+  assert.deepEqual(files, ['badges.yml', 'bundle-sync.yml', 'ci.yml', 'freshness.yml', 'release.yml', 'vendor-sync.yml', 'verify.yml']);
 });
 
 test('every action is pinned to a full commit SHA with a version comment, the same pin everywhere', () => {
