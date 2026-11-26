@@ -1,0 +1,109 @@
+{
+  "skill_name": "apple",
+  "part": "desktop-distribution",
+  "description": "Part evals for desktop-distribution in the skill-creator schema, plus checks: the rule ids of rules.json each case exercises. Each expectation starts with a bracketed tag, a rule id or a short name. Each case runs with and without the apple skill on Claude Code and Codex; files are copied into the root of an empty project first.",
+  "evals": [
+    {
+      "id": 41,
+      "name": "helper-other-team",
+      "prompt": "Our Mac app Relay starts a helper described in Relay.app/Contents/Resources/helper.json, and the app's listener refuses it (see logs/relay.log). codesign-node.txt is what codesign printed for the node it runs. The same helper works when I start it by hand. Why is it refused, and what should we change?",
+      "expected_output": "A diagnosis that the helper runs a node from Homebrew that is not signed by the app's team, so the listener's team check refuses it; the fix is to bundle node inside the app, sign it with the app's Developer ID and start it by its bundled path, then check with probe-app.mjs and the app's log.",
+      "files": [
+        "files/41-helper-other-team/Relay.app/Contents/Resources/helper.json",
+        "files/41-helper-other-team/Relay.app/Contents/Resources/helper/main.js",
+        "files/41-helper-other-team/logs/relay.log",
+        "files/41-helper-other-team/codesign-node.txt"
+      ],
+      "expectations": [
+        "[DD-TEAM-01] It names the cause: the helper starts /opt/homebrew/bin/node, ad hoc signed with no team, while the listener accepts only the app's team.",
+        "[fix] It bundles the runtime inside the app, signs it inside out with the app's identity (hardened runtime, timestamp), and changes helper.json to the bundled path.",
+        "[verify] It verifies with codesign --verify --deep --strict and the team identifiers (probe-app.mjs or equivalent) and with the app's own log, not only by starting the helper by hand.",
+        "[no-guess] It does not loosen the listener's team check to make the helper pass."
+      ],
+      "checks": [
+        "DD-TEAM-01",
+        "DD-SIGN-01"
+      ]
+    },
+    {
+      "id": 42,
+      "name": "installer-review",
+      "prompt": "People install Relay with curl -fsSL https://example.com/install.sh | bash, using install.sh. Review it and fix it so it is safe to publish.",
+      "expected_output": "A rewritten installer that downloads over https, compares the SHA-256 with a pinned value, verifies the app with codesign --verify --deep --strict, stages it with ditto and swaps it in with two renames, removes quarantine with /usr/bin/xattr only from the verified copy, and registers it with lsregister; checked with check-installer.mjs.",
+      "files": [
+        "files/42-installer-review/install.sh"
+      ],
+      "expectations": [
+        "[DD-INSTALL-01] The download uses https and the archive SHA-256 is compared with a pinned value before unpacking, stopping on a mismatch.",
+        "[DD-INSTALL-02] The unpacked app is verified with codesign --verify --deep --strict before it replaces the installed copy.",
+        "[DD-INSTALL-03] It no longer deletes the installed app first or copies over it: it stages with ditto and swaps with two renames, restoring the old copy if the swap fails.",
+        "[DD-WARN-XATTR] Quarantine is removed with /usr/bin/xattr, after the checks, only from the verified copy.",
+        "[check] It runs check-installer.mjs (or makes the same checks) on the result and reports the summary."
+      ],
+      "checks": [
+        "DD-INSTALL-01",
+        "DD-INSTALL-02",
+        "DD-INSTALL-03",
+        "DD-WARN-XATTR"
+      ]
+    },
+    {
+      "id": 43,
+      "name": "cask-upgrade",
+      "prompt": "Our tap has Casks/relay.rb. brew style complains, and after every brew upgrade Relay no longer starts at login. Relay updates itself with Sparkle (Relay/Info.plist). Fix the cask.",
+      "expected_output": "A cask without the postflight Ruby block, whose uninstall only quits the app while the login item and the Application Support folder move to zap, with auto_updates true; checked with check-cask.mjs --self-updating and brew style --cask.",
+      "files": [
+        "files/43-cask-upgrade/Casks/relay.rb",
+        "files/43-cask-upgrade/Relay/Info.plist"
+      ],
+      "expectations": [
+        "[DD-CASK-01] The postflight do ... end block is removed or replaced by the declarative install-step stanza, and it says to confirm the stanza with brew style --cask.",
+        "[DD-CASK-02] It explains that brew upgrade runs uninstall, and moves login_item and the ~/Library delete into zap.",
+        "[DD-CASK-03] It adds auto_updates true because the app updates itself with Sparkle.",
+        "[check] It runs check-cask.mjs --self-updating (or the same checks) and names brew style --cask and brew audit --cask as the authority."
+      ],
+      "checks": [
+        "DD-CASK-01",
+        "DD-CASK-02",
+        "DD-CASK-03"
+      ]
+    },
+    {
+      "id": 44,
+      "name": "feed-first-build",
+      "prompt": "Users on Apple silicon Macs say Relay never updates past the version they installed, while Intel Macs and Windows update fine. Our release job writes dist/latest.json and runs scripts/check-release.mjs. What is wrong and how do we stop it happening again?",
+      "expected_output": "A diagnosis that the feed has no darwin-aarch64 entry although the aarch64 archive and signature were built, and that the release check only requires platforms already served, so it can never require the first; the fix adds the entry and changes the gate to require every built platform, checked with check-feed.mjs --platforms.",
+      "files": [
+        "files/44-feed-first-build/dist/latest.json",
+        "files/44-feed-first-build/dist/files.txt",
+        "files/44-feed-first-build/scripts/check-release.mjs",
+        "files/44-feed-first-build/served-platforms.json"
+      ],
+      "expectations": [
+        "[DD-FEED-01] It finds that latest.json lacks darwin-aarch64 while files.txt lists the aarch64 archive and its .sig, and adds the entry with the https url and the signature.",
+        "[gate] It changes check-release.mjs to require every platform the job built, not the ones already served, and explains why the served list never gains a platform.",
+        "[check] It runs check-feed.mjs with --platforms naming every built platform (or makes the same check)."
+      ],
+      "checks": [
+        "DD-FEED-01"
+      ]
+    },
+    {
+      "id": 45,
+      "name": "adhoc-download",
+      "prompt": "We sign our Mac app ad hoc and put the zip on our website. People who download it get a message that it cannot be opened. Should our install page just tell them to use Open Anyway in System Settings?",
+      "expected_output": "No: a Developer ID build that is notarized and stapled is the way to give a download to other people; an ad hoc build is only for the developer's Macs or a checksum-checking curl installer. It explains quarantine, how to check the result with spctl, and hands notarization to the notarization row.",
+      "files": [],
+      "expectations": [
+        "[DD-WARN-ADHOC] It does not recommend Open Anyway as the install path and explains that the browser download carries the quarantine flag that Gatekeeper checks.",
+        "[DD-GATE-01] It recommends a Developer ID build with the hardened runtime and a timestamp, notarized and stapled, and checking it with spctl --assess (probe-app.mjs).",
+        "[routing] It hands submitting to the notary service to the notarization row and asks for explicit approval before any submit.",
+        "[alternative] If notarization is not possible yet, it offers the checksum-checking curl installer for people who accept it, and says what that does not protect."
+      ],
+      "checks": [
+        "DD-GATE-01",
+        "DD-WARN-ADHOC"
+      ]
+    }
+  ]
+}

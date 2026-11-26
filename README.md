@@ -104,6 +104,12 @@ skills/
       assets/                a login page with a session cookie, remote-shell configs for Capacitor and Tauri, a web app manifest,
                              and the offline page that is all a remote shell's webDir or frontendDist should hold
       scripts/               check-shell.mjs (the origin a shell loads), probe-webkit.mjs (WebKit sign-in and cookie probe)
+    desktop-distribution/    own part: shipping a Mac app outside the App Store
+      PART.md                the guide the router sends to
+      references/            signing and Gatekeeper, installers and disk images, Homebrew casks, update feeds and build machines,
+                             generated evidence
+      assets/                a checksum-checking curl installer, a cask for a self-updating app, an update feed for every platform
+      scripts/               probe-app.mjs (read-only codesign and spctl probe), check-installer.mjs, check-cask.mjs, check-feed.mjs
     .vendor/                 third-party parts, byte-for-byte at pinned commits
       <part>/
         SKILL.md ...         upstream files, unmodified
@@ -155,7 +161,7 @@ The same constraint shapes the rest of the tree: each skill's own `skills/<name>
 
 The router reads a part's `SKILL.md` in full, resolves each relative path a part mentions against the folder of the file that mentions it (then the part's own folder), checks inactive parts' activation first, and applies the errata recorded in its `UPSTREAM.json`.
 
-### Own parts (6)
+### Own parts (7)
 
 Written for this project and released under its MIT licence. Each has a `PART.md` guide; a part with checkers has error rules in `rules.json` that they enforce, and a pass and a fail fixture for every error rule.
 
@@ -166,6 +172,7 @@ Written for this project and released under its MIT licence. Each has a `PART.md
 | `launch-video` | Demo clips rendered from code, never screen recordings: whether a still or a live replica is enough, an HTML and CSS rebuild of the UI rendered frame by frame at 2x, H.264, VP9, AV1 and transparent encodes with a frame-0 start image, and a lazy embed that starts late, plays one clip at a time and can be paused. 7 error rules and 8 warnings | Node 22 or later; ffmpeg and ffprobe; Playwright with Chromium in the user's project; macOS outside an agent sandbox for HEVC with alpha |
 | `menubar-widgets` | macOS menu bar apps and WidgetKit widgets: whether a menu or a window is enough, status items that redraw only when light or dark changes, Edit Widget options through AppIntentConfiguration, stale extension processes after a self-update, offscreen widget snapshots with byte baselines, and testing beside the installed copy. 5 error rules and 6 warnings | Node 22 or later; on macOS, Swift for the snapshot checks (they skip elsewhere); `ps` and `lsof` for the read-only probe |
 | `web-shells` | Web apps on iPhone, iPad and Mac: a home-screen web app or a Capacitor or Tauri shell, the origin a built shell really loads, sign-in with a login page and a session cookie instead of HTTP Basic Auth, and cookies in WebKit tests. 5 error rules and 4 warnings | Node 22 or later; Playwright with WebKit in the user's project for the probe; openssl for its local HTTPS server |
+| `desktop-distribution` | Mac apps shipped outside the App Store: whether a notarized zip is enough, Developer ID against ad hoc signatures, helpers and bundled runtimes signed with the app's team, the notarization handoff, a curl installer that checks the checksum and signature and swaps the app in with two renames, disk images, Homebrew casks that leave login items to zap, and self-update feeds with every platform from the first release. 10 error rules and 8 warnings | Node 22 or later; on macOS, codesign and spctl for the live probe (it skips elsewhere, and a recording works anywhere) |
 | `hig` | Apple's Human Interface Guidelines for native app interfaces on iOS, iPadOS, macOS, watchOS, tvOS and visionOS: an own-words digest of all 158 guideline pages (platforms, foundations, patterns, components, inputs, technologies), each section linked to its page, with a build checklist and a review table that states its proof boundary. Numbered claims cite the ledger | None; the Simulator's Accessibility Inspector, or a device, for the checks code cannot prove |
 
 Known limit, measured in `evals/RESULTS.md`: on Claude Code, apple started on 45 of the 53 routing rows at high effort (the bar is 90 %) and on 40 at medium; for plain knowledge questions such as Swift 6 migration or Swift Testing, Claude Code often answers without starting a skill. Start it by name with `/apple` when the answer should follow this skill. Codex started it on all 53.

@@ -539,6 +539,26 @@
       }
     },
     {
+      "id": "r58",
+      "kind": "row",
+      "row": "Mac apps outside the App Store",
+      "prompt": "Our Mac app is ad hoc signed and people install it with a curl script that just unzips it over the copy in /Applications. Some users end up with a broken app after an update, and our helper process is refused by the app on some Macs. How should the installer and the signing work?",
+      "expect": {
+        "trigger": true,
+        "part": "desktop-distribution"
+      }
+    },
+    {
+      "id": "r59",
+      "kind": "row",
+      "row": "Mac apps outside the App Store",
+      "prompt": "Apple silicon Macs never get our app's self-updates while Intel Macs do, and after brew upgrade our cask also removes the app's login item. Where do we look first and what do we change in the update feed and the cask?",
+      "expect": {
+        "trigger": true,
+        "part": "desktop-distribution"
+      }
+    },
+    {
       "id": "n01",
       "kind": "near-miss",
       "row": "write-swift split",

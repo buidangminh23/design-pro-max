@@ -7,6 +7,13 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Added
 
 - A fourth skill, `skills/uxui-prompt/`: the MIT `lucian-uxui` skill by Seokwoooo (renamed, its CLI reading bundled data first) with the English catalog, tokens and all 480 elements of `lucian-uxui-prompt` bundled under `data/api/v1/`, so search, `get` and `tokens` work offline. `vendor/uxui-prompt.json` pins the commit and records every file; `scripts/uxui-sync.mjs` syncs, updates and checks it, CI runs `check`, and the Bundle sync workflow runs `update`. THIRD_PARTY_NOTICES.md lists it.
+- A seventh own part, `skills/apple/desktop-distribution/`: shipping a Mac app outside the App Store. `PART.md` reads the task and may conclude that a notarized zip is enough, then chooses the channel (Developer ID download, checksum-checking curl installer, Homebrew tap, self-update feed), with hard rules, recipes, build steps, a never-ship list, verify, report and routing; four references (`signing-and-gatekeeper.md`, `installers-and-dmg.md`, `homebrew-casks.md`, `update-feeds-and-builds.md`) and a generated `references/evidence.md`. Notarizing itself stays with the `asc-notarization` row, which this part checks before and after.
+- desktop-distribution templates: `assets/install-macos.sh` (https download, SHA-256 comparison, `codesign --verify --deep --strict`, quarantine removed with `/usr/bin/xattr` from the verified copy only, ditto staging, a two-rename swap with rollback, `lsregister -f` and `pluginkit -a`), `assets/example.rb` (a cask for a self-updating app with `auto_updates true` and login items in `zap`) and `assets/latest.json` (a feed with both Mac platforms).
+- desktop-distribution checkers for 10 error rules and 8 warnings: `scripts/probe-app.mjs` (read-only `codesign` and `spctl` probe of a built app, nested team identifiers, helpers that start a runtime from outside the bundle, build tools ahead of `/usr/bin`; skipped off macOS, and `--record` judges output recorded on another Mac) for DD-SIGN-01, DD-TEAM-01 and DD-GATE-01; `scripts/check-installer.mjs` for DD-INSTALL-01 to DD-INSTALL-03; `scripts/check-cask.mjs` for DD-CASK-01 to DD-CASK-03; `scripts/check-feed.mjs` for DD-FEED-01, with JSON feeds and Sparkle appcasts. 36 fixture cases in `fixtures/desktop-distribution/`, five part evals and two routing rows. Ledger entries IL-19 to IL-23 restate the owner's lessons in own words, with Apple's notarization guide and Homebrew's Cask Cookbook as public sources.
+
+### Changed
+
+- The router's not-covered list no longer lists DMG or curl installers and Sparkle feeds; they route to `desktop-distribution`.
 
 ## [0.2.0] - 2026-11-24
 

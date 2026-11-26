@@ -1,0 +1,6 @@
+Relay-1.4.0-x64.app.tar.gz
+Relay-1.4.0-x64.app.tar.gz.sig
+Relay-1.4.0-aarch64.app.tar.gz
+Relay-1.4.0-aarch64.app.tar.gz.sig
+Relay-1.4.0-setup.exe
+Relay-1.4.0-setup.exe.sig
