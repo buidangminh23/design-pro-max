@@ -37,6 +37,6 @@ CoreSimulator is shared by every Xcode on the Mac, so running `xcodebuild -runFi
 
 ## Screen automation limits
 
-Screen-automation tools can miss Notification Center widgets and cannot click menu bar apps that have no Dock icon (IL-28). Check a widget by reading its snapshot (`../menubar-widgets/PART.md`) or by asking the user to look, not by clicking.
+Screen-automation tools can miss Notification Center widgets and cannot click menu bar apps that have no Dock icon (IL-28). Check a widget by reading its snapshot (`../../menubar-widgets/PART.md`) or by asking the user to look, not by clicking.
 
 Sources: Downloading and installing additional Xcode components: https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components. man simctl is printed by `xcrun simctl help`.
